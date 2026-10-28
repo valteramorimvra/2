@@ -10,3 +10,6 @@
 .mp18 .mpb:not(.primario) .mpi { stroke: #7dd3fc; }
 .tela-inicio > .mp-atalhos .mpb { min-height: 32px; }
 @media (max-height: 380px) { .mp18 { gap: 6px; } .mp18 .mp-2 { gap: 6px; } .mp18 .mp-2 .mpb { min-height: 36px; } }
+/* v1.2.33 — menu inicial reorganizado em grupos (FROTA · APRENDER · JOGO) */
+.mp18 .mp-grupo { font-size: 9.5px; letter-spacing: .18em; color: #7dd3fc; opacity: .8; margin: 4px 0 -3px 2px; font-weight: 700; }
+@media (max-height: 420px) { .mp18 .mp-grupo { display: none; } }
