@@ -6,7 +6,7 @@ import { botaoFantasma } from './ui/fantasma.js';
 import { fichaTecnica, fichaHtml } from './fichaTecnica.js'; /* v1.2.17 item 25 */
 import './styles.css';
 import './ui/telas120.css';
-import './ui/telas1216.css'; import './ui/telas1218.css'; import './ui/telas1221.css';
+import './ui/telas1216.css'; import './ui/telas1218.css'; import './ui/telas1221.css'; import './ui/telas1233.css'; /* v1.2.32/1.2.33: menu */
 import { telaManual1231 } from './ui/manual1231.js'; import { FONTES_1231 } from './ui/fontes1231.js'; /* v1.2.31 item 7: MANUAL organizado */
 import { Tutorial1231, deveOferecerTutorial1231, ofereceTutorial1231 } from './ui/tutorial1231.js'; /* v1.2.31 item 8: tutorial opcional */
 import { NavalCombat3D } from './modernNavalCombat3D.js';

@@ -19,10 +19,11 @@ export class Missil1231Fx {
   passo(dt, sim, a = 1, refDe = null) { const vistos = new Set();
     sim.navios.forEach((n) => { const k = n.nm1231; const m = k && k.m; if (!n.C || !n.C.missilNuclear) return; const ref = refDe ? refDe(n) : null;
       if (ref) abreEscotilha1231(ref, k.voando && m ? m.esc : 0); /* abre → míssil sai → fecha atrás dele */
-      if (!k || !k.voando || !m) return; vistos.add(n.id); const s = this._slot(n.id); const g = s.g; g.visible = m.fase >= 1; const x = m.px + (m.x - m.px) * a, y = m.py + (m.y - m.py) * a, z = m.pz + (m.z - m.pz) * a; g.position.set(x, y, z);
+      if (!k) return; const L = []; if (k.voando && m) L.push([m, n.id]); if (k.ms) for (const mm of k.ms) L.push([mm, n.id + '_' + mm.k]); /* v1.2.33: mísseis anteriores ainda em voo */
+      for (const [m, K] of L) { vistos.add(K); const s = this._slot(K); const g = s.g; g.visible = m.fase >= 1; const x = m.px + (m.x - m.px) * a, y = m.py + (m.y - m.py) * a, z = m.pz + (m.z - m.pz) * a; g.position.set(x, y, z);
       if (m.fase >= 1) { const vv = Math.hypot(m.vx, m.vy, m.vz) || 1; g.lookAt(x + m.vx / vv, y + m.vy / vv, z + m.vz / vv); g.rotateY(Math.PI); /* nariz em −z local → aponta p/ a velocidade */ g.rotation.set(g.rotation.x, g.rotation.y, g.rotation.z); }
       const d = 1 + 0.15 * Math.sin(sim.t * 40); s.ch.scale.set(5 * d, 5 * d, 1); s.lz.intensity = m.fase >= 1 ? 6e4 : 0;
-      s.tAm -= dt; if (s.tAm <= 0 && m.fase >= 1) { s.tAm = 0.08; s.pos.copyWithin(3, 0, (NT - 1) * 3); s.pos[0] = x; s.pos[1] = y; s.pos[2] = z; s.n = Math.min(NT, s.n + 1); s.pts.geometry.attributes.position.needsUpdate = true; s.pts.geometry.setDrawRange(0, s.n); } });
+      s.tAm -= dt; if (s.tAm <= 0 && m.fase >= 1) { s.tAm = 0.08; s.pos.copyWithin(3, 0, (NT - 1) * 3); s.pos[0] = x; s.pos[1] = y; s.pos[2] = z; s.n = Math.min(NT, s.n + 1); s.pts.geometry.attributes.position.needsUpdate = true; s.pts.geometry.setDrawRange(0, s.n); } } });
     for (const [id, s] of this.slots) if (!vistos.has(id)) { s.g.visible = false; if (s.n) { s.n = Math.max(0, s.n - 2); s.pts.geometry.setDrawRange(0, s.n); } if (!s.n) { s.lz.intensity = 0; } } }
   dispose() { for (const s of this.slots.values()) { this.cena.remove(s.g, s.pts); s.pts.geometry.dispose(); } this.slots.clear(); this._tex.dispose(); }
 }

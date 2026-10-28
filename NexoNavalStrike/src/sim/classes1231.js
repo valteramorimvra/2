@@ -19,10 +19,10 @@ export function adiciona1231(CLASSES, { D, CAN, VIDA }) {
     canhao: CAN({ cal: 130, V0: 850, cad: 1.7, dano: 32, alc: 14000, disp: 0.6, torres: 1, canos: 1, som: 'grande' }),
     vls: 64, vlsRe: 0.62, missil: 'longo', salva: 4, sam: 48, torp: 6, tubos: [1, 3], ciws: 2, ciwsLug: [0, 1], a30: 0, laser: 0, chaff: 14, heli: 2, casco: 'convencional', cascoN: 'chn', estilo: 'cruzador', pf: 'ataque', antiAereo: 1, defesaFrota: 1 }));
   CLASSES.nakhimov = D('cruzador', 'nakhimov', Object.assign({}, PREM, { nome: 'Cruzador Nuclear Almirante Nakhimov', classe: 'Classe Orlan modernizada (proj. 11442M)', nomeOriginal: 'Admiral Nakhimov', num: 'CGN 080', est25: 'cruzador',
-    papel: 'Cruzador nuclear de 250 m: 80 UKSK à proa/vante da casaria, 96 Fort-M em 12 tambores, 6 Pantsir-M, canhão A-192M de 130 mm à ré, RBU, torpedos e convoo de ré',
+    papel: 'Cruzador nuclear de 250 m, 100 km/h na velocidade máxima: 80 UKSK à proa/vante da casaria, 96 Fort-M em 12 tambores, 6 Pantsir-M, canhão A-192M de 130 mm à ré, RBU, torpedos e convoo de ré',
     L: S3.L, B: S3.B, T: S3.T, F: 9.8, vmax: S3.vmax, acel: 0.55, giro: 0.6, vida: VIDA(1100), blind: 2.4, rcs: 1.2, radar: 22000, desl: S3.desl,
     canhao: CAN({ cal: 130, V0: 850, cad: 1.7, dano: 32, alc: 14000, disp: 0.6, torres: 1, canos: 1, som: 'grande' }),
-    vls: 80, vlsRe: 0.5, missil: 'hiper', salva: 4, sam: 96, torp: 10, tubos: [1, 5], ciws: 6, ciwsLug: [0, 1, 2, 3, 4, 5], a30: 0, laser: 0, chaff: 14, heli: 2, rbu: 1, casco: 'convencional', cascoN: 'rus', estilo: 'cruzador', pf: 'ataque', antiAereo: 1, defesaFrota: 1 }));
+    vls: 80, vlsRe: 0.5, missil: 'hiper', salva: 4, sam: 96, torp: 10, tubos: [1, 5], ciws: 6, ciwsLug: [0, 1, 2, 3, 4, 5], a30: 0, laser: 0, chaff: 14, heli: 2, rbu: { nome: 'LG-12 Tufao', salvas: 10, foguetes: 12, alc: 5500, min: 300, dano: 30, cad: 14, el: 0.62 } /* v1.2.32: lançador RBU completo */, casco: 'convencional', cascoN: 'rus', estilo: 'cruzador', pf: 'ataque', antiAereo: 1, defesaFrota: 1 }));
 }
 export const META_1231 = { sejong: ['KOR', 4, 'real_kor'], nanchang: ['CHN', 4, 'real_chn'], nakhimov: ['RUS', 4, 'real_rus'] };
 export const NOMES_OURO_1231 = { sejong: 'SEJONG O GRANDE', nanchang: 'NANCHANG', nakhimov: 'ALMIRANTE NAKHIMOV' };

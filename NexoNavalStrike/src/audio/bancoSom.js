@@ -59,10 +59,21 @@ export const RECEITAS = {
       const ton = 0.30 * Math.sin(TAU * 1000 * t * w + 0.5 * Math.sin(TAU * 6 * t)) * (0.7 + 0.3 * Math.sin(TAU * 2 * t)) + 0.20 * Math.sin(TAU * 1510 * t * w + 0.3 * Math.sin(TAU * 5 * t + 1)) * (0.7 + 0.3 * Math.sin(TAU * 3 * t + 2)) + 0.12 * Math.sin(TAU * 2020 * t * w) * tu * 0.5 + 0.07 * Math.sin(TAU * 2760.5 * t * w + 1.3) * tv * 0.5;
       return ton + 1.5 * bp1(n) * tu + 0.9 * bp2(n) * tv + 0.55 * bp3(n) * tu + 0.18 * bp4(n) * tv; }), 0.3); },
   /** IMPACTO DE GRANADA perto: estalo da detonação (HP, 4 ms), estrondo (corpo 120–900 Hz), estilhaços metálicos (BP 3–6 kHz, estalos), coluna d'água caindo (chiado 1,5–5 kHz) e cauda grave. 2,6 s. */
-  'gr:impacto'(sr) { const N = Math.round(sr * 2.6), r = rng(97), hp = bq('hp', 2500, 0.7, sr), bpB = bq('bp', 420, 0.6, sr), bpE = bq('bp', 4200, 1.5, sr), bpA = bq('bp', 2600, 0.5, sr), lp = bq('lp', 260, 0.8, sr), u = rng(98), a = new Float32Array(N); let est = 0;
-    for (let i = 0; i < N; i++) { const t = i / sr, n = r(); let s = 2.2 * hp(n) * Math.exp(-t / 0.004) + 2.4 * bpB(n) * Math.exp(-t / 0.16) * Math.min(1, t / 0.0015) + 1.0 * Math.sin(TAU * (70 - 35 * Math.min(1, t / 0.5)) * t) * Math.exp(-t / 0.35);
-      est = Math.max(est * 0.993, t < 0.6 && (u() * 0.5 + 0.5) < 0.002 * (1 - t / 0.6) ? 0.5 + 0.5 * Math.abs(u()) : 0); s += bpE(n) * est * 1.4; s += 1.1 * bpA(n) * (t > 0.25 ? Math.min(1, (t - 0.25) / 0.3) * Math.exp(-(t - 0.25) / 0.7) : 0); s += 1.6 * lp(n) * Math.exp(-t / 0.9); a[i] = s; }
-    return normaliza(a, 0.2); },
+  /* v1.2.33: granada REALISTA sem pico — estalo da onda de choque (pulso N), corpo médio, baque grave, rolamento, coluna d'água (spray) e gotas caindo; tanh segura o transiente */
+  'gr:impacto'(sr) { const N = Math.round(sr * 2.8), r = rng(97), u = rng(98), hp = bq('hp', 1800, 0.7, sr), bpM = bq('bp', 650, 0.7, sr), lp = bq('lp', 220, 0.7, sr), lp2 = bq('lp', 110, 0.7, sr), bpS = bq('bp', 2400, 0.6, sr), bpG = bq('bp', 3600, 1.4, sr), a = new Float32Array(N); let gota = 0;
+    for (let i = 0; i < N; i++) { const t = i / sr, n = r(); let s = 1.3 * hp(n) * Math.exp(-t / 0.0025);
+      s += t < 0.004 ? 1.1 * Math.sin(Math.PI * t / 0.004) : t < 0.009 ? -0.55 * Math.sin(Math.PI * (t - 0.004) / 0.005) : 0; /* onda N */
+      s += 1.6 * bpM(n) * Math.exp(-t / 0.07) * Math.min(1, t / 0.001); s += 1.1 * Math.sin(TAU * (62 - 30 * Math.min(1, t / 0.4)) * t) * Math.exp(-t / 0.28) * Math.min(1, t / 0.002);
+      s += 1.2 * lp(n) * Math.exp(-t / 0.45); s += 0.9 * lp2(n) * Math.exp(-t / 1.1) * Math.min(1, t / 0.05);
+      s += 1.0 * bpS(n) * (t > 0.14 ? Math.min(1, (t - 0.14) / 0.22) * Math.exp(-(t - 0.14) / 0.75) : 0); /* coluna d'água */
+      gota = Math.max(gota * 0.992, t > 0.5 && t < 2.4 && (u() * 0.5 + 0.5) < 0.0016 * (1 - (t - 0.5) / 1.9) ? 0.4 + 0.6 * Math.abs(u()) : 0); s += 0.9 * bpG(n) * gota;
+      a[i] = Math.tanh(s * 0.9); }
+    return normaliza(a, 0.16); },
+  /* v1.2.33: pás do helicóptero (blade slap 17,5 Hz = rotor de 4 pás a ~262 rpm), rotor de cauda (100 Hz) e assobio da turbina — laço de 2 s exato (frequências inteiras no período) */
+  heli_pas_loop(sr) { const N = Math.round(sr * 2), r = rng(4517), B = bq('bp', 380, 0.9, sr), B2 = bq('bp', 900, 1.2, sr), Lp = bq('lp', 140, 0.7, sr), Hc = bq('bp', 5200, 6, sr), a = new Float32Array(N);
+    for (let i = 0; i < N; i++) { const t = i / sr, n = r(), fa = (t * 17.5) % 1, pa = Math.exp(-fa / 0.05) * Math.min(1, fa / 0.004), ft = (t * 100) % 1, tr = Math.exp(-ft / 0.18);
+      a[i] = 1.5 * B(n) * pa + 0.55 * B2(n) * pa * pa + 0.9 * Math.sin(TAU * 35 * t) * pa + 0.5 * Lp(n) * (0.6 + 0.4 * pa) + 0.16 * Math.sin(TAU * 100 * t) * tr + 0.08 * Math.sin(TAU * 200 * t + 0.7) * tr + 0.05 * Hc(n); }
+    return normaliza(a, 0.22); },
 };
 /** Gera o banco em fatias (cede a UI entre receitas). criaBuf(nome, Float32Array) recebe cada uma pronta. Devolve ms gastos. */
 export async function geraBanco(sr, criaBuf, nomes = Object.keys(RECEITAS)) { const t0 = performance.now(); for (const n of nomes) { await new Promise((ok) => setTimeout(ok, 0)); try { criaBuf(n, RECEITAS[n](sr)); } catch (e) { criaBuf(n, null, e); } } return Math.round(performance.now() - t0); }

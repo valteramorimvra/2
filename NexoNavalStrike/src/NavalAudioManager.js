@@ -32,8 +32,11 @@ export class NavalAudioManager extends NavalAudio {
   limpaLacos() { if (!this.ctx) return; const t = this.ctx.currentTime; for (const [k, L] of this.laços) { if (L.mx) { if (t - L.ult > 0.5 && L.v !== 0) { L.v = 0; this.mixL.node.port.postMessage({ t: 'g', s: L.s, g: 0 }); } if (t - L.ult > 1.2) { this.mixL.node.port.postMessage({ t: 'stop', s: L.s }); this.mixL.uso[L.s] = 0; this.laços.delete(k); } continue; } if (t - L.ult > 0.5) { L.g.gain.setTargetAtTime(0, t, 0.1); if (t - L.ult > 1.2) { try { L.s.stop(); } catch (e) {} this.laços.delete(k); } } } }
   /** Helicóptero/VANT: rotor + turbina com atenuação pela distância e Doppler pela velocidade radial (m/s, + = afastando). */
   rotor(chave, d, pan, vRad, vant = 0) { const at = 1 / (1 + d / 260); const dop = 343 / (343 + vRad); const lp = d > 1500 ? Math.max(700, 6000 - d) : 0;
-    if (vant) { this.laco(chave, 'heli_turbina_loop', at * 0.12, pan, 1.6 * dop, lp); return; }
-    this.laco(chave + 'r', 'heli_rotor_loop', at * 0.75, pan, dop, lp); this.laco(chave + 't', 'heli_turbina_loop', at * 0.28, pan, dop * 1.05, lp); }
+    const pas = this._heliPas(); /* v1.2.33: camada das pás batendo no ar + rotor de cauda (audio/bancoSom.js heli_pas_loop) */
+    if (vant) { this.laco(chave, 'heli_turbina_loop', at * 0.12, pan, 1.6 * dop, lp); if (pas) this.laco(chave + 'p', 'heli_pas_loop', at * 0.16, pan, dop, lp || 900); return; }
+    this.laco(chave + 'r', 'heli_rotor_loop', at * 0.62, pan, dop, lp); this.laco(chave + 't', 'heli_turbina_loop', at * 0.24, pan, dop * 1.05, lp); if (pas) this.laco(chave + 'p', 'heli_pas_loop', at * 0.5, pan, dop, lp); }
+  /** v1.2.33: publica o laço sintetizado das pás como buffer de laço (pool nativo e mixer de laços). */
+  _heliPas() { if (this.buf.heli_pas_loop) return 1; const b = this.banco && this.banco.heli_pas_loop; if (!b) return 0; this.buf.heli_pas_loop = b; if (this.mixL) this._envia(this.mixL, 'heli_pas_loop', b); return 1; }
   /** v1.2.17 item 32: NAVEGAÇÃO de OUTRO navio próximo (até 3): máquina (diesel/turbina conforme a classe; rotação ∝ velocidade e tamanho) + casco na água (ruído grave, abafa com a distância). */
   navegacaoOutro(i, C, fv, d, pan) { const K = this._kNav || (this._kNav = Array.from({ length: 64 }, (_, k) => ['nvm' + k, 'nva' + k])), k = K[i & 63]; const P = this.perfilNav(C), at = 1 / (1 + d / 220), v = Math.min(1, Math.abs(fv));
     const lp = Math.max(500, 9000 / (1 + d / 400)); this.laco(k[0], P.tipo === 'diesel' || P.tipo === 'codog' && v < 0.55 ? 'motor_diesel_loop' : 'turbina_loop', d > 1600 ? 0 : at * (0.1 + v * 0.22), pan, (0.7 + v * 0.55) * Math.min(1.25, Math.max(0.75, Math.sqrt(P.s))), lp);

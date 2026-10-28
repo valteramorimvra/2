@@ -9,6 +9,8 @@
 import * as THREE from 'three';
 import { FASE } from './sim/world.js';
 import { alturaMar } from './sim/ocean.js';
+/** v1.2.33: acumulador de ritmo (traçantes/s) — no máx. 1 por quadro, sem sorteio. */
+function ritmoAA(st, dt, r) { st._ac = (st._ac || 0) + dt * r; if (st._ac >= 1) { st._ac = Math.min(1, st._ac - 1); return true; } return false; }
 export { passoHidro, raioGiro, raioMin, arrasto, eficaciaLeme, acel0, HIDRO } from './naval5v5/hidro.js';
 export { passoArmas5, torreCobre, torresQueCobrem, AUTO } from './naval5v5/armas.js';
 export { CIWS, A30, DEF, POOL5, probCiws, pA30 } from './naval5v5/defesa.js';
@@ -44,6 +46,12 @@ export class Naval5v5 {
   local(n, lx, ly, lz, o) { const c = Math.cos(n.rumo), s = Math.sin(n.rumo); o.x = n.x + lx * c - lz * s; o.y = ly + n.arfagem; o.z = n.z + lx * s + lz * c; return o; }
 
   /** Chamado a cada quadro, depois do passo da simulação. */
+  /** v1.2.33: raio laser fino (designador) de um reparo antiaéreo que está disparando — pool de 24, aditivo, sem luz. */
+  laserAA(p, st, cam) { if (!this._lz) { const P = this.feixes[0] && this.feixes[0].parent; if (!P) return; this._lz = []; const M = new THREE.MeshBasicMaterial({ color: '#ff2f2f', transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }), G = new THREE.CylinderGeometry(0.05, 0.05, 1, 5, 1, true).translate(0, 0.5, 0).rotateX(Math.PI / 2);
+      for (let k = 0; k < 24; k++) { const x = new THREE.Mesh(G, M); x.visible = false; x.frustumCulled = false; P.add(x); this._lz.push(x); } this._lzV = new THREE.Vector3(); }
+    if ((this._lzN | 0) >= this._lz.length) return; const g = this._lz[this._lzN | 0], L = Math.hypot(st.tx - p.x, st.ty - p.y, st.tz - p.z) || 1; this._lzN = (this._lzN | 0) + 1;
+    g.visible = true; g.position.set(p.x, p.y, p.z); g.lookAt(this._lzV.set(st.tx, st.ty, st.tz)); const s = (0.8 + Math.min(1.4, Math.hypot(p.x - cam.x, p.z - cam.z) / 1800)) * (0.85 + 0.3 * Math.random()); g.scale.set(s, s, L); }
+  laserAAFim() { if (!this._lz) return; for (let k = this._lzN | 0; k < this._lz.length; k++) this._lz[k].visible = false; this._lzN = 0; }
   quadro(dt) {
     const j = this.j, sim = j.S.sim, fx = j.fx, cp = j.cam.position; const o = this._o || (this._o = { x: 0, y: 0, z: 0 });
     // SAMs
@@ -55,18 +63,18 @@ export class Naval5v5 {
       if (Math.random() < 0.6) { const fx2 = Math.sin(l.rumo), fz2 = -Math.cos(l.rumo); fx.borrifo(l.x + fx2 * 6, l.z + fz2 * 6, fx2 * l.v * 0.4 + (Math.random() - 0.5) * 6, fz2 * l.v * 0.4 + (Math.random() - 0.5) * 6, 0.5); fx.bolhas(l.x - fx2 * 8, l.z - fz2 * 8); }
       if (l.fogo && Math.random() < 0.35) { const a = sim.navios[l.alvo]; if (a) { const dx = a.x - l.x, dz = a.z - l.z, d = Math.hypot(dx, dz); fx.tracante(l.x + Math.sin(l.rumo) * 4, y + 1.8, l.z - Math.cos(l.rumo) * 4, dx / d, 0.012, dz / d, 1, d / 1000 + 0.05); } } }
     // reparos de 30 mm e CIWS: pontaria, traçantes e áudio
-    let perto = 1e9, pan = 0; const red = (j.save && j.save.ajustes.efDefesa) !== 'normal'; fx.trReduzido = red; /* v1.2.1 Efeitos de defesa: reduzido (padrão) | normal */
+    let perto = 1e9, pan = 0; const red = (j.save && j.save.ajustes.efDefesa) !== 'normal'; fx.trReduzido = red; /* v1.2.1 Efeitos de defesa: reduzido (padrão) | normal */ this._lzN = 0;
     for (let k = 0; k < sim.navios.length; k++) { const n = sim.navios[k], r = j.navios[k]; if (!r) continue;
       if (n.sec && r.sec) for (let a = 0; a < n.sec.length; a++) { const R = r.sec[a]; if (R) { R.g.rotation.y = -n.sec[a].az; if (R.el) R.el.rotation.x = n.sec[a].el; } } /* v1.2.18 item 14d: secundárias giram/elevam */
       for (let a = 0; a < n.a30.length; a++) { const st = n.a30[a], R = r.a30[a]; if (R) { R.g.rotation.y = -st.az; R.cab.rotation.x = st.el; } if (!st.fogo) continue; const pm = n.P.a30[a]; this.local(n, pm.x, pm.y, pm.z, o);
-        if (Math.random() < 0.33 /* v1.2.15: −15% */ && (!red || ((st._k = (st._k || 0) + 1) % 5 === 0))) /* v1.2.14: −30% */ { const dx = st.tx - o.x, dy = st.ty - o.y, dz = st.tz - o.z, d = Math.hypot(dx, dy, dz) || 1; fx.tracante(o.x, o.y, o.z, dx / d + (Math.random() - 0.5) * 0.02, dy / d + (Math.random() - 0.5) * 0.02, dz / d + (Math.random() - 0.5) * 0.02, 1, Math.min(1.6, d / 1000 + 0.1)); }
+        if (a % 2 === 1) this.laserAA(o, st, cp); /* v1.2.33: laser fino nos reparos pares (2º, 4º…) */ if (ritmoAA(st, dt, red ? 4 : 16)) /* v1.2.33: traçantes em ritmo constante (sem engasgos), mesma potência */ { const dx = st.tx - o.x, dy = st.ty - o.y, dz = st.tz - o.z, d = Math.hypot(dx, dy, dz) || 1; fx.tracante(o.x, o.y, o.z, dx / d + (Math.random() - 0.5) * 0.02, dy / d + (Math.random() - 0.5) * 0.02, dz / d + (Math.random() - 0.5) * 0.02, 1, Math.min(1.6, d / 1000 + 0.1)); }
         const dc = Math.hypot(o.x - cp.x, o.y - cp.y, o.z - cp.z); if (dc < 2500) j.audio.a30(dc, j.pan(o.x, o.z)); }
-      for (let c = 0; c < n.ciws.length; c++) { const st = n.ciws[c]; if (!st.fogo) continue; const pc = n.P.ciws[c]; this.local(n, pc.x, pc.y, pc.z, o);
+      for (let c = 0; c < n.ciws.length; c++) { const st = n.ciws[c]; if (!st.fogo) continue; const pc = n.P.ciws[c]; this.local(n, pc.x, pc.y, pc.z, o); if (c % 2 === 1) this.laserAA(o, st, cp); /* v1.2.33 */
         const dx = st.tx - o.x, dy = st.ty - o.y, dz = st.tz - o.z, d = Math.hypot(dx, dy, dz) || 1; const q = red ? ((st._k = (st._k || 0) + 1) % 7 === 0 ? 1 : 0) : (Math.random() < 0.75 ? 1 : 0) + (Math.random() < 0.3 ? 1 : 0); /* v1.2.14: −30% traçantes */ /* v1.2.1 reduzido: 1 em 5 traçantes visíveis */
         const vsH = st.tipo === 'h'; for (let t = 0; t < q; t++) fx.tracante(o.x, o.y, o.z, dx / d + (Math.random() - 0.5) * 0.014, dy / d + (Math.random() - 0.5) * 0.014, dz / d + (Math.random() - 0.5) * 0.014, vsH ? 2 : 0, Math.min(1.1, d / 1100 + 0.08)); if (vsH && Math.random() < 0.084) fx.faiscas(st.tx, st.ty, st.tz);
         { const meuPerto = n === j.eu && j.camModo === 'perto'; const pb = (meuPerto ? (red ? 0.08 : 0.2) : red ? 0.25 : 0.5) * 0.6; /* v1.2.15: −15% */ if (Math.random() < pb) fx.brilho.emite(o.x, o.y, o.z, 0, 0, 0, '#ffd27a', meuPerto ? 0.36 : 0.75, meuPerto ? 1.4 : 2.6, 0.05, 0, 0, 0); /* v1.2.14: clarão do CIWS −30% */ } /* clarão do próprio CIWS atenuado na câmera próxima */
         const dc = Math.hypot(o.x - cp.x, o.y - cp.y, o.z - cp.z); if (dc < perto) { perto = dc; pan = j.pan(o.x, o.z); } j.audio.ciwsRajada(dc, j.pan(o.x, o.z)); } }
-    j.audio.ciwsContinuo(perto < 2600, perto, pan);
+    this.laserAAFim(); j.audio.ciwsContinuo(perto < 2600, perto, pan);
     { let f = 0; const wo = this._wo || (this._wo = { x: 0, y: 0, z: 0 }); for (const n of sim.navios) { if (!n.lasers) continue; for (let i = 0; i < n.lasers.length && f < this.feixes.length; i++) { const L = n.lasers[i]; if (!L.on) continue; const pl = n.P.laser[i]; sim.mundo(n, pl.x, pl.y + 0.95, pl.z, wo);
         const m = this.feixes[f++]; const dx = L.tx - wo.x, dy = L.ty - wo.y, dz = L.tz - wo.z, d = Math.hypot(dx, dy, dz) || 1; m.visible = true; m.position.set(wo.x, wo.y, wo.z); m.lookAt(this._vL.set(L.tx, L.ty, L.tz)); const lg = (1 + Math.min(1, Math.hypot(wo.x - cp.x, wo.z - cp.z) / 1500)) * 0.8; m.scale.set(lg, lg, d); /* v1.2.14: feixe mais fino */
         if (Math.random() < 0.175) fx.faiscas(L.tx, L.ty, L.tz); if (Math.random() < 0.14) fx.fumaca.emite(L.tx, L.ty, L.tz, 0, 1, 0, '#9aa0a6', 0.25, 2, 1.2, 1.5, 0, 0.4); } } for (; f < this.feixes.length; f++) this.feixes[f].visible = false; } /* v1.2.11: laser */

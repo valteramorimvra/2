@@ -30,6 +30,10 @@ export const eficaciaLeme = (C, v, u) => clamp(Math.max(Math.abs(v) / (0.35 * C.
 
 const _f = { arfagem: 0, caturro: 0, balanco: 0 };
 /** Um passo de dinâmica do navio vivo (substitui a cinemática 1.0.0). Retorna dv (para o caimento ao frear). */
+/** v1.2.33: fator de inércia de guinada (≥0,8…≤1,6) — porte (deslocamento, log) × tipo: corvetas viram mais rápido; cruzadores e porta-aviões mais devagar. Cacheado em C. */
+export function kGiro(C) { if (C._kg) return C._kg; const d = Math.max(300, C.desl || (C.L * C.B * C.T * 0.55) || 3000), T = String(C.est25 || C.estilo || '');
+  let k = 1 + 0.22 * Math.log10(d / 3000); k *= C.porta || C.superPA || /capitania|porta/.test(T) ? 1.18 : /cruzador/.test(T) ? 1.1 : /destroi/.test(T) ? 1.04 : /corveta|patrulha|lancha/.test(T) ? 0.9 : 1;
+  return (C._kg = Math.max(0.8, Math.min(1.6, k))); }
 export function passoHidro(sim, n, dt) {
   const C = n.C;
   if (n.tel !== n.telAlvo) { n.tTel = (n.tTel || 0) + dt; if (n.tTel > 0.35) { n.tel += Math.sign(n.telAlvo - n.tel); n.tTel = 0; } }
@@ -69,7 +73,7 @@ export function passoHidro(sim, n, dt) {
     const tS = 1.6 + 2.4 * clamp((C.L - 60) / 240, 0, 1); n.thr = (n.thr || 0) + clamp(alvoT - (n.thr || 0), -dt / tS, dt / tS); /* rampa do motor elétrico do thruster */
     if (Math.abs(n.thr) > 1e-3) { const grau = C.L <= 60 ? 4 : C.L <= 140 ? 4 - 2 * (C.L - 60) / 80 : Math.max(0.6, 2 - 1.4 * (C.L - 140) / 160); wAlvo += n.thr * grau * Math.PI / 180 * (n.vida < C.vida * 0.25 ? 0.7 : 1); } else n.thr = 0; }
   // inércia de guinada: navios maiores demoram mais a começar e a parar de girar
-  n.w += (wAlvo - n.w) * Math.min(1, dt / (PNg.tGiro * Math.sqrt(C.L / 142)));
+  n.w += (wAlvo - n.w) * Math.min(1, dt / (PNg.tGiro * Math.sqrt(C.L / 142) * kGiro(C))); /* v1.2.33: inércia de guinada por porte e tipo */
   n.rumo = ang(n.rumo + n.w * dt);
   // v1.2.3: DERIVA — na curva a popa escorrega para fora (β ≈ kDeriva·L/R): o vetor velocidade fica fora da proa; resposta com inércia
   { const vAbs = Math.abs(n.v); const LR = vAbs > 0.5 ? (n.w * C.L) / vAbs : 0; const bAlvo = clamp(-PNg.kDeriva * LR, -PNg.betaMax, PNg.betaMax) * clamp(vAbs / 3, 0, 1);

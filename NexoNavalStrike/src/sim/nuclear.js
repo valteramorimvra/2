@@ -45,13 +45,17 @@ export const NUK = Object.freeze({
   ciwsQueda: 0.0015, laserQueda: 0.004, // só ANTES do paraquedas; após chute = 0
   iaIntervalo: 2, iaMinSc: 1.6,
   // v1.2.26 item K: PILOTAGEM MANUAL — v1.2.29: menos tremor (taxas menores)
-  manBank: 0.85, manTaxaRol: 0.38, manPitch: 0.22, manTaxaPitch: 0.12, manFatorCurva: 2.0, manCurvaMax: 0.16, manAltMin: 160, manAltMax: 3500, manTempo: 320, assume: 4,
+  manBank: 1, manTaxaRol: 0.9, manPitch: 0.5, manTaxaPitch: 0.6, manFatorCurva: 6, manCurvaMax: 0.36, /* v1.2.32: manche mais responsivo */ manAltMin: 160, manAltMax: 3500, manTempo: 320, assume: 4,
   // v1.2.28/29: acelerador + mira solo + preparo bombas (1ª = 10 s; seguintes mais longas)
   thrNiveis: [165, 195, 225, 255, 285], thrMin: 165, thrMax: 285, bombasSurtida: 10, tRecargaPouso: 25, relancaAbatido: 25, /* v1.2.29 Valter 15:07: era 3 / 18 s; relançamento 25 s após abatido */
-  tPrep1: 10, tPrepN: [22, 32, 42], // s: 1ª bomba pronta em 10 s após decolar; 2ª/3ª/4ª com preparo maior
+  tPrep1: 10, tPrepN: [10, 10, 10], // s: 1ª bomba pronta em 10 s após decolar; v1.2.33: seguintes 10 s após a ÚLTIMA bomba da salva (ver FILA.rearme)
   // ESPERA — órbita sem atacar
   espRaio: 2800, espAlt: 2200, espV: 200, espFolga: 2800, autonomia: 720,
 });
+/** v1.2.32/1.2.33: esquadrilha de 3 bombardeiros — líder (jogador/IA) + 2 alas.
+ *  Fila escalonada: cada ala 'passo' m atrás do anterior (27 m de avião + ~10 m de folga) e 'degrau' m mais alto.
+ *  O líder solta no comando; as alas soltam 'intervalo' s e 2·'intervalo' s depois; próxima salva 'rearme' s após a última bomba. */
+export const FILA = Object.freeze({ passo: 37, degrau: 10, intervalo: 4, rearme: 10, nAlas: 2, decAla: 2.6 });
 /** v1.2.29 (Valter 15:12): paiol nuclear por porta-aviões — constante ÚNICA. 'ilimitado' = flag no estado (k.ilimitado), contagem não decrementa
  *  (sem Infinity no estado salvo). Para voltar a um paiol finito, troque por um número (ex.: 10). */
 export const PAIOL_NUCLEAR_PA = 'ilimitado';
@@ -61,7 +65,7 @@ export const nuclearLiberado = (sim, n) => !!n && (n.papel === 'jogador' || !!(s
 /** Queda do bombardeiro (abatido ou terreno): carga perdida; libera k.noAr; novo bombardeiro em NUK.relancaAbatido s. */
 function quedaBombardeiro(sim, q) { const n = sim.navios[q.dono], k = n && n.nk; if (!k || k.noAr !== q.idx) return; k.noAr = -1; q.cargas = 0; k.tRec = Math.max(k.tRec || 0, sim.t + NUK.relancaAbatido); }
 
-const NB = 4; // pool fixo de bombardeiros/bombas (2 PA por lado)
+const NB = 12; // pool fixo de bombardeiros/bombas (2 PA por lado × líder + 2 alas, com folga)
 const _o = { x: 0, y: 0, z: 0 };
 
 export function instalaNuclear(sim) {
@@ -83,11 +87,40 @@ export function motivoNuclear(sim, n) { if (!nuclearLiberado(sim, n)) return 'se
 export function lancaNuclear(sim, n, cmd) { const k = prepara(n); const mot = motivoNuclear(sim, n); if (mot) { sim.evento({ t: 'nkNegado', id: n.id, motivo: mot }); return 0; }
   let a = sim.navios[cmd && cmd.alvo != null ? cmd.alvo : n.alvoId], ax, az; if (a && !a.morto && a.time !== n.time) { ax = a.x; az = a.z; } else { a = null; if (cmd && Number.isFinite(cmd.px) && Number.isFinite(cmd.pz)) { ax = +cmd.px; az = +cmd.pz; } else { sim.evento({ t: 'nkNegado', id: n.id, motivo: 'semAlvo' }); return 0; } }
   if (Math.hypot(ax - n.x, az - n.z) > NUK.alcanceMax) { sim.evento({ t: 'nkNegado', id: n.id, motivo: 'alcance' }); return 0; }
-  const q = sim.nukes.find((x) => !x.ativo && !x.b.ativo); if (!q) { sim.evento({ t: 'nkNegado', id: n.id, motivo: 'pool' }); return 0; }
+  const q = sim.nukes.find((x) => !x.ativo && !x.b.ativo && !(x.espDec > 0)); if (!q) { sim.evento({ t: 'nkNegado', id: n.id, motivo: 'pool' }); return 0; }
   const nCarga = k.ilimitado ? NUK.bombasSurtida : Math.min(NUK.bombasSurtida, k.bombas); if (!k.ilimitado) k.bombas -= nCarga; k.usadas += nCarga; k.noAr = q.idx; const L = n.C.L, P = n.P || {}, dY = P.convoo && P.convoo.y != null ? P.convoo.y + 0.6 /* fiscal nukefumaca: convés de voo REAL (= aeronaves comuns, aereo.js pad/decolaPista); antes C.F+1.6 = 4–6 m DENTRO do casco/hangar */ : (P.deckY != null ? P.deckY : n.C.F) + 1.6;
   q.ativo = 1; q.fase = 1; q.dono = n.id; q.time = n.time; q.t = 0; q.alvo = a ? a.id : -1; q.ax = ax; q.az = az; q.tSam = 0; q.sams.length = 0; q.deck = dY; q.v = 0; q.manual = 0; q.manualPend = 0; q.tMan = 0; q.espera = 0; q.devolve = 0; q.cargas = nCarga; q.thr = 2; q.miraSolo = 0; q.jx = q.jy = q.sx = q.sy = q.w = q.bank = q.gam = q.tAssume = 0; q.nSoltas = 0; q.tPrep = NUK.tPrep1 || 10; q.auto = a ? 1 : 0; /* v1.2.29: AUTO se alvo travado; prep 1ª bomba 10 s */
   sim.mundo(n, 0, dY, L * 0.38, _o); q.x = q.px = _o.x; q.y = q.py = _o.y; q.z = q.pz = _o.z; q.rumo = q.prumo = n.rumo; q.vx = q.vy = q.vz = 0; q.pitch = q.ppitch = 0; q.roll = q.proll = 0; // começa no terço de ré do convés, aproado
-  sim.evento({ t: 'nkDecola', id: n.id, idx: q.idx, x: q.x, y: q.y, z: q.z, alvo: q.alvo, ax, az }); escoltaNuclear(sim, n, q); return 1; }
+  sim.evento({ t: 'nkDecola', id: n.id, idx: q.idx, x: q.x, y: q.y, z: q.z, alvo: q.alvo, ax, az }); escoltaNuclear(sim, n, q); criaAlas(sim, q); return 1; }
+/** v1.2.32: reserva as 2 alas no pool; decolam do mesmo convés 2,6 s e 5,2 s depois do líder. */
+function criaAlas(sim, c) { c.pontoFixo = c.alvo < 0 ? 1 : 0; c.lider = -1; let k = 0;
+  for (const w of sim.nukes) { if (k >= FILA.nAlas) break; if (w === c || w.ativo || w.b.ativo || w.espDec > 0) continue; k++;
+    w.ativo = 0; w.fase = 0; w.dono = c.dono; w.time = c.time; w.t = 0; w.alvo = c.alvo; w.ax = c.ax; w.az = c.az; w.tSam = 0; w.sams.length = 0; w.deck = c.deck; w.v = 0; w.manual = 0; w.manualPend = 0; w.tMan = 0; w.espera = 0; w.devolve = 0; w.cargas = c.cargas; w.thr = 2; w.miraSolo = 0;
+    w.jx = w.jy = w.sx = w.sy = w.w = w.bank = w.gam = w.tAssume = 0; w.nSoltas = 0; w.tPrep = 1e9; w.auto = 0; w.pontoFixo = c.pontoFixo; w.lider = c.idx; w.ala = k; w.espDec = FILA.decAla * k; w.soltaEm = 0; } }
+/** v1.2.33: líder soltou → alas soltam 4 s e 8 s depois; líder só tem a próxima bomba 10 s após a última da salva. */
+function agendaAlas(sim, L) { for (const w of sim.nukes) if (w.lider === L.idx && (w.ativo || w.espDec > 0) && (w.cargas | 0) > 0) { w.soltaEm = sim.t + FILA.intervalo * w.ala; L.tPrep = Math.max(L.tPrep || 0, FILA.intervalo * w.ala + FILA.rearme); } }
+/** v1.2.32: ala aguardando a vez de decolar. */
+function alaEspera(sim, q, dt) { q.espDec -= dt; if (q.espDec > 0) return; q.espDec = 0; const L = sim.nukes[q.lider], n = sim.navios[q.dono];
+  if (!L || !L.ativo || L.dono !== q.dono || !n || n.morto) { q.lider = -1; return; }
+  q.ativo = 1; q.fase = 1; q.t = 0; q.v = 0; sim.mundo(n, 0, q.deck, n.C.L * 0.38, _o); q.x = q.px = _o.x; q.y = q.py = _o.y; q.z = q.pz = _o.z; q.rumo = q.prumo = n.rumo; q.vx = q.vy = q.vz = 0; q.pitch = q.ppitch = 0; q.roll = q.proll = 0; }
+/** v1.2.33: ala em voo — fila escalonada atrás do líder (alas acima), segura a posição com ganho alto quando perto; longe, aproxima. */
+function passoAla(sim, q, dt) { const L = sim.nukes[q.lider];
+  if (!L || !L.ativo || L.dono !== q.dono) { q.lider = -1; if (q.fase >= 2) { q.fase = 3; q.tEsc = 0; q.manual = 0; q.tPrep = 0; } return passoBombardeiro(sim, q, dt); }
+  if (q.fase === 1) return passoBombardeiro(sim, q, dt);
+  guardaPose(q); q.t += dt;
+  const fx = Math.sin(L.rumo), fz = -Math.cos(L.rumo), atr = FILA.passo * q.ala, sx = L.x - fx * atr, sz = L.z - fz * atr, sy = Math.max(150, L.y + FILA.degrau * q.ala);
+  const ex = sx - q.x, ey = sy - q.y, ez = sz - q.z, Lv = Math.max(120, L.v || 0), jd = Math.hypot(ex, ey, ez), pf = jd < 90, kg = jd > 400 ? 0.5 : 1.6;
+  let vx = (L.vx || fx * Lv) + ex * kg, vz = (L.vz || fz * Lv) + ez * kg, vy = (L.vy || 0) + ey * kg; const vM = Lv + (jd > 400 ? 90 : 45), vh = Math.hypot(vx, vz); if (vh > vM) { vx *= vM / vh; vz *= vM / vh; } vy = clamp(vy, -60, 60);
+  let dr = ang((pf ? L.rumo : Math.atan2(vx, -vz)) - q.rumo); const tr = (pf ? 1.2 : 0.6) * dt; dr = clamp(dr, -tr, tr); const w = dr / Math.max(1e-4, dt); q.rumo = ang(q.rumo + dr);
+  const v = Math.max(110, Math.hypot(vx, vz)); q.v = v; q.vx = vx; q.vz = vz; q.vy = vy; q.x += vx * dt; q.y += vy * dt; q.z += vz * dt;
+  q.pitch = pf ? (L.pitch || 0) + (Math.atan2(vy, v) - (L.pitch || 0)) * 0.3 : Math.atan2(vy, v); const rl = pf ? (L.roll || 0) : clamp(-w * 2.2, -1, 1); q.roll = (q.roll || 0) + clamp(rl - (q.roll || 0), -0.9 * dt, 0.9 * dt);
+  q.w = w; q.bank = -q.roll; q.gam = q.pitch; q.fase = L.fase >= 3 ? 3 : 2;
+  if (q.soltaEm > 0 && sim.t >= q.soltaEm && !q.b.ativo && (q.cargas | 0) > 0 && q.y > NUK.hRajada + 120) { q.soltaEm = 0; q.tPrep = 0; solta(sim, q); q.fase = 2; q.tPrep = 1e9; }
+  interceptaBombardeiro(sim, q, dt); }
+/** v1.2.33 (render/câmera): o último ala da fila já em posição (ou o próprio líder). */
+export function ultimoDaFila(sim, L) { if (!sim || !sim.nukes || !L) return L; let u = L, ma = 0;
+  for (const w of sim.nukes) if (w.ativo && w.lider === L.idx && w.dono === L.dono && w.fase >= 2 && (w.ala | 0) > ma) { const fx = Math.sin(L.rumo), fz = -Math.cos(L.rumo), a = FILA.passo * w.ala; if (Math.hypot(L.x - fx * a - w.x, L.z - fz * a - w.z) < 160) { ma = w.ala | 0; u = w; } }
+  return u; }
 /** v1.2.27: escolta de caças do PA — ativa esquadrilha e marca até 4 aviões para cobrir o bombardeiro. */
 function escoltaNuclear(sim, n, q) { if (!n.helis || !n.helis.length) return; n.esq = 1; let k = 0;
   for (const i of n.helis) { const h = sim.helis[i]; if (!h || h.estado === 7 /* ABATIDO */) continue; if (!h.H || !h.H.aviao) continue;
@@ -106,7 +139,7 @@ function voaPara(q, rx, rz, alt, v, dt, sim) { if (sim && !q.manual) { const rum
 
 export function passoNuclear(sim, dt) { if (!sim.nukes) return;
   for (const n of sim.navios) if (temNuclear(n) && !n.nk) prepara(n);
-  for (const q of sim.nukes) { if (q.ativo) passoBombardeiro(sim, q, dt); if (q.b.ativo) passoBomba(sim, q, dt); }
+  for (const q of sim.nukes) { if (q.ativo) { if (q.lider >= 0) passoAla(sim, q, dt); else passoBombardeiro(sim, q, dt); } else if (q.espDec > 0) alaEspera(sim, q, dt); if (q.b.ativo) passoBomba(sim, q, dt); }
   passoChoque(sim, dt);
   for (const n of sim.navios) if (n.nk && !n.morto && n.papel !== 'jogador' && n.papel !== 'alvo' && !n.controleRemoto) iaNuclear(sim, n, dt); }
 
@@ -128,11 +161,11 @@ function passoBombardeiro(sim, q, dt) { guardaPose(q); q.t += dt; if (q.tPrep > 
   if (q.fase === 2) { const a = q.alvo >= 0 ? sim.navios[q.alvo] : null; if (a && !a.morto) { const lead = lanco().t; const c = Math.cos(a.rumo), s = Math.sin(a.rumo); q.ax = a.x + s * a.v * lead; q.az = a.z - c * a.v * lead; }
     const L = lanco(), dx = q.ax - q.x, dz = q.az - q.z, d = Math.hypot(dx, dz);
     /* v1.2.27: sobe ao teto ANTES de fechar — senão chega baixo e aborta sem soltar */
-    const sobe = q.y < NUK.altVoo * 0.88; let tx = q.ax, tz = q.az;
+    const sobe = q.y < NUK.altVoo * 0.88; /* v1.2.32: sem alvo nem mira de solo → segue reto (não persegue ponto antigo) */ const reto = !(a && !a.morto) && !q.miraSolo && !q.pontoFixo; let tx = reto ? q.x + Math.sin(q.rumo) * 5000 : q.ax, tz = reto ? q.z - Math.cos(q.rumo) * 5000 : q.az;
     /* fiscal nukefumaca (item 3): sobe em ROTA RETA até a altitude (sem órbita de subida) */
     voaPara(q, tx, tz, NUK.altVoo, sobe ? NUK.vVoo * 0.7 : NUK.vVoo, dt, sim);
     const alinhado = Math.abs(ang(marcacao(q.x, q.z, q.ax, q.az) - q.rumo)) < 0.16;
-    if (!sobe && alinhado && d <= L.x + 120 && q.y > NUK.altVoo * 0.85) {
+    if (!reto && !sobe && alinhado && d <= L.x + 120 && q.y > NUK.altVoo * 0.85) {
       /* v1.2.29: AUTO não solta se o ponto zero previsto cai perto de aliado (fogo amigo visual/choque) */
       const I = impactoNuclear(q, _imp || (_imp = {})); let okAl = 1;
       if (I.ok) for (const e of sim.navios) { if (e.morto || e.time !== q.time) continue; if (Math.hypot(e.x - I.x, e.z - I.z) < (NUK.raioTotal || 1500) * 0.85) { okAl = 0; break; } }
@@ -147,11 +180,11 @@ function passoBombardeiro(sim, q, dt) { guardaPose(q); q.t += dt; if (q.tPrep > 
   interceptaBombardeiro(sim, q, dt); }
 
 /** v1.2.26 item K: voo MANUAL — manche suavizado (inércia de comando), rolagem com taxa limitada, curva coordenada (taxa ∝ g·tan(inclinação)/v), ângulo de trajetória com taxa limitada, piso/teto de altitude suaves e energia (sobe perde, desce ganha velocidade). */
-function voaManual(q, dt, sim) { const P = NUK; q.sx += clamp(q.jx - q.sx, -0.9 * dt, 0.9 * dt); q.sy += clamp(q.jy - q.sy, -0.9 * dt, 0.9 * dt); /* v1.2.29: menos tremor */
-  q.bank += clamp(q.sx * P.manBank - q.bank, -P.manTaxaRol * dt, P.manTaxaRol * dt); let gA = q.sy * P.manPitch;
-  if (q.y < P.manAltMin + 120) gA = Math.max(gA, (P.manAltMin + 120 - q.y) / 500); if (q.y > P.manAltMax - 200) gA = Math.min(gA, -(q.y - P.manAltMax + 200) / 800);
-  q.gam += clamp(gA - q.gam, -P.manTaxaPitch * dt, P.manTaxaPitch * dt); const v = Math.max(1, q.v);
-  q.w = clamp(G * Math.tan(q.bank) / v * P.manFatorCurva, -P.manCurvaMax, P.manCurvaMax); q.rumo = ang(q.rumo + q.w * dt); q.roll = -q.bank;
+function voaManual(q, dt, sim) { const P = NUK; q.sx += (q.jx - q.sx) * Math.min(1, 5 * dt); q.sy += (q.jy - q.sy) * Math.min(1, 6 * dt); /* v1.2.32: manche suavizado exponencial */
+  q.bank += clamp((q.sx * P.manBank - q.bank) * 2.6 * dt, -P.manTaxaRol * dt, P.manTaxaRol * dt); let gA = q.sy * P.manPitch;
+  if (q.y < P.manAltMin + 160) gA = Math.max(gA, (P.manAltMin + 160 - q.y) / 300); if (q.y > P.manAltMax - 200) gA = Math.min(gA, -(q.y - P.manAltMax + 200) / 800);
+  q.gam += clamp((gA - q.gam) * 4 * dt, -P.manTaxaPitch * dt, P.manTaxaPitch * dt); const v = Math.max(1, q.v);
+  q.w = (q.w || 0) + (clamp(G * Math.tan(q.bank) / v * P.manFatorCurva, -P.manCurvaMax, P.manCurvaMax) - (q.w || 0)) * Math.min(1, 3 * dt); q.rumo = ang(q.rumo + q.w * dt); q.roll = -q.bank;
   { const thr = P.thrNiveis ? P.thrNiveis[Math.max(0, Math.min(4, q.thr | 0))] : P.vVoo; const vMin = P.thrMin || 165; /* v1.2.28: acelerador tipo telégrafo; sem estol abaixo do mínimo */ q.v = clamp(q.v - G * Math.sin(q.gam) * 0.6 * dt + clamp(thr - q.v, -6 * dt, 7 * dt), vMin, P.thrMax || 290); if (q.v <= vMin + 2 && (q.thr | 0) === 0) q._estolAviso = 1; else q._estolAviso = 0; } q.pitch = q.gam;
   q.vy = q.v * Math.sin(q.gam); const vh = q.v * Math.cos(q.gam); q.vx = Math.sin(q.rumo) * vh; q.vz = -Math.cos(q.rumo) * vh; q.x += q.vx * dt; q.y = Math.max(P.manAltMin * 0.6, q.y + q.vy * dt); q.z += q.vz * dt; if (sim && colideAereoTerreno(sim, q, dt, { manual: 1, margem: 3 })) { q.ativo = 0; const nn = sim.navios[q.dono]; if (nn && nn.nk && nn.nk.noAr === q.idx) nn.nk.noAr = -1; sim.evento({ t: 'nkTerreno', idx: q.idx, id: q.dono, x: q.x, y: q.y, z: q.z }); } }
 /** v1.2.26 item K (20:10): ESPERA — órbita de espera SEM ATACAR (não lança, não persegue). Centro = navio-mãe, deslocado para longe das defesas inimigas (alcance SAM + folga). */
@@ -172,13 +205,13 @@ export function comandoNuclear(sim, n, cmd) { const q = nkBombardeiroDe(sim, n);
   else if (cmd.t === 'nkCtl') { q.jx = clamp(+cmd.jx || 0, -1, 1); q.jy = clamp(+cmd.jy || 0, -1, 1); }
   else if (cmd.t === 'nkThr') { q.thr = Math.max(0, Math.min(4, cmd.v | 0)); sim.evento({ t: 'nkThr', idx: q.idx, id: n.id, v: q.thr }); } /* v1.2.28: acelerador 0–4 */
   else if (cmd.t === 'nkMiraSolo') { /* v1.2.28: retícula no mar/terra — ponto onde a bomba deve cair */ if (Number.isFinite(cmd.px) && Number.isFinite(cmd.pz)) { q.ax = +cmd.px; q.az = +cmd.pz; q.alvo = -1; q.miraSolo = 1; sim.evento({ t: 'nkMiraSolo', idx: q.idx, id: n.id, px: q.ax, pz: q.az }); } }
-  else if (cmd.t === 'nkTrava') { const a = cmd.alvo != null && cmd.alvo >= 0 ? sim.navios[cmd.alvo] : null; if (a && !a.morto && a.time !== n.time) { q.alvo = a.id; q.ax = a.x; q.az = a.z; q.miraSolo = 0; q.espera = 0; q.auto = 1; /* fiscal nukefumaca (item 3): ao travar → DIRETO ao alvo (sem órbita) */ } /* toque SÓ trava; soltar só trocando de alvo (ignora alvo:-1) */ sim.evento({ t: 'nkTravado', idx: q.idx, id: n.id, alvo: q.alvo }); }
+  else if (cmd.t === 'nkTrava') { const a = cmd.alvo != null && cmd.alvo >= 0 ? sim.navios[cmd.alvo] : null; if (a && !a.morto && a.time !== n.time) { q.alvo = a.id; q.ax = a.x; q.az = a.z; q.miraSolo = 0; q.espera = 0; q.auto = 1; q.pontoFixo = 0; /* fiscal nukefumaca (item 3): ao travar → DIRETO ao alvo (sem órbita) */ } /* toque SÓ trava; soltar só trocando de alvo (ignora alvo:-1) */ sim.evento({ t: 'nkTravado', idx: q.idx, id: n.id, alvo: q.alvo }); }
   else if (cmd.t === 'nkSolta') { if (q.fase === 2 && q.y > NUK.hRajada + 120 && (q.cargas | 0) > 0) solta(sim, q); } }
 
 function solta(sim, q) { if (q.b.ativo) return; /* uma bomba em queda por vez */ if ((q.tPrep || 0) > 0) return; /* v1.2.29: preparo */ const rest = (q.cargas | 0); if (rest <= 0) return; const b = q.b; b.ativo = 1; b.t = 0; b.chute = 0; b.x = b.px = q.x; b.y = b.py = q.y - 2; b.z = b.pz = q.z; b.vx = q.vx; b.vy = q.vy; b.vz = q.vz; b.dono = q.dono; b.time = q.time;
   q.cargas = rest - 1; q.nSoltas = (q.nSoltas | 0) + 1; /* v1.2.29: seguintes com preparo maior */ { const seq = NUK.tPrepN || [22, 32, 42]; q.tPrep = q.cargas > 0 ? (seq[Math.min(seq.length - 1, (q.nSoltas | 0) - 1)] || 28) : 0; }
   if (q.cargas <= 0) { q.fase = 3; q.tEsc = 18; q.rumoEsc = ang(q.rumo + Math.PI); q.devolve = 0; } else { q.devolve = 1; }
-  sim.evento({ t: 'nkSolta', idx: q.idx, id: q.dono, x: b.x, y: b.y, z: b.z, ax: q.ax, az: q.az, tq: lanco().t, restam: q.cargas, prep: q.tPrep }); }
+  sim.evento({ t: 'nkSolta', idx: q.idx, id: q.dono, x: b.x, y: b.y, z: b.z, ax: q.ax, az: q.az, tq: lanco().t, restam: q.cargas, prep: q.tPrep }); if (!(q.lider >= 0)) agendaAlas(sim, q); }
 
 function passoBomba(sim, q, dt) { const b = q.b; b.px = b.x; b.py = b.y; b.pz = b.z; b.t += dt; const k = b.t > NUK.tChute ? NUK.kChute : NUK.kLivre; if (b.t > NUK.tChute && !b.chute) { b.chute = 1; sim.evento({ t: 'nkChute', idx: q.idx, x: b.x, y: b.y, z: b.z }); }
   const v = Math.hypot(b.vx, b.vy, b.vz); b.vx -= k * v * b.vx * dt; b.vz -= k * v * b.vz * dt; b.vy -= (G + k * v * b.vy) * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;

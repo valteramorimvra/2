@@ -59,7 +59,7 @@ export const SPEC = {
   },
   /* ===================== ALMIRANTE NAKHIMOV (proj. 11442M) ===================== */
   nakhimov: {
-    L: 250.1, B: 28.5, T: 9.1, vmax: 15.95 /* 31 nós */, desl: 25860,
+    L: 250.1, B: 28.5, T: 9.1, vmax: 23.742 /* v1.2.33: ×1,17 (velMul) = 27,78 m/s = 100 km/h na máxima */, desl: 25860,
     casco: { esc: 'rus', transom: 0.8, flare: 0.36, rake: 0.075, bulbo: 1.0, fino: 0.95, Fpts: [[0, 8.8], [0.2, 9.0], [0.5, 9.8], [0.7, 11.0], [0.85, 13.0], [0.95, 15.0], [1, 15.8]] },
     blocos: [
       { n: 'passadico', z0: 104, z1: 128, h: 11, w: 0.62, enc: 0.84 },

@@ -6,10 +6,14 @@
 // Luzes: NENHUMA luz nova (recompilaria todos os sombreadores); modula sol/hemi/exposição/céu/neblina já existentes e RESTAURA os valores-base no fim.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { modeloHeli } from './aereo3d.js'; /* v1.2.26: bombardeiro único 'bombardeiroNuclear' (Urubu-rei) */
+import { modeloHeli } from './aereo3d.js'; import { Particulas } from './fx.js'; /* v1.2.33: fumaça colorida dos bombardeiros */ /* v1.2.26: bombardeiro único 'bombardeiroNuclear' (Urubu-rei) */
 
 const ss = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const Y0 = 150; // altura da rajada (= NUK.hRajada)
+/* v1.2.33: esquadrilha nuclear — fumaça de jato (verde líder, azul 2º, amarela 3º) e pintura metálica nas mesmas cores, com reflexo do céu */
+const NK_FUMACA = ['#1ee46e', '#2a7dff', '#ffd21a'];
+const NK_METAL = [{ c: '#3f9a68', e: '#1f2a24' }, { c: '#3f6fc4', e: '#1d2433' }, { c: '#c9a443', e: '#2d281c' }];
+const papelFila = (q) => (q.lider >= 0 ? (q.ala === 1 ? 1 : 2) : 0);
 /** Curvas do cogumelo (m, s) — exportadas para teste/documentação */
 export const CURVA = {
   topo: (T) => Y0 + 3300 * (1 - Math.exp(-T / 24)),              // altura do centro da capa
@@ -76,10 +80,10 @@ function geoBomba() { const L = new THREE.LatheGeometry([[0, -2.0], [0.32, -1.75
 export class NuclearFx {
   /** @param cb { som(parte, x, y, z), tremor(k), vibra(ms), tremorOk(), msg(txt, cor) } */
   constructor(cena, R, amb, nivel, fx, cb = {}) { this.cena = cena; this.R = R; this.amb = amb; this.fx = fx; this.cb = cb; this.nivel = nivel; this.tl = 0; this.base = null; this.st = { picoPuffs: 0, deton: 0 };
-    this.NP = [260, 480, 700][nivel] ?? 480; this.slots = [0, 1].map((i) => ({ i, ativo: 0, t0: 0, x: 0, y: 0, z: 0, d: 0, fila: [] }));
-    const N = this.NP * 2; this.N = N; this.kind = new Uint8Array(N); this.pa = new Float32Array(N * 4); // a,b,c,s por puff
+    this.NP = [260, 480, 700][nivel] ?? 480; this.slots = [0, 1, 2].map((i) => /* v1.2.32: 3 detonações simultâneas (salva de 3 bombardeiros) */ ({ i, ativo: 0, t0: 0, x: 0, y: 0, z: 0, d: 0, fila: [] }));
+    const N = this.NP * 3; this.N = N; this.kind = new Uint8Array(N); this.pa = new Float32Array(N * 4); // a,b,c,s por puff
     let r = 1226; const rnd = () => { r = (r * 16807) % 2147483647; return r / 2147483647; };
-    for (let s = 0; s < 2; s++) for (let j = 0; j < this.NP; j++) { const i = s * this.NP + j, u = j / this.NP; this.kind[i] = u < 0.46 ? 0 : u < 0.66 ? 1 : u < 0.84 ? 2 : u < 0.94 ? 3 : 4; // 0 capa, 1 haste, 2 surge, 3 coluna, 4 saia
+    for (let s = 0; s < 3; s++) for (let j = 0; j < this.NP; j++) { const i = s * this.NP + j, u = j / this.NP; this.kind[i] = u < 0.46 ? 0 : u < 0.66 ? 1 : u < 0.84 ? 2 : u < 0.94 ? 3 : 4; // 0 capa, 1 haste, 2 surge, 3 coluna, 4 saia
       this.pa[i * 4] = rnd() * Math.PI * 2; this.pa[i * 4 + 1] = rnd() * Math.PI * 2; this.pa[i * 4 + 2] = rnd(); this.pa[i * 4 + 3] = rnd(); }
     const ig = new THREE.InstancedBufferGeometry(); const pl = new THREE.PlaneGeometry(1, 1); ig.index = pl.index; ig.setAttribute('position', pl.attributes.position); ig.setAttribute('uv', pl.attributes.uv);
     this.aPos = new THREE.InstancedBufferAttribute(new Float32Array(N * 4), 4).setUsage(THREE.DynamicDrawUsage); this.aCol = new THREE.InstancedBufferAttribute(new Float32Array(N * 4), 4).setUsage(THREE.DynamicDrawUsage); this.aExt = new THREE.InstancedBufferAttribute(new Float32Array(N * 2), 2).setUsage(THREE.DynamicDrawUsage);
@@ -103,7 +107,7 @@ export class NuclearFx {
     // bombardeiros/bombas/paraquedas (pool 4, como na simulação)
     const gb = geoBombardeiro(), mb = [new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.62, metalness: 0.28, side: THREE.DoubleSide }), new THREE.MeshStandardMaterial({ color: '#1c2a36', roughness: 0.06, metalness: 0.9, envMapIntensity: 1.2 })], /* fuselagem: tinta naval fosca semimetálica; cabine: vidro escuro espelhado */ gbo = geoBomba(), mbo = new THREE.MeshStandardMaterial({ color: '#c9ccc4', roughness: 0.5, metalness: 0.5 });
     const gc = new THREE.SphereGeometry(9, 16, 6, 0, Math.PI * 2, 0, Math.PI * 0.42).translate(0, -9 * Math.cos(Math.PI * 0.42), 0), mc = new THREE.MeshStandardMaterial({ color: '#f2efe8', roughness: 0.9, side: THREE.DoubleSide, emissive: '#2a1c10' });
-    this.bomb = []; for (let i = 0; i < 4; i++) { const a = modeloHeli('bombardeiroNuclear') || new THREE.Mesh(gb, mb) /* v1.2.26: o MESMO Urubu-rei do navios1226 (materiais PBR compartilhados com o parque/ala → 0 programas novos) */, b = new THREE.Mesh(gbo, mbo), c = new THREE.Mesh(gc, mc); a.rotation.order = 'YXZ'; b.rotation.order = 'YXZ'; for (const m of [a, b, c]) { m.visible = false; m.userData.nk = 1; m.traverse((o) => { o.userData.nk = 1; }); cena.add(m); }
+    this.bomb = []; for (let i = 0; i < 12; i++) { /* v1.2.32: pool = sim/nuclear.js NB */ const a = modeloHeli('bombardeiroNuclear') || new THREE.Mesh(gb, mb) /* v1.2.26: o MESMO Urubu-rei do navios1226 (materiais PBR compartilhados com o parque/ala → 0 programas novos) */, b = new THREE.Mesh(gbo, mbo), c = new THREE.Mesh(gc, mc); a.rotation.order = 'YXZ'; b.rotation.order = 'YXZ'; for (const m of [a, b, c]) { m.visible = false; m.userData.nk = 1; m.traverse((o) => { o.userData.nk = 1; }); cena.add(m); }
       this.bomb.push({ av: a, bo: b, ch: c, tR: 0, queda: 0, vx: 0, vy: 0, vz: 0, rx: 0 }); }
     this.sams = Array.from({ length: 8 }, () => ({ t: -1, tv: 1, x: 0, y: 0, z: 0, idx: 0 })); this._v = new THREE.Vector3(); this._c = new THREE.Color(); this._c2 = new THREE.Color(); this.vento = { x: 3.5, z: -1.2 };
   }
@@ -209,14 +213,29 @@ export class NuclearFx {
     const pr = q.prumo != null ? q.prumo : q.rumo, pp = q.ppitch != null ? q.ppitch : (q.pitch || 0), pl = q.proll != null ? q.proll : (q.roll || 0);
     let dr = q.rumo - pr; while (dr > Math.PI) dr -= Math.PI * 2; while (dr < -Math.PI) dr += Math.PI * 2;
     o.rumo = pr + dr * A; o.pitch = pp + ((q.pitch || 0) - pp) * A; o.roll = pl + ((q.roll || 0) - pl) * A; return o; }
-  passoAvioes(dt, sim, alpha = 0) { const fx = this.fx, Q = sim.nukes; if (!Q) return; this.st.avioes = 0; const a = alpha, P = this._pAv || (this._pAv = { x: 0, y: 0, z: 0, rumo: 0, pitch: 0, roll: 0 }), Pb = this._pBo || (this._pBo = { x: 0, y: 0, z: 0 });
-    for (let i = 0; i < 4; i++) { const q = Q[i], b = this.bomb[i]; if (!q) continue;
+  passoAvioes(dt, sim, alpha = 0) { const fx = this.fx, Q = sim.nukes; if (!Q) return; if (this._trl) this._trl.passo(dt, this.vento ? this.vento.x : 0, this.vento ? this.vento.z : 0); this.st.avioes = 0; const a = alpha, P = this._pAv || (this._pAv = { x: 0, y: 0, z: 0, rumo: 0, pitch: 0, roll: 0 }), Pb = this._pBo || (this._pBo = { x: 0, y: 0, z: 0 });
+    for (let i = 0; i < 12; i++) { const q = Q[i], b = this.bomb[i]; if (!q) continue;
       if (b.queda) { const av = b.av; b.vy -= 9.81 * dt; b.vx *= 0.995; b.vz *= 0.995; av.position.x += b.vx * dt; av.position.y += b.vy * dt; av.position.z += b.vz * dt; av.rotation.x -= 0.6 * dt; av.rotation.z += 1.4 * dt; b.tR += dt;
         if (b.tR > 0.03) { b.tR = 0; fx.fumaca.emite(av.position.x, av.position.y, av.position.z, 0, 2, 0, '#2a2622', 0.7, 14, 6, 6); fx.brilho.emite(av.position.x, av.position.y, av.position.z, 0, 0, 0, '#ff9a3a', 0.9, 7, 0.35, 4); }
         if (av.position.y < 0) { b.queda = 0; av.visible = false; fx.explosao(av.position.x, 2, av.position.z, 1.2); for (let k = 0; k < 20; k++) fx.agua.emite(av.position.x, 1, av.position.z, (Math.random() - 0.5) * 18, 18 + Math.random() * 26, (Math.random() - 0.5) * 18, '#e8eef2', 0.8, 6, 2.2, 3, 9.8); } }
-      else { b.av.visible = !!q.ativo; if (q.ativo) { this.st.avioes++; this._pose(q, a, P); b.av.position.set(P.x, P.y, P.z); b.av.rotation.set(P.pitch, -P.rumo, P.roll); if (q.fase >= 2) { b.tR += dt; if (b.tR > 0.06) { b.tR = 0; const c = Math.cos(P.rumo), s2 = Math.sin(P.rumo); for (const sx of [-4.3, 4.3]) fx.fumaca.emite(P.x + c * sx - s2 * 6, P.y - 1, P.z + s2 * sx + c * 6, 0, 0, 0, '#dfe4ea', 0.28, 4, 5, 3, 0, 0.1); } } } }
+      else { b.av.visible = !!q.ativo; if (q.ativo) { this.st.avioes++; this._pose(q, a, P); b.av.position.set(P.x, P.y, P.z); b.av.rotation.set(P.pitch, -P.rumo, P.roll); this.pinta(q, b); if (q.fase >= 2) this.trilha(q, P, b); else b._tx = null; } }
       const B = q.b; b.bo.visible = !!B.ativo; b.ch.visible = !!(B.ativo && B.chute); if (B.ativo) { const bx = B.px != null ? B.px : B.x, by = B.py != null ? B.py : B.y, bz = B.pz != null ? B.pz : B.z; Pb.x = bx + (B.x - bx) * a; Pb.y = by + (B.y - by) * a; Pb.z = bz + (B.z - bz) * a; b.bo.position.set(Pb.x, Pb.y, Pb.z); const v = Math.hypot(B.vx, B.vz); b.bo.rotation.set(Math.atan2(B.vy, v), -Math.atan2(B.vx, -B.vz), 0);
         if (B.chute) { const vv = Math.hypot(B.vx, B.vy, B.vz) || 1, o = Math.min(1, (B.t - 1.5) * 2); b.ch.position.set(Pb.x - B.vx / vv * 16, Pb.y - B.vy / vv * 16, Pb.z - B.vz / vv * 16); b.ch.scale.setScalar(0.2 + 0.8 * o); b.ch.lookAt(Pb.x, Pb.y, Pb.z); b.ch.rotateX(-Math.PI / 2); } } } }
+  /** v1.2.33: pintura metálica por posição na fila (clona materiais uma vez por papel; vidro/luzes ficam). */
+  pinta(q, b) { const p = papelFila(q); if (b._pinta === p) return; b._pinta = p; const C = NK_METAL[p], M = this._nkMat || (this._nkMat = new Map());
+    b.av.traverse((o) => { if (!o.isMesh || !o.material || Array.isArray(o.material)) return; const m0 = o.userData._m0 || (o.userData._m0 = o.material);
+      if (!m0.isMeshStandardMaterial || m0.isMeshPhysicalMaterial || m0.transparent || m0.opacity < 1 || m0.roughness < 0.1) return;
+      const k = m0.uuid + '|' + p; let m = M.get(k); if (!m) { m = m0.clone(); const hx = m0.color ? m0.color.getHex() : 0x808080, L = (0.299 * ((hx >> 16) & 255) + 0.587 * ((hx >> 8) & 255) + 0.114 * (hx & 255)) / 255, esc = L < 0.26;
+        m.map = null; m.roughnessMap = null; if (m.color) m.color.set(esc ? C.e : C.c); m.metalness = esc ? 0.9 : 0.82; m.roughness = esc ? 0.36 : 0.24; m.envMapIntensity = esc ? 1.1 : 1.5; m.needsUpdate = true; M.set(k, m); }
+      o.material = m; }); }
+  /** v1.2.33: fumaça de jato contínua saindo da cauda — puffs a cada 3 m ao longo do caminho percorrido (contínua mesmo com quadro lento). */
+  trilha(q, P, b) { const c = this.camRef; if (c && Math.hypot(c.position.x - P.x, c.position.y - P.y, c.position.z - P.z) > 8000) { b._tx = null; return; }
+    let T = this._trl; if (!T) { if (!this.fx || !this.fx.tex) return; T = this._trl = new Particulas(this.cena, 2400, false, 3, this.fx.tex); }
+    const cp = Math.cos(P.pitch || 0), fx = Math.sin(P.rumo) * cp, fy = Math.sin(P.pitch || 0), fz = -Math.cos(P.rumo) * cp, x = P.x - fx * 13.8, y = P.y + 1.6 - fy * 13.8, z = P.z - fz * 13.8, cor = NK_FUMACA[papelFila(q)];
+    if (b._tx == null || Math.hypot(x - b._tx, y - b._ty, z - b._tz) > 400) { b._tx = x; b._ty = y; b._tz = z; return; }
+    const dx = x - b._tx, dy = y - b._ty, dz = z - b._tz, d = Math.hypot(dx, dy, dz), passo = 3; if (d < passo) return; const N = Math.min(24, Math.floor(d / passo));
+    for (let k = 1; k <= N; k++) { const f = (k * passo) / d; T.emite(b._tx + dx * f, b._ty + dy * f, b._tz + dz * f, (Math.random() - 0.5) * 0.6, (Math.random() - 0.5) * 0.4, (Math.random() - 0.5) * 0.6, cor, 0.8, 3.2, 6, 3, -0.04, 0.35); }
+    const f = (N * passo) / d; b._tx += dx * f; b._ty += dy * f; b._tz += dz * f; }
   passoSams(dt, sim) { for (const s of this.sams) { if (s.t < 0) continue; s.t += dt; const q = sim.nukes && sim.nukes[s.idx]; if (!q || s.t > s.tv) { s.t = -1; continue; } const u = s.t / s.tv, x = s.x + (q.x - s.x) * u, y = s.y + (q.y - s.y) * u * u, z = s.z + (q.z - s.z) * u; this.fx.fumaca.emite(x, y, z, 0, 0, 0, '#e8eaec', 0.45, 5, 3.5, 4, 0, 0.2); this.fx.brilho.emite(x, y, z, 0, 0, 0, '#ffd27a', 1, 3, 0.08, 0); } }
   /** Cache InstancedMesh arvNuke no 1º uso (REVISAO #11). */
   _cacheArv() {
