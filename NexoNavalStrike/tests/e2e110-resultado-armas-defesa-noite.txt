@@ -1,0 +1,19 @@
+torres (az, bloqueada): [[1.58,0],[1.58,0],[1.58,0]]
+Fortaleza: torres que dispararam juntas = 3
+auto: {"auto":1,"tiros":12,"chips":"tc:T1 Proa3,2s tc:T23,2s tc:T3 Popa3,2s"}
+CIWS: sem engajamento na tentativa 0
+CIWS: sem engajamento na tentativa 1
+CIWS x míssil capturado a 632 m
+SAM: nenhum lançamento na tentativa 0
+SAM: nenhum lançamento na tentativa 1
+SAM: nenhum lançamento na tentativa 2
+estatística SAM: {"tiros":0,"acertos":0,"misLanc":0,"misAcertos":0,"torpLanc":0,"torpAcertos":0,"abates":0,"dano":0,"intercept":0,"ricochetes":0}
+30 mm x lancha capturado a 1331 m
+lanchas: [8]
+drone: null
+drone final: {"ativo":1,"menores":1}
+HUD defesa: .hud-estado × .hud-teleg button[4]
+noite: {"q":0,"fps":11,"expo":1.25}
+áudio: {"canhao_grande":"gravação real","canhao_medio":"gravação real","canhao_rapido":"gravação real","canhao_longe":"gravação real","ciws":"gravação real","vls_lancamento":"gravação real","explosao_perto":"gravação real","explosao_media":"gravação real","explosao_grande":"gravação real","explosao_longe":"gravação real","respingo_grande":"gravação real","respingo":"gravação real","impacto_metal":"gravação real","torpedo_corrida":"gravação real","alarme_trava":"gravação real","motor_diesel_loop":"gravação real","turbina_loop":"gravação real"}
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

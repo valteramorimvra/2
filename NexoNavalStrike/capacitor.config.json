@@ -1,0 +1,7 @@
+{
+  "appId": "br.com.valteramorim.nexonaval",
+  "appName": "Nexo Naval Strike 3D",
+  "webDir": "dist",
+  "android": { "allowMixedContent": false, "captureInput": false, "webContentsDebuggingEnabled": false, "backgroundColor": "#060606" },
+  "plugins": { "CapacitorHttp": { "enabled": false } }
+}

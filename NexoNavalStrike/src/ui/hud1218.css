@@ -1,0 +1,30 @@
+/* v1.2.18 item 3: indicador de direção de granada inimiga — pequeno, na borda, discreto (não cobre nada; não recebe toque) */
+.h-grInd { position: absolute; left: 0; top: 0; width: 22px; height: 22px; pointer-events: none; z-index: 6; will-change: transform; }
+.h-grInd[hidden] { display: none; }
+.h-grInd i { position: absolute; inset: 0; display: block; }
+.h-grInd i::before { content: ''; position: absolute; left: 4px; top: 4px; width: 0; height: 0; border-top: 7px solid transparent; border-bottom: 7px solid transparent; border-left: 13px solid #f97316; filter: drop-shadow(0 0 2px rgba(0,0,0,.85)); left: 5px; }
+.h-grInd.n0 { opacity: .55; } .h-grInd.n1 { opacity: .8; } .h-grInd.n2 { opacity: 1; animation: grPulso .32s ease-in-out infinite alternate; }
+.h-grInd.n2 i::before { border-left-color: #ef4444; }
+@keyframes grPulso { from { opacity: .65; } to { opacity: 1; } }
+/* v1.2.18 item 5: log de impactos NUNCA truncado ("IMPACTO DE CAN…"): linha inteira, sem reticências; até 3 linhas visíveis; itens não encolhem */
+.hud.v12 .h-log { max-height: none !important; overflow: visible !important; }
+.hud.v12 .h-log .lg { white-space: nowrap !important; text-overflow: clip !important; overflow: visible !important; max-width: none !important; flex-shrink: 0; }
+.hud.v12 .h-log .lg:nth-child(n+4) { display: none; }
+@media (max-width: 840px) { .hud.v12 .h-log .lg { font-size: 8.5px; } }
+/* v1.2.18 (regressão canhoto1217): em telas ≤ 840 px a linha inteira do log invadia a FITA de rumo (binóculo/espectador) → o log desce para LOGO ABAIXO da fita; nada truncado, nada removido */
+@media (max-width: 840px) { .hud.v12 .h-log { top: 62px !important; } }
+/* v1.2.18 item 5: MODO HELICÓPTERO com layout próprio — controles do navio (telégrafo, acelerador, leme, armas, chaves) saem de cena enquanto o jogador pilota (a IA comanda o navio, v1.2.17 item 27); voltam no botão NAVIO */
+.hud.modo-heli .h-teleg, .hud.modo-heli .h-leme, .hud.modo-heli .h-acel, .hud.modo-heli .h-armas, .hud.modo-heli .h-chaves, .hud.ctl-novo.modo-heli .h-chaves { display: none !important; }
+.hud.v12.modo-heli .h-cons { bottom: 112px !important; }
+/* botões do heli em arco com folga (POUSAR × NAVIO se tocavam) e número do ARMA dentro da tela */
+.hud .hl-bts .cb.a1.p0 { right: 160px; bottom: 22px; } .hud .hl-bts .cb.a1.p1 { right: 142px; bottom: 86px; } .hud .hl-bts .cb.a1.p2 { right: 86px; bottom: 146px; } .hud .hl-bts .cb.a1.p3 { right: 22px; bottom: 164px; } /* caixas de 52 px separadas ≥ 4 px em X ou Y (antes as caixas se tocavam) */
+.hud .hl-bts .cb-g { bottom: 20px !important; }
+/* v1.2.21 item 16: placar aberto com NOMES COMPLETOS — sem reticências; quebra em até 2 linhas e fonte um pouco menor, coluna do nome ocupa o espaço livre */
+.hud .h-lista .ls-l { grid-template-columns: 18px minmax(0, 1fr) auto; align-items: start; }
+.hud .h-lista .ls-l b, .hud .h-lista .ls-l span { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; word-break: normal; hyphens: none; line-height: 1.18; }
+.hud .h-lista .ls-l b { font-size: 10.5px; } .hud .h-lista .ls-l span { font-size: 9px; }
+.hud .h-lista .ls-l em { font-size: 9.5px; } .hud .h-lista .ls-l small { font-size: 8.5px; white-space: nowrap; }
+
+/* v1.2.21 item 16: faixa estreita entre botões → colunas empilhadas (nome com largura total), rolagem por dentro */
+.hud .h-lista.estreita { flex-direction: column; gap: 4px; }
+.hud .h-lista.estreita .ls-c { width: 100%; min-width: 0; flex: none; }

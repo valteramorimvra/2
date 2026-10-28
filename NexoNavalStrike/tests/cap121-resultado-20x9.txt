@@ -1,0 +1,11 @@
+1 navegando: {"kn":30,"frac":0.382,"aj":0.95,"fov":44.1,"rumo":15,"girando":false,"tv":"PRONTO · 0,3 km","ciws":"0","misseis":2,"log":[],"feed":["Lanchas de ataque rápido inimigas na área","Ricochete!","Helicóptero inimigo no ar"]}
+2a girando (alvo 6): {"kn":30.3,"frac":0.459,"aj":0.92,"fov":43.8,"rumo":15,"girando":true,"tv":"GIRANDO 59° · 5,5 km","ciws":"0","misseis":5,"log":[],"feed":["Lanchas de ataque rápido inimigas na área","Ricochete!","Helicóptero inimigo no ar"]} torres az ["45/G"]
+2b alinhada: {"kn":30.7,"frac":0.459,"aj":1.8,"fov":40.8,"rumo":15,"girando":true,"tv":"GIRANDO 15° · 5,5 km","ciws":"0","misseis":8,"log":[],"feed":["Lanchas de ataque rápido inimigas na área","Helicóptero inimigo no ar"]} torres az ["86/G"]
+3 CIWS reduzido: {"kn":31.6,"frac":0.449,"aj":1.8,"fov":41.2,"rumo":15,"girando":false,"tv":"PRONTO · 5,5 km","ciws":"1","misseis":13,"log":[],"feed":["ALERTA: míssil em ataque terminal!","MÍSSIL INIMIGO — DEFESA ATIVADA","ALERTA: míssil em ataque terminal!"]}
+3b CIWS +1,2 s: {"kn":31.7,"frac":0.453,"aj":1.8,"fov":40.8,"rumo":15,"girando":false,"tv":"PRONTO · 5,5 km","ciws":"1","misseis":16,"log":[],"feed":["MÍSSIL INIMIGO — DEFESA ATIVADA","ALERTA: míssil em ataque terminal!"]}
+4a travando: {"alvo":5,"trava":0.17,"caixa":"h-alvo TRAVANDO 17%"}
+4b travado: {"alvo":5,"trava":1,"caixa":"h-alvo travado TRAVADO"}
+4c ff: {"alvo":5,"quer":5,"passos":1250,"ativo":0,"dUlt":37,"vida":345,"imp":["missil:47"]}
+4c impacto: {"log":["IMPACTO DE MÍSSIL 47","SAM da frota interceptou ×3"],"df":[]}
+5 AUTO-MIRA: {"autoMira":true,"on":true,"salvo":true}
+erros: []

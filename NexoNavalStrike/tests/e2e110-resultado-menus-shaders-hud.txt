@@ -1,0 +1,17 @@
+FALHA em menus: TypeError: Cannot read properties of null (reading 'innerText')
+    at <anonymous>:1:41
+shaders nível 1: {"programas":25,"ruins":[],"glErro":0,"nivel":1}
+shaders nível 0: {"programas":37,"ruins":[],"glErro":0,"nivel":0}
+shaders nível 2: {"programas":39,"ruins":[],"glErro":0,"nivel":2}
+shaders nível 1: {"programas":39,"ruins":[],"glErro":0,"nivel":1}
+HUD 915x412: 28 elementos, problemas: nenhum
+HUD 800x360: 28 elementos, problemas: .hud-estado × .hud-teleg button[4]
+HUD 1280x720: 28 elementos, problemas: nenhum
+HUD 960x432: 28 elementos, problemas: nenhum
+HUD 740x360: 28 elementos, problemas: .hud-estado × .hud-teleg button[4]
+HUD 1600x720: 28 elementos, problemas: nenhum
+HUD canhoto 915x412: nenhum
+HUD binóculo: nenhum
+áudio: {"canhao_grande":"gravação real","canhao_medio":"gravação real","canhao_rapido":"gravação real","canhao_longe":"gravação real","ciws":"gravação real","vls_lancamento":"gravação real","explosao_perto":"gravação real","explosao_media":"gravação real","explosao_grande":"gravação real","explosao_longe":"gravação real","respingo_grande":"gravação real","respingo":"gravação real","impacto_metal":"gravação real","torpedo_corrida":"gravação real","alarme_trava":"gravação real","motor_diesel_loop":"gravação real","turbina_loop":"gravação real"}
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

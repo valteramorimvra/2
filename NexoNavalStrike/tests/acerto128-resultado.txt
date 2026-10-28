@@ -1,0 +1,5 @@
+MÍSSEIS  200 lançados: 161 acertos (80.5%), CIWS/SAM 20, isca 15, ilha 4, ERRO não explicado 0
+TORPEDOS 100 lançados: 92 acertos (92.0%), CIWS/SAM 8, isca 0, ilha 0, ERRO não explicado 0
+impactos com evento de explosão: 270
+PASSOU
+FIM

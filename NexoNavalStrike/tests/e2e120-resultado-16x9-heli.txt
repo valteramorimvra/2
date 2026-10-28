@@ -1,0 +1,8 @@
+helis do navio: [1,0]
+HUD helicóptero: 10 elementos; sem sobreposição
+heli: {"ctrl":0,"est":[[3,43],[1,8]]}
+heli atitude: {"pitch":-25.4,"roll":35.1,"kmh":33,"flares":2}
+após voltar: {"ctrl":-1,"est":[4,1]}
+NaN: ok
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

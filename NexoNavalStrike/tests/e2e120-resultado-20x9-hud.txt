@@ -1,0 +1,13 @@
+HUD partida: 19 elementos; PROBLEMAS: .h-painel × .h-radar
+FPS headless (SwiftShader, CPU): 3
+NaN: ok
+auto: {"tiros":2,"autoMira":true,"auto":1}
+HUD binóculo: 18 elementos; PROBLEMAS: .h-painel × .h-radar
+HUD drone: 19 elementos; PROBLEMAS: .h-painel × .h-radar
+cams: {"cam":"drone","uav":0}
+HUD alerta: 18 elementos; PROBLEMAS: .h-painel × .h-radar
+iscas: {"chaff":2,"res":5,"iscas":1}
+consumíveis: {"kit":"ouro 2/3 t39","controle":"ouro 2/3 t24","bomba":"ouro 3/3 t0","reparoHeli":"ouro 3/3 t0","abastece":"ouro 4/4 t0"} fogo 0
+crítico: {"vida":285,"max":1187,"fogo":0,"alag":0}
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

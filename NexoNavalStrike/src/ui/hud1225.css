@@ -1,0 +1,28 @@
+/* v1.2.25 item 8 — ZONA CENTRAL (placar) → lista COMPLETA.
+   Causa confirmada (1.2.24): (a) paisagem: a lista era encaixada no vão entre os botões abaixo do placar (93 px de altura) e rolava por dentro — 4 de 16 navios visíveis;
+   (b) retrato: o placar era empurrado para a direita (translateX ≥ var(--sl)+329px−50vw) e ficava FORA da tela (x 323…624 numa tela de 412 px) — o toque no centro não o alcançava. */
+@media (max-aspect-ratio: 4/5) {
+  .hud.v12 .h-placar { top: 148px; left: 50%; transform: translateX(-50%) scale(.9); }
+  .hud.v12 .h-fita { top: 182px; left: 50%; transform: translateX(-50%); }
+  .hud.v12 .h-fita canvas { width: 220px; }
+}
+/* painel aberto: os controles saem de cena (sem botão sobre a lista e sem lista sobre botão); qualquer toque fecha o painel */
+.hud.ls-aberta > *:not(.h-placar):not(.h-lista):not(.h-marcas) { visibility: hidden !important; }
+.hud.ls-aberta .h-marcas { opacity: .35; }
+.hud .h-lista.l1225 { overflow: hidden; z-index: 9; background: rgba(6,8,12,.92); }
+.hud .h-lista.l1225 .ls-l { padding: 2px 5px; margin-bottom: 2px; }
+.hud .h-lista.l1225.densa .ls-l { grid-template-columns: 16px minmax(0, 1fr) auto; grid-template-areas: 'f c e' 'f n s'; padding: 1px 4px; margin-bottom: 1px; }
+.hud .h-lista.l1225.densa .ls-l b { font-size: 9.5px; line-height: 1.1; } .hud .h-lista.l1225.densa .ls-l span { font-size: 8.5px; line-height: 1.1; }
+.hud .h-lista.l1225.densa .ls-l em { font-size: 9px; } .hud .h-lista.l1225.densa .ls-l small { font-size: 8px; }
+.hud .h-lista.l1225.densa .ls-c h4 { margin-bottom: 2px; font-size: 9px; }
+.hud .h-lista.l1225.cols4 .ls-c { display: grid; grid-template-columns: 1fr 1fr; column-gap: 4px; align-content: start; } .hud .h-lista.l1225.cols4 .ls-c h4 { grid-column: 1 / -1; }
+
+/* v1.2.29 item 13: contador aeronaves no ar — sob o radar (topo-esq), fora do centro/botões */
+.hud .h-ar { position: absolute; z-index: 6; pointer-events: none;
+  right: calc(var(--sr, 0px) + 42px); top: 6px; /* pedido 02:45 item 1: entre a zona central (placar) e o botão do olho; antes: left calc(var(--sl, 8px) + 44px); top: 136px (em cima do telégrafo) */
+  padding: 3px 8px; border-radius: 6px; font: 600 11px/1.2 system-ui, sans-serif;
+  color: #e2e8f0; background: rgba(6, 10, 16, .72); border: 1px solid rgba(148, 163, 184, .35);
+  letter-spacing: .02em; white-space: nowrap; }
+.hud .h-ar b { color: #7dd3fc; } .hud .h-ar span { color: #fca5a5; }
+@media (max-aspect-ratio: 19/9) { .hud .h-ar { right: calc(var(--sr, 0px) + 6px); top: 36px; } } /* 16:9 e mais quadrado: não cabe entre a zona central e o olho → logo abaixo do olho */
+@media (max-aspect-ratio: 4/5) { .hud .h-ar { right: 6px; top: 36px; font-size: 10px; } }

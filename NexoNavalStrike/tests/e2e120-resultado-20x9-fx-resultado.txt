@@ -1,0 +1,6 @@
+afundamento alvo: 5
+farol em -1945,916
+NaN: ok
+economia antes/depois: {"p":9976000,"o":100000} → {"p":985367549,"o":100040}
+ERROS DE CONSOLE: nenhum
+avisos: nenhum
