@@ -5,7 +5,7 @@ import { luzCidade, fatorHora } from './cidade.js';
 import { ONDAS, NUKE_ONDAS } from '../sim/ocean.js';
 /* v1.2.14 PERSPECTIVA AÉREA: antes de qualquer compilação, o trecho de névoa do three também DESSATURA com a distância (névoa original mantida; aditivos não ganham brilho) (silhuetas distantes azuladas/cinzentas, sem contorno duro). Mesmo número de programas (só muda o texto do chunk). */
 if (!THREE.ShaderChunk.fog_fragment.includes('aerea1214')) THREE.ShaderChunk.fog_fragment = THREE.ShaderChunk.fog_fragment.replace('gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );', '/* aerea1214 */ float fAe = smoothstep( 6000.0, 22000.0, vFogDepth ); /* v1.2.15: só além de ~6 km e no máx. 30% (1.2.14: 4%/km até 60% → cinza chapado) */ float lAe = dot( gl_FragColor.rgb, vec3( 0.299, 0.587, 0.114 ) ); gl_FragColor.rgb = mix( gl_FragColor.rgb, vec3( lAe ), fAe * 0.3 ); gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );');
-import { shadersAgua, CORES_AGUA, MAX_CASCOS, LUZ_ESPUMA } from '../naval5v5/agua.js';
+import { shadersAgua, CORES_AGUA, MAX_CASCOS, LUZ_ESPUMA, SOL_PT, IMP_ONDAS } from '../naval5v5/agua.js';
 import { GLSL_GERSTNER, NW } from '../naval5v5/gerstner.js';
 
 export const TEMPOS = {
@@ -45,7 +45,7 @@ export class Ambiente {
     this.uC = { uSol: { value: new THREE.Vector3(0, 1, 0) }, uCorSol: { value: new THREE.Color() }, uZen: { value: new THREE.Color() }, uHor: { value: new THREE.Color() }, uNoite: { value: 0 }, uNuvem: { value: 0 }, uChuva: { value: 0 }, uT2: { value: 0 } };
     this.uM = Object.assign({}, this.uC, { uT: { value: 0 }, uW: { value: Array.from({ length: NW }, () => new THREE.Vector4()) }, uQ: { value: Array.from({ length: NW }, () => new THREE.Vector4()) }, uAgua: { value: new THREE.Color() }, uRaso: { value: new THREE.Color() }, uProf: { value: null }, uTam: { value: 12000 }, uNeb: { value: 0.0001 }, uFog: { value: new THREE.Color() }, uFundo: { value: new THREE.Color(CORES_AGUA.fundo) }, uCosta: { value: new THREE.Color(CORES_AGUA.costa) }, uCrista: { value: new THREE.Color(CORES_AGUA.crista) }, uLuzAgua: { value: 1 }, uAmp: { value: 1 },
       uCas: { value: Array.from({ length: MAX_CASCOS }, () => new THREE.Vector4()) }, uDim: { value: Array.from({ length: MAX_CASCOS }, () => new THREE.Vector4()) }, uCurv: { value: new Float32Array(MAX_CASCOS) }, uNC: { value: 0 },
-      uNk: { value: new THREE.Vector4(0, 0, 0, 0) }, uNkP: { value: new THREE.Vector4(0, 0, 0, 0) } /* v1.2.30 item 9: anel nuclear (ativo=0 → custo zero no VS) */ });
+      uNk: { value: new THREE.Vector4(0, 0, 0, 0) }, uNkP: { value: new THREE.Vector4(0, 0, 0, 0) }, uImp: { value: Array.from({ length: 6 }, () => new THREE.Vector4()) }, uImpK: { value: new Float32Array(6) } /* v1.2.53 */ /* v1.2.30 item 9: anel nuclear (ativo=0 → custo zero no VS) */ });
     this.ceu = new THREE.Mesh(new THREE.SphereGeometry(1, 40, 20), new THREE.ShaderMaterial({ uniforms: this.uC, vertexShader: VS_CEU, fragmentShader: FS_CEU, side: THREE.BackSide, depthWrite: false, depthTest: false, fog: false }));
     this.ceu.renderOrder = -10; this.ceu.frustumCulled = false; cena.add(this.ceu);
     this.sol = new THREE.DirectionalLight('#ffffff', 2); this.sol.castShadow = false; this.sol.shadow.mapSize.set(2048, 2048); this.sol.shadow.bias = -0.0004; this.sol.shadow.normalBias = 0.6; const sc = this.sol.shadow.camera; sc.left = sc.bottom = -170; sc.right = sc.top = 170; sc.near = 10; sc.far = 1600; cena.add(this.sol); cena.add(this.sol.target);
@@ -69,7 +69,7 @@ export class Ambiente {
       const kH = tp.noite ? 0.22 : hora === 'entardecer' ? 0.62 : 1; const quente = hora === 'entardecer' ? new THREE.Color('#ff9a5a') : null;
       for (const [u, c] of [['uFundo', PC.fundo], ['uCosta', PC.costa], ['uCrista', PC.crista]]) { const col = new THREE.Color(c).multiplyScalar(kH * (nub ? 0.82 : 1)); if (quente) col.lerp(quente.clone().multiplyScalar(kH * 0.5), 0.12); if (nub) col.lerp(new THREE.Color('#5d6b75').multiplyScalar(kH * 0.6), nub * 0.3); this.uM[u].value.copy(col); } }
     this.uM.uAgua.value.set(tp.agua); this.uM.uRaso.value.set(tp.raso); this.uM.uLuzAgua.value = (tp.luzAgua || 1) * (1 - nub * 0.25); this.expo = tp.expo || 1; const neb = tp.neb * (tempo === 'chuva' ? 2.6 : nub ? 1.5 : 1); this.uM.uNeb.value = neb;
-    { const lz = Math.min(1, this.uM.uLuzAgua.value * (0.2 + 0.8 * Math.min(1, Math.max(0, s.y) * 2.4))); LUZ_ESPUMA.value.copy(this.uC.uHor.value).lerp(new THREE.Color(1, 1, 1), 0.55).multiplyScalar(lz); } /* v1.2.18 item 4: esteira iluminada pela cena */ this.uM.uFog.value.copy(this.uC.uHor.value); this.cena.fog.color.copy(this.uC.uHor.value); this.cena.fog.density = neb * 1.05;
+    { const lz = Math.min(1, this.uM.uLuzAgua.value * (0.2 + 0.8 * Math.min(1, Math.max(0, s.y) * 2.4))); SOL_PT.value.copy(s); LUZ_ESPUMA.value.copy(this.uC.uHor.value).lerp(new THREE.Color(1, 1, 1), 0.55).multiplyScalar(lz); } /* v1.2.18 item 4: esteira iluminada pela cena */ this.uM.uFog.value.copy(this.uC.uHor.value); this.cena.fog.color.copy(this.uC.uHor.value); this.cena.fog.density = neb * 1.05;
     this.sol.color.set(tp.sol); this.sol.intensity = tp.is * (1 - nub * 0.55); this.hemi.intensity = tp.hemi * (1 + nub * 0.15); this.hemi.color.copy(this.uC.uZen.value).lerp(new THREE.Color('#ffffff'), 0.4);
     this.noite = !!tp.noite; this.ambienteEnv();
   }
@@ -79,6 +79,7 @@ export class Ambiente {
   atualiza(t, cam, foco) {
     this.uM.uT.value = t; /* v1.2.16: t = relógio CONTÍNUO de render (sim.t + resto do acumulador), não mais o tempo do passo fixo de 60 Hz em degraus */ this.uC.uT2.value = t; this.ceu.position.copy(cam.position); this.ceu.scale.setScalar(cam.far * 0.9);
     if (this.mar) this.mar.position.set(cam.position.x, 0, cam.position.z); /* v1.2.16: o plano do mar segue a câmera de forma CONTÍNUA (antes: degraus de 4 m numa malha POLAR, que não coincide consigo mesma ao deslocar → a cada 4 m de câmera os vértices amostravam outras ondas e a água 'travava'/saltava). Ondas, espuma e ruído são em coordenadas de MUNDO: nada a compensar em UV */
+    { const U = this.uM.uImp.value, K = this.uM.uImpK.value; for (let i = 0; i < 6; i++) { const o = IMP_ONDAS[i]; if (o && t - o.t0 < 16) { U[i].set(o.x, o.z, o.t0, o.A); K[i] = o.k; } else U[i].w = 0; } } /* v1.2.53: ondas de impacto → shader */
     /* v1.2.30 item 9: sync anel nuclear → shader (só 1º vivo; se vazio, uNkP.w=0 e VS pula) */
     { const Q = NUKE_ONDAS; if (Q.length) { const o = Q[0]; this.uM.uNk.value.set(o.x, o.z, o.t0, o.A0); this.uM.uNkP.value.set(o.cg != null ? o.cg : o.c * 0.5, o.k, o.rMax, 1); } else { this.uM.uNkP.value.w = 0; } }
     if (foco) { this.sol.position.set(foco.x + this.dirSol.x * 800, this.dirSol.y * 800 + 20, foco.z + this.dirSol.z * 800); this.sol.target.position.set(foco.x, 0, foco.z); }

@@ -279,6 +279,13 @@ function iaTatica(sim, n, h, a, dt) { const H = h.H;
   if (h.tSub > 0) { h.tSub -= dt; voa(h, h.rSub ?? n.rumo, H.vmax * 0.8, 320, dt, sim); return true; } /* subida inicial reta após a catapulta (sem curva colada ao convés) */
   if (h.tQuebra > 0) { h.tQuebra -= dt; voa(h, h.bQuebra, H.vmax, 240, dt, sim); return true; } /* quebra e sobe após o disparo */
   return false; }
+/** v1.2.53: aeronave em voo atingida pela frente de choque — STALL temporário: perde sustentação (cai), rola e guina sem controle; o controle volta suave no fim. Perto do mar = queda. */
+export function passoTurbulencia(sim, dt) { for (const h of sim.helis) { if (!h.usado || (h.estado !== EST.VOO && h.estado !== EST.RETORNO)) continue; const vivo = h.nkTurb > sim.t; if (!vivo && !h._nkR) continue;
+    const u = vivo ? Math.min(1, (h.nkTurb - sim.t) / 3) : 0, av = !!(h.H && h.H.aviao); /* deslocamentos de atitude somados POR CIMA do piloto (avião: atitude absoluta a cada tick; helicóptero: atitude suavizada → desconta a anterior) */
+    h.nkAR = (h.nkAR || 0) + (vivo ? h.nkP * u : -(h.nkAR || 0) * 1.2) * dt; h.nkAQ = (h.nkAQ || 0) + (vivo ? h.nkQ * u : -(h.nkAQ || 0) * 1.2) * dt; h.nkP = (h.nkP || 0) * (1 - dt * 0.3);
+    const offR = h.nkAR, offQ = clamp(h.nkAQ, -0.9, 0.5); if (av) { h.roll = (h.roll || 0) + offR; h.pitch = (h.pitch || 0) + offQ; } else { h.roll = (h.roll || 0) - (h._nkR || 0) + offR; h.pitch = (h.pitch || 0) - (h._nkQ || 0) + offQ; }
+    h._nkR = Math.abs(offR) > 1e-3 || vivo ? offR : 0; h._nkQ = offQ; if (!h._nkR) { h.nkAR = 0; h.nkAQ = 0; }
+    if (vivo) { h.rumo = ang(h.rumo + h.nkY * u * dt); h.y -= (6 + 16 * u) * u * dt; /* STALL: perde sustentação */ if (h.y < alturaMar(h.x, h.z, sim.t) + 4) { h.nkTurb = 0; h._nkR = 0; derrubaAereo(sim, 'h', h, null); } } } }
 export function passoAereo(sim, dt) { POOL_REF.s = sim; if (!sim.stConves) sim.stConves = { arremetidas: 0 }; for (const n of sim.navios) if (n.dk) validaDk(sim, n);
   /* v1.2.27: porta-aviões (Abrolhos/Costa Verde/Chapada/Lençóis e demais PA) — ondas contínuas até maxAr, jogador e bots */
   for (const n of sim.navios) { if (n.morto || !n.helis || !n.helis.length || !(n.C.porta === 'pa' || n.C.maxAr >= 8)) continue;

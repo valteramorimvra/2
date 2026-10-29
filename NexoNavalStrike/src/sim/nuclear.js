@@ -259,8 +259,19 @@ export function fatorNuclear(d) {
 }
 /** Intensidade da frente de choque (0…1) na distância d — usada p/ impulso/vibração (independente do dano). */
 export function fatorChoque(d) { const Rb = NUK.raioBorda * 1.6; if (d >= Rb) return 0; return Math.pow(Math.max(0, 1 - d / Rb), 1.4); }
-/** Atraso da frente (s): supersônica perto do zero → 343 m/s. Mesma curva do FX (CURVA.choque invertida aprox.). */
-export function atrasoChoque(d) {
+/* v1.2.53: FRENTE DE CHOQUE FÍSICA — sobrepressão de pico Kinney-Graham ΔP/P0(Z), Z = R / W^(1/3) (W = 1 kt TNT = 1e6 kg → W^(1/3) = 100),
+   velocidade da frente por Rankine-Hugoniot v_s = c0·√(1 + (γ+1)/(2γ)·ΔP/P0) (γ = 1,4; c0 = 343 m/s) e R(T) integrado UMA vez (tabela determinística, dt = 10 ms). */
+export const CHOQUE = { W13: 100, c0: 343, gama: 1.4, dt: 0.01, n: 9000 };
+export function sobrepressao(R) { const Z = Math.max(0.05, R) / CHOQUE.W13; return 808 * (1 + (Z / 4.5) ** 2) / (Math.sqrt(1 + (Z / 0.048) ** 2) * Math.sqrt(1 + (Z / 0.32) ** 2) * Math.sqrt(1 + (Z / 1.35) ** 2)); }
+export function velChoque(R) { const g = CHOQUE.gama; return CHOQUE.c0 * Math.sqrt(1 + (g + 1) / (2 * g) * sobrepressao(R)); }
+const TAB_R = (() => { const t = new Float64Array(CHOQUE.n + 1); let R = 20; t[0] = 0; for (let i = 1; i <= CHOQUE.n; i++) { /* RK2 */ const k1 = velChoque(R), k2 = velChoque(R + k1 * CHOQUE.dt * 0.5); R += k2 * CHOQUE.dt; t[i] = R - 20; } return t; })();
+/** Raio da frente de choque (m) no tempo T (s) após a detonação — o FX (anel, onda no mar) usa a MESMA curva. */
+export function raioChoque(T) { if (!(T > 0)) return 0; const u = T / CHOQUE.dt; if (u >= CHOQUE.n) return TAB_R[CHOQUE.n] + (T - CHOQUE.n * CHOQUE.dt) * CHOQUE.c0; const i = Math.floor(u), f = u - i; return TAB_R[i] + (TAB_R[i + 1] - TAB_R[i]) * f; }
+/** Atraso da frente (s) até a distância d — inversa de raioChoque por busca binária na tabela. */
+export function atrasoChoque(d) { if (!(d > 0) || d !== d) d = 1; d = Math.max(1, d); if (d >= TAB_R[CHOQUE.n]) return CHOQUE.n * CHOQUE.dt + (d - TAB_R[CHOQUE.n]) / CHOQUE.c0;
+  let lo = 0, hi = CHOQUE.n; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (TAB_R[m] < d) lo = m; else hi = m; } return (lo + (d - TAB_R[lo]) / Math.max(1e-6, TAB_R[hi] - TAB_R[lo])) * CHOQUE.dt; }
+/** Atraso antigo (aprox. 343T + 520(1−e^(−T/0.5))) — mantido só como referência. */
+export function atrasoChoqueAntigo(d) {
   /* REVISAO #13+#14: inverte CURVA.choque R(T)=343T+520(1-exp(-T/0.5)) para impulso = anel visual; d=max(d,1) */
   if (!(d > 0) || d !== d) d = 1; d = Math.max(1, d);
   let T = d / NUK.vChoque;
@@ -351,8 +362,11 @@ function passoChoque(sim, dt) {
       n.v += (q.ux * s - q.uz * c) * vRad;
       if (C.vmax != null) n.v = clamp(n.v, -C.vmax * 0.35, C.vmax); /* respeita vmax */
       n.w = (n.w || 0) + (NUK.impYaw || 0.55) * q.fc * (q.ux * c + q.uz * s) * Math.min(1, 80 / C.L);
-      n.lista = clamp((n.lista || 0) + (NUK.impLista || 0.28) * q.fc * (q.ux * c + q.uz * s), -0.35, 0.35); /* sem capotar */
-      n.balanco = clamp((n.balanco || 0) + (NUK.impLista || 0.28) * 0.6 * q.fc, -0.45, 0.45);
+      n.lista = clamp((n.lista || 0) + (NUK.impLista || 0.28) * 0.55 * q.fc * (q.ux * c + q.uz * s), -0.3, 0.3); /* sem capotar */
+      { /* v1.2.53: TORQUE da frente sobre o casco → velocidade angular pela inércia: I_roll ≈ M(B² + (2·KG)²)/12, I_pitch ≈ M(L² + T²)/12. O balanço/caturro (mola-amortecedor de hidro.js) devolve o navio — adernamento e rolamento REAIS em vez de salto de ângulo */
+        const B = C.B || 16, L = C.L || 120, Tc = C.T || 5, KG = (C.F || 8) * 0.55, pr = (NUK.pressaoArea || 6) * q.fc; const lat = q.ux * c + q.uz * s, lon = q.ux * s - q.uz * c;
+        const Iroll = (B * B + 4 * KG * KG) / 12, Ipit = (L * L + Tc * Tc) / 12; /* por unidade de massa */ const Aroll = L * (C.F || 8), Apit = B * (C.F || 8);
+        n.balV = clamp((n.balV || 0) + pr * lat * Aroll * (C.F || 8) * 0.5 / (M / L * Iroll * 60), -0.9, 0.9); n.catV = clamp((n.catV || 0) + pr * lon * Apit * (C.F || 8) * 0.5 / (M / B * Ipit * 60), -0.25, 0.25); }
       n.nkChoqueAte = Math.max(n.nkChoqueAte || 0, sim.t + 10); /* controlo recuperável ≤10 s */
       sim.evento({ t: 'nkChoqueNavio', id: n.id, fc: q.fc, d: q.d, dv: vRad, I, M, w: n.w });
     } else if (q.tipo === 'aereo') {
@@ -363,6 +377,7 @@ function passoChoque(sim, dt) {
       const lim = NUK.dvAereoMax || 120; if (I > lim) I = lim;
       h.vx = (h.vx || 0) + q.ux * I; h.vy = (h.vy || 0) + Math.max(8, (q.uy || 0.2) * I * 0.55 + 12 * q.fc); h.vz = (h.vz || 0) + q.uz * I;
       if (h.v != null) h.v = Math.hypot(h.vx, h.vz);
+      if (q.kind !== 'u') { /* v1.2.53: distância média → perda de sustentação e giro descontrolado (vórtices da frente); assimetria determinística pelo índice */ const sg = (h.idx % 2) ? 1 : -1; h.nkTurb = sim.t + 2.5 + 5 * q.fc; h.nkP = sg * (1.2 + 2.6 * q.fc); h.nkY = -sg * (0.4 + 1.2 * q.fc); h.nkQ = -(0.3 + 0.8 * q.fc); }
       sim.evento({ t: 'nkChoqueAereo', kind: q.kind, idx: q.idx, fc: q.fc, d: q.d, I });
     } else if (q.tipo === 'convés') {
       const h = sim.helis[q.idx]; if (!h || !noConvesVisivel(h)) continue; const n = sim.navios[h.dono]; if (!n || n.morto) continue;
@@ -386,3 +401,4 @@ export function iaNuclear(sim, n, dt) { const k = n.nk; k.tIa -= dt; if (k.tIa >
     let sc = 0; for (const o of sim.navios) { if (o.morto) continue; const d = Math.hypot(o.x - e.x, o.z - e.z); if (o.time === n.time) { if (d < NUK.raioTotal * 0.7) { sc = -1; break; } continue; } if (d < NUK.raioTotal * 0.85) sc += o.C.superPA || (o.helis && o.helis.length >= 6) || o.C.vida >= 7000 ? 1.6 : 1; }
     if (sc > bs) { bs = sc; best = e; } }
   const tardio = sim.t > 420; if (best && (bs >= NUK.iaMinSc || (tardio && bs >= 1))) lancaNuclear(sim, n, { alvo: best.id }); }
+export { detona as detonaTeste }; /* v1.2.53: testes headless da frente de choque */

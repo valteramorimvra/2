@@ -4,7 +4,7 @@
 // Desempenho: TUDO criado no carregamento (memória estática, 0 alocação/0 programa novo em combate). Puffs = 1 InstancedBufferGeometry
 // (1 draw call para cogumelo+haste+coluna+surge; ordenação de trás p/ frente na CPU; LOD por qualidade e por distância). Total ≤ 7 draw calls no pico.
 // Luzes: NENHUMA luz nova (recompilaria todos os sombreadores); modula sol/hemi/exposição/céu/neblina já existentes e RESTAURA os valores-base no fim.
-import * as THREE from 'three';
+import * as THREE from 'three'; import { raioChoque } from '../sim/nuclear.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { modeloHeli } from './aereo3d.js'; import { Particulas } from './fx.js'; /* v1.2.33: fumaça colorida dos bombardeiros */ import { montaHidro3D } from './hidro3d.js'; import { HIDROS } from '../sim/hidroaviao.js'; /* v1.2.39 */ /* v1.2.26: bombardeiro único 'bombardeiroNuclear' (Urubu-rei) */
 
@@ -19,7 +19,7 @@ export const CURVA = {
   topo: (T) => Y0 + 3300 * (1 - Math.exp(-T / 24)),              // altura do centro da capa
   raioCapa: (T) => 180 + 1050 * (1 - Math.exp(-T / 30)),          // raio maior do toro
   raioBola: (T) => 280 * (1 - Math.exp(-T / 0.32)),               // bola de fogo
-  choque: (T) => 343 * T + 520 * (1 - Math.exp(-T / 0.5)),         // frente de choque (supersônica no início → 343 m/s)
+  choque: (T) => raioChoque(T),         // v1.2.53: frente de choque FÍSICA (Kinney-Graham + Rankine-Hugoniot) — a mesma da simulação
   flash: (T) => Math.exp(-T / 0.03) + 0.9 * (1 - Math.exp(-T / 0.15)) * Math.exp(-T / 0.9), // pulso duplo térmico
   surge: (T) => (T < 2 ? 0 : 1900 * (1 - Math.exp(-(T - 2) / 14))),
   dura: 160,

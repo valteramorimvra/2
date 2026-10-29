@@ -21,7 +21,7 @@ import { passoArmas5, taxaTorre, kickRecuo } from '../naval5v5/armas.js';
 import { instalaSec } from '../naval5v5/secundarias.js';
 import { arrastoCal, solucaoArrasto, elevacaoArrasto, arcoBloqueado, alcanceMax, cargaArco } from '../naval5v5/balistica.js';
 import { instalaAvarias, passoAvarias, danoLocal, passoAfundamento, MODS_PADRAO } from '../naval5v5/avarias.js';
-import { instalaAereo, instalaHelisNavio, comandoAereo, passoAereo, sensorAereo, POOL_AEREO } from '../naval5v5/aereo.js';
+import { instalaAereo, instalaHelisNavio, comandoAereo, passoAereo, passoTurbulencia, sensorAereo, POOL_AEREO } from '../naval5v5/aereo.js';
 import { instalaDefesa, instalaNavio, passoCiws5, passoLaser, passoSam, passoSams, passoA30, passoAmeacas, granadaNaAgua, CIWS, POOL5 } from '../naval5v5/defesa.js';
 
 import { instalaNuclear, passoNuclear, lancaNuclear, comandoNuclear } from './nuclear.js'; import { criaTrafego, passoTrafego, acertaCivil, danoCivil } from './trafego.js'; /* v1.2.46 */
@@ -126,7 +126,7 @@ export class Sim {
     const dt = DT; this.tick++; this.t += dt;
     const L = this.ordemTick(); /* v1.2.20: ORDEM NEUTRA — a cada tick a ordem de processamento dos navios se inverte (antes o azul sempre ia primeiro e o vermelho, por último, reagia ao estado mais novo: vantagem sistemática do vermelho em bot × bot) */
     for (const n of L) this.passoNavio(n, dt);
-    this.passoGranadas(dt); this.passoMisseis(dt); passoSams(this, dt); this.passoTorpedos(dt); passoAereo(this, dt); passoMissil1231(this, dt); passoNuclear(this, dt); passoHidros(this, dt); if (!this.trafego && this.trafegoOn !== false && this.tick === 1) this.trafego = criaTrafego(this, this._seedTr || 1); passoTrafego(this, dt); /* v1.2.46: tráfego civil */ this.passoIscas(dt); passoAmeacas(this, dt);
+    this.passoGranadas(dt); this.passoMisseis(dt); passoSams(this, dt); this.passoTorpedos(dt); passoAereo(this, dt); passoTurbulencia(this, dt); /* v1.2.53 */ passoMissil1231(this, dt); passoNuclear(this, dt); passoHidros(this, dt); if (!this.trafego && this.trafegoOn !== false && this.tick === 1) this.trafego = criaTrafego(this, this._seedTr || 1); passoTrafego(this, dt); /* v1.2.46: tráfego civil */ this.passoIscas(dt); passoAmeacas(this, dt);
     for (const n of L) { passoCiws5(this, n, dt); passoLaser(this, n, dt); passoSam(this, n, dt); passoA30(this, n, dt); }
     if (this.tick % 15 === 0) this.sensores();
     for (const n of L) passoArmas5(this, n, dt);

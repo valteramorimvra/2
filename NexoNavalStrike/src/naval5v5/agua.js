@@ -1,5 +1,9 @@
 import * as THREE from 'three';
-export const LUZ_ESPUMA = { value: new THREE.Color(1, 1, 1) }; /* v1.2.18 item 4: luz ambiente da espuma/esteira (sem brilho próprio) */
+export const LUZ_ESPUMA = { value: new THREE.Color(1, 1, 1) }; export const SOL_PT = { value: new THREE.Vector3(0, 1, 0) }; /* v1.2.53: direção do sol p/ espalhamento da fumaça */
+/* v1.2.53: ONDAS DE IMPACTO — a massa d'água que cai das colunas devolve momento ao mar: pacotes de ondas capilar-gravidade radiais (dispersão em água funda ω = √(g·k), velocidade de grupo c_g = ω/2k)
+   que deslocam a MALHA de verdade. Até 6 vivas (x, z, t0, A) + k (número de onda). Render apenas (a física dos navios não depende delas). */
+export const IMP_ONDAS = []; export const MAX_IMP = 6;
+export function ondaImpacto(x, z, t0, A, lambda) { if (IMP_ONDAS.length >= MAX_IMP) { let k = 0; for (let i = 1; i < IMP_ONDAS.length; i++) if (IMP_ONDAS[i].t0 < IMP_ONDAS[k].t0) k = i; IMP_ONDAS.splice(k, 1); } IMP_ONDAS.push({ x, z, t0, A, k: 6.2831853 / Math.max(2, lambda) }); } /* v1.2.18 item 4: luz ambiente da espuma/esteira (sem brilho próprio) */
 // Shader de água "modern naval" otimizado para WebView móvel (WebGL 1, sem textura de profundidade).
 // • v1.2.29 item 4: normais multi-escala + SSS Beer + whitecaps por inclinação + reflexo/refração melhores (LOD).
 // • 6 ondas de Gerstner (v1.2.3) com cristas agudas (o MESMO GLSL_GERSTNER usado pela física).
@@ -19,7 +23,7 @@ export function shadersAgua(GLSL_CEU, nivel) {
   const vs = def + GLSL_GERSTNER + `
 /* v1.2.16: precision highp (ShaderMaterial.precision) */
 /* v1.2.30 nuke1230 item 9: anel nuclear — uNk=(cx,cz,t0,A0) uNkP=(c,k,rMax,ativo); ativo=0 → ramo barato */
-uniform vec4 uNk; uniform vec4 uNkP;
+uniform vec4 uNk; uniform vec4 uNkP; uniform vec4 uImp[6]; uniform float uImpK[6];
 varying vec3 vW; varying float vCr; varying vec3 vN;
 void main(){ vec3 wp = (modelMatrix * vec4(position, 1.0)).xyz; vec3 n; float cr; float atn = 1.0 - smoothstep(2500.0, 7000.0, length(wp.xz - cameraPosition.xz));
   vec3 d = onda(wp.xz, n, cr) * atn; wp += d;
@@ -37,6 +41,10 @@ void main(){ vec3 wp = (modelMatrix * vec4(position, 1.0)).xyz; vec3 n; float cr
       cr += clamp(hnk * 0.08 + max(0.0, -uu) * 0.35 * (Amp / max(uNk.w / 400.0, 1.0)), 0.0, 1.6); /* espuma na crista do anel */
     }
   }
+  for (int i = 0; i < 6; i++) { vec4 I = uImp[i]; if (I.w <= 0.0) continue; float tau = uT - I.z; if (tau <= 0.0 || tau > 16.0) continue; /* v1.2.53: onda de impacto (pacote radial disperso) */
+    float k = uImpK[i], w = sqrt(9.81 * k), cg = 0.5 * w / k, lam = 6.2831853 / k; vec2 dv = wp.xz - I.xy; float r = length(dv); float fr = cg * tau * 2.0 + lam * 0.5; if (r > fr + lam) continue;
+    float amp = I.w * exp(-tau / 4.0) * (1.0 - smoothstep(fr - lam * 0.5, fr + lam, r)) / (1.0 + r * k * 0.22); float ph = k * r - w * tau; float hi = amp * cos(ph) - (tau < 1.2 ? I.w * 0.8 * (1.0 - tau / 1.2) * exp(-r * r * k * k * 0.25) : 0.0);
+    wp.y += hi * atn; float sr = -amp * k * sin(ph) * atn; vec2 rd = dv / max(r, 0.5); n = normalize(n + vec3(-rd.x * sr, 0.0, -rd.y * sr) * 0.6); cr += clamp(hi * 0.6, 0.0, 0.8) * atn; }
   vW = wp; vCr = cr * atn; vN = normalize(mix(vec3(0.0, 1.0, 0.0), n, atn)); gl_Position = projectionMatrix * viewMatrix * vec4(wp, 1.0); }`;
   const fs = def + GLSL_CEU + GLSL_GERSTNER + `
 uniform vec3 uFundo; uniform vec3 uCosta; uniform vec3 uCrista; uniform float uLuzAgua; uniform float uAmp;
