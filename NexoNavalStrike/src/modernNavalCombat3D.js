@@ -313,7 +313,7 @@ export class NavalCombat3D {
     /* clamp: câmera nunca entra na fuselagem (~raio 12 m) */
     { const dx = tx - P.x, dy = ty - P.y, dz = tz - P.z, d = Math.hypot(dx, dy, dz) || 1; const minD = 14; if (d < minD) { const s = minD / d; tx = P.x + dx * s; ty = Math.max(8, P.y + dy * s); tz = P.z + dz * s; } }
     if (!this._nkCP) this._nkCP = new THREE.Vector3(cam.position.x, cam.position.y, cam.position.z); const c = this._nkCP;
-    const k = 1 - Math.exp(-dt * (this.mem.trans > 0 ? 3.0 : 14)); /* pose já contínua — acompanha sem jitter de passo */ c.x += (tx - c.x) * k; c.y += (ty - c.y) * k; c.z += (tz - c.z) * k; c.y = Math.max(c.y, 8);
+    const k = 1 - Math.exp(-dt * (this.mem.trans > 0 ? 3.0 : 14)); /* pose já contínua — acompanha sem jitter de passo */ c.x += (tx - c.x) * k; c.y += (ty - c.y) * k; c.z += (tz - c.z) * k; c.y = Math.max(c.y, 8); if (!Number.isFinite(c.x + c.y + c.z)) { c.set(P.x, P.y + 20, P.z + 40); if (!Number.isFinite(c.x + c.y + c.z)) return false; } /* v1.2.37: nunca deixa a câmera inválida (tela preta) */
     /* só tremor nuke/atingido se ajuste ligado — NÃO canhão/tremorCanhao */
     const aj = this.save && this.save.ajustes; if (aj && aj.tremorAtingido !== false && (this.mem.shakeNuke || 0) > 0) { this.mem.shakeNuke = Math.max(0, this.mem.shakeNuke - dt * 1.15); const sh = Math.min(this.mem.shakeNuke, 0.55); c.x += (Math.random() - 0.5) * sh * 1.4; c.y += (Math.random() - 0.5) * sh * 0.9; }
     cam.position.copy(c); cam.lookAt(ax, ay, az); if (q.manual) cam.rotateZ(-(q.bank || 0) * 0.5); /* v1.2.32 */ cam.fov += (55 - cam.fov) * Math.min(1, dt * 5); cam.updateProjectionMatrix(); this.camPos.copy(c); return true; }

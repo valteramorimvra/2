@@ -55,7 +55,7 @@ export const NUK = Object.freeze({
 /** v1.2.32/1.2.33: esquadrilha de 3 bombardeiros — líder (jogador/IA) + 2 alas.
  *  Fila escalonada: cada ala 'passo' m atrás do anterior (27 m de avião + ~10 m de folga) e 'degrau' m mais alto.
  *  O líder solta no comando; as alas soltam 'intervalo' s e 2·'intervalo' s depois; próxima salva 'rearme' s após a última bomba. */
-export const FILA = Object.freeze({ passo: 37, degrau: 10, intervalo: 4, rearme: 10, nAlas: 2, decAla: 2.6 });
+export const FILA = Object.freeze({ passo: 37, degrau: 10, intervalo: 4, rearme: 10, nAlas: 2, decAla: 2.6, cam: 40 /* m: câmera atrás do último da fila */ });
 /** v1.2.29 (Valter 15:12): paiol nuclear por porta-aviões — constante ÚNICA. 'ilimitado' = flag no estado (k.ilimitado), contagem não decrementa
  *  (sem Infinity no estado salvo). Para voltar a um paiol finito, troque por um número (ex.: 10). */
 export const PAIOL_NUCLEAR_PA = 'ilimitado';
