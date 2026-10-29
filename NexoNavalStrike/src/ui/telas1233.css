@@ -20,3 +20,7 @@
 .hud:not(.modo-hd) .nk-bts .hdb { display: none !important; }
 .hud .hl-bts .cb.hd-t { right: 22px; bottom: 224px; }
 .hud .hl-bts .cb.hd-v { right: 150px; bottom: 150px; }
+/* v1.2.41: HIDROAVIÕES no estaleiro */
+.es-lista .hd-h{color:#7fd3ff}.es-lista .hd-s{font-style:normal;margin-right:4px}
+.es-lista button.hdn{position:relative}.es-lista .hd-sw{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:6px;vertical-align:-2px;box-shadow:0 0 0 1px rgba(255,255,255,.35),inset 0 1px 2px rgba(255,255,255,.4)}
+.selo.hd-selo{background:linear-gradient(90deg,#0e6fa8,#38bdf8);color:#fff}
