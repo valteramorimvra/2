@@ -21,14 +21,72 @@ export function destrutivel(o, tipo, ex = {}) { mesclaEstatico(o, new Set(['feix
 /** v1.2.19: tanque cilíndrico de combustível (teto cônico baixo, escada helicoidal sugerida por anel). */
 export function tanque(r = 10, h = 12) { const g = new THREE.Group(); const c = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 20).translate(0, h / 2, 0), mat('tq', () => M('#d9dcd8', 0.6, 0.35))); g.add(c); const t = new THREE.Mesh(new THREE.ConeGeometry(r * 1.01, r * 0.22, 20).translate(0, h + r * 0.11, 0), mat('tqt', () => M('#b9bcb8', 0.6, 0.35))); g.add(t);
   for (const y of [h * 0.33, h * 0.66]) { const a = new THREE.Mesh(new THREE.CylinderGeometry(r * 1.015, r * 1.015, 0.35, 20).translate(0, y, 0), mat('tqa', () => M('#9ca09c', 0.6, 0.4))); g.add(a); } const d = new THREE.Mesh(new THREE.CylinderGeometry(r + 3, r + 3, 1.4, 20).translate(0, 0.2, 0), mat('conc', () => M('#9ca3af', 0.95, 0.02))); g.add(d); return sombra(g); }
-export function galpao(w, d, h, cor = '#8b949c') { const g = new THREE.Group(); const p = new THREE.Mesh(new THREE.BoxGeometry(w, h, d).translate(0, h / 2, 0), mat('g' + cor, () => M(cor, 0.75, 0.25))); g.add(p);
-  const tel = new THREE.Shape(); tel.moveTo(-w / 2 - 0.4, 0); tel.lineTo(0, w * 0.18); tel.lineTo(w / 2 + 0.4, 0); tel.lineTo(-w / 2 - 0.4, 0); const tg = new THREE.ExtrudeGeometry(tel, { depth: d + 0.8, bevelEnabled: false }).translate(0, h, -d / 2 - 0.4); g.add(new THREE.Mesh(tg, mat('telha', () => M('#5b6670', 0.6, 0.4))));
-  const porta = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.45, h * 0.7), mat('porta', () => M('#3b434a', 0.6, 0.5))); porta.position.set(0, h * 0.35, d / 2 + 0.05); g.add(porta); return sombra(g); }
-export function guindaste(h = 34, cor = '#d6a21e') { const g = new THREE.Group(); const m = mat('gd' + cor, () => M(cor, 0.55, 0.45)); const L = h * 0.42;
-  for (const [x, z] of [[-L / 2, -5], [L / 2, -5], [-L / 2, 5], [L / 2, 5]]) { const p = new THREE.Mesh(new THREE.BoxGeometry(1.1, h, 1.1).translate(0, h / 2, 0), m); p.position.set(x, 0, z); g.add(p); }
-  for (const z of [-5, 5]) { const v = new THREE.Mesh(new THREE.BoxGeometry(L + 1.2, 1.6, 1.2), m); v.position.set(0, h, z); g.add(v); }
-  const lanca = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.8, h * 1.6), m); lanca.position.set(0, h + 2, -h * 0.25); g.add(lanca); const cab = new THREE.Mesh(new THREE.BoxGeometry(3, 2.4, 3), mat('cab', () => M('#e5e7eb', 0.5, 0.2))); cab.position.set(0, h - 1, -h * 0.55); g.add(cab);
-  const cabo = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, h * 0.7, 4), mat('cabo', () => M('#222', 0.5, 0.6))); cabo.position.set(0, h * 0.62, -h * 0.75); g.add(cabo); return sombra(g); }
+/* v1.2.65 (Valter: "nada de lego"): texturas procedurais pequenas e reaproveitadas — chapa ondulada com escorridos, portão de enrolar,
+   faixa de janelas e concreto com juntas/manchas. Geradas uma vez (canvas) e compartilhadas por todos os galpões/cais. */
+const TEX = {};
+function texCanvas(k, w, h, desenha, rep = true) { if (TEX[k]) return TEX[k]; const cv = document.createElement('canvas'); cv.width = w; cv.height = h; desenha(cv.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; if (rep) t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; return (TEX[k] = t); }
+let _sd = 7; const rnd0 = () => ((_sd = (_sd * 16807) % 2147483647) / 2147483647);
+/** Chapa ondulada (trapezoidal) vertical: sombreamento de onda a cada 1/16 da textura + escorridos de ferrugem/sujeira. */
+export const texOndulada = () => texCanvas('ondulada', 128, 128, (c, w, h) => { for (let x = 0; x < w; x++) { const f = (x % 8) / 8, v = f < 0.25 ? 236 : f < 0.5 ? 214 : f < 0.75 ? 192 : 222; c.fillStyle = `rgb(${v},${v},${v})`; c.fillRect(x, 0, 1, h); }
+  for (let i = 0; i < 26; i++) { const x = rnd0() * w, l = 20 + rnd0() * 90, a = 0.05 + rnd0() * 0.12; const g = c.createLinearGradient(0, 0, 0, l); g.addColorStop(0, `rgba(70,52,38,${a})`); g.addColorStop(1, 'rgba(70,52,38,0)'); c.fillStyle = g; c.fillRect(x, 0, 1 + rnd0() * 2, l); }
+  const g2 = c.createLinearGradient(0, h * 0.82, 0, h); g2.addColorStop(0, 'rgba(40,36,30,0)'); g2.addColorStop(1, 'rgba(40,36,30,.22)'); c.fillStyle = g2; c.fillRect(0, 0, w, h); });
+const texPortao = () => texCanvas('portao', 64, 128, (c, w, h) => { for (let y = 0; y < h; y++) { const f = (y % 6) / 6, v = f < 0.5 ? 200 : 168; c.fillStyle = `rgb(${v},${v + 4},${v + 8})`; c.fillRect(0, y, w, 1); } c.fillStyle = 'rgba(0,0,0,.35)'; c.fillRect(0, 0, 3, h); c.fillRect(w - 3, 0, 3, h); c.fillStyle = '#e1b12c'; for (let x = 0; x < w; x += 12) { c.fillRect(x, h - 8, 6, 8); } c.fillStyle = '#20252b'; for (let x = 6; x < w; x += 12) c.fillRect(x, h - 8, 6, 8); });
+const texJanelas = () => texCanvas('janelas', 128, 32, (c, w, h) => { c.fillStyle = '#c9ced3'; c.fillRect(0, 0, w, h); for (let x = 0; x < w; x += 16) { const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#5d7486'); g.addColorStop(0.55, '#26333e'); g.addColorStop(1, '#3a4a57'); c.fillStyle = g; c.fillRect(x + 2, 3, 12, h - 6); c.fillStyle = 'rgba(255,255,255,.18)'; c.fillRect(x + 3, 4, 4, h - 10); c.fillStyle = '#c9ced3'; c.fillRect(x + 7.5, 3, 1, h - 6); } });
+/** Concreto de cais: grão, manchas de óleo/umidade e juntas de dilatação a cada 1/4 da textura. */
+export const texConcreto = () => texCanvas('concreto', 256, 256, (c, w, h) => { c.fillStyle = '#9a9c9a'; c.fillRect(0, 0, w, h); const im = c.getImageData(0, 0, w, h), d = im.data; for (let i = 0; i < d.length; i += 4) { const n = (rnd0() - 0.5) * 26; d[i] += n; d[i + 1] += n; d[i + 2] += n; } c.putImageData(im, 0, 0);
+  for (let i = 0; i < 14; i++) { const x = rnd0() * w, y = rnd0() * h, r = 6 + rnd0() * 28, g = c.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, `rgba(48,46,42,${0.12 + rnd0() * 0.16})`); g.addColorStop(1, 'rgba(48,46,42,0)'); c.fillStyle = g; c.fillRect(x - r, y - r, r * 2, r * 2); }
+  c.fillStyle = 'rgba(30,30,30,.55)'; for (let k = 0; k < 4; k++) { c.fillRect(0, k * 64, w, 1.5); c.fillRect(k * 64, 0, 1.5, h); } });
+/** Armazém portuário: paredes de chapa ondulada, cumeeira e calhas, portões de enrolar com faixa de advertência, porta de pessoal,
+ *  faixa de janelas nas laterais longas e rodapé de concreto. w = largura (fachada do portão, eixo x), d = profundidade (z), h = pé-direito. */
+export function galpao(w, d, h, cor = '#8b949c') { const g = new THREE.Group();
+  const parede = mat('gw' + cor + w + 'x' + h + 'x' + d, () => { const t = texOndulada().clone(); t.needsUpdate = true; t.repeat.set(Math.max(1, (w + d) / 9), 1); return new THREE.MeshStandardMaterial({ color: cor, map: t, roughness: 0.68, metalness: 0.35 }); });
+  const p = new THREE.Mesh(new THREE.BoxGeometry(w, h, d).translate(0, h / 2, 0), parede); g.add(p);
+  const rod = new THREE.Mesh(new THREE.BoxGeometry(w + 0.3, 1.1, d + 0.3).translate(0, 0.55, 0), mat('rodape', () => M('#8d8f8c', 0.95, 0.02))); g.add(rod);
+  const tel = new THREE.Shape(); tel.moveTo(-w / 2 - 0.6, 0); tel.lineTo(0, w * 0.16); tel.lineTo(w / 2 + 0.6, 0); tel.lineTo(-w / 2 - 0.6, 0); const tg = new THREE.ExtrudeGeometry(tel, { depth: d + 1.2, bevelEnabled: false }).translate(0, h, -d / 2 - 0.6);
+  g.add(new THREE.Mesh(tg, mat('telha2', () => { const t = texOndulada().clone(); t.needsUpdate = true; t.rotation = Math.PI / 2; t.repeat.set(6, 6); return new THREE.MeshStandardMaterial({ color: '#7b8590', map: t, roughness: 0.55, metalness: 0.45 }); })));
+  const cum = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.5, d + 1.4).translate(0, h + w * 0.16 + 0.1, 0), mat('cumeeira', () => M('#5d666f', 0.5, 0.55))); g.add(cum);
+  for (const sx of [-1, 1]) { const ca = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, d + 1.4).translate(sx * (w / 2 + 0.75), h - 0.15, 0), mat('calha', () => M('#b4bac0', 0.45, 0.6))); g.add(ca);
+    for (const sz of [-1, 1]) { const tb = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, h - 0.4, 6).translate(sx * (w / 2 + 0.3), (h - 0.4) / 2, sz * (d / 2 - 0.6)), mat('calha', () => M('#b4bac0', 0.45, 0.6))); g.add(tb); }
+    const jan = new THREE.Mesh(new THREE.PlaneGeometry(d * 0.86, 1.6), mat('jan' + d, () => { const t = texJanelas().clone(); t.needsUpdate = true; t.repeat.set(Math.max(1, d / 8), 1); return new THREE.MeshStandardMaterial({ map: t, roughness: 0.25, metalness: 0.3 }); }));
+    jan.position.set(sx * (w / 2 + 0.06), h * 0.78, 0); jan.rotation.y = sx * Math.PI / 2; g.add(jan); }
+  const nP = w > 30 ? 2 : 1, pw = Math.min(w * 0.36, 11), ph = Math.min(h * 0.72, 9); for (let i = 0; i < nP; i++) { const x = nP === 1 ? 0 : (i ? 1 : -1) * w * 0.24;
+    const moldura = new THREE.Mesh(new THREE.BoxGeometry(pw + 0.8, ph + 0.5, 0.3).translate(x, (ph + 0.5) / 2, d / 2 + 0.1), mat('moldura', () => M('#3a4148', 0.55, 0.5))); g.add(moldura);
+    const porta = new THREE.Mesh(new THREE.PlaneGeometry(pw, ph), mat('portao', () => new THREE.MeshStandardMaterial({ map: texPortao(), roughness: 0.5, metalness: 0.55 }))); porta.position.set(x, ph / 2, d / 2 + 0.27); g.add(porta);
+    const caixa = new THREE.Mesh(new THREE.BoxGeometry(pw + 0.4, 0.9, 0.8).translate(x, ph + 0.75, d / 2 + 0.45), mat('moldura', () => M('#3a4148', 0.55, 0.5))); g.add(caixa); }
+  const pp = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 2.2), mat('porta', () => M('#2f5d8a', 0.5, 0.4))); pp.position.set(w / 2 - 2.2, 1.1 + 0.55, d / 2 + 0.06); g.add(pp);
+  const marq = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.12, 1.1).translate(w / 2 - 2.2, 3.1, d / 2 + 0.6), mat('calha', () => M('#b4bac0', 0.45, 0.6))); g.add(marq);
+  return sombra(g); }
+/** Barra prismática entre dois pontos (perfil de aço) — base das treliças. */
+const _va = new THREE.Vector3(), _vb = new THREE.Vector3(), _up = new THREE.Vector3(0, 1, 0), _qB = new THREE.Quaternion();
+function barra(g, m, ax, ay, az, bx, by, bz, e = 0.45) { _va.set(ax, ay, az); _vb.set(bx, by, bz); const L = _va.distanceTo(_vb); if (L < 0.01) return; const b = new THREE.Mesh(new THREE.BoxGeometry(e, L, e), m);
+  b.position.copy(_va).add(_vb).multiplyScalar(0.5); _qB.setFromUnitVectors(_up, _vb.sub(_va).normalize()); b.quaternion.copy(_qB); g.add(b); return b; }
+/** Guindaste de pórtico de cais (tipo STS): 4 pernas com contraventamento em X, truques de rodas sobre trilhos, vigas de portal,
+ *  lança em TRELIÇA projetada sobre a água (−z local), torre em A com estais, casa de máquinas, cabine do operador no carro,
+ *  cabos de içamento e spreader suspenso, escada, luzes de obstáculo. h = altura do portal (m). */
+export function guindaste(h = 34, cor = '#d6a21e') { const g = new THREE.Group(); const m = mat('gd' + cor, () => M(cor, 0.5, 0.55)), mf = mat('gdf' + cor, () => M(new THREE.Color(cor).multiplyScalar(0.72).getStyle(), 0.55, 0.5));
+  const X = 9, Z = 8, hp = h - 2, alc = h * 1.15, tras = 20, hb = 2.6, xb = 2.3;
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) { barra(g, m, sx * X, 1.2, sz * Z, sx * X, hp, sz * Z, 1.3);
+    const tr = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.2, 1.8).translate(sx * X, 0.6, sz * Z), mat('truque', () => M('#2c3137', 0.6, 0.6))); g.add(tr); }
+  for (const sz of [-1, 1]) { barra(g, m, -X, 1.6, sz * Z, X, 1.6, sz * Z, 1.1); barra(g, m, -X, h * 0.52, sz * Z, X, h * 0.52, sz * Z, 1.0); barra(g, m, -X, hp, sz * Z, X, hp, sz * Z, 1.4);
+    barra(g, mf, -X, 2, sz * Z, X, h * 0.5, sz * Z, 0.5); barra(g, mf, X, 2, sz * Z, -X, h * 0.5, sz * Z, 0.5); barra(g, mf, -X, h * 0.54, sz * Z, X, hp - 0.6, sz * Z, 0.5); barra(g, mf, X, h * 0.54, sz * Z, -X, hp - 0.6, sz * Z, 0.5); }
+  for (const sx of [-1, 1]) { barra(g, m, sx * X, h * 0.52, -Z, sx * X, h * 0.52, Z, 0.9); barra(g, m, sx * X, hp, -Z, sx * X, hp, Z, 1.2); barra(g, mf, sx * X, h * 0.54, -Z, sx * X, hp - 0.6, Z, 0.45); }
+  /* lança em treliça: banzos superior/inferior nos dois lados (x = ±xb), montantes e diagonais a cada 4 m */
+  const z0 = tras, z1 = -alc, yb = h, yt = h + hb; for (const sx of [-1, 1]) { barra(g, m, sx * xb, yb, z0, sx * xb, yb, z1, 0.75); barra(g, m, sx * xb, yt, z0, sx * xb, yt, z1 + 3, 0.6);
+    let k = 0; for (let z = z0; z > z1 + 3; z -= 4, k++) { barra(g, mf, sx * xb, yb, z, sx * xb, yt, z, 0.32); barra(g, mf, sx * xb, yb, z, sx * xb, yt, Math.max(z1 + 3, z - 4), 0.28); } barra(g, m, sx * xb, yt, z1 + 3, sx * xb, yb, z1, 0.5); }
+  for (let z = z0; z > z1; z -= 8) { barra(g, mf, -xb, yt, z, xb, yt, z, 0.28); barra(g, mf, -xb, yb, z, xb, yb, z, 0.32); }
+  /* torre em A + estais da lança (tirantes) */ const ya = h + 16, za = 5; for (const sx of [-1, 1]) { barra(g, m, sx * 3.2, yt, za + 4, sx * 0.5, ya, za, 0.8); barra(g, m, sx * 3.2, yt, za - 4, sx * 0.5, ya, za, 0.8); }
+  const cabT = mat('cabo', () => M('#1f2328', 0.4, 0.8)); for (const sx of [-1, 1]) { barra(g, cabT, sx * 0.4, ya, za, sx * xb, yt, z1 + 4, 0.14); barra(g, cabT, sx * 0.4, ya, za, sx * xb, yt, -alc * 0.42, 0.12); barra(g, cabT, sx * 0.4, ya, za, sx * xb, yt, z0, 0.14); }
+  const casa = new THREE.Mesh(new THREE.BoxGeometry(7.5, 4.6, 9).translate(0, yt + 2.3, tras - 6), mat('casaMaq', () => M('#e7e9eb', 0.6, 0.25))); g.add(casa);
+  const grade = new THREE.Mesh(new THREE.PlaneGeometry(5.5, 2.2), mat('grelha', () => M('#5b6168', 0.7, 0.4))); grade.position.set(3.77, yt + 2.6, tras - 6); grade.rotation.y = Math.PI / 2; g.add(grade);
+  /* carro (trolley) + cabine do operador envidraçada pendurada + cabos + spreader */ const zc = -alc * 0.62; const carro = new THREE.Mesh(new THREE.BoxGeometry(xb * 2 + 0.8, 1.4, 4.2).translate(0, yb - 0.4, zc), mat('carro', () => M('#2f353c', 0.55, 0.6))); g.add(carro);
+  const cab = new THREE.Mesh(new THREE.BoxGeometry(2.6, 2.4, 2.8).translate(1.4, yb - 2.6, zc + 2.4), mat('cab', () => M('#e5e7eb', 0.5, 0.2))); g.add(cab);
+  const vid = new THREE.Mesh(new THREE.BoxGeometry(2.66, 1.3, 2.86).translate(1.4, yb - 2.3, zc + 2.4), mat('vidroCab', () => new THREE.MeshStandardMaterial({ color: '#203040', roughness: 0.08, metalness: 0.9, envMapIntensity: 1.4 }))); g.add(vid);
+  const ys = h * 0.38; for (const [cx, cz] of [[-1.1, -1.4], [1.1, -1.4], [-1.1, 1.4], [1.1, 1.4]]) barra(g, cabT, cx, yb - 1.1, zc + cz, cx * 3.5, ys + 0.6, zc + cz * 0.9, 0.09);
+  const spr = new THREE.Mesh(new THREE.BoxGeometry(12.2, 0.7, 2.5).translate(0, ys, zc), mat('spreader', () => M('#e0a81c', 0.55, 0.4))); g.add(spr);
+  for (let i = 0; i < 9; i++) { const y = 2 + i * (hp - 4) / 9; barra(g, mat('escada', () => M('#9aa1a8', 0.5, 0.6)), X + 1.2, y, Z - 1, X + 1.2, y + (hp - 4) / 9, Z - 3.6, 0.3); }
+  for (const [lx, ly, lz] of [[0, ya + 0.6, za], [xb, yt + 0.4, z1 + 3], [-xb, yt + 0.4, z1 + 3]]) { const l = new THREE.Mesh(new THREE.SphereGeometry(0.4, 8, 6), mat('lampVerm', () => new THREE.MeshBasicMaterial({ color: '#ff3020' }))); l.position.set(lx, ly, lz); l.userData.luz = 1; g.add(l); }
+  return sombra(g); }
 export function conteineres(n, larg, prof, seed = 1) { let sd = seed * 9301 + 49297; const rnd = () => ((sd = (sd * 16807) % 2147483647) / 2147483647); const geo = new THREE.BoxGeometry(12, 2.6, 2.45).translate(0, 1.3, 0);
   const im = new THREE.InstancedMesh(geo, mat('cont', () => M('#ffffff', 0.7, 0.35)), n); const mt = new THREE.Matrix4(), c = new THREE.Color(); const cores = ['#b91c1c', '#1d4ed8', '#047857', '#c2410c', '#6b7280', '#a16207', '#0e7490', '#7c2d12'];
   let k = 0; for (let i = 0; i < n * 3 && k < n; i++) { const col = Math.floor(rnd() * (larg / 12.6)), lin = Math.floor(rnd() * (prof / 2.6)), nv = Math.floor(rnd() * 4); mt.makeTranslation(col * 12.6 - larg / 2, nv * 2.62, lin * 2.6 - prof / 2); im.setMatrixAt(k, mt); im.setColorAt(k, c.set(cores[Math.floor(rnd() * cores.length)])); k++; }

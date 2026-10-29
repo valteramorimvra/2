@@ -18,7 +18,7 @@ const MAPA_SOMBRA = function (r, o, c, sc, g, dm) { if (dm && !(dm.alphaTest > 0
 import { Hud } from './ui/hud.js';
 import { Naval5v5 } from './modernNaval5v5.js';
 import { Aereo3D, modeloHeli } from './render/aereo3d.js';
-import { galpao, guindaste, conteineres, poste, farolGirante } from './render/props.js';
+import { galpao, guindaste, conteineres, poste, farolGirante, texConcreto } from './render/props.js';
 import { orla, boia } from './render/cidade.js';
 import { PARAM } from './armasParametros.js'; import { alcRadar as alcRadarAlvo } from './sim/deteccao.js'; /* v1.2.30 item 11 */
 import { urlBandeira, CAMO_T } from './render/camuflagem.js';
@@ -116,7 +116,7 @@ export class NavalCombat3D {
   abreHangar() { try { if (!this.hangar) this.hangar = new Hangar3D(this.R); } catch (e) { return null; } this.escondeVitrine(); this.hangar.redimensiona(this.W, this.H); this.hangar.ativo = true; return this.hangar; }
   fechaHangar() { if (this.hangar) this.hangar.ativo = false; }
   /** Vista ampla do estaleiro/porto (opcional): cais com guindastes, galpões, contêineres, navios atracados e luzes. */
-  montaPorto() { const V = this.vitrine; if (V.porto) return V.porto; const g = new THREE.Group(); const conc = new THREE.MeshStandardMaterial({ color: '#5f666e', roughness: 0.95, metalness: 0.02 });
+  montaPorto() { const V = this.vitrine; if (V.porto) return V.porto; const g = new THREE.Group(); const tc = texConcreto().clone(); tc.needsUpdate = true; tc.repeat.set(110 / 18, 520 / 18); const conc = new THREE.MeshStandardMaterial({ color: '#a8aaa8', map: tc, roughness: 0.93, metalness: 0.02 }); /* v1.2.65: concreto com juntas de dilatação e manchas (antes cinza liso) */
     /* v1.2.16 item 31: BASE NAVAL de guerra — cais militar de concreto (borda em x = 35), defensas de borracha, cabeços, armazéns cinza, guindastes de doca, torres de iluminação, navios de guerra ao fundo; sem contêineres/elementos civis */
     const cais = new THREE.Mesh(new THREE.BoxGeometry(110, 6.5, 520).translate(0, -1.0, 0), conc); cais.position.x = 90; cais.receiveShadow = true; g.add(cais);
     { const borr = new THREE.MeshStandardMaterial({ color: '#15171a', roughness: 0.9 }); const fg = new THREE.CylinderGeometry(0.75, 0.75, 3.2, 10); for (let i = 0; i < 26; i++) { const f = new THREE.Mesh(fg, borr); f.rotation.x = Math.PI / 2; f.position.set(34.25, 0.7, -250 + i * 20); g.add(f); } /* defensas (fenders) cilíndricas penduradas no paramento */

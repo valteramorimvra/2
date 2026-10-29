@@ -326,3 +326,5 @@
 .ar-t-apoio { --cat: #a8762a !important; } .ar-t-corveta { --cat: #47677d !important; } .ar-t-fragata { --cat: #4a6638 !important; } .ar-t-destroier { --cat: #6e5330 !important; }
 .ar-t-cruzador { --cat: #574774 !important; } .ar-t-capitania { --cat: #7f3530 !important; } .ar-t-porta { --cat: #2c6669 !important; } .ar-t-hidro { --cat: #355f88 !important; } .ar-t-aero { --cat: #5f6434 !important; }
 @media (max-height: 440px) { .tela-arvore .ar-linha { grid-template-columns: 100px repeat(6, 210px); } .tela-arvore .ar-card { width: 96px; height: 62px; } .tela-arvore .ar-linha:not(.ar-cab)::after { left: 106px; } }
+/* v1.2.65 (Valter): saldo de moedas CENTRALIZADO no topo do menu (antes ficava deslocado para a direita do centro); tamanho e demais botões iguais à 1.2.64 */
+.tela-inicio .mw-moedas { right: auto !important; left: 50% !important; translate: -50% 0 !important; transform: none !important; }
