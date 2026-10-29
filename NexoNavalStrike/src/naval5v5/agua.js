@@ -98,8 +98,8 @@ void main(){ vec3 V = normalize(cameraPosition - vW); float dc = length(cameraPo
   vec3 dd = onda(vW.xz, N, cr); cr = vCr; float det = 1.0 - smoothstep(140.0, 1100.0, dc); vec2 q = vW.xz * 0.09;
   vec2 q1 = mat2(0.799, 0.602, -0.602, 0.799) * q, q2 = mat2(0.485, -0.875, 0.875, 0.485) * q * 1.73;
   if (det > 0.0) {
-    float n1 = ns(q1 + uT * 0.35) - ns(q2 - uT * 0.3);
-    N = normalize(N + vec3(n1, 0.0, n1 * 0.9) * (0.16 * det));
+    float n1 = ns(q1 + uT * 0.35) - ns(q2 - uT * 0.3); float n2 = ns(mat2(0.94, -0.34, 0.34, 0.94) * q * 0.41 + vec2(uT * 0.11, -uT * 0.07)) - 0.5; float n3 = ns(mat2(0.2, 0.98, -0.98, 0.2) * q * 2.9 - uT * 0.55) - 0.5;
+    N = normalize(N + vec3(n1 * 0.7 + n2 * 0.75 + n3 * 0.35, 0.0, n1 * 0.6 - n2 * 0.55 + n3 * 0.4) * (0.13 * det)); /* v1.2.52: 3 oitavas em direções diferentes — quebra o padrão repetido de listras no meio do mar */
   }
   { float dn = 1.0 - smoothstep(16.0, 140.0, dc); if (dn > 0.0) {
       float f1 = ns(vW.xz * 0.62 + uT * 1.1);
