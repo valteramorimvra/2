@@ -5,6 +5,7 @@
 // (sem detonar). Após o paraquedas abrir a bomba NÃO é abatível por CIWS/laser (alvo pequeno sob retardo + tempo curto — irrealista). FOGO AMIGO = 0.
 // v1.2.27: raio ~1,5–5 km. v1.2.29 (nuke1230 v2): dano MÁX 50% vida (cai c/ distância); fogo amigo 0;
 // onda de choque atraso d/343; arranca convés; T.estr; efeitos ~7 s antes do fim. Colisão terreno (desvio/impacto).
+import { choqueCivis } from './trafego.js';
 import { clamp, ang, marcacao, G } from './util.js';
 import { desviaTerreno, colideAereoTerreno } from './colisaoTerreno.js';
 import { alturaMar, emiteOndaNuclear } from './ocean.js';
@@ -275,7 +276,7 @@ function detona(sim, x, y, z, dono, time) {
   const det = { t: sim.t, x, y, z, time, dono: dono ? dono.id : -1, mortos: [], danos: [], impulsos: 0, convés: 0 }; sim.nukeDet.push(det); if (sim.nukeDet.length > 8) sim.nukeDet.shift();
   sim.nkEspetaculoAte = Math.max(sim.nkEspetaculoAte || 0, sim.t + (NUK.fimAtraso || 7));
   sim.evento({ t: 'nkDetona', x, y, z, time, dono: det.dono, espetaculo: NUK.fimAtraso || 7 });
-  emiteOndaNuclear(x, z, sim.t, 6e3, 280); /* item 9: A0=6e3 (REVISAO #1) */
+  emiteOndaNuclear(x, z, sim.t, 6e3, 280); choqueCivis(sim, x, z); /* v1.2.46: onda de choque empurra/afunda os civis */ /* item 9: A0=6e3 (REVISAO #1) */
   // 1) DANO imediato (térmico/radiação prompt) — máx 50% vida; FOGO AMIGO = 0
   for (const n of sim.navios) { if (n.morto) continue; const dh = Math.max(0, Math.hypot(n.x - x, n.z - z) - n.C.L * 0.5), d = Math.max(1, Math.hypot(dh, y)); const f = fatorNuclear(d);
     agendaChoqueNavio(sim, n, x, y, z, d, fatorChoque(d)); /* REVISAO #5: impulso mesmo fora do raio de dano */

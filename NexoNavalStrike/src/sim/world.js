@@ -24,7 +24,8 @@ import { instalaAvarias, passoAvarias, danoLocal, passoAfundamento, MODS_PADRAO 
 import { instalaAereo, instalaHelisNavio, comandoAereo, passoAereo, sensorAereo, POOL_AEREO } from '../naval5v5/aereo.js';
 import { instalaDefesa, instalaNavio, passoCiws5, passoLaser, passoSam, passoSams, passoA30, passoAmeacas, granadaNaAgua, CIWS, POOL5 } from '../naval5v5/defesa.js';
 
-import { instalaNuclear, passoNuclear, lancaNuclear, comandoNuclear } from './nuclear.js'; import { passoHidros, comandoHidro } from './hidroaviao.js'; /* v1.2.39: hidroaviões */
+import { instalaNuclear, passoNuclear, lancaNuclear, comandoNuclear } from './nuclear.js'; import { criaTrafego, passoTrafego, acertaCivil, danoCivil } from './trafego.js'; /* v1.2.46 */
+import { passoHidros, comandoHidro } from './hidroaviao.js'; /* v1.2.39: hidroaviões */
 import { passoMissil1231, lancaMissilNuclear1231 } from './missilNuclear1231.js'; /* v1.2.31 */ /* v1.2.26: bombardeiro + bomba atômica */
 export const DT = 1 / 60;
 export const PISCA_BOT = 0.2;
@@ -65,7 +66,7 @@ function pool(n, f) { const a = new Array(n); for (let i = 0; i < n; i++) a[i] =
 function dhM(h0, hm) { const d = h0 - hm; return d >= 0.5 ? d : hm > 0 ? Math.max(-80, d) : 0.5; }
 export class Sim {
   constructor({ arena, seed = 1, hora = 'dia', tempo = 'limpo' }) {
-    this.T = arena; resetCacheTerreno(); this.rng = new Rng(seed); this.tick = 0; this.t = 0; this.hora = hora; this.tempo = tempo;
+    this.T = arena; resetCacheTerreno(); this.rng = new Rng(seed); this._seedTr = seed; this.tick = 0; this.t = 0; this.hora = hora; this.tempo = tempo;
     this.navios = []; this.eventos = []; this.fim = null;
     this.granadas = pool(POOL.granadas, () => ({ x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, dono: -1, dano: 0, cal: 0, t: 0 }));
     this.misseis = pool(POOL.misseis, () => ({ x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, dono: -1, time: '', alvo: -1, isca: -1, fase: 0, t: 0, v: 0, perfil: null, cel: 0, iscasVistas: 0, tf: 0, d0: 0 }));
@@ -125,7 +126,7 @@ export class Sim {
     const dt = DT; this.tick++; this.t += dt;
     const L = this.ordemTick(); /* v1.2.20: ORDEM NEUTRA — a cada tick a ordem de processamento dos navios se inverte (antes o azul sempre ia primeiro e o vermelho, por último, reagia ao estado mais novo: vantagem sistemática do vermelho em bot × bot) */
     for (const n of L) this.passoNavio(n, dt);
-    this.passoGranadas(dt); this.passoMisseis(dt); passoSams(this, dt); this.passoTorpedos(dt); passoAereo(this, dt); passoMissil1231(this, dt); passoNuclear(this, dt); passoHidros(this, dt); this.passoIscas(dt); passoAmeacas(this, dt);
+    this.passoGranadas(dt); this.passoMisseis(dt); passoSams(this, dt); this.passoTorpedos(dt); passoAereo(this, dt); passoMissil1231(this, dt); passoNuclear(this, dt); passoHidros(this, dt); if (!this.trafego && this.trafegoOn !== false && this.tick === 1) this.trafego = criaTrafego(this, this._seedTr || 1); passoTrafego(this, dt); /* v1.2.46: tráfego civil */ this.passoIscas(dt); passoAmeacas(this, dt);
     for (const n of L) { passoCiws5(this, n, dt); passoLaser(this, n, dt); passoSam(this, n, dt); passoA30(this, n, dt); }
     if (this.tick % 15 === 0) this.sensores();
     for (const n of L) passoArmas5(this, n, dt);
@@ -300,6 +301,7 @@ export class Sim {
         { const sec = hit.lz < -n.C.L * 0.25 ? 0.9 : hit.lz > n.C.L * 0.3 ? 1.15 : 1; const d = g.dano * sec * (hit.ly < 1 ? 1.25 : 1) * 1 /* v1.2.21 item 19: AP já leva +22% (municaoEf); o ×1,1 extra contra blindagem dava +34% */ * (rico ? 0.25 : 1); if (g.foguete) dono.stats.heliAcertos = (dono.stats.heliAcertos || 0) + 1; else dono.stats.acertos++; if (!(dono && dono !== n && dono.time === n.time)) danoLocal(this, n, hit, d, 'canhao', g); /* v1.2.30 item 12: fogo amigo = 0 também no dano LOCAL (alagamento/módulo) */ this.dano(n, d, dono, 'canhao');
           this.evento({ t: 'impacto', x: hit.px, y: hit.py, z: hit.pz, alvo: n.id, dono: g.dono, cal: g.cal, agua: g.agua ? 1 : 0, tipo: g.rbu ? 'rbu' : g.foguete ? 'foguete' : 'canhao', ly: hit.ly, dano: Math.max(1, Math.round(d / n.C.blind)) }); }
         g.ativo = 0; g.fim = 'navio'; continue; }
+      { const cv = this.trafego && g.y < 40 ? acertaCivil(this, g.x, g.y, g.z) : null; if (cv) { danoCivil(this, cv, g.dano * (g.agua ? 0.3 : 1), g.x, g.z, g.agua ? 0 : g.fogo || 0.15); this.evento({ t: 'impactoCivil', x: g.x, y: g.y, z: g.z, cal: g.cal, agua: g.agua ? 1 : 0, civ: cv.id }); g.ativo = 0; g.fim = 'civil'; continue; } } /* v1.2.46: mercantes/rebocadores são atingíveis */
       const hA = alturaMar(g.x, g.z, this.t);
       if (g.y <= hA) { const hT = alturaTerreno(this.T, g.x, g.z); this.evento({ t: hT > 0 ? 'terra' : 'agua', x: g.x, y: Math.max(hA, hT), z: g.z, cal: g.cal, dono: g.dono, gr: g.rbu && g.can === 0 ? 1 : 0, jato: g.agua ? 1 : 0 }); if (hT <= 0) granadaNaAgua(this, g); if (g.rbu && hT <= 0) this.explodeRbu(g); g.ativo = 0; g.fim = hT > 0 ? 'terra' : 'agua'; continue; }
       if (alturaTerreno(this.T, g.x, g.z) > g.y) { this.evento({ t: 'terra', x: g.x, y: g.y, z: g.z, cal: g.cal, dono: g.dono }); g.ativo = 0; g.fim = 'terra'; continue; }

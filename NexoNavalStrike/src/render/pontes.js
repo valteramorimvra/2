@@ -22,7 +22,7 @@ function parte(nome, P, corAco, destr) { const g = new THREE.Group(); g.name = '
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 /** Ponte PÊNSIL. a, b = margens {x,z}; o: { vao, torreH, deck, larg, cor, estilo: 'barras'|'cabos', painel }. Eixo local: +X de a para b. */
 export function pontePensil(a, b, o) { const G = new THREE.Group(); const L = Math.hypot(b.x - a.x, b.z - a.z); const ang = Math.atan2(b.z - a.z, b.x - a.x); G.position.set(a.x, 0, a.z); G.rotation.y = -ang;
-  const vao = Math.min(o.vao, L * 0.72), s1 = L / 2 - vao / 2, s2 = L / 2 + vao / 2, H = o.torreH, D = o.deck, W = o.larg, hw = W / 2, pn = o.painel || 15, barras = o.estilo === 'barras', cor = o.cor;
+  const vao = Math.min(o.vao, L * 0.72), s1 = L / 2 - vao / 2, s2 = L / 2 + vao / 2, H = o.torreH, D = o.deck, W = o.larg, _via = (G.userData.via = { L, larg: o.larg, y: () => o.deck + 0.6 }), /* v1.2.46: pista para os carros */ hw = W / 2, pn = o.painel || 15, barras = o.estilo === 'barras', cor = o.cor;
   const tr = barras ? 9 : 7.6; /* altura da treliça de enrijecimento */
   const yCabo = (s) => { if (s >= s1 && s <= s2) { const u = (s - (s1 + s2) / 2) / (vao / 2); return (barras ? D + 1 : D + 4) + (H - (barras ? D + 1 : D + 4)) * u * u; } const ancor = barras ? D - 2 : D - 6; if (s < s1) { const u = s / s1; return ancor + (H - ancor) * Math.pow(u, 1.35); } const u = (L - s) / (L - s2); return ancor + (H - ancor) * Math.pow(u, 1.35); };
   const partes = []; const novaP = () => ({ aco: [], conc: [], asf: [], luz: [], verm: [] });
@@ -51,7 +51,7 @@ export function pontePensil(a, b, o) { const G = new THREE.Group(); const L = Ma
   G.name = 'ponte'; G.userData.pilares = pilares; G.userData.partes = partes; return G; }
 /** Ponte de VIGAS (caixão de concreto) sobre pilares duplos; perfil elevado no meio (gabarito de navegação). */
 export function ponteVigas(a, b, o) { const G = new THREE.Group(); const L = Math.hypot(b.x - a.x, b.z - a.z); const ang = Math.atan2(b.z - a.z, b.x - a.x); G.position.set(a.x, 0, a.z); G.rotation.y = -ang;
-  const W = o.larg, hw = W / 2, vaoP = o.vaoP || 46, yD = (s) => o.base + (o.alto - o.base) * Math.pow(Math.sin(Math.PI * Math.max(0, Math.min(1, s / L))), 0.6); const pilares = [];
+  const W = o.larg, hw = W / 2, vaoP = o.vaoP || 46, yD = (s) => o.base + (o.alto - o.base) * Math.pow(Math.sin(Math.PI * Math.max(0, Math.min(1, s / L))), 0.6); const pilares = []; G.userData.via = { L, larg: W, y: (s) => yD(s) + 0.6 }; /* v1.2.46 */
   const nT = Math.max(3, Math.round(L / 140)); for (let t = 0; t < nT; t++) { const sA = (L * t) / nT, sB = (L * (t + 1)) / nT; const P = { aco: [], conc: [], asf: [], luz: [], verm: [] };
     for (let s = sA; s < sB - 0.1; s += 10) { const s2 = Math.min(sB, s + 10), y1 = yD(s), y2 = yD(s2); barra(P.conc, V(s, y1 - 1.6, 0), V(s2, y2 - 1.6, 0), W * 0.7, 3.2); barra(P.asf, V(s, y1 + 0.25, 0), V(s2, y2 + 0.25, 0), W, 0.5); for (const z of [-hw + 0.3, hw - 0.3]) barra(P.conc, V(s, y1 + 0.9, z), V(s2, y2 + 0.9, z), 0.4, 1.0); }
     for (let s = sA + vaoP / 2; s < sB; s += vaoP) { const y = yD(s); for (const z of [-W * 0.25, W * 0.25]) caixa(P.conc, s, (y - 3.2) / 2 - 10, z, 2.6, y - 3.2 + 20, 2.6); caixa(P.conc, s, y - 3.6, 0, 3, 1.4, W * 0.8); pilares.push([s, 0]); }
