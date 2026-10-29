@@ -24,7 +24,7 @@ import { instalaAvarias, passoAvarias, danoLocal, passoAfundamento, MODS_PADRAO 
 import { instalaAereo, instalaHelisNavio, comandoAereo, passoAereo, sensorAereo, POOL_AEREO } from '../naval5v5/aereo.js';
 import { instalaDefesa, instalaNavio, passoCiws5, passoLaser, passoSam, passoSams, passoA30, passoAmeacas, granadaNaAgua, CIWS, POOL5 } from '../naval5v5/defesa.js';
 
-import { instalaNuclear, passoNuclear, lancaNuclear, comandoNuclear } from './nuclear.js';
+import { instalaNuclear, passoNuclear, lancaNuclear, comandoNuclear } from './nuclear.js'; import { passoHidros, comandoHidro } from './hidroaviao.js'; /* v1.2.39: hidroaviões */
 import { passoMissil1231, lancaMissilNuclear1231 } from './missilNuclear1231.js'; /* v1.2.31 */ /* v1.2.26: bombardeiro + bomba atômica */
 export const DT = 1 / 60;
 export const PISCA_BOT = 0.2;
@@ -114,7 +114,8 @@ export class Sim {
       case 'rbu': if (cmd.canal === 1 && n.fgC) { this.trocaCanal(n); this.lancaRbu(n, cmd.alvo != null ? cmd.alvo : n.alvoId); this.trocaCanal(n); } else this.lancaRbu(n, cmd.alvo != null ? cmd.alvo : n.alvoId); break; /* v1.2.14: canal 1 = FOGUETES ASW independente do lança-granadas */
       case 'uav': case 'esquadrilha': case 'heliLanca': case 'heliCtrl': case 'heliFlare': case 'iaNavio': case 'heliFogo': case 'heliVolta': case 'controle': comandoAereo(this, n, cmd); break;
       case 'nuclear': (n.C.missilNuclear ? lancaMissilNuclear1231 : lancaNuclear)(this, n, cmd); break; /* v1.2.31: míssil nuclear de navio */ /* v1.2.26 */
-      case 'nkPiloto': case 'nkEspera': case 'nkCtl': case 'nkThr': case 'nkMiraSolo': case 'nkTrava': case 'nkSolta': comandoNuclear(this, n, cmd); break; /* v1.2.26/28: pilotagem + acel + mira solo */
+      case 'hidro': case 'hdPil': case 'hdMissil': case 'hdTorp': case 'hdFlare': case 'hdVolta': comandoHidro(this, n, cmd); break; /* v1.2.39 */
+      case 'nkPiloto': case 'nkEspera': case 'nkCtl': case 'nkThr': case 'nkMiraSolo': case 'nkTrava': case 'nkSolta': if (cmd.t === 'nkSolta' && n.hd && n.hd.pil && n.hd.noAr >= 0) { comandoHidro(this, n, cmd); break; } comandoNuclear(this, n, cmd); break; /* v1.2.26/28: pilotagem + acel + mira solo */
     }
   }
 
@@ -124,7 +125,7 @@ export class Sim {
     const dt = DT; this.tick++; this.t += dt;
     const L = this.ordemTick(); /* v1.2.20: ORDEM NEUTRA — a cada tick a ordem de processamento dos navios se inverte (antes o azul sempre ia primeiro e o vermelho, por último, reagia ao estado mais novo: vantagem sistemática do vermelho em bot × bot) */
     for (const n of L) this.passoNavio(n, dt);
-    this.passoGranadas(dt); this.passoMisseis(dt); passoSams(this, dt); this.passoTorpedos(dt); passoAereo(this, dt); passoMissil1231(this, dt); passoNuclear(this, dt); this.passoIscas(dt); passoAmeacas(this, dt);
+    this.passoGranadas(dt); this.passoMisseis(dt); passoSams(this, dt); this.passoTorpedos(dt); passoAereo(this, dt); passoMissil1231(this, dt); passoNuclear(this, dt); passoHidros(this, dt); this.passoIscas(dt); passoAmeacas(this, dt);
     for (const n of L) { passoCiws5(this, n, dt); passoLaser(this, n, dt); passoSam(this, n, dt); passoA30(this, n, dt); }
     if (this.tick % 15 === 0) this.sensores();
     for (const n of L) passoArmas5(this, n, dt);

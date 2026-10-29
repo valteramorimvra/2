@@ -139,7 +139,7 @@ function voaPara(q, rx, rz, alt, v, dt, sim) { if (sim && !q.manual) { const rum
 
 export function passoNuclear(sim, dt) { if (!sim.nukes) return;
   for (const n of sim.navios) if (temNuclear(n) && !n.nk) prepara(n);
-  for (const q of sim.nukes) { if (q.ativo) { if (q.lider >= 0) passoAla(sim, q, dt); else passoBombardeiro(sim, q, dt); } else if (q.espDec > 0) alaEspera(sim, q, dt); if (q.b.ativo) passoBomba(sim, q, dt); }
+  for (const q of sim.nukes) { if (q.ativo && q.hidro) { /* v1.2.39: hidroavião — passo próprio em sim/hidroaviao.js */ } else if (q.ativo) { if (q.lider >= 0) passoAla(sim, q, dt); else passoBombardeiro(sim, q, dt); } else if (q.espDec > 0) alaEspera(sim, q, dt); if (q.b.ativo) passoBomba(sim, q, dt); }
   passoChoque(sim, dt);
   for (const n of sim.navios) if (n.nk && !n.morto && n.papel !== 'jogador' && n.papel !== 'alvo' && !n.controleRemoto) iaNuclear(sim, n, dt); }
 
@@ -198,7 +198,7 @@ export function impactoNuclear(q, out = {}) { let x = q.x, y = q.y - 2, z = q.z,
   while (y > NUK.hRajada && t < 90) { const k = t > NUK.tChute ? NUK.kChute : NUK.kLivre, v = Math.hypot(vx, vy, vz); vx -= k * v * vx * dt; vz -= k * v * vz * dt; vy -= (G + k * v * vy) * dt; x += vx * dt; y += vy * dt; z += vz * dt; t += dt; }
   out.x = x; out.z = z; out.t = t; out.ok = q.y > NUK.hRajada + 120 ? 1 : 0; return out; }
 /** v1.2.26 item K: comandos do jogador para o SEU bombardeiro no ar. */
-export function nkBombardeiroDe(sim, n) { const k = n && n.nk; return k && k.noAr >= 0 && sim.nukes ? sim.nukes[k.noAr] : null; }
+export function nkBombardeiroDe(sim, n) { const h = n && n.hd; if (h && h.pil && h.noAr >= 0 && sim.nukes) { const q = sim.nukes[h.noAr]; if (q && q.ativo && q.hidro) return q; } /* v1.2.39: pilotando o hidroavião */ const k = n && n.nk; return k && k.noAr >= 0 && sim.nukes ? sim.nukes[k.noAr] : null; }
 export function comandoNuclear(sim, n, cmd) { const q = nkBombardeiroDe(sim, n); if (!q || !q.ativo || q.dono !== n.id) return;
   if (cmd.t === 'nkPiloto') { const m = cmd.v ? 1 : 0; if (q.fase === 1 && m) { q.manualPend = 1; return; } if (m === q.manual && !q.espera) return; q.espera = 0; q.manual = m; if (m) { q.bank = clamp(-q.roll, -NUK.manBank, NUK.manBank); q.gam = Math.atan2(q.vy || 0, Math.max(1, q.v)); q.sx = q.bank / NUK.manBank; q.sy = 0; q.jx = q.jy = 0; } else { q.tAssume = NUK.assume; if (q.fase === 3) { q.tEsc = Math.min(q.tEsc || 0, 6); q.rumoEsc = marcacao(q.ax, q.az, q.x, q.z); } } sim.evento({ t: 'nkIa', idx: q.idx, id: n.id, v: m ? 0 : 1 }); }
   else if (cmd.t === 'nkEspera') { const v = cmd.v ? 1 : 0; if (v) { if (q.manual) { q.manual = 0; q.tAssume = NUK.assume; } q.espera = q.fase <= 2 ? 1 : 0; q.manualPend = 0; q.espC = null; } else q.espera = 0; sim.evento({ t: 'nkEspera', idx: q.idx, id: n.id, v: q.espera }); }
@@ -206,7 +206,9 @@ export function comandoNuclear(sim, n, cmd) { const q = nkBombardeiroDe(sim, n);
   else if (cmd.t === 'nkThr') { q.thr = Math.max(0, Math.min(4, cmd.v | 0)); sim.evento({ t: 'nkThr', idx: q.idx, id: n.id, v: q.thr }); } /* v1.2.28: acelerador 0–4 */
   else if (cmd.t === 'nkMiraSolo') { /* v1.2.28: retícula no mar/terra — ponto onde a bomba deve cair */ if (Number.isFinite(cmd.px) && Number.isFinite(cmd.pz)) { q.ax = +cmd.px; q.az = +cmd.pz; q.alvo = -1; q.miraSolo = 1; sim.evento({ t: 'nkMiraSolo', idx: q.idx, id: n.id, px: q.ax, pz: q.az }); } }
   else if (cmd.t === 'nkTrava') { const a = cmd.alvo != null && cmd.alvo >= 0 ? sim.navios[cmd.alvo] : null; if (a && !a.morto && a.time !== n.time) { q.alvo = a.id; q.ax = a.x; q.az = a.z; q.miraSolo = 0; q.espera = 0; q.auto = 1; q.pontoFixo = 0; /* fiscal nukefumaca (item 3): ao travar → DIRETO ao alvo (sem órbita) */ } /* toque SÓ trava; soltar só trocando de alvo (ignora alvo:-1) */ sim.evento({ t: 'nkTravado', idx: q.idx, id: n.id, alvo: q.alvo }); }
-  else if (cmd.t === 'nkSolta') { if (q.fase === 2 && q.y > NUK.hRajada + 120 && (q.cargas | 0) > 0) solta(sim, q); } }
+  else if (cmd.t === 'nkSolta') { if (q.hidro) return; /* v1.2.39: hidroavião solta pela rota própria (world.js → soltaBombaHidro) */ if (q.fase === 2 && q.y > NUK.hRajada + 120 && (q.cargas | 0) > 0) solta(sim, q); } }
+/** v1.2.39: a mesma bomba atômica, usada pelo hidroavião (sim/hidroaviao.js). */
+export function soltaBomba(sim, q) { const t = q.tPrep; q.tPrep = 0; solta(sim, q); if (!q.b.ativo) q.tPrep = t; }
 
 function solta(sim, q) { if (q.b.ativo) return; /* uma bomba em queda por vez */ if ((q.tPrep || 0) > 0) return; /* v1.2.29: preparo */ const rest = (q.cargas | 0); if (rest <= 0) return; const b = q.b; b.ativo = 1; b.t = 0; b.chute = 0; b.x = b.px = q.x; b.y = b.py = q.y - 2; b.z = b.pz = q.z; b.vx = q.vx; b.vy = q.vy; b.vz = q.vz; b.dono = q.dono; b.time = q.time;
   q.cargas = rest - 1; q.nSoltas = (q.nSoltas | 0) + 1; /* v1.2.29: seguintes com preparo maior */ { const seq = NUK.tPrepN || [22, 32, 42]; q.tPrep = q.cargas > 0 ? (seq[Math.min(seq.length - 1, (q.nSoltas | 0) - 1)] || 28) : 0; }
