@@ -97,6 +97,7 @@ void main(){ vec3 V = normalize(cameraPosition - vW); float dc = length(cameraPo
   { float dn = 1.0 - smoothstep(16.0, 140.0, dc); if (dn > 0.0) {
       float f1 = ns(vW.xz * 0.62 + uT * 1.1);
       N = normalize(N + vec3(f1 - 0.5, 0.0, (f1 - 0.5) * 0.85) * (0.22 * dn));
+      /* v1.2.33b: marolas capilares finas que correm com o vento (só perto da câmera) */ float f2 = ns(vec2(vW.x * 1.35 + uT * 2.1, vW.z * 0.42 - uT * 0.4)) - ns(vec2(vW.x * 0.47 - uT * 0.6, vW.z * 1.6 + uT * 1.7)); N = normalize(N + vec3(f2 * 0.6, 0.0, f2 * 0.45) * (0.12 * dn));
   } }
   float filt = clamp(smoothstep(90.0, 1100.0, dc) + length(fwidth(vW.xz)) * 0.04, 0.0, 0.93); N = normalize(mix(N, vec3(0.0, 1.0, 0.0), filt));
 #endif
@@ -128,6 +129,9 @@ void main(){ vec3 V = normalize(cameraPosition - vW); float dc = length(cameraPo
   float sp = (pow(nh, 520.0) * 2.1 + pow(nh, 64.0) * 0.28 + pow(nh, 10.0) * 0.04 * faixa) * cristaW * (0.22 + 0.78 * faixa);
   sp *= 1.0 - 0.8 * smoothstep(70.0, 230.0, cameraPosition.y);
   c += uCorSol * sp * (1.0 - uChuva * 0.8) * (1.0 - uNuvem * 0.75);
+#ifndef BARATO
+  { /* v1.2.33b: CINTILAÇÃO do sol — facetas minúsculas que piscam no caminho do sol (glitter) */ float gl = ns(vW.xz * 2.3 + vec2(uT * 1.7, -uT * 0.9)) * ns(vW.xz * 3.7 - vec2(uT * 1.3, -uT * 1.1)); float spk = smoothstep(0.62, 0.9, gl) * pow(nh, 36.0) * (0.15 + 0.85 * faixa) * (1.0 - smoothstep(80.0, 1400.0, dc)) * (1.0 - uNoite); c += uCorSol * spk * 2.2 * (1.0 - uNuvem * 0.85) * (1.0 - uChuva); }
+#endif
   // espuma: cristas (limiar de inclinação/altura), arrebentação e cascos
 #ifdef BARATO
   float rn = 0.5;
