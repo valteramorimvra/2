@@ -6,7 +6,7 @@
 // Luzes: NENHUMA luz nova (recompilaria todos os sombreadores); modula sol/hemi/exposição/céu/neblina já existentes e RESTAURA os valores-base no fim.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { modeloHeli } from './aereo3d.js'; import { Particulas } from './fx.js'; /* v1.2.33: fumaça colorida dos bombardeiros */ /* v1.2.26: bombardeiro único 'bombardeiroNuclear' (Urubu-rei) */
+import { modeloHeli } from './aereo3d.js'; import { Particulas } from './fx.js'; /* v1.2.33: fumaça colorida dos bombardeiros */ import { montaHidro3D } from './hidro3d.js'; import { HIDROS } from '../sim/hidroaviao.js'; /* v1.2.39 */ /* v1.2.26: bombardeiro único 'bombardeiroNuclear' (Urubu-rei) */
 
 const ss = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const Y0 = 150; // altura da rajada (= NUK.hRajada)
@@ -218,9 +218,18 @@ export class NuclearFx {
       if (b.queda) { const av = b.av; b.vy -= 9.81 * dt; b.vx *= 0.995; b.vz *= 0.995; av.position.x += b.vx * dt; av.position.y += b.vy * dt; av.position.z += b.vz * dt; av.rotation.x -= 0.6 * dt; av.rotation.z += 1.4 * dt; b.tR += dt;
         if (b.tR > 0.03) { b.tR = 0; fx.fumaca.emite(av.position.x, av.position.y, av.position.z, 0, 2, 0, '#2a2622', 0.7, 14, 6, 6); fx.brilho.emite(av.position.x, av.position.y, av.position.z, 0, 0, 0, '#ff9a3a', 0.9, 7, 0.35, 4); }
         if (av.position.y < 0) { b.queda = 0; av.visible = false; fx.explosao(av.position.x, 2, av.position.z, 1.2); for (let k = 0; k < 20; k++) fx.agua.emite(av.position.x, 1, av.position.z, (Math.random() - 0.5) * 18, 18 + Math.random() * 26, (Math.random() - 0.5) * 18, '#e8eef2', 0.8, 6, 2.2, 3, 9.8); } }
-      else { b.av.visible = !!q.ativo; if (q.ativo) { this.st.avioes++; this._pose(q, a, P); b.av.position.set(P.x, P.y, P.z); b.av.rotation.set(P.pitch, -P.rumo, P.roll); this.pinta(q, b); if (q.fase >= 2) this.trilha(q, P, b); else b._tx = null; } }
+      else if (q.ativo && q.hidro) { b.av.visible = false; this.st.avioes++; this._pose(q, a, P); this.hidro(q, b, P, dt); }
+      else { if (b.hd) for (const k in b.hd) b.hd[k].visible = false; b.av.visible = !!q.ativo; if (q.ativo) { this.st.avioes++; this._pose(q, a, P); b.av.position.set(P.x, P.y, P.z); b.av.rotation.set(P.pitch, -P.rumo, P.roll); this.pinta(q, b); if (q.fase >= 2) this.trilha(q, P, b); else b._tx = null; } }
       const B = q.b; b.bo.visible = !!B.ativo; b.ch.visible = !!(B.ativo && B.chute); if (B.ativo) { const bx = B.px != null ? B.px : B.x, by = B.py != null ? B.py : B.y, bz = B.pz != null ? B.pz : B.z; Pb.x = bx + (B.x - bx) * a; Pb.y = by + (B.y - by) * a; Pb.z = bz + (B.z - bz) * a; b.bo.position.set(Pb.x, Pb.y, Pb.z); const v = Math.hypot(B.vx, B.vz); b.bo.rotation.set(Math.atan2(B.vy, v), -Math.atan2(B.vx, -B.vz), 0);
         if (B.chute) { const vv = Math.hypot(B.vx, B.vy, B.vz) || 1, o = Math.min(1, (B.t - 1.5) * 2); b.ch.position.set(Pb.x - B.vx / vv * 16, Pb.y - B.vy / vv * 16, Pb.z - B.vz / vv * 16); b.ch.scale.setScalar(0.2 + 0.8 * o); b.ch.lookAt(Pb.x, Pb.y, Pb.z); b.ch.rotateX(-Math.PI / 2); } } } }
+  /** v1.2.39: hidroavião — modelo próprio por tipo (criado na 1ª vez), hélices girando, borrifo na corrida/pouso na água e esteira de espuma. */
+  hidro(q, b, P, dt) { const S = HIDROS[q.hidro]; if (!S) return; const hd = b.hd || (b.hd = {}); let m = hd[q.hidro]; if (!m) { m = hd[q.hidro] = montaHidro3D(S); m.traverse((o) => { o.userData.nk = 1; }); this.cena.add(m); }
+    for (const k in hd) hd[k].visible = k === q.hidro; m.position.set(P.x, P.y, P.z); m.rotation.set(P.pitch, -P.rumo, P.roll);
+    const giro = (q.fase === 4 ? Math.max(0.2, q.v / S.vDecola) : 1) * 55 * dt; for (const h of m.userData.helices) h.rotation.z += giro;
+    if (m.userData.estrobo) m.userData.estrobo.visible = (this.tl * 1.2) % 1 < 0.08;
+    const naAgua = q.fase === 1 || (q.fase === 4 && q.y < 4); if (naAgua && q.v > 4) { b.tW = (b.tW || 0) + dt; if (b.tW > 0.04) { b.tW = 0; const fx = this.fx, sx = Math.sin(P.rumo), sz = -Math.cos(P.rumo), cx = Math.cos(P.rumo), cz = Math.sin(P.rumo), k = Math.min(1, q.v / 50);
+      for (const s of [-1, 1]) fx.agua.emite(P.x + sx * S.L * 0.05 + cx * s * 2.2, P.y - 0.6, P.z + sz * S.L * 0.05 + cz * s * 2.2, cx * s * (6 + 10 * k) - sx * q.v * 0.2, 3 + 9 * k, cz * s * (6 + 10 * k) - sz * q.v * 0.2, '#eef3f6', 0.75, 2.2 + 2.5 * k, 1.4, 2.2, 9.8);
+      if (fx.borrifo) fx.borrifo(P.x - sx * S.L * 0.45, P.z - sz * S.L * 0.45, -sx * q.v * 0.3, -sz * q.v * 0.3, 0.6 * k); } } }
   /** v1.2.33: pintura metálica por posição na fila (clona materiais uma vez por papel; vidro/luzes ficam). */
   pinta(q, b) { const p = papelFila(q); if (b._pinta === p) return; b._pinta = p; const C = NK_METAL[p], M = this._nkMat || (this._nkMat = new Map());
     b.av.traverse((o) => { if (!o.isMesh || !o.material || Array.isArray(o.material)) return; const m0 = o.userData._m0 || (o.userData._m0 = o.material);
