@@ -172,7 +172,7 @@ export function recompensa(r, classe) {
   const C = CLASSES[classe]; const s = r.stats || r; const tier = C.tier || 1; const mult = GANHO_TIPO[TIPO_NAVIO[classe] || 'corveta'].mult;
   const base = Math.round(30_000 * mult), porDano = Math.round(Math.min(s.dano || 0, 9000) * 140 * mult), porAbate = (s.abates || 0) * Math.round(38_000 * mult), porDef = ((s.intercept || 0) + (s.menores || 0)) * 6_500, porVit = r.vitoria === true ? Math.round(55_000 * mult) : r.vitoria === null ? 15_000 : 0;
   let prata = base + porDano + porAbate + porDef + porVit;
-  const bonus = C.premium ? BONUS_PREMIUM[classe] || 0.5 : 0; const prataBonus = Math.round(prata * bonus); prata += prataBonus;
+  const bonus = C.premium ? BONUS_PREMIUM[classe] || 0.5 : 0; const prataBonus = Math.round(prata * bonus); prata += prataBonus; { const TETO = 2_200_000; if (prata > TETO) prata = Math.round(TETO + (prata - TETO) * 0.4); } /* v1.2.36: teto suave — com aeronaves mais agressivas (1.2.33) partidas longas de porta-aviões passavam de 3,9 mi */
   const pesquisa = Math.round(900 * tier + (s.dano || 0) * 6 + (s.abates || 0) * 1_400 + (r.vitoria === true ? 1_500 : 0));
   const ouro = (r.vitoria === true ? 15 : 3) + (s.abates || 0) * 5;
   const reparo = Math.max(MANUTENCAO.minimo, Math.round((1 - (r.vidaFinal ?? 1)) * 100 * MANUTENCAO.porHp * tier * 10));
