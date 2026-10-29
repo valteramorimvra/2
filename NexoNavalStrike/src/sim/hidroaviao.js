@@ -40,12 +40,13 @@ export function motivoHidro(sim, n) { if (!temHidro(n) && !(sim && sim.nkBotAtom
 export function hidroDe(sim, n) { const k = n && n.hd; if (!k || k.noAr < 0 || !sim.nukes) return null; const q = sim.nukes[k.noAr]; return q && q.ativo && q.hidro && q.dono === n.id ? q : null; }
 
 /** Comando { t:'hidro' } — decola (corrida na água ao lado do navio). */
+const hdNv = (n, S) => { const v = n.aeroNv && n.aeroNv[S.id]; return v > 1 ? 1 + 0.08 * (v - 1) : 1; }; /* v1.2.61: blindagem pelo nível do hangar */
 export function lancaHidro(sim, n) { const mot = motivoHidro(sim, n); if (mot) { sim.evento({ t: 'hdNegado', id: n.id, motivo: mot }); return 0; }
   const k = estadoHidro(n), S = HIDROS[k.tipo] || HIDROS.albatroz; const q = sim.nukes.find((x) => !x.ativo && !x.b.ativo && !(x.espDec > 0)); if (!q) { sim.evento({ t: 'hdNegado', id: n.id, motivo: 'pool' }); return 0; }
   const lado = (n.C.B * 0.5 + S.env * 0.5 + 18); sim.mundo(n, lado, 0, -n.C.L * 0.1, _o);
   Object.assign(q, { ativo: 1, aa: 4, tAA: 0, fl: 6, tFlareCd: 0, tFlareAte: 0, miraSolo: 0, pontoFixo: 0, hidro: S.id, fase: 1, dono: n.id, time: n.time, t: 0, alvo: n.alvoId >= 0 ? n.alvoId : -1, ax: _o.x, az: _o.z, tSam: 0, deck: 0, v: Math.max(0, n.v || 0), manual: 0, manualPend: 0, tMan: 0, espera: 0, devolve: 0, cargas: 99, thr: 3, miraSolo: 0,
     jx: 0, jy: 0, sx: 0, sy: 0, w: 0, bank: 0, gam: 0, tAssume: 0, nSoltas: 0, tPrep: 0, auto: n.alvoId >= 0 ? 1 : 0, lider: -1, ala: 0, pontoFixo: 0, soltaEm: 0,
-    vida: S.vida, vidaMax: S.vida, misseis: S.misseis, torps: S.torps, flares: S.flares, tFlare: 0, tFlareCad: 0, tMis: 0, tTorp: 0, pend: q.pend || [], sobFogo: 0, pousando: 0, fuga: 0 });
+    vida: S.vida * hdNv(n, S), vidaMax: S.vida * hdNv(n, S), misseis: S.misseis, torps: S.torps, flares: S.flares, tFlare: 0, tFlareCad: 0, tMis: 0, tTorp: 0, pend: q.pend || [], sobFogo: 0, pousando: 0, fuga: 0 });
   q.pend.length = 0; q.sams.length = 0;
   q.x = q.px = _o.x; q.z = q.pz = _o.z; q.y = q.py = alturaMar(_o.x, _o.z, sim.t) + 1.2; q.rumo = q.prumo = n.rumo; q.vx = q.vy = q.vz = 0; q.pitch = q.ppitch = 0; q.roll = q.proll = 0;
   k.noAr = q.idx; k.pil = 1; k.voos++; sim.evento({ t: 'hdDecola', id: n.id, idx: q.idx, tipo: S.id, x: q.x, y: q.y, z: q.z }); return 1; }

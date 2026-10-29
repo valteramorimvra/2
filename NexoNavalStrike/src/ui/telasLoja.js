@@ -2,6 +2,9 @@
 // MERCADO (ofertas do dia, caixas e câmbio, no estilo Modern Warships) e LOJA de pacotes (offline, compras de teste).
 import { CLASSES, ORDEM_CLASSES } from '../sim/classes.js';
 import { HIDROS, ORDEM_HIDROS } from '../sim/hidroaviao.js';
+import { AERONAVES, fichaAero, possuiAero } from '../aeronaves.js'; import { miniAero } from './telaHangar.js'; import { silh } from './silhuetas.js'; /* v1.2.61 */
+const fotoAero = (a) => { const m = miniAero(a.id); return m ? `<i class="cm-foto" style="background-image:url(${m})"></i>` : a.modelo.hidro ? `<i class="cm-foto" style="background-image:url(fotos/navios/${a.modelo.hidro}.webp)"></i>` : `<i class="cm-foto cm-silh">${silh(a.modelo.heli)}</i>`; };
+const ROM5 = ['', 'I', 'II', 'III', 'IV', 'V'];
 import { PRECO, PINTURAS, TIPO_NAVIO } from '../navalTechTreeEconomy.js';
 import { NEXOS, ofertasDoDia, comprarOferta, CAIXAS, abreCaixa, chanceTxt, CAMBIO, trocar, LOJA, compraLoja, tempoAteVirar, diaHoje } from '../mercado.js';
 
@@ -22,16 +25,17 @@ export function telaArvore(D) { const { mostra, voltar, eco, carteira, statusNav
   const linhas = TIPOS_ARVORE.filter(([t]) => t === 'hidro' || grade[t]).map(([t, nome]) => {
     if (t === 'hidro') return `<div class="ar-linha"><div class="ar-tipo">${nome}</div>${[1, 2, 3, 4, 5, 6].map((nv) => `<div class="ar-cel">${nv === 3 ? ORDEM_HIDROS.map((h) => `<button class="ar-card st-possui hd" data-h="${h}"><i class="ar-foto" style="background-image:url(fotos/navios/${h}.webp)"></i><b>${HIDROS[h].nome}</b><small>${HIDROS[h].base.split(' (')[0]}</small></button>`).join('') : ''}</div>`).join('')}</div>`;
     return `<div class="ar-linha"><div class="ar-tipo">${nome}</div>${[1, 2, 3, 4, 5, 6].map((nv) => `<div class="ar-cel">${(grade[t][nv] || []).map(card).join('')}</div>`).join('')}</div>`; }).join('');
-  const el = mostra('arvore', `${voltar()}${carteira()}<h2>Árvore tecnológica <small>nível × tipo · toque num navio para abrir no estaleiro</small></h2>
-    <div class="ar-wrap"><div class="ar-grade"><div class="ar-linha ar-cab"><div class="ar-tipo"></div>${[1, 2, 3, 4].map((n) => `<div class="ar-cel"><b>NÍVEL ${ROMANO[n]}</b></div>`).join('')}<div class="ar-cel lend"><b>◆ LENDÁRIO</b></div><div class="ar-cel slend"><b>✦ SUPER</b></div></div>${linhas}</div></div>`);
-  el.addEventListener('click', (e) => { const b = e.target.closest('.ar-card'); if (!b) return; som(); if (b.dataset.h) irHidro(b.dataset.h); else irEstaleiro(b.dataset.k); });
+  const linhaAero = `<div class="ar-linha"><div class="ar-tipo">Aeronaves</div>${[1, 2, 3, 4, 5, 6].map((nv) => `<div class="ar-cel">${nv <= 5 ? AERONAVES.filter((a) => a.tier === nv).map((a) => `<button class="ar-card ${possuiAero(eco, a.id) ? 'st-possui' : 'st-compra'} hd" data-aero="${a.id}">${fotoAero(a).replace('cm-foto', 'ar-foto')}<b>${fichaAero(a.id).nome.split(' ').pop()}</b><small>${a.papel}</small></button>`).join('') : ''}</div>`).join('')}</div>`; /* v1.2.61: aeronaves por nível → hangar 3D */
+  const el = mostra('arvore', `${voltar()}${carteira()}<h2>Árvore tecnológica <small>nível × tipo · navio abre no estaleiro, aeronave abre no hangar</small></h2>
+    <div class="ar-wrap"><div class="ar-grade"><div class="ar-linha ar-cab"><div class="ar-tipo"></div>${[1, 2, 3, 4].map((n) => `<div class="ar-cel"><b>NÍVEL ${ROMANO[n]}</b></div>`).join('')}<div class="ar-cel lend"><b>◆ LENDÁRIO</b></div><div class="ar-cel slend"><b>✦ SUPER</b></div></div>${linhas}${linhaAero}</div></div>`);
+  el.addEventListener('click', (e) => { const b = e.target.closest('.ar-card'); if (!b) return; som(); if (b.dataset.aero) D.irHangar(b.dataset.aero); else if (b.dataset.h) irHidro(b.dataset.h); else irEstaleiro(b.dataset.k); });
   void eco; void PRECO; }
 
 /** MERCADO: ofertas do dia (renovam à meia-noite), caixas com tabela de chances e câmbio entre as moedas. */
 /* ---------- preço de cada navio no COMÉRCIO (em Nexos) com variação diária, como uma bolsa ---------- */
 export function precoNavioNx(k) { const p = PRECO[k] || {}; const base = p.ouro ? p.ouro / 10 : p.prata ? p.prata / 400 : 300; return Math.max(300, Math.round(base / 50) * 50); }
 export function variacaoDia(k, dia = diaHoje()) { let h = dia; for (const c of k) h = (h * 31 + c.charCodeAt(0)) >>> 0; h = (h * 1664525 + 1013904223) >>> 0; return Math.round(((h / 4294967296) - 0.45) * 50) / 100; }
-const CATS = [['todos', 'Todos', '✦'], ['navios', 'Navios', '⛴'], ['hidros', 'Hidroaviões', '✈'], ['pinturas', 'Camuflagens', '◩'], ['ofertas', 'Ofertas do dia', '%'], ['caixas', 'Caixas', '▣'], ['cambio', 'Câmbio', '⇄']];
+const CATS = [['todos', 'Todos', '✦'], ['navios', 'Navios', '⛴'], ['aero', 'Aeronaves', '✈'], ['hidros', 'Hidroaviões', '⛵'], ['pinturas', 'Camuflagens', '◩'], ['ofertas', 'Ofertas do dia', '%'], ['caixas', 'Caixas', '▣'], ['cambio', 'Câmbio', '⇄']];
 const ORDENS = [['padrao', 'Padrão'], ['menor', 'Menor preço'], ['maior', 'Maior preço'], ['nivel', 'Nível'], ['alta', 'Maior alta do dia']];
 /** MERCADO no estilo "Comércio": coluna de categorias, ordenação e grade de cartões com FOTO, nome, nível, preço em Nexos e variação do dia. */
 export function telaMercado(D, aba = 'navios', ordem = 'padrao') { const { mostra, voltar, eco, save, carteira, som, toast, eventoCompra } = D;
@@ -43,10 +47,12 @@ export function telaMercado(D, aba = 'navios', ordem = 'padrao') { const { mostr
     return { k, preco: p.m === 'ouro' ? p.v * 400 : p.v, v: 0, f: forca(k), nivel: C.superLend ? 6 : C.lendario ? 5 : C.tier || 1, html: `<button class="cm-card${tem ? ' tem' : ''}${C.lendario ? ' lend' : ''}${C.superLend ? ' slend' : ''}" data-nav="${k}"><span class="cm-topo"><b class="cm-nv">${nv}</b>${C.civil ? '<em class="cm-new">NOVO</em>' : C.premium ? '<em class="cm-prem">PREMIUM</em>' : ''}</span><i class="cm-foto" style="background-image:url(fotos/navios/${k}.webp)"></i><span class="cm-nome">${C.nome}</span><span class="cm-preco">${tem ? '<b class="cm-tem">NA FROTA ✓</b>' : p.v ? moedaHtml(p.m, p.v) : '<b class="cm-tem">GRÁTIS</b>'}</span></button>` }; };
   const cartaHidro = (h) => `<button class="cm-card tem" data-hd="${h}"><span class="cm-topo"><b class="cm-nv">✈</b><em class="cm-new">NOVO</em></span><i class="cm-foto" style="background-image:url(fotos/navios/${h}.webp)"></i><span class="cm-nome">${HIDROS[h].nome} <small>${HIDROS[h].base.split(' (')[0]}</small></span><span class="cm-preco"><b class="cm-tem">DISPONÍVEL ✓</b></span></button>`;
   const cartaPint = (p) => { const P0 = PINTURAS[p], tem = eco.possuiPintura(p), m = P0.ouro ? 'ouro' : 'prata', v = P0.ouro || P0.prata || 0; return `<button class="cm-card cm-pc${tem ? ' tem' : ''}${P0.lendaria ? ' lend' : ''}${P0.heroica ? ' slend' : ''}" data-pint="${p}"><span class="cm-topo"><b class="cm-nv">${P0.lendaria ? '◆' : P0.heroica ? '★' : '◩'}</b>${P0.bonus ? `<em class="cm-prem">+${Math.round(P0.bonus * 100)}%</em>` : P0.hp ? `<em class="cm-new cm-hp">+${Math.round(P0.hp * 100)}% HP</em>` : ''}</span><i class="cm-foto sw" style="background:linear-gradient(135deg,${P0.cores[0]} 0 33%,${P0.cores[1]} 33% 66%,${P0.cores[2]} 66%)"></i><span class="cm-nome">${P0.nome}</span><span class="cm-preco">${tem ? '<b class="cm-tem">POSSUI ✓</b>' : v ? moedaHtml(m, v) : '<b class="cm-tem">GRÁTIS</b>'}</span></button>`; };
+  const cartaAero = (a) => { const tem = possuiAero(eco, a.id), m = a.preco.ouro ? 'ouro' : 'prata', v = a.preco.ouro || a.preco.prata || 0; return `<button class="cm-card${tem ? ' tem' : ''}${a.tier >= 5 ? ' lend' : ''}" data-aero="${a.id}"><span class="cm-topo"><b class="cm-nv">${ROM5[a.tier]}</b>${a.preco.ouro ? '<em class="cm-prem">PREMIUM</em>' : ''}</span>${fotoAero(a)}<span class="cm-nome">${fichaAero(a.id).nome} <small>${a.papel}</small></span><span class="cm-preco">${tem ? '<b class="cm-tem">NO HANGAR ✓</b>' : moedaHtml(m, v)}</span></button>`; }; /* v1.2.61 */
   let corpo = '';
   if (aba === 'navios' || aba === 'todos') { let L = ORDEM_CLASSES.filter((k) => CLASSES[k] && CLASSES[k].L && !CLASSES[k].mercante).map(cartaNavio);
     if (ordem === 'padrao') L.sort((a, b) => b.f - a.f); else if (ordem === 'menor') L.sort((a, b) => a.preco - b.preco); else if (ordem === 'maior') L.sort((a, b) => b.preco - a.preco); else if (ordem === 'nivel') L.sort((a, b) => a.nivel - b.nivel); else if (ordem === 'alta') L.sort((a, b) => b.v - a.v);
-    corpo = `<div class="cm-grade">${L.map((q) => q.html).join('')}${aba === 'todos' ? ORDEM_HIDROS.map(cartaHidro).join('') + PINTURAS_LISTA().map(cartaPint).join('') : ''}</div>`; }
+    corpo = `<div class="cm-grade">${L.map((q) => q.html).join('')}${aba === 'todos' ? AERONAVES.map(cartaAero).join('') + ORDEM_HIDROS.map(cartaHidro).join('') + PINTURAS_LISTA().map(cartaPint).join('') : ''}</div>`; }
+  else if (aba === 'aero') corpo = `<div class="cm-grade">${[...AERONAVES].sort((x, y) => y.tier - x.tier).map(cartaAero).join('')}</div>`;
   else if (aba === 'hidros') corpo = `<div class="cm-grade">${ORDEM_HIDROS.map(cartaHidro).join('')}</div>`;
   else if (aba === 'pinturas') corpo = `<div class="cm-grade">${PINTURAS_LISTA().map(cartaPint).join('')}</div>`;
   else if (aba === 'ofertas') corpo = `<div class="mk-ofertas">${of.map((o) => `<div class="mk-of${o.destaque ? ' dest' : ''}${comp[o.id] ? ' feito' : ''}">
@@ -57,7 +63,7 @@ export function telaMercado(D, aba = 'navios', ordem = 'padrao') { const { mostr
   else if (aba === 'caixas') corpo = `<div class="mk-caixas">${Object.entries(CAIXAS).map(([id, C]) => `<div class="mk-cx" style="--cx:${C.cor}"><i class="mk-cxi"></i><b>${C.nome}</b><ul>${chanceTxt(C).map((t) => `<li>${t}</li>`).join('')}</ul>${C.garantia ? `<small>Garantia: pintura heroica ou lendária a cada ${C.garantia} caixas (${(save.d.caixas && save.d.caixas[id]) || 0} abertas)</small>` : ''}<button class="btn primario btn-peq" data-cx="${id}">ABRIR ${moedaHtml('nexos', C.preco)}</button></div>`).join('')}</div>`;
   else corpo = `<div class="mk-cambio">${CAMBIO.map((c) => `<div class="mk-tr"><b>${c.txt}</b><div class="mk-q">${[10, 100, 1000].map((q) => `<button class="btn btn-peq" data-tr="${c.id}" data-q="${q}">${n0(q)} → ${n0(q * c.taxa)}</button>`).join('')}</div></div>`).join('')}</div>`;
   const titulo = (CATS.find((c) => c[0] === aba) || CATS[1])[1];
-  const el = mostra('mercado', `<div class="cm-topo-bar"><button class="cm-voltar" data-ir="inicio">‹ Voltar</button><h2>COMÉRCIO <small>// compra e venda de navios, hidroaviões e camuflagens</small></h2></div>${carteira()}
+  const el = mostra('mercado', `<div class="cm-topo-bar"><button class="cm-voltar" data-ir="inicio">‹ Voltar</button><h2>COMÉRCIO <small>// compra e venda de navios, aeronaves, hidroaviões e camuflagens</small></h2></div>${carteira()}
     <nav class="cm-cats">${CATS.map(([k, t, ic]) => `<button data-aba="${k}" class="${k === aba ? 'on' : ''}"><i>${ic}</i>${t}</button>`).join('')}<button data-ir2="loja" class="cm-loja"><i>＋</i>Loja</button></nav>
     <div class="cm-area">${['navios', 'todos'].includes(aba) ? `<div class="cm-filtro"><label>${titulo}</label><select data-ordem>${ORDENS.map(([k, t]) => `<option value="${k}" ${k === ordem ? 'selected' : ''}>${t}</option>`).join('')}</select><small>Preços variam todo dia · renovam em ${tempoAteVirar()}</small></div>` : `<div class="cm-filtro"><label>${titulo}</label></div>`}<div class="cm-corpo">${corpo}</div></div>`);
   el.querySelector('[data-ordem]') && el.querySelector('[data-ordem]').addEventListener('change', (e) => { som(); telaMercado(D, aba, e.target.value); });
@@ -65,6 +71,7 @@ export function telaMercado(D, aba = 'navios', ordem = 'padrao') { const { mostr
     if (d.aba) { som(); return telaMercado(D, d.aba); } if (d.ir2) { som(); return telaLoja(D); }
     if (d.nav) { som(); return D.fichaNavio(d.nav, () => telaMercado(D, aba, ordem)); }
     if (d.hd) { som(); return D.irHidro(d.hd); }
+    if (d.aero) { som(); return D.irHangar(d.aero); } /* v1.2.61: abre o hangar 3D nessa aeronave (comprar, evoluir, usar) */
     if (d.pint) { som(); return D.previaPintura(d.pint, () => telaMercado(D, aba, ordem)); }
     if (d.of) { const o = of.find((q) => q.id === d.of); const r = comprarOferta(eco, o, save); if (r.ok && r.txt) { mostraPremio(D, r); } else eventoCompra(r.ok, r.ok ? `${o.titulo} adquirido` : r.motivo); return telaMercado(D, aba); }
     if (d.cx) { const r = abreCaixa(eco, d.cx, save); if (!r.ok && r.motivo) { eventoCompra(false, r.motivo); return; } mostraPremio(D, r, CAIXAS[d.cx]); return telaMercado(D, aba); }

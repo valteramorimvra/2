@@ -1,0 +1,55 @@
+/* v1.2.61 — HANGAR (modelo do Valter): painéis escuros translúcidos sobre o galpão 3D, como no menu inicial */
+.tela-hangar { position: absolute; inset: 0; touch-action: none; user-select: none; color: #e3e9ef; font-family: inherit; }
+.tela-hangar svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.tela-hangar button { font: inherit; color: inherit; cursor: pointer; }
+.tela-hangar .hg-top { position: absolute; top: 0; left: 0; right: 0; height: 44px; display: flex; align-items: center; gap: 6px; padding: 0 max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left)); background: linear-gradient(180deg, rgba(10,13,17,.92), rgba(10,13,17,.55)); border-bottom: 1px solid rgba(170,180,195,.16); }
+.tela-hangar .hg-volta { display: flex; align-items: center; gap: 6px; background: none; border: 0; padding: 6px 8px; font-size: 17px; letter-spacing: .08em; }
+.tela-hangar .hg-volta svg { width: 22px; height: 22px; }
+.tela-hangar .hg-esp { flex: 1; }
+.tela-hangar .hg-tb { display: flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 12px; font-weight: 700; letter-spacing: .06em; background: rgba(30,36,44,.8); border: 1px solid rgba(170,180,195,.22); border-radius: 3px; }
+.tela-hangar .hg-ficha { position: absolute; left: max(12px, env(safe-area-inset-left)); top: 52px; width: 236px; padding: 8px 10px; background: linear-gradient(180deg, rgba(16,20,26,.86), rgba(12,15,19,.72)); border: 1px solid rgba(170,180,195,.18); border-radius: 4px; }
+.tela-hangar .hg-ficha h2 { margin: 2px 0 2px; font-size: 16px; text-transform: none; font-weight: 800; line-height: 1.15; letter-spacing: .02em; }
+.tela-hangar .hg-cat { color: #e0b54a; font-size: 10.5px; font-weight: 700; letter-spacing: .12em; }
+.tela-hangar .hg-papel { margin: 0 0 8px; font-size: 12px; color: #c4cdd6; } .tela-hangar .hg-papel span { color: #8b98a5; }
+.tela-hangar .hg-b { display: grid; grid-template-columns: 74px 1fr 38px; align-items: center; gap: 6px; font-size: 11px; color: #aeb9c4; margin: 3px 0; }
+.tela-hangar .hg-b i { height: 5px; background: rgba(255,255,255,.1); border-radius: 3px; position: relative; overflow: hidden; }
+.tela-hangar .hg-b i::after { content: ''; position: absolute; inset: 0; width: calc(var(--v) * 100%); background: linear-gradient(90deg, #4b9fd1, #8fd0f2); }
+.tela-hangar .hg-b em { font-style: normal; text-align: right; color: #e3e9ef; font-variant-numeric: tabular-nums; }
+.tela-hangar .hg-nv { display: flex; align-items: center; gap: 3px; margin: 8px 0 8px; font-size: 11px; color: #aeb9c4; }
+.tela-hangar .hg-nv i { width: 14px; height: 5px; background: rgba(255,255,255,.14); } .tela-hangar .hg-nv i.on { background: #e0b54a; } .tela-hangar .hg-nv span { margin-left: 6px; }
+.tela-hangar .hg-comprar, .tela-hangar .hg-usar { width: 100%; padding: 8px; border-radius: 3px; font-weight: 800; font-size: 13px; letter-spacing: .05em; border: 0; }
+.tela-hangar .hg-comprar { background: linear-gradient(180deg, #e7b94a, #b9861f); color: #1a1407; }
+.tela-hangar .hg-usar { background: linear-gradient(180deg, #3d9ad0, #22719f); } .tela-hangar .hg-usar.on { background: rgba(60,140,90,.55); cursor: default; }
+.tela-hangar .hg-ala { margin: 0; font-size: 11.5px; color: #9fb0bf; }
+.tela-hangar .hg-360 { position: absolute; left: calc(50% - 60px); bottom: 128px; width: 120px; height: 34px; pointer-events: none; text-align: center; }
+.tela-hangar .hg-360 i { position: absolute; inset: 0; border: 2px solid rgba(230,236,242,.55); border-top-color: transparent; border-radius: 50%; }
+.tela-hangar .hg-360 b { position: relative; top: 18px; font-size: 13px; letter-spacing: .1em; text-shadow: 0 1px 4px #000; }
+.tela-hangar .hg-lista { position: absolute; right: max(10px, env(safe-area-inset-right)); top: 52px; bottom: 132px; width: 132px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; padding-right: 2px; scrollbar-width: thin; }
+.tela-hangar .hg-it { position: relative; flex: none; height: 74px; padding: 0; border: 1px solid rgba(170,180,195,.22); border-radius: 3px; background: rgba(16,20,26,.8); overflow: hidden; text-align: left; }
+.tela-hangar .hg-it.on { border-color: #e0b54a; box-shadow: inset 0 0 0 1px #e0b54a; }
+.tela-hangar .hg-mini { position: absolute; inset: 0; background: #1b2128 center / cover no-repeat; }
+.tela-hangar .hg-it b, .tela-hangar .hg-it small { position: absolute; left: 5px; right: 5px; text-shadow: 0 1px 3px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tela-hangar .hg-it b { bottom: 15px; font-size: 11.5px; } .tela-hangar .hg-it small { bottom: 2px; font-size: 10px; color: #e0b54a; }
+.tela-hangar .hg-it::after { content: ''; position: absolute; inset: 40% 0 0; background: linear-gradient(180deg, transparent, rgba(0,0,0,.75)); pointer-events: none; }
+.tela-hangar .hg-it b, .tela-hangar .hg-it small { z-index: 1; }
+.tela-hangar .hg-it.bloq .tela-hangar .hg-mini { filter: saturate(.35) brightness(.7); }
+.tela-hangar .hg-acoes { position: absolute; left: max(12px, env(safe-area-inset-left)); bottom: 120px; display: flex; gap: 6px; }
+.tela-hangar .hg-ac { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 74px; padding: 6px 0; background: rgba(16,20,26,.84); border: 1px solid rgba(170,180,195,.22); border-radius: 3px; font-size: 10.5px; letter-spacing: .06em; }
+.tela-hangar .hg-ac svg { width: 22px; height: 22px; } .tela-hangar .hg-ac.on { border-color: #4b9fd1; color: #9ad6f7; } .tela-hangar .hg-ac.off { opacity: .4; }
+.tela-hangar .hg-baixo { position: absolute; left: max(12px, env(safe-area-inset-left)); right: 300px; bottom: 8px; }
+.tela-hangar .hg-abas { display: flex; gap: 2px; }
+.tela-hangar .hg-abas button { padding: 5px 16px; font-size: 12px; font-weight: 700; letter-spacing: .08em; background: rgba(16,20,26,.8); border: 1px solid rgba(170,180,195,.2); border-bottom: 0; border-radius: 3px 3px 0 0; color: #9eabb8; }
+.tela-hangar .hg-abas button.on { color: #fff; background: rgba(36,44,54,.94); box-shadow: inset 0 2px 0 #e0b54a; }
+.tela-hangar .hg-cards { display: flex; gap: 6px; overflow-x: auto; padding: 6px; height: 70px; background: rgba(20,25,31,.9); border: 1px solid rgba(170,180,195,.18); scrollbar-width: none; }
+.tela-hangar .hg-card { flex: none; width: 150px; padding: 6px 8px; background: rgba(40,47,56,.85); border: 1px solid rgba(170,180,195,.18); border-radius: 3px; text-align: left; display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+.tela-hangar .hg-card b { font-size: 12px; } .tela-hangar .hg-card small { font-size: 10.5px; color: #9fb0bf; line-height: 1.2; } .tela-hangar .hg-card em { font-style: normal; font-size: 9.5px; font-weight: 700; color: #e0b54a; letter-spacing: .06em; margin-top: auto; }
+.tela-hangar .hg-card.on { border-color: rgba(224,181,74,.7); } .tela-hangar .hg-card.off { opacity: .55; } .tela-hangar .hg-card.off em { color: #8b98a5; }
+.tela-hangar .hg-atalhos { position: absolute; right: max(10px, env(safe-area-inset-right)); bottom: 8px; display: flex; gap: 6px; }
+.tela-hangar .hg-big { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 136px; height: 98px; background: linear-gradient(180deg, rgba(36,44,54,.94), rgba(18,22,28,.94)); border: 1px solid rgba(170,180,195,.25); border-radius: 4px; font-size: 11.5px; letter-spacing: .06em; }
+.tela-hangar .hg-big svg { width: 30px; height: 30px; }
+@media (max-height: 440px) { .tela-hangar .hg-ficha { width: 220px; padding: 7px 10px; } .tela-hangar .hg-ficha h2 { font-size: 15px; } .tela-hangar .hg-lista { width: 116px; bottom: 112px; } .tela-hangar .hg-it { height: 62px; } .tela-hangar .hg-big { width: 116px; height: 84px; } .tela-hangar .hg-baixo { right: 256px; } .tela-hangar .hg-cards { height: 60px; } .tela-hangar .hg-acoes { bottom: 100px; } .tela-hangar .hg-360 { bottom: 110px; } .tela-hangar .hg-ficha h2 { font-size: 14.5px; } .tela-hangar .hg-b { margin: 1px 0; } .tela-hangar .hg-nv { margin: 5px 0; } .tela-hangar .hg-ac { width: 64px; } }
+.tela-hangar button { backdrop-filter: none; -webkit-backdrop-filter: none; background-image: none; }
+.tela-hangar .hg-comprar { background-image: linear-gradient(180deg, #e7b94a, #b9861f); } .tela-hangar .hg-usar { background-image: linear-gradient(180deg, #3d9ad0, #22719f); } .tela-hangar .hg-usar.on { background-image: none; }
+.tela-hangar .hg-big, .tela-hangar .hg-ac, .tela-hangar .hg-it, .tela-hangar .hg-tb, .tela-hangar .hg-abas button, .tela-hangar .hg-card { background-color: rgba(18,22,28,.9); }
+.tela-hangar .hg-ac small { font-size: 9.5px; color: #e0b54a; letter-spacing: 0; min-height: 11px; }
+.cm-silh, .ar-foto.cm-silh { display: flex; align-items: center; justify-content: center; color: #9fb6c9; background: radial-gradient(ellipse at 50% 60%, #26313d, #0f1520 70%) !important; } .cm-silh .silh { width: 78%; height: auto; }

@@ -1,6 +1,7 @@
 // Nexo Naval Strike 3D — classe principal do motor de jogo (render + integração). A simulação determinística fica em
 // sim/ (passo fixo 60 Hz, comandos, NetAdapter); aqui só se DESENHA o estado e se traduz o toque em comandos.
 // Mundo: x = leste, z = sul, y = cima, 1 unidade = 1 m. Rumo 0 = norte, horário. 100% offline.
+import { Hangar3D } from './render/hangar3d.js'; /* v1.2.61 */
 import * as THREE from 'three';
 import { criaSessao } from './sim/session.js';
 import { animaCenario } from './render/props.js';
@@ -64,7 +65,7 @@ export class NavalCombat3D {
     this._laco = (t) => this.laco(t); this._raf = requestAnimationFrame(this._laco);
     window.__nns = this; this.PARAM = PARAM; this.alturaTerrenoTeste = alturaTerreno; this.criaNavio3D = criaNavio3D; this.CLASSES = CLASSES; // gancho de teste (sem efeito visível)
   }
-  redimensiona() { const W = innerWidth, H = innerHeight; this.W = W; this.H = H; this.R.setSize(W, H, false); for (const c of [this.cam, this.vitrine && this.vitrine.cam]) if (c) { c.aspect = W / H; c.updateProjectionMatrix(); } }
+  redimensiona() { const W = innerWidth, H = innerHeight; this.W = W; this.H = H; this.R.setSize(W, H, false); for (const c of [this.cam, this.vitrine && this.vitrine.cam]) if (c) { c.aspect = W / H; c.updateProjectionMatrix(); } if (this.hangar) this.hangar.redimensiona(W, H); }
   nivelInicial() { const a = this.save.ajustes.qualidade; if (a !== 'auto') return { baixa: 0, media: 1, alta: 2 }[a] ?? 1; const dpr = devicePixelRatio || 1; const mem = navigator.deviceMemory || 4; return mem <= 2 ? 0 : mem >= 4 ? 2 : 1; } /* v1.2.47: ALTA por padrão (a autoQualidade ainda rebaixa sozinha se o FPS cair) */ /* v1.2.38: volta à regra da 1.2.31 — ALTA automática (1.2.35) travava celulares */
   aplicaQualidade() { const n = this.Q.nivel; this.R.setPixelRatio(Math.min(devicePixelRatio || 1, [1.1, 1.6, 2][n]) /* v1.2.26 E */); this.R.setSize(this.W, this.H, false); this.R.shadowMap.enabled = n > 0;
     if (this.amb) { this.amb.sombras(n > 0, n === 2 ? 2048 : 1536); /* v1.2.26 E: sombra média menos pixelada */ this.amb.criaMar(n); } if (this.fx) this.fx.setFator([0.5, 0.8, 1][n]); if (this.cam) { this.cam.far = [16000, 22000, 26000][n]; this.cam.updateProjectionMatrix(); }
@@ -105,6 +106,9 @@ export class NavalCombat3D {
     let q = F.find((x) => x.t < 0); if (!q) q = F.reduce((a, b) => (a.t < b.t ? a : b)); q.t = t0; q.nome = nome; q.d = d; q.pan = pan; q.vol = vol; q.rate = rate; }
   passoSomAtrasado(t) { const F = this._filaSom; if (!F) return; for (const q of F) if (q.t >= 0 && t >= q.t) { q.t = -1; this.audio.toca(q.nome, { d: q.d, pan: q.pan, vol: q.vol, rate: q.rate }); this.stSomAbate = (this.stSomAbate || 0) + 1; } }
   escondeVitrine() { if (this.vitrine) this.vitrine.ativo = false; }
+  /** v1.2.61: HANGAR 3D (criado na 1ª abertura; mesmo renderizador). */
+  abreHangar() { try { if (!this.hangar) this.hangar = new Hangar3D(this.R); } catch (e) { return null; } this.escondeVitrine(); this.hangar.redimensiona(this.W, this.H); this.hangar.ativo = true; return this.hangar; }
+  fechaHangar() { if (this.hangar) this.hangar.ativo = false; }
   /** Vista ampla do estaleiro/porto (opcional): cais com guindastes, galpões, contêineres, navios atracados e luzes. */
   montaPorto() { const V = this.vitrine; if (V.porto) return V.porto; const g = new THREE.Group(); const conc = new THREE.MeshStandardMaterial({ color: '#5f666e', roughness: 0.95, metalness: 0.02 });
     /* v1.2.16 item 31: BASE NAVAL de guerra — cais militar de concreto (borda em x = 35), defensas de borracha, cabeços, armazéns cinza, guindastes de doca, torres de iluminação, navios de guerra ao fundo; sem contêineres/elementos civis */
@@ -579,7 +583,7 @@ export class NavalCombat3D {
   // ======================= LAÇO =======================
   laco(tms) {
     this._raf = requestAnimationFrame(this._laco); const t = tms / 1000; const dt = Math.min(0.1, this._ultimo ? t - this._ultimo : 0.016); this._ultimo = t; CAMO_T.value = t % 3600; /* v1.2.15: animação das camuflagens lendárias (jogo e estaleiro) */
-    if (!this.rodando || !this.cena) { if (this.vitrine && this.vitrine.ativo) this.quadroVitrine(dt, t); return; }
+    if (!this.rodando || !this.cena) { if (this.hangar && this.hangar.ativo) { this.hangar.passo(dt); return; } /* v1.2.61: hangar 3D */ if (this.vitrine && this.vitrine.ativo) this.quadroVitrine(dt, t); return; }
     if (this.pausado) return;
     this._t0q = performance.now(); this.tJogo += dt; const S = this.S, sim = S.sim;
     if (this.mem.fogoSeg) { this.mem.fogoSeg += dt; if (this.mem.fogoSeg > 0.35) { this.mem.fogoSeg = 1e-3; const bF = this.hud.r && this.hud.r.b_fogo; if (bF && !bF.classList.contains('apertado')) { this.mem.fogoSeg = 0; S.comando({ t: 'canhaoSolta' }); } else S.comando({ t: 'canhao', seg: 1 }); /* v1.2.21 item 11b: salva contínua só com o botão REALMENTE segurado */ if (!this.mem.segurou) { this.mem.segurou = 1; this.hud.msg('Salva: todas as torres prontas', 0.9, '#86efac'); } } }

@@ -2,6 +2,7 @@
 // (botão LANÇAR DRONE). Determinístico (sim.rng), pools fixos. O jogador pode ASSUMIR um helicóptero (a IA assume o navio)
 // e voltar ao navio (a IA assume o helicóptero: patrulha, ataca, volta para pousar e rearmar). Podem ser abatidos por
 // CIWS, 30 mm e SAM inimigos. Sensores elevados enxergam por cima das ilhas e plotam no radar da frota (data-link).
+import { bonusNivel } from '../aeronaves.js';
 import { clamp, ang, marcacao, G } from '../sim/util.js';
 import { HELIS, UAV, MISSEIS, TORPEDO } from '../sim/classes.js';
 import { alturaMar } from '../sim/ocean.js';
@@ -49,7 +50,7 @@ export function instalaAereo(sim) {
 export function instalaHelisNavio(sim, n, modelos) {
   n.helis = []; n.tUav = 0; n.uav = -1; n.controle = -1; /* −1 = navio; k = helicóptero k */ n.controleIA = 0; const nh = n.Cb.heli || 0; if (!nh || !n.P.convoo) return;
   const lista = (n.C.helisPadrao ? n.C.helisPadrao : modelos && modelos.length ? modelos : ['multi', 'asw']).slice(0, nh); /* v1.2.11: porta-aviões usam a ala aérea própria (caças VTOL) */
-  lista.forEach((mod, k) => { const h = sim.helis.find((q) => !q.usado); if (!h) return; const H = HELIS[mod] || HELIS.leve; const fu = n.mods.heliFuel || 1;
+  lista.forEach((mod, k) => { const h = sim.helis.find((q) => !q.usado); if (!h) return; let H = HELIS[mod] || HELIS.leve; const nvA = n.aeroNv && n.aeroNv[H.id]; if (nvA > 1) { const b = bonusNivel(nvA); H = Object.assign({}, H, { vmax: H.vmax * b.vel, vida: Math.round(H.vida * b.vida), recarga: H.recarga ? H.recarga * b.recarga : H.recarga }); } /* v1.2.61: evolução do hangar */ const fu = n.mods.heliFuel || 1;
     Object.assign(h, { usado: 1, ativo: 0, estado: k === 0 ? EST.CONVOO : EST.HANGAR, slot: k, dono: n.id, time: n.time, modelo: H.id, camo: n.camoAereo || 'padrao' /* v1.2.17 13i */, H, comb: H.comb * fu, combMax: H.comb * fu, mun: Math.round(H.mun * (n.mods.heliMun || 1)), munMax: Math.round(H.mun * (n.mods.heliMun || 1)), vida: H.vida, ctrl: 'ia', alt: ALT_IA, alvo: -1, tArma: 0, tEst: 0, auto: n.papel !== 'jogador' ? 1 : 0, rumo: n.rumo, v: 0 });
     h.lancar = 0; h.oculto = 1; h.dkE = -1; h.dkC = -1; h.esp = 0; h.tEspera = 0; n.helis.push(h.idx); iniConves(sim, n, h, k); });
   n.reservaAr = n.C.alaTotal ? Math.max(0, n.C.alaTotal - n.helis.length) : 0; /* v1.2.26: aeronaves de reserva no hangar dos gigantes (repõem abatidas) */
