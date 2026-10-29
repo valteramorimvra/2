@@ -70,7 +70,7 @@ float espumaCasco(vec2 p){ float e = 0.0;
     float lxE = lx; if (ka2 > 1e-5 && ra > 0.0) { float ph = min(ra * ka2, 1.4); lxE = lx - sign(kc) * (1.0 - cos(ph)) / ka2; }
     float wE = D.y * (0.9 + ra / max(compE, 1.0) * 1.6);
     float te = step(0.0, ra) * (1.0 - smoothstep(compE * 0.4, compE, ra)) * (1.0 - smoothstep(wE * 0.6, wE, abs(lxE)));
-    e = max(e, te * smoothstep(0.3, 0.75, n + 0.35 - ra / max(compE, 1.0) * 0.4) * clamp((spd - 1.5) / 8.0, 0.0, 1.0) * 0.45); }
+    e = max(e, te * smoothstep(0.3, 0.75, n + 0.35 - ra / max(compE, 1.0) * 0.4) * clamp((spd - 1.5) / 8.0, 0.0, 1.0) * 0.55); } /* v1.2.35: esteira mais visível (era 0,45) */
   return e; }
 /** v1.2.15: textura de espuma REAL — rede de bolhas (células de ruído) que se rompe conforme a espuma envelhece/afina (k = densidade). Sem textura nova. */
 float renda(vec2 p, float k){ float a = ns(p * 1.9 + uT * 0.07), b = ns(p * 4.3 - uT * 0.11), c = ns(p * 9.7 + vec2(uT * 0.05, 0.0)); float cel = abs(a - 0.5) * 1.3 + abs(b - 0.5) * 0.7 + c * 0.25; return smoothstep(1.0 - k, 1.0 - k + 0.35, cel + k * 0.55); }
@@ -140,7 +140,7 @@ void main(){ vec3 V = normalize(cameraPosition - vW); float dc = length(cameraPo
 #endif
   /* v1.2.29 item 4: whitecaps por inclinação (1-Ny) + altura — espuma de crista e esteira mais legíveis */
   float slope = 1.0 - clamp(N.y, 0.0, 1.0);
-  float espC = smoothstep(0.38, 0.78, cr + (rn - 0.5) * 0.38 + slope * 1.4) * smoothstep(0.36, 0.88, hn) * 0.48 * (0.6 + 0.55 * rn) * (1.0 - smoothstep(380.0, 2000.0, dc));
+  float espC = smoothstep(0.38, 0.78, cr + (rn - 0.5) * 0.38 + slope * 1.4) * smoothstep(0.36, 0.88, hn) * 0.56 * (0.6 + 0.55 * rn) * (1.0 - smoothstep(380.0, 2000.0, dc)); /* v1.2.35: cristas um pouco mais brancas (era 0,48) */
   float espR = (1.0 - smoothstep(0.3, 3.6, prof)) * (0.38 + 0.48 * ns(vW.xz * 0.55 + uT * 0.55)) * (0.5 + 0.5 * smoothstep(0.28, 0.88, hn));
   float espH = espumaCasco(vW.xz);
   float esp = clamp(max(max(espC, espR), espH * 0.88), 0.0, 0.94);
