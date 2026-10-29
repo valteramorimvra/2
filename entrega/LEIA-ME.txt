@@ -1,5 +1,5 @@
-NEXO NAVAL STRIKE 3D — v1.2.46 (versionCode 49)
+NEXO NAVAL STRIKE 3D — v1.2.47 (versionCode 50)
 
 1. DESINSTALE o app antigo (a chave de assinatura é nova; sem desinstalar o Android recusa).
-2. Instale NexoNavalStrike-1.2.46.apk (permita "instalar apps desconhecidos" se pedir).
+2. Instale NexoNavalStrike-1.2.47.apk (permita "instalar apps desconhecidos" se pedir).
 3. Novidades: veja no jogo em NOVIDADES (menu inicial).

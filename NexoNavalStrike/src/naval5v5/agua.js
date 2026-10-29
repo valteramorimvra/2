@@ -130,7 +130,7 @@ void main(){ vec3 V = normalize(cameraPosition - vW); float dc = length(cameraPo
   vec3 R = reflect(-V, N); R.y = abs(R.y);
   vec2 sx = normalize(uSol.xz + vec2(1e-4)); vec2 rx = normalize(R.xz + vec2(1e-4)); float faixa = pow(max(dot(rx, sx), 0.0), 18.0) * (1.0 - uNoite); /* reflexo de cor só na FAIXA DO SOL */
   vec3 cr0 = ceu(R); float lum = dot(cr0, vec3(0.3, 0.45, 0.25)); vec3 ceuEsc = mix(vec3(0.05, 0.11, 0.19), vec3(0.18, 0.28, 0.4), clamp(lum, 0.0, 1.0)) * (0.55 + 0.45 * lum);
-  vec3 c = mix(base, mix(ceuEsc, cr0, 0.40 + 0.60 * faixa), clamp(fres, 0.0, 0.86));
+  vec3 c = mix(base, mix(ceuEsc, cr0, 0.62 + 0.38 * faixa), clamp(fres, 0.0, 0.86)); /* v1.2.47: reflexo do céu mais vivo (mar menos 'tinta escura') */
 #ifndef BARATO
   { float rc = reflexoCasco(vW.xz, N) * (1.0 - smoothstep(250.0, 1600.0, dc)); c = mix(c, c * vec3(0.32, 0.35, 0.4) + vec3(0.012, 0.014, 0.018) * uLuzAgua, rc * (0.35 + 0.5 * fres)); } /* v1.2.35: reflexo do casco */
 #endif /* v1.2.29 item 4: reflexo céu mais limpo */
