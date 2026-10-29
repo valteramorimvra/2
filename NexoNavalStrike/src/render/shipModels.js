@@ -5,7 +5,7 @@
 // de torpedo, CIWS, botes, balsas, corrimãos e números de casco. Peças estáticas são FUNDIDAS (mergeGeometries) por
 // material → poucos draw calls; peças móveis (torres, CIWS, radar, tampas VLS) ficam separadas.
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'; import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { texPintura, texChapas, texRugo, texNumero, texHeliponto, prisma, texJanelas, texPorta, texHangar, grao } from './textures.js';
 import { CLASSES } from '../sim/classes.js';
 import { NOMES_PADRAO } from '../sim/nomes.js';
@@ -415,33 +415,62 @@ function extras1211(g, C, P, M, dY, meia) { const L = C.L, s = P.sup; if (C.osv)
     const hd = mesh(new THREE.SphereGeometry(1.05, 14, 10).scale(1, 0.85, 1), M.aa); hd.position.y = 2.1; lg.add(hd); const ln = mesh(cil(0.42, 0.42, 0.5, 14).rotateX(Math.PI / 2), M.vidro); ln.position.set(0, 2.15, -0.95); lg.add(ln);
     for (const sx of [-1, 1]) { const rd = mesh(caixa(0.12, 0.8, 0.9), M.escuro); rd.position.set(sx * 1.05, 2.1, 0); lg.add(rd); } g.add(lg); }
 }
-/** v1.2.42: navio de APOIO OFFSHORE (Parcel das Paredes): passadiço alto de 4 pavimentos com janelas corridas e asas, mastro treliçado com radomes,
- *  chaminés laterais, convés de carga aberto à ré com balaustrada amarela, contêineres coloridos, guindaste articulado e pórtico (A-frame) de popa, bote de resgate laranja. */
-const MAT_OSV = {}; const mOSV = (c, r = 0.6, m = 0.3) => MAT_OSV[c] || (MAT_OSV[c] = new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: m }));
-function extrasOSV(g, C, P, M, dY, meia) { const L = C.L, s = P.sup, cS = s.z1 - s.z0, h = s.h, zS = (s.z0 + s.z1) / 2, y0 = dY(zS), wS = meia(zS) * 2 * 0.9;
+/** v1.2.45: navio de APOIO OFFSHORE (Parcel das Paredes) refeito com formas reais: casaria de 4 pavimentos em blocos CHANFRADOS (cantos arredondados),
+ *  faixas de janelas e vigias, passadiço com vidraça inclinada e asas até o costado, teto com balaustrada, mastro treliçado com radar/radomes/antenas,
+ *  chaminés gêmeas, guincho e cabeços na proa, amurada azul com corrimão amarelo no convés de carga, contêineres corrugados, tanques, carretéis,
+ *  guindaste articulado (pedestal, cabine, lanças com cilindros hidráulicos, moitão), pórtico A de popa, bote de resgate com turco e balsas salva-vidas.
+ *  O casco/costado são os do navio (casco azul + sup branca pela pintura 'offshore'); a casaria genérica de navio de guerra é removida antes. */
+const MAT_OSV = {}; const mOSV = (c, r = 0.6, m = 0.3, mapa) => MAT_OSV[c + (mapa ? ':t' : '')] || (MAT_OSV[c + (mapa ? ':t' : '')] = new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: m, map: mapa || null }));
+let _texCont = null; const texConteiner = () => { if (_texCont) return _texCont; const W = 128, H = 64, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'); x.fillStyle = '#ffffff'; x.fillRect(0, 0, W, H);
+  for (let i = 0; i < W; i += 4) { const g = x.createLinearGradient(i, 0, i + 4, 0); g.addColorStop(0, 'rgba(0,0,0,0.18)'); g.addColorStop(0.5, 'rgba(255,255,255,0.12)'); g.addColorStop(1, 'rgba(0,0,0,0.18)'); x.fillStyle = g; x.fillRect(i, 3, 4, H - 6); }
+  x.fillStyle = 'rgba(0,0,0,0.35)'; x.fillRect(0, 0, W, 3); x.fillRect(0, H - 3, W, 3); x.fillRect(0, 0, 3, H); x.fillRect(W - 3, 0, 3, H); for (let i = 0; i < 40; i++) { x.fillStyle = `rgba(110,60,30,${0.05 + Math.random() * 0.1})`; x.fillRect(Math.random() * W, Math.random() * H, 2 + Math.random() * 6, 1 + Math.random() * 3); }
+  _texCont = new THREE.CanvasTexture(c); _texCont.colorSpace = THREE.SRGBColorSpace; return _texCont; };
+const rbox = (w, h, d, r = 0.35) => new RoundedBoxGeometry(w, h, d, 3, Math.min(r, w / 2.2, h / 2.2, d / 2.2));
+function extrasOSV(g, C, P, M, dY, meia) { const L = C.L, s = P.sup, cS = s.z1 - s.z0, h = s.h, zS = (s.z0 + s.z1) / 2, y0 = dY(zS), wS = meia(zS) * 2 * 0.92;
+  /* 1) tira a casaria/mastro/chaminé genéricos de navio de guerra e o heliponto (o que está acima do convés na área da casaria, sem nome de arma) */
+  { g.updateMatrixWorld(true); const bx = new THREE.Box3(), FICA = /^(torre\d|nomeOuro|nomeOuroPopa)$/;
+    for (const o of [...g.children]) { if (FICA.test(o.name || '')) continue; bx.setFromObject(o); if (bx.isEmpty()) continue; const cz = (bx.min.z + bx.max.z) / 2; let tira = false; o.traverse((q) => { if (q.material === M.heli) tira = true; });
+      if (!tira && bx.min.y > 0.4 && bx.min.y > dY(cz) - 1.2 && ((cz > s.z0 - 4 && cz < s.z1 + 7) || /^(radar\d?|flamula|gala)$/.test(o.name || ''))) tira = true; if (tira) g.remove(o); } }
   const add = (geo, mat, x, y, z, det) => { const o = mesh(geo, mat); o.position.set(x, y, z); if (det) o.userData.det = 1; g.add(o); return o; };
-  /* pavimentos 3 e 4 (passadiço com asas) */ add(bloco(wS * 0.92, cS * 0.78, h, 0.9, 0.12), M.sup, 0, y0 + h * 2, s.z0 + cS * 0.42);
-  add(bloco(wS * 1.12, cS * 0.5, h, 0.94, 0.08), M.sup, 0, y0 + h * 3, s.z0 + cS * 0.3);
-  const jb = add(caixa(wS * 1.13, h * 0.42, cS * 0.51), M.vidro, 0, y0 + h * 3.55, s.z0 + cS * 0.3); /* janelas corridas do passadiço */
-  for (const yy of [1.5, 2.5]) add(caixa(wS * 0.94, h * 0.22, cS * 0.8), M.vidro, 0, y0 + h * yy, s.z0 + cS * 0.42, 1); /* vigias dos camarotes */
-  add(caixa(wS * 1.16, 0.25, cS * 0.54), M.sup, 0, y0 + h * 4, s.z0 + cS * 0.3); /* teto */
-  for (const sx of [-1, 1]) for (let k = 0; k < 7; k++) add(caixa(0.06, 1.0, 0.06), mOSV('#e3b02a', 0.5, 0.4), sx * wS * 0.56, y0 + h * 4 + 0.5, s.z0 + cS * (0.08 + k * 0.07), 1); /* balaustre amarelo do teto */
-  /* mastro treliçado com radomes e radar */ { const zm = s.z0 + cS * 0.52, ym = y0 + h * 4, Hm = 10, aM = 0.9; const ac = mOSV('#1b1d21', 0.5, 0.6);
-    for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(cil(0.09, 0.09, Hm, 6), ac, dx * aM, ym + Hm / 2, zm + dz * aM);
-    for (let k = 1; k < 6; k++) { const yy = ym + k * Hm / 6; add(caixa(aM * 2.2, 0.12, 0.12), ac, 0, yy, zm - aM); add(caixa(aM * 2.2, 0.12, 0.12), ac, 0, yy, zm + aM); add(caixa(0.12, 0.12, aM * 2.2), ac, -aM, yy, zm); add(caixa(0.12, 0.12, aM * 2.2), ac, aM, yy, zm); add(caixa(aM * 2.4, 0.08, aM * 2.4), mOSV('#e3b02a', 0.5, 0.4), 0, yy - 0.05, zm, 1); }
-    const rd = add(new THREE.SphereGeometry(0.75, 16, 12), mOSV('#f2f4f5', 0.35, 0.1), 0.6, ym + Hm + 0.7, zm); rd.userData.det = 1; add(new THREE.SphereGeometry(0.5, 14, 10), mOSV('#f2f4f5', 0.35, 0.1), -1.6, ym + 1.0, s.z0 + cS * 0.85);
-    const rb = new THREE.Group(); rb.name = 'radar'; rb.position.set(0, ym + Hm * 0.62, zm - aM - 0.5); rb.add(mesh(caixa(4.2, 0.22, 0.35), ac)); g.add(rb); }
-  /* chaminés laterais à ré do passadiço */ for (const sx of [-1, 1]) { const ch = add(caixa(1.4, h * 1.5, 2.2), M.sup, sx * wS * 0.4, y0 + h * 2 + h * 0.75, s.z1 - 1.4); add(caixa(1.46, 0.5, 2.26), mOSV('#1b1d21'), sx * wS * 0.4, y0 + h * 3.5 + 0.25, s.z1 - 1.4); void ch; }
-  /* convés de carga: balaustrada amarela, contêineres, carretéis */ const z0 = s.z1 + 2, z1 = L / 2 - 6, amar = mOSV('#e3b02a', 0.5, 0.4);
-  for (const sx of [-1, 1]) { for (let z = z0; z < L / 2 - 1; z += 2.4) { const x = sx * (meia(z) - 0.25); add(caixa(0.08, 1.1, 0.08), amar, x, dY(z) + 0.55, z, 1); } add(caixa(0.1, 0.1, L / 2 - 1 - z0), amar, sx * (meia((z0 + L / 2) / 2) - 0.25), dY(z0) + 1.1, (z0 + L / 2 - 1) / 2, 1); }
-  const CT = ['#3f8f3a', '#e0752a', '#f3f4f2', '#3f8f3a', '#9aa3ab', '#e0752a', '#1e5aa6', '#f0c419'];
-  let k = 0; for (let z = z0 + 3; z < z1 - 8; z += 6.6) for (const sx of [-1, 1]) { if ((k * 7) % 5 === 1) { k++; continue; } const hC = 2.6, alt = 1 + ((k * 5) % 3 === 0 ? 1 : 0); for (let a = 0; a < alt; a++) { const c = add(caixa(2.45, hC, 6.05), mOSV(CT[(k + a * 3) % CT.length], 0.72, 0.3), sx * meia(z) * 0.42, dY(z) + hC / 2 + a * hC, z); void c; } k++; }
-  for (const sx of [-1, 1]) { const cr = add(cil(1.1, 1.1, 1.6, 14).rotateZ(Math.PI / 2), mOSV('#1f6fb5'), sx * meia(z1 - 6) * 0.35, dY(z1 - 6) + 1.2, z1 - 6); void cr; }
-  /* guindaste articulado (bombordo) */ { const zc = s.z1 + 3, xc = -meia(zc) * 0.62, yc = dY(zc); const azulG = mOSV('#1f6fb5'), branco = mOSV('#f1f3f4', 0.5, 0.3);
-    add(cil(0.9, 1.1, 3.2, 14), azulG, xc, yc + 1.6, zc); const b1 = add(caixa(0.9, 0.9, 13), branco, xc, yc + 5.5, zc + 5.2); b1.rotation.x = -0.32; const b2 = add(caixa(0.7, 0.7, 9), branco, xc, yc + 6.6, zc + 13.6); b2.rotation.x = 0.18; add(cil(0.03, 0.03, 6, 4), mOSV('#222'), xc, yc + 4.2, zc + 17.6); }
-  /* pórtico A-frame de popa */ { const zp = L / 2 - 2.5, yp = dY(zp), wA = meia(zp) * 1.5, aA = mOSV('#1f6fb5'); for (const sx of [-1, 1]) { const p = add(caixa(0.7, 9, 0.7), aA, sx * wA / 2, yp + 4.3, zp); p.rotation.x = 0.28; } add(caixa(wA + 0.7, 0.9, 0.9), mOSV('#f1f3f4', 0.5, 0.3), 0, yp + 8.6, zp + 1.25); }
-  /* bote de resgate laranja (boreste) */ { const zb = s.z1 - 4, xb = meia(zb) * 0.8; const b = add(new THREE.SphereGeometry(1, 14, 8).scale(1.1, 0.6, 3.2), M.bote, xb, y0 + h * 1.3, zb); void b; add(caixa(0.2, 1.8, 0.2), mOSV('#1b1d21'), xb - 0.7, y0 + h * 0.9, zb - 2.2, 1); add(caixa(0.2, 1.8, 0.2), mOSV('#1b1d21'), xb - 0.7, y0 + h * 0.9, zb + 2.2, 1); }
-  /* bombas de incêndio (FiFi) e tubulação vermelha no castelo */ for (const sx of [-1, 1]) add(cil(0.25, 0.25, 6, 8).rotateX(Math.PI / 2), mOSV('#c0392b', 0.5, 0.4), sx * wS * 0.4, y0 + h * 4 - 0.2, s.z0 + cS * 0.5, 1);
+  const branco = M.sup, azul = mOSV('#1f6fb5', 0.5, 0.35), amar = mOSV('#e3b02a', 0.5, 0.4), escuro = mOSV('#1b1d21', 0.55, 0.5), cinza = mOSV('#8d959c', 0.6, 0.4), verm = mOSV('#c0392b', 0.5, 0.35), laranja = mOSV('#ea6a1e', 0.6, 0.15);
+  const jan = (w, hh, x, y, z, ry = 0) => { const p = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), M.janela); p.position.set(x, y, z); p.rotation.y = ry; p.userData.det = 1; g.add(p); return p; };
+  /* 2) casaria em 4 pavimentos chanfrados, recuando à ré, com janelas nos lados e na frente */
+  const PAV = [[wS, cS, 0], [wS * 0.94, cS * 0.86, 0.02], [wS * 0.88, cS * 0.68, 0.04], [wS * 0.9, cS * 0.44, 0.06]];
+  PAV.forEach(([w, c, f], i) => { const yb = y0 + h * i, zc = s.z0 + cS * f + c / 2; add(rbox(w, h, c, 0.45), branco, 0, yb + h / 2, zc); add(caixa(w + 0.1, 0.16, c + 0.1), branco, 0, yb + h - 0.02, zc, 1); /* friso do pavimento */
+    const hj = i === 3 ? h * 0.5 : h * 0.3, yj = yb + h * (i === 3 ? 0.58 : 0.55); for (const sx of [-1, 1]) jan(c * 0.8, hj, sx * (w / 2 + 0.03), yj, zc, sx * Math.PI / 2); if (i < 3) jan(w * 0.7, hj, 0, yj, s.z0 + cS * f - 0.03, Math.PI); });
+  /* passadiço: vidraça frontal inclinada + asas até o costado */ { const yb = y0 + h * 3, zf = s.z0 + cS * 0.06; const vf = add(caixa(wS * 0.86, h * 0.62, 0.12), M.vidro, 0, yb + h * 0.58, zf - 0.25); vf.rotation.x = 0.28;
+    const wa = meia(zf + cS * 0.12) * 2 - 0.4; add(rbox(wa, 0.35, 3.2, 0.12), branco, 0, yb + h * 0.32, zf + 1.8); for (const sx of [-1, 1]) { add(rbox(1.6, h * 0.8, 2.6, 0.2), branco, sx * (wa / 2 - 0.8), yb + h * 0.75, zf + 1.8); jan(2.2, h * 0.36, sx * (wa / 2 - 0.8), yb + h * 0.82, zf + 0.48, Math.PI); }
+    add(rbox(wS * 1.0, 0.3, cS * 0.5, 0.12), branco, 0, yb + h + 0.12, s.z0 + cS * 0.29); /* teto com beiral */
+    for (const sx of [-1, 1]) for (let k = 0; k < 9; k++) add(cil(0.04, 0.04, 1.0, 5), amar, sx * wS * 0.49, yb + h + 0.75, s.z0 + cS * (0.06 + k * 0.055), 1);
+    for (const sx of [-1, 1]) add(cil(0.05, 0.05, cS * 0.45, 5).rotateX(Math.PI / 2), amar, sx * wS * 0.49, yb + h + 1.22, s.z0 + cS * 0.28, 1); }
+  /* mastro treliçado (atrás do passadiço) com radar giratório, radomes, antenas e luzes */ { const zm = s.z0 + cS * 0.5, ym = y0 + h * 4 + 0.2, Hm = 11, aM = 0.85;
+    for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const pe = add(cil(0.08, 0.1, Hm, 6), escuro, dx * aM * 0.8, ym + Hm / 2, zm + dz * aM * 0.8); pe.rotation.z = -dx * 0.012; }
+    for (let k = 1; k < 7; k++) { const yy = ym + k * Hm / 7, a = aM * (1 - k * 0.025); for (const [w, d, x, z] of [[a * 2, 0.08, 0, -a], [a * 2, 0.08, 0, a], [0.08, a * 2, -a, 0], [0.08, a * 2, a, 0]]) add(caixa(w, 0.08, d), escuro, x * 0.8, yy, zm + z * 0.8, 1); if (k % 2) for (const sx of [-1, 1]) { const dg = add(caixa(0.05, Hm / 7 * 1.4, 0.05), escuro, sx * a * 0.8, yy - Hm / 14, 0 + zm - a * 0.8, 1); dg.rotation.z = sx * 0.55; } }
+    for (const k of [2, 4, 6]) add(rbox(aM * 2.6, 0.12, aM * 2.6, 0.04), amar, 0, ym + k * Hm / 7 - 0.06, zm, 1); /* plataformas */
+    const rb = new THREE.Group(); rb.name = 'radar'; rb.position.set(0, ym + Hm * 0.66, zm - aM - 0.4); const ant = mesh(rbox(4.6, 0.26, 0.4, 0.1), escuro); rb.add(ant); g.add(rb);
+    const rb2 = new THREE.Group(); rb2.name = 'radar2'; rb2.position.set(0, ym + Hm * 0.86, zm - aM - 0.2); rb2.add(mesh(rbox(3.2, 0.2, 0.32, 0.08), escuro)); g.add(rb2);
+    add(new THREE.SphereGeometry(0.78, 18, 14), mOSV('#f2f4f5', 0.35, 0.1), 0, ym + Hm + 0.75, zm); add(cil(0.3, 0.4, 0.5, 10), escuro, 0, ym + Hm + 0.05, zm);
+    for (const [x, z, r] of [[-wS * 0.3, s.z0 + cS * 0.62, 0.55], [wS * 0.3, s.z0 + cS * 0.62, 0.55], [wS * 0.36, s.z0 + cS * 0.2, 0.42]]) { add(cil(0.12, 0.15, 1.2, 8), escuro, x, y0 + h * 4 + 0.75, z, 1); add(new THREE.SphereGeometry(r, 16, 12), mOSV('#f2f4f5', 0.35, 0.1), x, y0 + h * 4 + 1.35 + r * 0.6, z); }
+    for (const [x, hh] of [[-0.7, 4.5], [0.7, 3.6], [0, 2.8]]) add(cil(0.03, 0.05, hh, 5), escuro, x, ym + Hm + hh / 2, zm + 0.6, 1); }
+  /* chaminés gêmeas (à ré da casaria, no 3º pavimento) */ for (const sx of [-1, 1]) { const zc = s.z1 - 2.2, xc = sx * wS * 0.3; add(rbox(1.5, h * 1.5, 2.3, 0.35), branco, xc, y0 + h * 2 + h * 0.75, zc); add(rbox(1.56, 0.55, 2.36, 0.15), escuro, xc, y0 + h * 3.5 + 0.2, zc); add(cil(0.28, 0.28, 0.7, 10), escuro, xc - sx * 0.2, y0 + h * 3.5 + 0.7, zc + 0.3); }
+  /* balsas salva-vidas (casulos brancos) e bote de resgate laranja com turco */ for (const sx of [-1, 1]) for (let k = 0; k < 3; k++) add(cil(0.38, 0.38, 1.5, 12).rotateZ(Math.PI / 2), mOSV('#f4f4f2', 0.45, 0.1), sx * (wS / 2 + 0.35), y0 + h * 1 + 0.5, s.z0 + cS * (0.3 + k * 0.12), 1);
+  { const zb = s.z1 - 5, xb = (meia(zb) - 1.4); const b = add(new THREE.SphereGeometry(1, 18, 10).scale(1.05, 0.62, 3.1), laranja, xb, y0 + h * 1.25, zb); void b; add(new THREE.CylinderGeometry(0.9, 0.9, 0.12, 14, 1, false, 0, Math.PI).rotateZ(Math.PI / 2).scale(1, 1, 2.6), mOSV('#f4f4f2', 0.4, 0.1), xb, y0 + h * 1.25 + 0.55, zb, 1);
+    const tu = add(caixa(0.22, h * 1.6, 0.22), escuro, xb + 1.2, y0 + h * 1.2, zb - 1.6); void tu; const br = add(caixa(1.5, 0.2, 0.2), escuro, xb + 0.5, y0 + h * 2, zb - 1.6); void br; }
+  /* proa: guincho de âncora, cabeços, monitores laterais de reserva */ { const zp = -L * 0.43, yp = dY(zp); for (const sx of [-1, 1]) { add(cil(0.55, 0.55, 1.1, 14).rotateZ(Math.PI / 2), escuro, sx * 1.1, yp + 0.6, zp); add(cil(0.25, 0.25, 0.7, 8), escuro, sx * (meia(zp + 4) - 1), yp + 0.35, zp + 4); add(cil(0.25, 0.25, 0.7, 8), escuro, sx * (meia(zp + 4) - 1), yp + 0.35, zp + 4.8); } add(rbox(2.6, 0.7, 1.4, 0.15), verm, 0, yp + 0.4, zp - 0.4); }
+  /* 3) convés de carga à ré: amurada azul + corrimão amarelo, contêineres corrugados, tanques e carretéis */ const z0 = s.z1 + 1.5, zFim = L / 2 - 1.2;
+  for (const sx of [-1, 1]) { for (let z = z0; z < zFim; z += 3) { const z2 = Math.min(zFim, z + 3), zm = (z + z2) / 2, x = sx * (meia(zm) - 0.12); add(caixa(0.18, 1.1, z2 - z + 0.02), azul, x, dY(zm) + 0.55, zm); add(cil(0.045, 0.045, z2 - z, 5).rotateX(Math.PI / 2), amar, x - sx * 0.05, dY(zm) + 1.75, zm, 1); add(cil(0.03, 0.03, 0.65, 5), amar, x - sx * 0.05, dY(zm) + 1.42, z, 1); } }
+  const tC = texConteiner(), CT = ['#3c8a3a', '#e0752a', '#eceeec', '#3c8a3a', '#8f989f', '#e0752a', '#1e5aa6', '#e9c033'];
+  let k = 0; for (let z = z0 + 2.5; z < zFim - 14; z += 6.5) for (const sx of [-1, 1]) { if ((k * 7) % 5 === 1) { k++; continue; } const alt = 1 + ((k * 5) % 3 === 0 ? 1 : 0); for (let a = 0; a < alt; a++) add(caixa(2.44, 2.59, 6.06), mOSV(CT[(k + a * 3) % CT.length], 0.68, 0.3, tC), sx * meia(z) * 0.42, dY(z) + 1.3 + a * 2.6, z); k++; }
+  for (const sx of [-1, 1]) { const zt = zFim - 11; add(cil(1.05, 1.05, 5, 18).rotateX(Math.PI / 2), mOSV('#f2f4f5', 0.4, 0.3), sx * meia(zt) * 0.45, dY(zt) + 1.4, zt); for (const dz of [-1.8, 1.8]) add(rbox(2.4, 0.9, 0.3, 0.08), escuro, sx * meia(zt) * 0.45, dY(zt) + 0.45, zt + dz, 1); }
+  for (const sx of [-1, 1]) { const zr = zFim - 6, xr = sx * meia(zr) * 0.36; add(cil(1.0, 1.0, 1.4, 22).rotateZ(Math.PI / 2), azul, xr, dY(zr) + 1.25, zr); for (const dx of [-0.75, 0.75]) add(cil(1.45, 1.45, 0.12, 24).rotateZ(Math.PI / 2), escuro, xr + dx, dY(zr) + 1.45, zr); }
+  /* guindaste articulado (bombordo, à ré da casaria) */ { const zc = s.z1 + 3.5, xc = -meia(zc) * 0.58, yc = dY(zc), bc = mOSV('#f1f3f4', 0.45, 0.3);
+    add(cil(0.95, 1.15, 3.4, 18), azul, xc, yc + 1.7, zc); add(cil(1.3, 1.3, 0.4, 20), escuro, xc, yc + 3.5, zc); const cab = add(rbox(2.2, 2.0, 2.6, 0.3), bc, xc, yc + 4.7, zc); void cab; jan(1.6, 0.8, xc - 1.11, yc + 5.0, zc, -Math.PI / 2);
+    const b1 = new THREE.Group(); b1.position.set(xc, yc + 5.2, zc + 0.6); b1.rotation.x = -0.55; g.add(b1); const l1 = mesh(rbox(0.85, 0.95, 12, 0.18), bc); l1.position.z = 6; b1.add(l1); const cyl = mesh(cil(0.18, 0.18, 6, 10).rotateX(Math.PI / 2), escuro); cyl.position.set(0, -0.75, 2.6); cyl.rotation.x = 0.12; b1.add(cyl);
+    const b2 = new THREE.Group(); b2.position.set(0, 0, 11.6); b2.rotation.x = 1.05; b1.add(b2); const l2 = mesh(rbox(0.7, 0.75, 9, 0.15), bc); l2.position.z = 4.4; b2.add(l2); const ponta = mesh(cil(0.4, 0.4, 0.5, 12).rotateZ(Math.PI / 2), amar); ponta.position.z = 8.9; b2.add(ponta);
+    b1.updateMatrixWorld(true); const pt = ponta.getWorldPosition(new THREE.Vector3()); const fio = add(cil(0.025, 0.025, Math.max(1, pt.y - (yc + 2.5)), 4), escuro, pt.x, (pt.y + yc + 2.5) / 2, pt.z, 1); void fio; add(rbox(0.6, 0.8, 0.6, 0.1), amar, pt.x, yc + 2.3, pt.z); }
+  /* pórtico A de popa (tubos com cilindros hidráulicos) */ { const zp = zFim - 1.2, yp = dY(zp), wA = meia(zp) * 1.6, aA = azul; for (const sx of [-1, 1]) { const pe = add(cil(0.32, 0.38, 9.5, 12), aA, sx * wA / 2, yp + 4.4, zp + 0.9); pe.rotation.x = 0.22; const hy = add(cil(0.14, 0.14, 4.2, 8), escuro, sx * wA / 2, yp + 2, zp - 1.0); hy.rotation.x = -0.5; }
+    add(rbox(wA + 0.9, 0.8, 0.8, 0.2), mOSV('#f1f3f4', 0.45, 0.3), 0, yp + 8.95, zp + 1.95); add(cil(0.55, 0.55, 0.3, 16).rotateZ(Math.PI / 2), amar, 0, yp + 8.3, zp + 2.1); }
+  /* tubulação de incêndio (FiFi) vermelha subindo aos monitores */ for (const sx of [-1, 1]) add(cil(0.18, 0.18, h * 4, 8), verm, sx * wS * 0.42, y0 + h * 2, s.z0 + cS * 0.9, 1);
 }
 /** Funde as malhas estáticas por material (e separa as de detalhe para o LOD). */
 /** Inverte o sentido (winding) de uma geometria NÃO indexada: troca o 2º e o 3º vértice de cada triângulo em todos os atributos. */
