@@ -11,8 +11,8 @@ export function htmlIndice1231(cats) {
   return `<div class="mn-idx" data-v="indice"><div class="mn-cards">${cats.map((c) => `<button class="mn-card-cat" data-cat="${c.id}"><svg viewBox="0 0 24 24" aria-hidden="true">${c.icone}</svg><span><b>${c.titulo}</b><small>${c.resumo}</small></span><em>${c.secoes.length} seç.</em></button>`).join('')}</div></div>`;
 }
 
-export function telaManual1231({ mostra, voltar, som = () => {}, fontes, abrirAntigo = null, abrirTutorial = null, categoria = null, secao = null }) {
-  const cats = categoriasAtivas(); const cache = new Map();
+export function telaManual1231({ mostra, voltar, som = () => {}, fontes, abrirAntigo = null, abrirTutorial = null, categoria = null, secao = null, extras = [] }) {
+  const ex = extras || [], cats = [...ex.filter((c) => c.id !== 'novidades'), ...categoriasAtivas(), ...ex.filter((c) => c.id === 'novidades')]; /* v1.2.64: Como jogar primeiro, Novidades por último */ const cache = new Map();
   const cabeca = (sub) => `<header class="mn-cab"><div><h2>MANUAL <small>${VERSAO_MANUAL}</small></h2>${sub ? `<span class="mn-mig">${sub}</span>` : ''}</div></header>`;
   const rodape = `<footer class="mn-rod"><span class="mn-dev">${CREDITO_DEV}</span><span>${abrirTutorial ? '<button class="mn-lnk" data-tut="1">Tutorial guiado</button> ' : ''}${abrirAntigo ? `<button class="mn-lnk" data-antigo="1">${LINK_MANUAL_ANTIGO.rotulo}</button>` : ''}</span></footer>`;
   const el = mostra('manual1231', `${voltar()}<div class="mn">${cabeca('')}<div class="mn-corpo"></div>${rodape}</div>`);
@@ -28,7 +28,7 @@ export function telaManual1231({ mostra, voltar, som = () => {}, fontes, abrirAn
     mostraSec(c, s);
   }
   function mostraSec(c, s) {
-    const k = c.id + '/' + s.id; if (!cache.has(k)) cache.set(k, `<h3>${s.titulo}</h3>${htmlSecao(fontes, s)}`);
+    const k = c.id + '/' + s.id; if (!cache.has(k)) cache.set(k, `<h3>${s.titulo}</h3>${s.html != null ? s.html : htmlSecao(fontes, s)}`);
     const art = corpo.querySelector('.mn-art'); art.innerHTML = cache.get(k); art.scrollTop = 0;
     corpo.querySelectorAll('.mn-nav button').forEach((b) => b.classList.toggle('on', b.dataset.sec === s.id));
   }

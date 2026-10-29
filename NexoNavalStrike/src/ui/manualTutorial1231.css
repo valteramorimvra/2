@@ -71,3 +71,14 @@
 .tela-inicio > .mp-atalhos { position: absolute; top: 52px; right: max(18px, env(safe-area-inset-right)); width: auto; display: flex; flex-direction: row; gap: 6px; z-index: 3; }
 .mp18.mp-atalhos .mpb { min-height: 30px; padding: 4px 10px 4px 8px; font-size: 10.5px; letter-spacing: .06em; gap: 5px; --ch: 7px; }
 .mp18.mp-atalhos .mpi { width: 14px; height: 14px; }
+/* v1.2.64 (Valter): MANUAL em tons militares — verde-oliva, cáqui, aço-canhão e latão */
+.tela-manual1231 { background: radial-gradient(ellipse at 15% 0%, rgba(92,104,62,.35), transparent 55%), linear-gradient(180deg, #1b1f17 0%, #11140f 100%) !important; color: #e4e1d2; }
+.tela-manual1231 .mn-cab h2 { color: #e9e2c3; text-shadow: 0 1px 0 #000; } .tela-manual1231 .mn-cab h2 small { color: #9a9572; }
+.tela-manual1231 .mn-mig { color: #b9b38f; } .tela-manual1231 .mn-ix { background: #23281c; border-color: rgba(200,178,122,.5); color: #d9c48a; }
+.tela-manual1231 .mn-card-cat { background: linear-gradient(180deg, #2a3021, #1d2117); border: 1px solid rgba(200,178,122,.28); border-left: 3px solid #8b7d3e; box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+.tela-manual1231 .mn-card-cat svg { stroke: #d4b65a; } .tela-manual1231 .mn-card-cat b { color: #ece5c6; } .tela-manual1231 .mn-card-cat small { color: #a9a483; } .tela-manual1231 .mn-card-cat em { color: #8e8a6a; }
+.tela-manual1231 .mn-nav button { background: #1f2419; border-color: rgba(200,178,122,.16); color: #cfc9a8; } .tela-manual1231 .mn-nav button.on { border-left-color: #d4b65a; background: #2e3524; color: #fff7da; }
+.tela-manual1231 .mn-art { background: linear-gradient(180deg, #1a1e15, #14170f); border-color: rgba(200,178,122,.22); color: #dcd8c4; }
+.tela-manual1231 .mn-art h3 { color: #d9c48a; border-bottom: 1px solid rgba(212,182,90,.35); padding-bottom: 4px; } .tela-manual1231 .mn-art b { color: #f3ecd0; } .tela-manual1231 .mn-art h4 { color: #e8dfb8; }
+.tela-manual1231 .mn-nota { border-left-color: #8b9a4a; background: #1e2416; } .tela-manual1231 .mn-rod, .tela-manual1231 .mn-dev { color: #9a9572; } .tela-manual1231 .mn-lnk { color: #d9c48a; border-color: rgba(200,178,122,.45); background: #23281c; }
+.tela-manual1231 .mn-art .cr-dev { display: none; } /* a linha "Responsável…" repetida em cada novidade fica só no rodapé */
