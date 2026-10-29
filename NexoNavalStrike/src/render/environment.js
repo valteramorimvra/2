@@ -81,7 +81,7 @@ export class Ambiente {
     if (this.mar) this.mar.position.set(cam.position.x, 0, cam.position.z); /* v1.2.16: o plano do mar segue a câmera de forma CONTÍNUA (antes: degraus de 4 m numa malha POLAR, que não coincide consigo mesma ao deslocar → a cada 4 m de câmera os vértices amostravam outras ondas e a água 'travava'/saltava). Ondas, espuma e ruído são em coordenadas de MUNDO: nada a compensar em UV */
     { const U = this.uM.uImp.value, K = this.uM.uImpK.value; for (let i = 0; i < 6; i++) { const o = IMP_ONDAS[i]; if (o && t - o.t0 < 16) { U[i].set(o.x, o.z, o.t0, o.A); K[i] = o.k; } else U[i].w = 0; } } /* v1.2.53: ondas de impacto → shader */
     /* v1.2.30 item 9: sync anel nuclear → shader (só 1º vivo; se vazio, uNkP.w=0 e VS pula) */
-    { const Q = NUKE_ONDAS; if (Q.length) { const o = Q[0]; this.uM.uNk.value.set(o.x, o.z, o.t0, o.A0); this.uM.uNkP.value.set(o.cg != null ? o.cg : o.c * 0.5, o.k, o.rMax, 1); } else { this.uM.uNkP.value.w = 0; } }
+    { const Q = NUKE_ONDAS; if (Q.length && t - Q[0].t0 < 120) { const o = Q[0]; this.uM.uNk.value.set(o.x, o.z, o.t0, o.A0); this.uM.uNkP.value.set(o.cg != null ? o.cg : o.c * 0.5, o.k, o.rMax, 1); } else { this.uM.uNkP.value.w = 0; } }
     if (foco) { this.sol.position.set(foco.x + this.dirSol.x * 800, this.dirSol.y * 800 + 20, foco.z + this.dirSol.z * 800); this.sol.target.position.set(foco.x, 0, foco.z); }
   }
 }

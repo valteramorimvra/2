@@ -8,7 +8,8 @@ export const ONDAS = []; // { dx, dz, A, k, c, Q }
 export const MAR = { bf: 3, vento: 0.6 };
 /** v1.2.30 nuke1230 item 9: anéis de onda de superfície da detonação. Vazio = custo zero.
  *  { x, z, t0, A0, c, k, rMax, vivo } — amplitude ~ A0/r (água profunda, cilindrico ≈1/r), fase k(r−c·τ). */
-export const NUKE_ONDAS = [];
+export const NUKE_ONDAS = []; export const NK_VIDA = 120; /* v1.2.57: vida do anel (s) */
+function nkFade(tau) { const u = Math.min(1, Math.max(0, (tau - 55) / 55)); return 1 - u * u * (3 - 2 * u); } /* 1 até 55 s → 0 em 110 s */
 
 export function defineMar(bf = 3, vento = 0.6) {
   bf = clamp(Math.round(bf), 0, BF.length - 1); MAR.bf = bf; MAR.vento = vento; const [A, L] = BF[bf]; ONDAS.length = 0;
@@ -31,13 +32,13 @@ export function alturaNuke(x, z, t) {
   const Q = NUKE_ONDAS; if (!Q.length) return 0;
   let h = 0;
   for (let i = Q.length - 1; i >= 0; i--) {
-    const o = Q[i]; const tau = t - o.t0; if (tau < 0) continue;
+    const o = Q[i]; const tau = t - o.t0; if (tau < 0) continue; if (tau > NK_VIDA) { Q.splice(i, 1); continue; } /* v1.2.57: anel some depois de passar a explosão */
     const cg = o.cg != null ? o.cg : o.c * 0.5;
     const r = Math.hypot(x - o.x, z - o.z); if (r > o.rMax || r < 8) { if (tau * cg > o.rMax + 800) { Q.splice(i, 1); } continue; }
     const front = cg * tau; const w = Math.max(40, 2.2 * Math.PI / o.k); // largura do pacote ~ 2,2 λ
     const u = (r - front) / w; if (u < -2.5 || u > 2.2) continue;
     // cilindrico ~1/r; piso em r≈λ
-    const Amp = o.A0 / Math.max(r, 2 * Math.PI / o.k) * Math.exp(-0.5 * u * u) * Math.exp(-tau / 55);
+    const Amp = o.A0 / Math.max(r, 2 * Math.PI / o.k) * Math.exp(-0.5 * u * u) * Math.exp(-tau / 30) * nkFade(tau); /* v1.2.57: dissipa gradualmente (antes e^(−τ/55) e durava ~23 min) */
     const ph = o.k * (r - o.c * tau); // fase com c_fase
     h += Amp * Math.cos(ph);
   }

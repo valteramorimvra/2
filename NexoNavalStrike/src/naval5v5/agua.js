@@ -31,8 +31,8 @@ void main(){ vec3 wp = (modelMatrix * vec4(position, 1.0)).xyz; vec3 n; float cr
     float tau = uT - uNk.z; float r = length(wp.xz - uNk.xy); float cg = uNkP.x; float cf = cg * 2.0; /* cg=grupo, cf=fase */
     float front = cg * tau;
     float ww = max(40.0, 2.2 * 6.2831853 / max(uNkP.y, 1e-4)); float uu = (r - front) / ww;
-    if (tau > 0.0 && r > 8.0 && r < uNkP.z && uu > -2.5 && uu < 2.2) {
-      float Amp = uNk.w / max(r, 6.2831853 / uNkP.y) * exp(-0.5 * uu * uu) * exp(-tau / 55.0);
+    if (tau > 0.0 && tau < 120.0 && r > 8.0 && r < uNkP.z && uu > -2.5 && uu < 2.2) {
+      float Amp = uNk.w / max(r, 6.2831853 / uNkP.y) * exp(-0.5 * uu * uu) * exp(-tau / 30.0) * (1.0 - smoothstep(55.0, 110.0, tau)); /* v1.2.57: some aos poucos depois da explosão (= física) */
       float ph = uNkP.y * (r - cf * tau); float hnk = Amp * cos(ph);
       wp.y += hnk * atn;
       float srd = -Amp * uNkP.y * sin(ph) * atn; /* ∂η/∂r */ /* ∂η/∂r ≈ −A k sin */

@@ -327,3 +327,28 @@ if (n.tVls > 0 || !pr.ok) { if (n.tVls > 0 || /^(travando|travandoMis|mira)$/.te
 - **Cores do Brasil mescladas:** faixas onduladas no espaço do modelo (verde #009c3b, amarelo #ffdf00, azul #002776 e filete branco), com semente diferente por papel.
 - **Iniciais** V (líder), R (ala 1) e A (ala 2) no dorso e nas duas asas, com o mesmo degradê, contorno branco e escuro.
 - Os decalques são colados por raycast na superfície real do modelo.
+
+---
+
+## 9. Travamentos ligados ao áudio: diagnóstico e solução (v1.2.57)
+
+**Diagnóstico.** Usei o perfilador de CPU (Chrome DevTools Protocol) numa batalha de 40 s com o build sem minificação. A síntese dos bancos de som rodava na thread do jogo **durante o começo da batalha**:
+
+- funções `ruido`, `estereo.rt`, `geraAA`, `bqStep`, `graos`, `caudaDifusa`, `reverb`, `geraJogador`, `_nukeEmenda`;
+- em lotes com `setTimeout(0)`, que competiam com cada quadro.
+
+**Solução:**
+
+1. **Web Worker** (`src/audio/sintWorker.js`): os bancos (motor e granadas, sons do jogador, nuclear, aeronaves e água) são calculados numa thread separada. Os `Float32Array` voltam por **transferência**, sem cópia. Depois disso, o perfil da batalha não tem mais nenhuma função de síntese na thread principal.
+2. **Cache persistente (IndexedDB)** em `src/audio/cacheSom.js`, com a chave versão + taxa de amostragem. Da 2ª abertura em diante, os sons vêm prontos do aparelho e não há síntese nenhuma.
+3. Se o Worker ou o IndexedDB faltarem, o jogo cai automaticamente no caminho antigo, sem quebrar.
+4. **AudioContext `latencyHint: 'balanced'`**: o buffer de saída fica maior, então o mixer (AudioWorklet) não fica sem CPU no celular (sem estalos nem engasgos). A latência continua imperceptível.
+5. Mantido de antes: concorrência por camadas, virtualização (incluindo síntese ao vivo), envio ao mixer por transferência e osciladores acima de Nyquist descartados.
+
+**Outros ajustes da v1.2.57:**
+
+- Anel nuclear no mar: decai com $e^{-\tau/30}$, apaga entre 55 e 110 s e é removido aos 120 s, na física e no shader.
+- Bomba: +4,5 dB (pico medido 0,53).
+- Fumaça: densidade 0,46; rastros 0,42.
+- Granadas: brasa leve e rastro fino de fumaça.
+- Foguetes: rastro fino.
