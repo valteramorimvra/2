@@ -1,0 +1,84 @@
+// v1.2.0 — NavalAudioManager: camada sobre o NavalAudio com TODOS os sons do jogo mapeados para arquivos .ogg reais CC0
+// (CREDITS-audio.md) + laços POSICIONAIS (rotor de helicóptero com Doppler/distância, incêndio, alagamento, bolhas),
+// crossfade diesel↔turbina pela velocidade, sequência de afundamento (rangido metálico + água + bolhas), flares/chaff,
+// rádio com estática e sons de interface (estaleiro, loja, troféus).
+import { NavalAudio, ARQ } from './NavalAudio.js';
+
+export const ARQ_120 = ['heli_rotor_loop', 'heli_turbina_loop', 'heli_passagem', 'flares', 'incendio_loop', 'alagamento_loop', 'rangido_metal', 'rangido_metal2', 'bolhas_loop', 'radio_estatica', 'ui_clique', 'ui_confirma'];
+/** Mapa evento → arquivo (documentação viva; usado pelo relatório e pelos testes). */
+export const MAPA_SONS = {
+  'motor diesel': 'motor_diesel_loop', 'turbina a gás': 'turbina_loop', 'canhão 57/76 mm': 'canhao_rapido / canhao_medio', 'canhão 100–155 mm': 'canhao_grande', 'disparo distante': 'canhao_longe',
+  'VLS': 'vls_lancamento', 'CIWS': 'ciws (+ síntese contínua)', 'trava de míssil': 'alarme_trava', 'míssil em voo': 'síntese (ruído filtrado + Doppler)', 'míssil chegando': 'síntese (alarme de 2 tons)', 'torpedo na água': 'torpedo_corrida + síntese (ruído grave)', 'torpedo': 'torpedo_corrida', 'gêiser': 'respingo / respingo_grande', 'impacto no casco': 'impacto_metal',
+  'explosões': 'explosao_perto / explosao_media / explosao_grande / explosao_longe', 'helicóptero': 'heli_rotor_loop + heli_turbina_loop (Doppler) + heli_passagem', 'flares/chaff': 'flares',
+  'incêndio a bordo': 'incendio_loop', 'alagamento': 'alagamento_loop', 'afundamento': 'rangido_metal + rangido_metal2 + bolhas_loop + explosao_grande', 'rádio': 'radio_estatica', 'interface': 'ui_clique / ui_confirma', 'música': 'musica_menu / musica_batalha' };
+
+export class NavalAudioManager extends NavalAudio {
+  constructor() { super(); this.arquivos = ARQ.concat(ARQ_120); this.laços = new Map(); this.tRadio = 0; }
+  /** Laço posicional identificado por `chave` (cria/atualiza/encerra). vol 0 → desliga suave. rate inclui Doppler. */
+  /** v1.2.17 item 33: LAÇO no mixer fixo de laços — 64 vozes alocadas uma vez; chave → voz; cheio → rouba o laço mais baixo; 0 nós de áudio criados.
+   *  Só envia mensagem quando algo mudou de fato (sem tráfego/alocação por quadro em regime). */
+  _lacoMix(chave, nome, vol, pan, rate, fc) { const X = this.mixL, id = X && X.ids[nome]; if (id == null) return false; const t = this.ctx.currentTime; let L = this.laços.get(chave);
+    if (!L) { if (vol <= 0.002) return true; let s = -1; for (let i = 0; i < 64; i++) if (!X.uso[i]) { s = i; break; }
+      if (s < 0) { let mn = vol, kk = null; for (const [k, Q] of this.laços) if (Q.mx && Q.v < mn) { mn = Q.v; kk = k; } if (kk == null) return true; s = this.laços.get(kk).s; this.laços.delete(kk); (this.mixStats || {}).roubadosLaco = ((this.mixStats || {}).roubadosLaco || 0) + 1; }
+      X.uso[s] = 1; L = { mx: 1, s, nome, v: -1, p: 9, r: 0, f: 0, ult: t }; X.node.port.postMessage({ t: 'play', k: id, s, g: 0, p: pan, fc: fc, r: rate, l: 1, sm: 0.1, o: Math.random(), bu: this._busDe ? this._busDe(nome, true) : 0 }); this.laços.set(chave, L); }
+    const g = this.ligado ? vol : 0; if (Math.abs(g - L.v) > Math.max(0.002, L.v * 0.02) || Math.abs(pan - L.p) > 0.02 || Math.abs(rate - L.r) > L.r * 0.004 || Math.abs(fc - L.f) > L.f * 0.03) { L.v = g; L.p = pan; L.r = rate; L.f = fc; X.node.port.postMessage({ t: 'g', s: L.s, g, p: Math.max(-1, Math.min(1, pan)), fc, r: rate }); }
+    L.ult = t; return true; }
+  laco(chave, nome, vol, pan = 0, rate = 1, lp = 0) { if (!this.ctx) return; const c = this.ctx, t = c.currentTime; if (this.mixL && this._lacoMix(chave, nome, vol, pan, Math.max(0.5, Math.min(1.8, rate)), lp || 20000)) return; let L = this.laços.get(chave);
+    if (!L) { if (vol <= 0.002 || !this.buf[nome]) return; const s = c.createBufferSource(); s.buffer = this.buf[nome]; s.loop = true; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 18000; const g = c.createGain(); g.gain.value = 0;
+      const p = c.createStereoPanner ? c.createStereoPanner() : null; s.connect(f); f.connect(g); { const D = this._busNo ? this._busNo(nome, true, true) : this.mestre; if (p) { g.connect(p); p.connect(D); } else g.connect(D); } /* v1.2.23 */ s.start(t, Math.random() * Math.max(0, this.buf[nome].duration - 0.1)); L = { s, g, p, f, nome }; this.laços.set(chave, L); }
+    L.g.gain.setTargetAtTime(this.ligado ? vol : 0, t, 0.12); if (L.p) L.p.pan.setTargetAtTime(Math.max(-1, Math.min(1, pan)), t, 0.08); L.s.playbackRate.setTargetAtTime(Math.max(0.5, Math.min(1.8, rate)), t, 0.1); L.f.frequency.setTargetAtTime(lp || 18000, t, 0.2);
+    L.ult = t; }
+  /** Encerra laços não atualizados há mais de 0,5 s. Chamar 1×/quadro. */
+  limpaLacos() { if (!this.ctx) return; const t = this.ctx.currentTime; for (const [k, L] of this.laços) { if (L.mx) { if (t - L.ult > 0.5 && L.v !== 0) { L.v = 0; this.mixL.node.port.postMessage({ t: 'g', s: L.s, g: 0 }); } if (t - L.ult > 1.2) { this.mixL.node.port.postMessage({ t: 'stop', s: L.s }); this.mixL.uso[L.s] = 0; this.laços.delete(k); } continue; } if (t - L.ult > 0.5) { L.g.gain.setTargetAtTime(0, t, 0.1); if (t - L.ult > 1.2) { try { L.s.stop(); } catch (e) {} this.laços.delete(k); } } } }
+  /** Helicóptero/VANT: rotor + turbina com atenuação pela distância e Doppler pela velocidade radial (m/s, + = afastando). */
+  rotor(chave, d, pan, vRad, vant = 0) { const at = 1 / (1 + d / 260); const dop = 343 / (343 + vRad); const lp = d > 1500 ? Math.max(700, 6000 - d) : 0;
+    const pas = this._heliPas(); /* v1.2.33: camada das pás batendo no ar + rotor de cauda (audio/bancoSom.js heli_pas_loop) */
+    if (vant) { this.laco(chave, 'heli_turbina_loop', at * 0.12, pan, 1.6 * dop, lp); if (pas) this.laco(chave + 'p', 'heli_pas_loop', at * 0.16, pan, dop, lp || 900); return; }
+    this.laco(chave + 'r', 'heli_rotor_loop', at * 0.62, pan, dop, lp); this.laco(chave + 't', 'heli_turbina_loop', at * 0.24, pan, dop * 1.05, lp); if (pas) this.laco(chave + 'p', 'heli_pas_loop', at * 0.5, pan, dop, lp); }
+  /** v1.2.33: publica o laço sintetizado das pás como buffer de laço (pool nativo e mixer de laços). */
+  _heliPas() { if (this.buf.heli_pas_loop) return 1; const b = this.banco && this.banco.heli_pas_loop; if (!b) return 0; this.buf.heli_pas_loop = b; if (this.mixL) this._envia(this.mixL, 'heli_pas_loop', b); return 1; }
+  /** v1.2.17 item 32: NAVEGAÇÃO de OUTRO navio próximo (até 3): máquina (diesel/turbina conforme a classe; rotação ∝ velocidade e tamanho) + casco na água (ruído grave, abafa com a distância). */
+  navegacaoOutro(i, C, fv, d, pan) { const K = this._kNav || (this._kNav = Array.from({ length: 64 }, (_, k) => ['nvm' + k, 'nva' + k])), k = K[i & 63]; const P = this.perfilNav(C), at = 1 / (1 + d / 220), v = Math.min(1, Math.abs(fv));
+    const lp = Math.max(500, 9000 / (1 + d / 400)); this.laco(k[0], P.tipo === 'diesel' || P.tipo === 'codog' && v < 0.55 ? 'motor_diesel_loop' : 'turbina_loop', d > 1600 ? 0 : at * (0.1 + v * 0.22), pan, (0.7 + v * 0.55) * Math.min(1.25, Math.max(0.75, Math.sqrt(P.s))), lp);
+    this.lacoRuido(k[1], 'torp', d > 1600 ? 0 : at * (0.04 + Math.pow(v, 1.5) * 0.16), pan, 0.55 + 0.6 * v, d); }
+  /** Incêndio/alagamento a bordo do navio do jogador (ou navio próximo). */
+  avarias(incendio, alagamento, d = 0, pan = 0, chave = 'eu') { const at = 1 / (1 + d / 300); this.laco(chave + 'fogo', 'incendio_loop', incendio ? 0.35 * at : 0, pan); this.laco(chave + 'agua', 'alagamento_loop', alagamento ? 0.3 * at : 0, pan); }
+  /** Sequência de afundamento: rangidos metálicos espaçados + bolhas em laço enquanto o casco desce. */
+  afundando(chave, t, d, pan) { const at = 1 / (1 + d / 450); this.laco(chave + 'bolhas', 'bolhas_loop', t > 3 && t < 40 ? 0.35 * at : 0, pan, 0.9);
+    const k = Math.floor(t / 4.5); const mem = this._af || (this._af = {}); if (mem[chave] !== k && t < 36) { mem[chave] = k; this.toca(k % 2 ? 'rangido_metal2' : 'rangido_metal', { d, pan, vol: 0.9, rate: 0.75 + (k % 3) * 0.08 }); } }
+  flares(d, pan) { this.toca('flares', { d, pan, vol: 1 }); if (this.ctx && this.ligado && this.mix && this.mix.ids.flaresSint != null) { this._vozM('flaresSint', 0.25 / (1 + d / 450) * 4, pan, d); return; } if (this.ctx && this.ligado) { const q = this.ctx.currentTime + 0.05; /* item 35: sem atraso de distância */ const out = this._saida(0.25 / (1 + d / 450), pan); this._ruido(out, q, 1.8, 'bandpass', 2600, 700, 0.5, 0.6); } }
+  /** Rádio: estática curta + bipes de câmbio (no máximo 1 a cada 2,5 s). */
+  radio() { const t = performance.now(); if (t - this.tRadio < 2500) return super.radio(); this.tRadio = t; this.toca('radio_estatica', { vol: 0.32, atraso: false, rate: 1 }); super.radio(); }
+  ui(tipo = 'clique') { if (tipo === 'compra') { this.toca('ui_confirma', { vol: 0.9, atraso: false }); this.moeda(); return; } this.toca(tipo === 'confirma' ? 'ui_confirma' : 'ui_clique', { vol: 0.7, atraso: false }); }
+  moeda() { if (!this.ctx || !this.ligado) return; if (this.mix && this.mix.ids['ui:moeda'] != null) { this._voz(this.mix, 'ui:moeda', 1, 0, 20000, 0, 1, true, 0); return; } const t = this.ctx.currentTime; this._osc(this.mestre, t + 0.02, 0.09, 'triangle', 1976, 1976, 0.08); this._osc(this.mestre, t + 0.1, 0.22, 'triangle', 2637, 2637, 0.08); }
+  fanfarra() { if (!this.ctx || !this.ligado) return; if (this.mix && this.mix.ids['ui:fanfarra'] != null) { this._voz(this.mix, 'ui:fanfarra', 1, 0, 20000, 0, 1, true, 0); return; } const t = this.ctx.currentTime; [523, 659, 784, 1047].forEach((f, i) => this._osc(this.mestre, t + i * 0.12, 0.35, 'triangle', f, f, 0.07)); }
+  /** v1.2.3: laço de RUÍDO procedural (sintetizado, sem arquivo/licença): voo de míssil (chiado do motor-foguete) e
+   *  esteira de torpedo (borbulhar grave). Distância → volume e passa-baixa; Doppler simples → frequência do filtro. */
+  lacoRuido(chave, tipo, vol, pan = 0, dop = 1, d = 0) { if (!this.ctx) return; const c = this.ctx, t = c.currentTime;
+    if (this.mixL && this.mixL.ids['rl:missil'] != null) { const L0 = this.laços.get(chave); const tp = L0 ? L0.tipo : tipo; /* missil: ruído passa-banda pré-filtrado, Doppler = taxa; torp/vento: ruído grave + passa-baixa do mixer */
+      const f0 = tp === 'vento' ? 520 * Math.max(0.6, Math.min(1.8, dop)) : (tp === 'torp' ? 380 : 2300) * Math.max(0.6, Math.min(1.6, dop)) * (tp === 'torp' ? 1 / (1 + d / 1200) + 0.25 : d > 1500 ? 0.6 : 1);
+      if (tp === 'assobio' || tp === 'fogueteV') { /* v1.2.17 item 15: aproximação — assobio da granada (tonal, Doppler pela taxa) e motor de foguete crepitando; abafa com a distância */ this._lacoMix(chave, tp === 'assobio' ? 'rl:assobio' : 'rl:foguete', vol, pan, Math.max(0.5, Math.min(1.8, dop)), d > 120 ? Math.max(900, 20000 / (1 + d / 600)) : 20000); const L1 = this.laços.get(chave); if (L1 && !L1.tipo) L1.tipo = tipo; return; }
+      if (tp === 'jato') { if (this.mixL.ids['rl:jato'] != null) { this._lacoMix(chave, 'rl:jato', vol, pan, Math.max(0.6, Math.min(1.6, dop)), d > 80 ? Math.max(900, 16000 / (1 + d / 900)) : 16000); const L1 = this.laços.get(chave); if (L1 && !L1.tipo) L1.tipo = tipo; return; } } /* v1.2.25 item 7: Doppler = taxa, absorção do ar = passa-baixa pela distância */
+      if (tp === 'missil') { this._lacoMix(chave, 'rl:missil', vol, pan, Math.max(0.6, Math.min(1.4, f0 / 2300)), d > 150 ? Math.max(1400, 20000 / (1 + d / 700)) : 20000); } /* v1.2.21 item 5: absorção do ar com a distância (chiado some de longe) */ else if (tp === 'torp' && this.mixL.ids['rl:torp'] != null) this._lacoMix(chave, 'rl:torp', vol * 1.5, pan, Math.max(0.6, Math.min(1.6, dop)), Math.max(500, 9000 / (1 + d / 400))); /* v1.2.17 item 20: zumbido próprio do torpedo; Doppler = taxa; abafa com a distância */ else this._lacoMix(chave, 'rl:grave', vol * (tp === 'torp' ? 1.6 : 1.3), pan, 1, f0);
+      const L = this.laços.get(chave); if (L && !L.tipo) L.tipo = tipo; return; }
+    let L = this.laços.get(chave);
+    if (!L) { if (vol <= 0.002) return; if (!this._bufRuido) { const b = c.createBuffer(1, c.sampleRate * 2, c.sampleRate), a = b.getChannelData(0); let y = 0; for (let i = 0; i < a.length; i++) { y = y * 0.6 + (Math.random() * 2 - 1) * 0.4; a[i] = y; } this._bufRuido = b; }
+      const s = c.createBufferSource(); s.buffer = this._bufRuido; s.loop = true; const f = c.createBiquadFilter(); f.type = tipo === 'torp' || tipo === 'vento' || tipo === 'fogueteV' ? 'lowpass' : 'bandpass'; f.Q.value = tipo === 'torp' || tipo === 'vento' || tipo === 'fogueteV' ? 0.7 : tipo === 'assobio' ? 9 : 1.4; /* v1.2.11: 'vento' */ const g = c.createGain(); g.gain.value = 0;
+      const p = c.createStereoPanner ? c.createStereoPanner() : null; s.connect(f); f.connect(g); { const D = this._busNo ? this._busNo('rl:' + tipo, true, true) : this.mestre; if (p) { g.connect(p); p.connect(D); } else g.connect(D); } /* v1.2.23 */ s.start(t, Math.random()); L = { s, g, p, f, nome: tipo, ruido: 1 }; this.laços.set(chave, L); }
+    const f0 = L.nome === 'vento' ? 520 * Math.max(0.6, Math.min(1.8, dop)) : (L.nome === 'torp' ? 380 : 2300) * Math.max(0.6, Math.min(1.6, dop)) * (L.nome === 'torp' ? 1 / (1 + d / 1200) + 0.25 : d > 1500 ? 0.6 : 1); /* v1.2.9: passa-baixa contínuo com a distância (torpedo) */
+    L.g.gain.setTargetAtTime(this.ligado ? vol : 0, t, 0.08); if (L.p) L.p.pan.setTargetAtTime(Math.max(-1, Math.min(1, pan)), t, 0.08); L.f.frequency.setTargetAtTime(f0, t, 0.06); L.ult = t; }
+  /** v1.2.3: alarme de MÍSSIL CHEGANDO (sintetizado): dois tons alternados rápidos; mais agudo e rápido na fase terminal. */
+  alarmeEntrante(terminal) { if (!this.ctx || !this.ligado) return; if (this.mix && this.mix.ids['ui:entrante' + (terminal ? 1 : 0)] != null) { this._voz(this.mix, 'ui:entrante' + (terminal ? 1 : 0), 1, 0, 20000, 0, 1, true, 0); return; } const t = this.ctx.currentTime, f = terminal ? [1250, 950] : [880, 660]; for (let i = 0; i < (terminal ? 6 : 4); i++) this._osc(this.mestre, t + i * (terminal ? 0.11 : 0.16), terminal ? 0.09 : 0.13, 'square', f[i % 2], f[i % 2], 0.045); }
+  /** v1.2.26 item B: som de convés de aeronave (potencia, catVapor, catEM, catFim, gancho, rotorParte) — posicional (pan + modeloDist), barramento AMBIENTE (slider), Doppler pela taxa; 0 nós (vozes únicas no mixer de laços, slots 63→44). */
+  aero(nome, d, pan, vol = 1, rate = 1) { if (!this.ctx || !this.ligado || this.ctx.state !== 'running') return 0; const k = 'ae:' + nome, M = this.modeloDist(d), at = Math.min(1.1, vol * M.g * 1.5), fc = M.fc < 19000 ? M.fc : 20000; if (at < 0.004) return 0; const st = this.aeStats || (this.aeStats = { tocou: 0, descartou: 0 });
+    const X = this.mixL, id = X && X.ids[k]; if (id == null) { const r = this._bancoToca ? this._bancoToca(k, at, pan, d, rate) : 0; if (r) st.tocou++; return r; }
+    const now = this.ctx.currentTime, S = this._aeS || (this._aeS = []); for (let i = S.length - 1; i >= 0; i--) if (S[i].f <= now) { X.uso[S[i].s] = 0; S.splice(i, 1); }
+    if (S.length >= 8) { let mi = 0; for (let i = 1; i < S.length; i++) if (S[i].g < S[mi].g) mi = i; if (S[mi].g >= at) { st.descartou++; return 0; } X.node.port.postMessage({ t: 'stop', s: S[mi].s }); X.uso[S[mi].s] = 0; S.splice(mi, 1); }
+    let s = -1; for (let i = 63; i >= 44; i--) if (!X.uso[i]) { s = i; break; } if (s < 0) { st.descartou++; return 0; } X.uso[s] = 1; S.push({ s, g: at, f: now + (X.dur[k] || 9) / Math.max(0.3, rate) + 0.15 });
+    X.node.port.postMessage({ t: 'play', k: id, s, g: at, p: Math.max(-1, Math.min(1, pan)), fc, r: rate, l: 0, bu: this._busDe ? this._busDe(k, true) : 0 }); st.tocou++; return 1; }
+  /** v1.2.26 item H: água da coluna CAINDO de volta no mar (chuva pesada + chiado), no instante da queda — barramento Impactos, voz única do mixer. */
+  /** v1.2.26: canhão eletromagnético — som PRÓPRIO (descarga + onda de choque supersônica), banco 'canhao_trilho' (barramento Canhões); os sons dos canhões convencionais não mudam. */
+  trilho(d, pan, vol = 1) { if (!this.ctx || !this.ligado || this.ctx.state !== 'running') return 0; const at = Math.min(1.25, vol * this.modeloDist(d).g * 1.35); if (at < 0.004) return 0; this.trilhoN = (this.trilhoN || 0) + 1; return this._bancoToca('canhao_trilho', at, pan, d, 0.97 + Math.random() * 0.06); }
+  quedaAgua(grande, d, pan, vol = 1) { if (!this.ctx || !this.ligado || this.ctx.state !== 'running') return 0; const at = Math.min(1.2, vol * this.modeloDist(d).g * 1.3); if (at < 0.004) return 0; return this._bancoToca('respingo:' + (grande ? 'quedaG' : 'queda'), at, pan, d, 0.96 + Math.random() * 0.08); }
+  paraMotor() { super.paraMotor(); for (const [, L] of this.laços) { if (L.mx) { this.mixL.node.port.postMessage({ t: 'stop', s: L.s }); this.mixL.uso[L.s] = 0; } else try { L.s.stop(); } catch (e) {} } this.laços.clear(); }
+}

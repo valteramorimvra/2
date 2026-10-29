@@ -1,0 +1,4 @@
+FINAL-02-spawn-convoo.diff
+FINAL-10-convoo-aeronaves.diff
+FINAL-01-cogumelo.diff
+FINAL-09-colisao-terreno.diff  # 1ac45403 revertido 20:11 (totNav 4); aguarda fix09 aprovado pelo Fiscal

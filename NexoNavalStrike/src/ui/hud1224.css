@@ -1,0 +1,20 @@
+/* v1.2.24 item 4: SÍMBOLO DA MIRA SIMPLIFICADO — só 4 cantos finos em volta do navio-alvo.
+   VERMELHO = a mira NÃO está sobre o alvo · VERDE = a mira está sobre o alvo (tiro vai acertar a área do navio).
+   Sem anel, sem traço central, sem animação; o cadeado fica pequeno ao lado quando travado. */
+.hud .h-alvo i, .hud .h-alvo.travado i, .hud.v12 .h-alvo i, .hud.v12 .h-alvo.travado i {
+  --c: #ef4444; --k: clamp(5px, calc(var(--s) * 0.22), 14px);
+  border: 0 !important; border-radius: 0 !important; clip-path: none !important; box-shadow: none !important; animation: none !important;
+  background:
+    linear-gradient(var(--c), var(--c)) left top / var(--k) 2px no-repeat, linear-gradient(var(--c), var(--c)) left top / 2px var(--k) no-repeat,
+    linear-gradient(var(--c), var(--c)) right top / var(--k) 2px no-repeat, linear-gradient(var(--c), var(--c)) right top / 2px var(--k) no-repeat,
+    linear-gradient(var(--c), var(--c)) left bottom / var(--k) 2px no-repeat, linear-gradient(var(--c), var(--c)) left bottom / 2px var(--k) no-repeat,
+    linear-gradient(var(--c), var(--c)) right bottom / var(--k) 2px no-repeat, linear-gradient(var(--c), var(--c)) right bottom / 2px var(--k) no-repeat !important;
+  filter: drop-shadow(0 0 1px rgba(0,0,0,.85));
+}
+.hud .h-alvo.alinhado i, .hud.v12 .h-alvo.alinhado i, .hud.v12 .h-alvo.travado.alinhado i { --c: #22c55e; }
+.hud .h-alvo::before, .hud .h-alvo::after, .hud.v12 .h-alvo.travado::after, .hud.v12 .h-alvo.alinhado::after, .hud.v12 .h-alvo.alinhado.anelTrava::after { display: none !important; content: none !important; animation: none !important; }
+.hud .h-alvo span, .hud.v12 .h-alvo span { font-size: 0; top: calc(var(--s) / -2 - 12px) !important; left: calc(var(--s) / 2 - 2px) !important; transform: none !important; color: #f87171; }
+.hud .h-alvo.alinhado span, .hud.v12 .h-alvo.alinhado span { color: #4ade80; }
+.hud .h-alvo span svg { width: 10px; height: 10px; }
+/* v1.2.24: linhas de Ajustes com texto em 2–3 linhas não encolhem (a caixa cresce com o texto; sem texto vazando da borda no retrato) */
+.aj-grade { grid-auto-rows: max-content; align-content: start; } /* as linhas da grade de Ajustes (altura fixa + overflow) eram espremidas a 44 px */

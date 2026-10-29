@@ -1,0 +1,99 @@
+# 1.2.19 (vc22) — escopo (pedido t1230, 23/10 21:15 BRT)
+- 1. Canhões das classes ANTIGAS (todas as que existiam na 1.2.17): som de canhão IGUAL ao da 1.2.17 (reverter a assinatura por navio do item 14e para essas classes; mesma amostra, mesmo filtro/rate/eco/ganho da 1.2.17). Pode ficar só "igual ou melhor" — na dúvida, idêntico à 1.2.17.
+- 2. Os 7 cruzeiros novos (Rei Trajano, Alm. Leidevaldo, Alm. Ronaldo, Capitã Kelly, Capitã Laiane, Alm. Klevton, Capitã Ana Nery): som de canhão FORTE e extremamente realista, digno de canhões pesados, proporcional ao porte de cada arma: 280 mm principal muito grave/pesado com onda de choque e reverberação; 100 mm automático médio; 30 mm e 12,7 mm leves e rápidos. Energia audível em alto-falante de celular (300 Hz–6 kHz além do grave), sem clipping, 0 nós em combate, com e sem Worklet, sem travar.
+- Testes: som1218, assin (ajustado: antigas = 1.2.17 bit a bit no parâmetro; novas distintas e mais fortes), unit, regressão curta (sobrepor1216, canhoto1217, heli1218, cine1218, perf1214). Registrar cada teste aqui.
+- APK único /workspace/NexoNavalStrike-1.2.19.apk, vc22, mesma chave, só VIBRATE, cópia em attachments; manual + relatório.
+
+## Implementação (21:22 BRT)
+- Antigas = 1.2.17 literal: toca→salvaTorres, _voz/_vozM, modeloDist, a30, salva e tiro() restaurados texto a texto da 1.2.17; timbre/assinatura 14e removidos do 5v5; pré-render das variantes 14e removido (src/audio/assinaturaCanhao.js fica sem uso).
+- Novo src/audio/canhaoPesado.js: cp_grande (280–305 mm, 4,6 s: gravação CC0 a 0,79×, onda de choque, boom 52→26 Hz + harmônicos, corpo 300–1200 Hz, estrondo rolando, eco no mar 0,11/0,29/0,62 s, reverb Schroeder 2,8 s), cp_longe, cp_100 (1,3 s), cp_30 (0,42 s), cp_127 (0,2 s). Limitador tanh, pico ≤ 0,92. Gerado 1× após decodificar (≈150 ms), vira AudioBuffer em this.buf → pool do mixer (Worklet e SP) e caminho nativo.
+- Roteamento: fimEventos usa cp_* só se C.cruzeiroPesado (os 7); secundárias (C.sec, só cruzeiros) cp_100/cp_30/cp_127 por calibre. _html mapeia cp_* para a gravação de origem. _catDe: cp_ na categoria canhao.
+- Testes ajustados: tests/assin1219.mjs (novo), navios1218 (checa banco cp_* no pool), som1218 (janelas de nível no celular dos cruzeiros + rajada cp_* em combate com contador de nós ligado).
+- Manual: Novidades 1.2.19 com o crédito. vc22/1.2.19 em build.gradle, package.json, diag.
+- Build: dist index-PK-TLDEr
+
+## Testes
+- 21:22 BRT · assin1219 a rc=0 (dist index-PK-TLDEr)
+- 21:25 BRT · som1218 w rc=0 (dist index-PK-TLDEr)
+- 21:25 BRT · som1218 m rc=0 (dist index-PK-TLDEr)
+- 3. (t1231, 21:25 BRT, print /cursor/stores/store-c4f9a8c9-1171-46ce-b4f5-688918da1d47/grok-bot/agents/c98e0fb9-cd2b-49e7-9b39-7bb4ba2b1e4b/attachments/01M5NMQYVH1QQKN3VTN9QQZMMT.jpg, Almirante Klevton em curva a 29 nós): ao girar em velocidade aparece um RASTRO RETO saindo da popa em linha reta. O rastro deve seguir a trajetória curva real (pontos da esteira ao longo do caminho percorrido); rastro reto só navegando reto. Vale para todas as classes.
+- 4. Antiaéreas (CIWS/SAM/30 mm) com luminosidade alta demais (bolhas brancas brilhantes no print): reduzir brilho/emissivo/bloom para aparência realista de metal pintado, sem halo.
+- 5. Algumas antiaéreas ATRAVESSANDO a estrutura nos navios novos (e conferir todas as 47 classes): reposicionar sobre convés/plataformas, sem interpenetração com casaria, mastros, torres, VLS ou heliponto. Teste: verificação geométrica de interpenetração por classe (0 casos) + capturas.
+- 21:28 BRT · som1218 s rc=0 (dist index-PK-TLDEr)
+- 21:28 BRT · som1218 o rc=0 (dist index-PK-TLDEr)
+- 5 (CORRIGIDO por t1232, 21:29 BRT): NÃO retirar nem mover antiaéreas para resolver. Configurar SETORES DE TIRO / linha de tiro livre por reparo (CIWS, 30 mm, SAM, canhões leves): cada antiaérea só dispara quando a estrutura do próprio navio (casaria, mastro, torres, chaminé, VLS, heli) NÃO bloqueia a linha até o alvo; quando bloqueada, segura o fogo e outra assume (cobertura 360° pelo conjunto). Projéteis/traçantes nunca atravessam a estrutura. Se o MODELO do reparo interpenetra a casaria, ajustar só o encaixe mínimo, sem remover. Vale para todas as 47 classes. Teste: arcos por reparo + 0 disparos com linha bloqueada + cobertura 360°.
+- 21:34 BRT · unit u rc=0 (dist index-PK-TLDEr)
+- 6. (t1235, 21:53 BRT) BUG: Valter vê batalhas 10×10 no modo original; deve ser 8×8 SEMPRE (investigar caminho real do celular: save antigo, preset, migração, modo, contagem de mercantes/aliados extras na UI). Teste no fluxo exato do app.
+- 7. Bots inimigos demoram a aparecer no início: todos visíveis/presentes desde o início (spawn imediato, sem atraso).
+- 8. IA mais inteligente e agressiva: avança em direção aos oponentes, fecha distância, usa cobertura do terreno; nada de batalha só de tiro a longe. Medir distância média de combate (meta bem menor que 6,5 km) mantendo equilíbrio ia1218 e 0 encalhes.
+- 9. Spawn em mapas grandes: oponentes a certa proximidade no início, mas não tão perto — com chance de se abrigar atrás de montanhas/ilhas.
+- 10. 5 MAPAS NOVOS extremamente realistas e detalhados (ex.: Florianópolis — ilha, pontes, cidade, morros; + 4 outros litorais brasileiros/mundiais à escolha, nomes de lugares ok), com relevo, cidade, portos, pontes, vegetação; sem CDN, assets CC0/PD/CC-BY/ODbL ou sintetizados; 0 programas WebGL novos por partida; LOD.
+- 11. DESTRUIÇÃO: canhões/granadas que acertam construções e pontes as destroem (estágios de dano, desabamento de ponte, incêndio, fumaça, destroços), de acordo com a arma/calibre. Pooled, sem travar.
+- 12. CAMUFLAGENS LENDÁRIAS NACIONAIS animadas e lindas: Brasil (onças simulando ataque + verde/amarelo/azul), EUA (águia + cores da bandeira), Alemanha (cores da bandeira + motivo próprio, nada de símbolo histórico/político), e assim por diante (mais nações). Nada religioso/demoníaco, sem marcas. Animação leve no shader existente/textura, sem programas novos em combate.
+- Tudo com extremo realismo, gráficos lindos, sem travar; regressão completa e APK único 1.2.19.
+- 10b. (t1237) Mapa Florianópolis COM a ponte Hercílio Luz (ponte pênsil icônica: torres, cabos/barras de olhal, tabuleiro treliçado, iluminação), além das pontes Colombo Salles/Pedro Ivo, ilha, Beira-Mar, morros. Destrutível conforme item 11. (t1236: máxima rapidez e eficiência)
+- 22:03 BRT · DECISÃO DO VALTER (t1241/widget): 1.2.19 sai PRIMEIRO só com itens 1–9 (sons, rastro, antiaéreas, 8×8, spawn imediato, IA avançando, spawn com abrigo). Itens 10, 10b, 11, 12 (5 mapas, Florianópolis + Hercílio Luz, destruição, camuflagens nacionais) passam para 1.2.20 (vc23), feitos logo depois — NÃO começar antes de entregar a 1.2.19.
+- 22:32 BRT · assin1219 a rc=0 (dist index-BcYqZlET)
+- 22:41 BRT · linhaTiro1219 (node, fonte final) rc=0 — 48 classes; 321 montagens (nenhuma retirada); máscaras pré-calculadas = geradas (0 dif.); menor fração livre 32% (kordao ciws3); 0 eixos de canos dentro de sólido; 16 884 direções aceitas traçadas, 0 atravessam; simulação 19 404 disparos (CIWS 3402, 30 mm 11 016, laser 4940, sec 46), 0 traçantes atravessando o navio. 58 montagens reposicionadas (AJUSTE_LT em layout.js: teto do bloco ou asa do passadiço).
+- 22:44 BRT · ia1218 SEEDS=3 T=300 (24 partidas, fonte final) rc=0 — dComb 4,89 km (base 6,55), dTiro 4,87 km, 1º contato 0 s, 1º disparo 2,8 s, engajam 99,6%, ociosos 0, encalhes 0, fogo amigo 0; vitórias az 15 × vm 9 (rodada anterior 9 × 13; somadas 24 × 22); colisões 56/24 partidas (base 79/96) — LACUNA: mais colisões no combate próximo.
+- 22:45 BRT · unit u rc=1 (dist index-BcYqZlET)
+- 22:45 BRT · oito1219 o8 rc=0 (dist index-BcYqZlET)
+- 22:48 BRT · som1218 w rc=1 (dist index-BcYqZlET)
+- 22:51 BRT · som1218 s rc=1 (dist index-BcYqZlET)
+- 22:55 BRT · sobrepor1216 sb rc=0 (dist index-BcYqZlET)
+- 23:02 BRT · canhoto1217 ch rc=0 (dist index-BcYqZlET)
+- 23:06 BRT · unit u2 rc=124 (dist index-BcYqZlET)
+- 00:00 BRT 24/10 · NOVA DECISÃO DO VALTER (t1245): CAMUFLAGENS (item 12) VOLTAM para a 1.2.19. Mapas/destruição (10, 10b, 11) continuam na 1.2.20.
+- 00:01 BRT · unit u3 (solo, timeout 1800 s) rc=0 — 76 passaram, 0 falharam (fonte atual; dist index-BcYqZlET)
+- 00:10–00:40 BRT · ITEM 12 implementado: src/render/camoNacional.js (atlas 1536×512 desenhado no app: onça-pintada no bote, águia-de-cabeça-branca, leão no bote, grou-de-coroa-vermelha) + pintura tipo 24 em camuflagem.js (uVar = nação, uParte = casco/sup, uBordo = borda da classe; animação só por uT). 5 lendárias nacionais: lend_nac_bra 15 000, eua 14 500, uk 14 000, chn 14 000, deu 13 500 ouro (acima das lendárias 9 500–12 500); especial → nunca nos bots. Alemanha só cores (sem símbolo). Testes ajustados: unit (CIWS do destróier: alvo no setor livre da máscara real; distância medida do pivô; bases 4–12 km do spawn imediato), som1218 (granadas reais dos inimigos — contato imediato — ocupavam os 2 indicadores: a fase passa a medir só a granada de teste), lend1215 (≥3 lendárias, 5 nacionais).
+- 00:41 BRT · camo1219 (5 nações, vitrine + partida real) rc=0 — 5 nacionais = só as 3 variantes do programa camo24 (as mesmas de qualquer pintura); partida com lend_nac_bra: 0 programas novos em combate (147→147); 0 erros JS. Fotos /workspace/nexo-naval-shots/1219/camo/. (dist index-BV7XOE7T)
+- 01:52 BRT · lend1215 (node) rc=0 — TUDO OK (fonte de index-CcGH8u1_)
+- 01:52 BRT · linhaTiro1219 (node) rc=0 — RESULTADO: TUDO OK (fonte de index-CcGH8u1_)
+- 01:54 BRT · som1218 w rc=0 (dist index-CcGH8u1_)
+- 01:55 BRT 24/10 · DECISÃO FINAL DO VALTER (t1249–t1251): TUDO NUMA SÓ — a 1.2.19 inclui também os 5 MAPAS (10, 10b Florianópolis + Hercílio Luz, 11 destruição/incêndio) e as camuflagens (12). Máxima eficiência, realismo e rapidez. APK único só no fim, com tudo.
+- 11b. (t1253, 01:56 BRT) DESTRUIÇÃO TAMBÉM NOS OUTROS MAPAS: todos os mapas (os 5 novos E os já existentes) devem ter itens destrutíveis (pontes, construções, portos/guindastes, torres, tanques) com estágios de dano, desabamento, incêndio, fumaça e destroços conforme arma/calibre. Pooled, 0 programas novos, sem travar.
+- 01:57 BRT · som1218 s rc=0 (dist index-CcGH8u1_)
+- 01:59 BRT · curva1219 cv rc=0 (dist index-CcGH8u1_)
+- 13. (t1254, 02:01 BRT) IMPACTOS E PROJÉTEIS — em TODOS os modos e no MODO CINEMA:
+  - Mísseis: explosão de impacto extremamente realista (flash, bola de fogo, onda de choque, fragmentos, fumaça escura persistente, incêndio no alvo) + som realista e forte no impacto (perto/longe). Melhorar também visual do míssil em voo na câmera cinema.
+  - Torpedos: ao atingir, explosão sob a linha d'água com COLUNA DE ÁGUA alta (spray, queda, espuma), estrondo grave; melhorar torpedo na câmera cinema (esteira, seguir até o impacto).
+  - Projéteis de canhão: forma REAL de granada (ogiva, corpo, cinta de forçamento, base/traçante), escala por calibre, alta resolução de perto na câmera cinema; impacto no casco/água coerente.
+  - Pooled, 0 programas novos, sem travar; som sem picos (mixer). Teste: captura cine + contagem de programas + som no impacto.
+- 02:01 BRT · camo1219 cm rc=0 (dist index-CcGH8u1_)
+- 02:01 BRT · assin1219 a rc=0 (dist index-CcGH8u1_)
+- 02:02 BRT · oito1219 o8 rc=0 (dist index-CcGH8u1_)
+- 01:52 BRT · unit u4 (timeout 2400 s) rc=0 — 76 passaram, 0 falharam (fonte de index-CcGH8u1_)
+- 02:06 BRT · sobrepor1216 sb rc=0 (dist index-CcGH8u1_)
+- 02:12 BRT · regressão intermediária INTERROMPIDA (canhoto1217 em andamento) — escopo cresceu (itens 10–13); regressão completa será refeita no dist final.
+- 02:24 BRT · fx1219 fx rc=0 (dist index-pJjPKe7L)
+- 02:26 BRT · fx1219 fx2 rc=0 (dist index-zJezLnvh)
+- 02:28 BRT · item 13 FEITO: fx.corposG (InstancedMesh do corpo real da granada, mesma geometria/material do projétil da câmera, compilado no pré-aquecimento) — corrigido o corte kC<6 que escondia todas as granadas; traçante encolhe de perto (largura limitada ao calibre); impactoMissil com bola de fogo da ogiva (~20 m, ~0,8 s) + núcleo/onda de choque/estilhaços/fumaça persistente; colunaTorpedo sobe ~4 s e fica 8–10 s; pool de fumaça +50% (1300/2100/2900) para a coluna não ser sobrescrita. Programas 125→125, 0 erros JS. Fotos em /workspace/nexo-naval-shots/1219/fx/. Parágrafo no manual.
+- 02:38 BRT · RETOMADA (nova sessão): encontrados já escritos e NÃO integrados: src/sim/destruicao.js (registro/dano), src/render/destr.js (estágios/fogo/desabamento), src/render/pontes.js (pênsil barras/cabos, vigas, achaTravessia), props.destrutivel (galpões/guindastes/tanques do porto), 5 arenas reais novas em arenasReais.js + miniaturas; world.js já emite 'estr'. Faltam: marcos por mapa (pontes/cidades/fortes), instanciar Destruicao no combate + eventos, pilares sólidos, testes destr1219/mapas1219, regressão, APK.
+- 02:42 BRT · (sessão paralela) A retomada das 02:38 detectou OUTRA sessão ativa trabalhando ao mesmo tempo (src/render/locais.js, tests/mapas1219.mjs, terrain.js com criaLocais). Para não haver edição concorrente, esta sessão PAROU e desfez as próprias mudanças (marcos.js apagado; terrain.js, props.js, cidade.js, destr.js restaurados). A linha das 02:38 ('NÃO integrados') está desatualizada — vale o trabalho da sessão ativa.
+- 02:42 BRT · [executor B, sessão paralela] ATENÇÃO: há DOIS agentes editando este projeto. Já integrei: locais.js (criaLocais: Floripa Hercílio Luz+2 pontes de vigas+bairros, Salvador, Gibraltar, SF Golden Gate/Alcatraz, Noronha) chamado em terrain.js após criaProps; new Destruicao(G,T) em terrain.js; destr.passo/explode e eventos 'terra'/'agua'/'estr'/'missilAgua'/'afunda' em modernNavalCombat3D.js; faróis destrutíveis; tests/mapas1219.mjs (florianopolis rc=0: 582 estruturas, prédio/ponte desabam, programas 147→147, 0 erros). Por favor NÃO criar marcos.js duplicando locais.js — use locais.js. Coordenar via este arquivo.
+- 02:50 BRT · mapas1219 a rc=0 (dist index-_EIQkObJ)
+- 02:56 BRT · mapas1219 b rc=0 (dist index-_EIQkObJ)
+- 03:03 BRT · mapas1219 c rc=0 (dist index-REXefIvI)
+- 03:05 BRT · perf1214 base1218 rc=0 (dist index-C2P1YRzt)
+- 03:06 BRT · perf1214 final rc=0 (dist index-C2P1YRzt)
+- 03:06 BRT · assin1219 a rc=0 (dist index-C2P1YRzt)
+- 03:06 BRT · oito1219 o8 rc=0 (dist index-C2P1YRzt)
+- 03:09 BRT · som1218 w rc=0 (dist index-C2P1YRzt)
+- 03:13 BRT · som1218 s rc=0 (dist index-C2P1YRzt)
+- 03:14 BRT · curva1219 cv rc=0 (dist index-C2P1YRzt)
+- 03:17 BRT · camo1219 cm rc=0 (dist index-C2P1YRzt)
+- 03:18 BRT · fx1219 fx rc=0 (dist index-C2P1YRzt)
+- 03:25 BRT · sobrepor1216 sb rc=0 (dist index-C2P1YRzt)
+- 03:32 BRT · canhoto1217 ch rc=0 (dist index-C2P1YRzt)
+- 03:38 BRT · heli1218 he rc=0 (dist index-C2P1YRzt)
+- 03:39 BRT · cine1218 ci rc=0 (dist index-C2P1YRzt)
+- 03:46 BRT · mapas1219 d rc=0 (dist index-C2P1YRzt)
+- 03:55 BRT · mapas1219 e rc=0 (dist index-C2P1YRzt)
+- 04:02 BRT · mapas1219 f rc=0 (dist index-C2P1YRzt)
+- 04:02 BRT · lend1215 ln rc=0 (dist index-C2P1YRzt)
+- 04:03 BRT · linhaTiro1219 lt rc=0 (dist index-C2P1YRzt)
+- 04:33 BRT · unit final (solo, timeout 2400 s) rc=0 (dist index-C2P1YRzt)
+- 03:00–03:05 BRT · Hercílio Luz prolongada para ≈821 m (viadutos ~200 m sobre terra em cada cabeceira); vilas costeiras + tanques destrutíveis nas arenas fictícias (item 11b); manual atualizado (5 arenas, Floripa/Hercílio Luz, destruição). Build final dist index-C2P1YRzt.
+- 03:16 BRT · APK construído de index-C2P1YRzt (vc22, 1.2.19, cert d0c31791…a599, só VIBRATE, 0 URLs externas além de w3.org).
+- 04:40–04:47 BRT · perf1214 A/B alternado (SEG=30): 1.2.18 laço 17,1/15,0 ms, 301 chamadas · 1.2.19 laço 22,7/20,7 ms, 447–449 chamadas · 1.2.19 sem locais/destruição (build de teste em /tmp, fonte restaurada) 20,6/21,8 ms, 437–441 → mapas/destruição ≈ 0; aumento vem de mais navios no quadro (combate próximo itens 7–9). 0 programas novos, 0 PointLight. Não cumprido "não pior que 1.2.18" — lacuna reportada, nada reduzido.
+- 04:50 BRT · APK ÚNICO /workspace/NexoNavalStrike-1.2.19.apk + cópia em attachments: sha256 d578ae6a8fcb21b31741586a52266e6db0ca2455f2bf85c02ce63629f29c50ed, 14.101.793 bytes. Relatório /workspace/NexoNavalStrike-1.2.19-relatorio.md. Servidores de teste meus :4181/:4182 encerrados.

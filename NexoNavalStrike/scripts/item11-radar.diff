@@ -1,0 +1,17 @@
+--- a/src/modernNavalCombat3D.js
++++ b/src/modernNavalCombat3D.js
+@@ -21,3 +21,3 @@
+ import { orla, boia } from './render/cidade.js';
+-import { PARAM } from './armasParametros.js';
++import { PARAM } from './armasParametros.js'; import { alcRadar as alcRadarAlvo } from './sim/deteccao.js'; /* v1.2.30 item 11 */
+ import { urlBandeira, CAMO_T } from './render/camuflagem.js';
+@@ -820,3 +820,3 @@
+       let sx = ((v.x + 1) / 2) * W, sy = ((1 - v.y) / 2) * Hh - 6; if (inim && Math.hypot(sx - W / 2, sy + 30 - Hh / 2) < 70) perto = 1;
+-      const fresco0 = !inim || sim.t - c.t < 1.1; const anon0 = inim && !this.mem.revelaTudo && !(fresco0 && ((q.id === n.alvoId && n.trava >= 1) || (c.q >= 3 && it.dist < PARAM.deteccao.perto))) && !(q.C.mercante && fresco0 && c.q >= 3);
++      const fresco0 = !inim || sim.t - c.t < 1.1; const anon0 = inim && !this.mem.revelaTudo && !(fresco0 && ((q.id === n.alvoId && n.trava >= 1) || (c.q >= 3 && it.dist < PARAM.deteccao.perto) || (n.radarAtivo && c.q >= 2 && Math.hypot(c.x - n.x, c.z - n.z) < alcRadarAlvo(n, q)))) /* v1.2.30 item 11: radar do jogador ligado + contato detectado por radar (q>=2, dentro do alcance de radar DESTE alvo) = identificado, sem trava */ && !(q.C.mercante && fresco0 && c.q >= 3);
+       if (anon0 && Math.abs(sx - W / 2) < W * 0.1 && Math.abs(sy - Hh / 2) < Hh * 0.13) continue; /* v1.2.12: contato anônimo nunca no centro da tela */
+@@ -827,3 +827,3 @@
+       postos.push(r); const m = H.marcas[k++]; m.hidden = false; m._sx = sx; m._sy = sy; m.style.transform = `translate(${sx.toFixed(1)}px, ${sy.toFixed(1)}px)`;
+-      const fresco = !inim || sim.t - c.t < 1.1, travadoQ = inim && q.id === n.alvoId && n.trava >= 1; const info = !inim || (fresco && (travadoQ || (c.q >= 3 && it.dist < PARAM.deteccao.perto))) || this.mem.revelaTudo; const merc = q.C.mercante && (!inim || (fresco && c.q >= 3)); /* v1.2.12: rótulo 'Mercante' sempre que detectado */ /* v1.2.2: nome/HP só detectado E perto, ou travado */
++      const fresco = !inim || sim.t - c.t < 1.1, travadoQ = inim && q.id === n.alvoId && n.trava >= 1; const info = !inim || (fresco && (travadoQ || (c.q >= 3 && it.dist < PARAM.deteccao.perto) || (n.radarAtivo && c.q >= 2 && Math.hypot(c.x - n.x, c.z - n.z) < alcRadarAlvo(n, q)))) || this.mem.revelaTudo; /* v1.2.30 item 11 */ const merc = q.C.mercante && (!inim || (fresco && c.q >= 3)); /* v1.2.12: rótulo 'Mercante' sempre que detectado */ /* v1.2.2: nome/HP só detectado E perto, ou travado */
+       const chave = q.id + (merc ? 'm' : '') + (info ? 'i' : fresco ? 'a' : 'f'); if (m._id !== chave) { m._id = chave; if (merc) { m._img.src = this.flag(q.C.nacao); m._img.style.display = ''; m._b.textContent = '⛴ Mercante'; } else if (info) { m._img.src = this.flag(q.C.nacao); m._img.style.display = ''; m._b.textContent = q.comandante || q.C.nome; } else { m._img.style.display = 'none'; m._b.textContent = fresco ? (c.q >= 3 ? '◆' : '◇') : '?'; } /* v1.2.12: contato anônimo = só um símbolo pequeno */ m._hp.style.display = m._n.style.display = info ? '' : 'none'; }

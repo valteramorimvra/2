@@ -1,0 +1,238 @@
+{
+ "R": {
+  "combos": [
+   {
+    "mapa": "atois",
+    "cl": "marcos",
+    "az": 1,
+    "vm": 1,
+    "e0": {
+     "t": 1,
+     "nIni": 1,
+     "vistos": 1,
+     "contato": 1,
+     "dmin": 7003
+    },
+    "listaIni": [
+     "Cmte. Prado"
+    ],
+    "anon": 0
+   },
+   {
+    "mapa": "guanabara",
+    "cl": "corveta",
+    "az": 0,
+    "vm": 1,
+    "e0": {
+     "t": 1,
+     "nIni": 1,
+     "vistos": 1,
+     "contato": 1,
+     "dmin": 6335
+    },
+    "listaIni": [
+     "Cmte. Correia"
+    ],
+    "anon": 0
+   },
+   {
+    "mapa": "santos",
+    "cl": "cruzador",
+    "az": 2,
+    "vm": 3,
+    "e0": {
+     "t": 1,
+     "nIni": 3,
+     "vistos": 3,
+     "contato": 3,
+     "dmin": 6560
+    },
+    "listaIni": [
+     "Cmte. Li Wei",
+     "Cmte. Prado",
+     "Cdr. Pemberton",
+     "Cmte. Fontes",
+     "Alm. Barroso"
+    ],
+    "anon": 0
+   },
+   {
+    "mapa": "fiordes",
+    "cl": "colosso",
+    "az": 0,
+    "vm": 1,
+    "e0": {
+     "t": 1,
+     "nIni": 1,
+     "vistos": 1,
+     "contato": 1,
+     "dmin": 7000
+    },
+    "listaIni": [
+     "Cmte. Correia"
+    ],
+    "anon": 0
+   }
+  ],
+  "lista": {
+   "destro/21x9": {
+    "aberta": true,
+    "o": [],
+    "fora": false,
+    "w": 338,
+    "h": 99,
+    "inimigos": [
+     "Cmte. Prado"
+    ],
+    "anon": 0
+   },
+   "destro/20x9": {
+    "aberta": true,
+    "o": [],
+    "fora": false,
+    "w": 292,
+    "h": 99,
+    "inimigos": [
+     "Cmte. Prado"
+    ],
+    "anon": 0
+   },
+   "destro/19.5x9": {
+    "aberta": true,
+    "o": [],
+    "fora": false,
+    "w": 269,
+    "h": 99,
+    "inimigos": [
+     "Cmte. Prado"
+    ],
+    "anon": 0
+   },
+   "destro/18x9": {
+    "aberta": true,
+    "o": [],
+    "fora": false,
+    "w": 279,
+    "h": 99,
+    "inimigos": [
+     "Cmte. Prado"
+    ],
+    "anon": 0
+   },
+   "destro/16x9": {
+    "aberta": true,
+    "o": [],
+    "fora": false,
+    "w": 407,
+    "h": 99,
+    "inimigos": [
+     "Cmte. Prado"
+    ],
+    "anon": 0
+   },
+   "destro/4x3": {
+    "aberta": true,
+    "o": [],
+    "fora": false,
+    "w": 600,
+    "h": 99,
+    "inimigos": [
+     "Cmte. Prado"
+    ],
+    "anon": 0
+   },
+   "canhoto/21x9": {
+    "aberta": true,
+    "o": [],
+    "fora": false,
+    "w": 338,
+    "h": 99,
+    "inimigos": [
+     "Cmte. Prado"
+    ],
+    "anon": 0
+   },
+   "canhoto/20x9": {
+    "aberta": true,
+    "o": [],
+    "fora": false,
+    "w": 292,
+    "h": 99,
+    "inimigos": [
+     "Cmte. Prado"
+    ],
+    "anon": 0
+   },
+   "canhoto/19.5x9": {
+    "aberta": true,
+    "o": [],
+    "fora": false,
+    "w": 269,
+    "h": 99,
+    "inimigos": [
+     "Cmte. Prado"
+    ],
+    "anon": 0
+   },
+   "canhoto/18x9": {
+    "aberta": true,
+    "o": [],
+    "fora": false,
+    "w": 279,
+    "h": 99,
+    "inimigos": [
+     "Cmte. Prado"
+    ],
+    "anon": 0
+   },
+   "canhoto/16x9": {
+    "aberta": true,
+    "o": [],
+    "fora": false,
+    "w": 407,
+    "h": 99,
+    "inimigos": [
+     "Cmte. Prado"
+    ],
+    "anon": 0
+   },
+   "canhoto/4x3": {
+    "aberta": true,
+    "o": [],
+    "fora": false,
+    "w": 600,
+    "h": 99,
+    "inimigos": [
+     "Cmte. Prado"
+    ],
+    "anon": 0
+   }
+  },
+  "drone": {
+   "temDrone": "{\"uav\":-1,\"tUav\":0,\"fim\":false}",
+   "menu": "[\"cinema\",\"perto\",\"optica\",\"conves\",\"canhao\",\"missil\",\"foguete\",\"projetil\",\"torpedo\"]",
+   "noAr": true,
+   "botao": "DRONENO AR",
+   "modosAposDecolar": [
+    "perto"
+   ],
+   "segundoToque": "perto",
+   "cicloCAMERA": [
+    "conves",
+    "canhao",
+    "longe",
+    "perto",
+    "conves",
+    "canhao",
+    "longe",
+    "perto"
+   ],
+   "menuAberto": "[\"CINEMA\",\"EXTERNA\",\"ÓPTICA\",\"CONVÉS\",\"CANHÃO\",\"MÍSSIL\",\"FOGUETE\",\"PROJÉTIL\",\"TORPEDO\"]",
+   "contatosPlotados": true,
+   "cinema": [
+    "perto/sobrevoo"
+   ]
+  }
+ },
+ "falhas": []
+}

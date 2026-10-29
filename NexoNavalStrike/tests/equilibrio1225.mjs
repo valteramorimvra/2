@@ -1,0 +1,11 @@
+// v1.2.25 item 9 — EQUILÍBRIO: partidas inteiras bot × bot (jogador sob IA), modo frota, mapa atois; vitórias por lado, poder por lado e composição.
+// SRC=… (base: /tmp/base1224/src) SEEDS=a-b CLASSE=… PA=1 (porta-aviões). Saída: 1 linha JSON por partida.
+const SRC = process.env.SRC || '/workspace/nexo-naval-strike/src'; const { criaSessao } = await import(SRC + '/sim/session.js');
+const { poder } = await import('/workspace/nexo-naval-strike/src/sim/esquadra.js'); /* mesma régua de poder nas duas builds */
+const [a, b] = (process.env.SEEDS || '1-4').split('-').map(Number); const CL = (process.env.CLASSES || 'destroier,cruzador,fragata,capitania').split(',');
+if (process.env.TROCA) globalThis.__nnsTrocaEsq = 1; if (process.env.LADO) globalThis.__nnsTrocaLado = 1; if (process.env.DIR) globalThis.__nnsDirCantos = { [process.env.MAPA]: process.env.DIR.split(',').map(Number) };
+for (let seed = a; seed <= b; seed++) { const classe = CL[seed % CL.length]; const S = criaSessao({ mapa: process.env.MAPA || 'atois', modo: 'frota', classe, seed, portaAvioes: !!process.env.PA }); const s = S.sim; const j = s.navios[S.match.jogadorId]; j.controleIA = 1; if (process.env.BOT) { const { papelDaClasse } = await import(SRC + '/sim/match.js'); j.papel = papelDaClasse(j.tipo); } /* BOT=1: o navio do jogador vira um bot comum do seu papel (sem a doutrina 'jogador sob IA', que preserva o navio) — mede só o equilíbrio das esquadras/posições */
+  const comp = { azul: [], vermelho: [] }, P = { azul: 0, vermelho: 0 }; for (const n of s.navios) { if (n.C.mercante) continue; comp[n.time].push(n.tipo + (n.funcao ? '/' + n.funcao : '')); P[n.time] += poder(n.tipo); }
+  const t0 = Date.now(); let k = 0; /* TROCA=1: classes trocadas entre os lados (definido antes do criaSessao) */ while (!s.fim && k < 60 * 700) { S.avanca(1 / 60); k++; }
+  const vivos = { azul: 0, vermelho: 0 }; for (const n of s.navios) if (!n.morto && !n.C.mercante) vivos[n.time]++;
+  console.log(JSON.stringify({ seed, classe, vencedor: s.fim ? s.fim.vencedor : null, motivo: s.fim ? s.fim.motivo : 'sem fim', t: Math.round(s.t), vivos, poder: { azul: +P.azul.toFixed(2), vermelho: +P.vermelho.toFixed(2) }, dP: +(Math.abs(P.azul - P.vermelho) / Math.max(P.azul, P.vermelho)).toFixed(3), comp, ms: Date.now() - t0 })); }

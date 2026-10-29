@@ -1,0 +1,3 @@
+economia antes/depois: {"p":9988000,"o":100000} → {"p":11494032,"o":100040}
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

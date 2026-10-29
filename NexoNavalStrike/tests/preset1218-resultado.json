@@ -1,0 +1,93 @@
+{
+ "R": {
+  "migracao": {
+   "lista": [
+    "Legado"
+   ],
+   "save": [
+    "Legado"
+   ],
+   "select": 0
+  },
+  "salvos": [
+   "Legado",
+   "Alfa",
+   "Bravo"
+  ],
+  "carregaAlfa": {
+   "mapa": "atois",
+   "az": 2,
+   "vm": 3,
+   "mar": 2,
+   "ativo": "Alfa",
+   "telaMapa": "atois"
+  },
+  "carregaBravo": {
+   "mapa": "santos",
+   "vm": [
+    "horizonte"
+   ],
+   "jog": "colosso"
+  },
+  "renomeia": [
+   "Legado",
+   "Alfa",
+   "Bravo 2"
+  ],
+  "confirmaVisivel": true,
+  "aposExcluir": [
+   "Alfa",
+   "Bravo 2"
+  ],
+  "aposRecarregar": [
+   "Alfa",
+   "Bravo 2"
+  ],
+  "sobreposicao": {
+   "21x9": {
+    "n": 30,
+    "o": [],
+    "fora": 0
+   },
+   "20x9": {
+    "n": 30,
+    "o": [],
+    "fora": 0
+   },
+   "16x9": {
+    "n": 30,
+    "o": [],
+    "fora": 0
+   },
+   "4x3": {
+    "n": 30,
+    "o": [],
+    "fora": 0
+   }
+  },
+  "bloqueio": {
+   "toast": [
+    "Adicione pelo menos 1 navio inimigo para zarpar"
+   ],
+   "jogo": false
+  },
+  "posZarpar": "{\"nns\":true,\"S\":true,\"rod\":true,\"tela\":\"?\",\"toast\":[],\"erros\":\"[]\"}",
+  "partida": {
+   "mapa": "atois",
+   "eu": "destroier",
+   "az": [
+    "fragata",
+    "destroier",
+    "cruzador"
+   ],
+   "vm": [
+    "destroier",
+    "corveta",
+    "sentinela"
+   ],
+   "vistos": 3,
+   "contatos": 3
+  }
+ },
+ "falhas": []
+}

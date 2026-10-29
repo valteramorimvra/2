@@ -1,0 +1,84 @@
+/* v1.2.31 — manual + tutorial: tema AMOLED (preto puro), símbolos pequenos, nada no centro do HUD. */
+.tela-manual1231 { background: #000 !important; }
+.mn { flex: 1; min-height: 0; min-width: 0; max-width: 100%; display: flex; flex-direction: column; gap: 6px; color: #e2e8f0; padding-top: 2px; }
+.mn-cab { padding-right: 96px; min-height: 44px; } .mn-cab > div { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; white-space: nowrap; }
+.mn-cab h2 { margin: 0; font-size: 18px; letter-spacing: .14em; font-weight: 700; color: #e2e8f0; }
+.mn-cab h2 small { font-size: 10px; letter-spacing: .08em; color: #64748b; font-weight: 600; margin-left: 4px; }
+.mn-mig { font-size: 12px; color: #94a3b8; margin-left: 10px; }
+.mn-ix { background: #06080c; border: 1px solid rgba(56,189,248,.35); color: #38bdf8; border-radius: 6px; padding: 3px 9px; font-size: 11px; font-weight: 600; }
+.mn-corpo { flex: 1; min-height: 0; min-width: 0; display: flex; }
+.mn-idx { flex: 1; min-height: 0; overflow: auto; touch-action: pan-y; }
+.mn-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; align-content: start; }
+.mn-card-cat { display: flex; align-items: center; gap: 10px; text-align: left; background: #04060a; border: 1px solid rgba(56,189,248,.22); border-radius: 10px; padding: 10px 12px; color: #e2e8f0; min-height: 78px; position: relative; }
+.mn-card-cat:active { border-color: #38bdf8; background: #0a121c; }
+.mn-card-cat svg { width: 22px; height: 22px; flex: none; fill: none; stroke: #38bdf8; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.mn-card-cat b { display: block; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; }
+.mn-card-cat small { display: block; font-size: 11px; color: #94a3b8; line-height: 1.3; margin-top: 2px; }
+.mn-card-cat em { position: absolute; right: 8px; top: 6px; font-style: normal; font-size: 9px; color: #64748b; }
+.mn-cat { flex: 1; min-height: 0; min-width: 0; display: flex; gap: 8px; }
+.mn-nav { width: 26%; max-width: 190px; min-width: 112px; display: flex; flex-direction: column; gap: 3px; overflow: auto; touch-action: pan-y; }
+.mn-nav button { text-align: left; background: #04060a; border: 1px solid rgba(148,163,184,.18); border-left: 3px solid transparent; color: #cbd5e1; border-radius: 6px; padding: 6px 8px; font-size: 11.5px; font-weight: 600; }
+.mn-nav button.on { border-left-color: #38bdf8; background: #0a121c; color: #fff; }
+.mn-art { flex: 1; min-width: 0; overflow: auto; touch-action: pan-y; background: #03050a; border: 1px solid rgba(56,189,248,.18); border-radius: 10px; padding: 8px 12px 14px; font-size: 12.5px; line-height: 1.45; color: #cbd5e1; user-select: text; -webkit-user-select: text; }
+.mn-art h3 { margin: 2px 0 6px; font-size: 14px; color: #38bdf8; letter-spacing: .05em; text-transform: uppercase; }
+.mn-art h4 { margin: 12px 0 4px; font-size: 12.5px; color: #e2e8f0; }
+.mn-art p { margin: 4px 0 8px; } .mn-art b { color: #f1f5f9; } .mn-art ul { margin: 4px 0 8px; padding-left: 18px; } .mn-art li { margin: 2px 0; }
+.mn-nota { border-left: 3px solid #38bdf8; background: #06101a; padding: 6px 9px; border-radius: 0 6px 6px 0; }
+.mn-pendp { border-left: 3px solid #f59e0b; background: #140e02; padding: 6px 9px; border-radius: 0 6px 6px 0; color: #e7d3a8; }
+.mn-pend { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: .08em; color: #000; background: #f59e0b; border-radius: 3px; padding: 1px 5px; vertical-align: 1px; }
+.mn-leg { font-size: 10.5px; color: #94a3b8; margin: 4px 0 6px; }
+.mn-estado { font-size: 11px; color: #94a3b8; }
+.mn-tabw { overflow-x: auto; touch-action: pan-x pan-y; margin: 4px 0 8px; border: 1px solid rgba(148,163,184,.15); border-radius: 8px; }
+.mn-tab { border-collapse: collapse; width: 100%; font-size: 11px; white-space: nowrap; }
+.mn-tab th { position: sticky; top: 0; background: #0a121c; color: #94a3b8; text-align: left; font-weight: 600; font-size: 10px; letter-spacing: .04em; padding: 4px 7px; }
+.mn-tab td { padding: 4px 7px; border-top: 1px solid rgba(148,163,184,.1); vertical-align: top; }
+.mn-tab td.mn-n { color: #f1f5f9; font-weight: 600; position: sticky; left: 0; background: #03050a; }
+.mn-tab td small { display: block; color: #64748b; font-weight: 400; font-size: 9.5px; }
+.mn-cons td, .mn-aero td, .mn-btn td, .mn-cam td { white-space: normal; min-width: 90px; }
+.mn-sel { font-style: normal; font-size: 8.5px; font-weight: 700; letter-spacing: .06em; color: #fbbf24; border: 1px solid rgba(251,191,36,.5); border-radius: 3px; padding: 0 3px; margin-left: 4px; vertical-align: 1px; }
+.mn-ficha { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 4px 10px; margin: 6px 0 10px; }
+.mn-ficha div { border-bottom: 1px solid rgba(148,163,184,.12); padding: 2px 0; } .mn-ficha dt { font-size: 9.5px; color: #64748b; letter-spacing: .04em; } .mn-ficha dd { margin: 0; color: #f1f5f9; font-weight: 600; }
+.mn-card { border: 1px solid rgba(56,189,248,.2); background: #04060a; border-radius: 8px; padding: 6px 10px 4px; margin: 6px 0; } .mn-card h4 { margin: 2px 0 2px; color: #38bdf8; }
+.mn-sw { display: inline-block; width: 22px; height: 12px; border-radius: 3px; margin-right: 4px; border: 1px solid rgba(255,255,255,.25); }
+.mn-rod { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 10.5px; color: #64748b; padding: 2px 2px 0; }
+.mn-dev { color: #94a3b8; font-weight: 600; letter-spacing: .02em; }
+.mn-lnk { background: transparent; border: 1px solid rgba(148,163,184,.3); color: #94a3b8; border-radius: 6px; padding: 3px 9px; font-size: 10.5px; }
+@media (max-width: 760px) { .mn-cards { grid-template-columns: repeat(2, 1fr); } }
+
+/* ===== TUTORIAL (1.2.31): overlay NÃO bloqueia o jogo; só o cartão recebe toque ===== */
+.tt { position: fixed; inset: 0; z-index: 9000; pointer-events: none; font-family: inherit; }
+.tt-anel { position: fixed; border: 2px solid #38bdf8; box-shadow: 0 0 0 9999px rgba(0,0,0,.58), 0 0 14px 2px rgba(56,189,248,.8) inset; pointer-events: none; transition: left .18s, top .18s, width .18s, height .18s; animation: tt-pulsa 1.4s ease-in-out infinite; }
+@keyframes tt-pulsa { 50% { border-color: #7dd3fc; } }
+.tt-cartao { position: fixed; width: min(300px, 40vw); box-sizing: border-box; pointer-events: auto; background: #000; border: 1px solid rgba(56,189,248,.55); border-radius: 10px; padding: 8px 10px 9px; color: #e2e8f0; box-shadow: 0 4px 18px rgba(0,0,0,.8); }
+.tt-cartao.feito { border-color: #4ade80; }
+.tt-topo { display: flex; justify-content: space-between; align-items: center; }
+.tt-topo small { font-size: 9.5px; letter-spacing: .1em; color: #64748b; font-weight: 700; }
+.tt-x { background: transparent; border: 1px solid rgba(148,163,184,.4); color: #94a3b8; border-radius: 5px; font-size: 9.5px; font-weight: 700; padding: 2px 7px; letter-spacing: .06em; }
+.tt-tit { display: block; font-size: 13px; color: #38bdf8; letter-spacing: .05em; text-transform: uppercase; margin: 3px 0 2px; }
+.tt-cartao.feito .tt-tit::after { content: ' ✓'; color: #4ade80; }
+.tt-txt { margin: 0 0 6px; font-size: 11.5px; line-height: 1.4; color: #cbd5e1; } .tt-txt b { color: #f1f5f9; }
+.tt-aviso { margin: 0 0 6px; font-size: 10.5px; color: #fbbf24; border-left: 3px solid #f59e0b; padding-left: 6px; }
+.tt-bts { display: flex; align-items: center; gap: 8px; }
+.tt-bts button { background: #06080c; border: 1px solid rgba(56,189,248,.45); color: #e2e8f0; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; }
+.tt-bts button:disabled { opacity: .3; } .tt-bts .tt-prox { margin-left: auto; background: #0a2a3d; border-color: #38bdf8; }
+.tt-pts { display: flex; gap: 3px; flex: 1; justify-content: center; } .tt-pts s { width: 5px; height: 5px; border-radius: 50%; background: #1e293b; } .tt-pts s.ok { background: #0e7490; } .tt-pts s.on { background: #38bdf8; }
+.tt-oferta { position: fixed; z-index: 9100; right: 10px; bottom: 10px; width: min(300px, 44vw); box-sizing: border-box; background: #000; border: 1px solid rgba(56,189,248,.55); border-radius: 10px; padding: 9px 11px; color: #e2e8f0; box-shadow: 0 4px 18px rgba(0,0,0,.8); display: flex; flex-direction: column; gap: 4px; }
+.tt-oferta b { font-size: 13px; color: #38bdf8; } .tt-oferta span { font-size: 11px; color: #94a3b8; line-height: 1.35; }
+.tt-oferta div { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 3px; } .tt-oferta button { background: #06080c; border: 1px solid rgba(148,163,184,.35); color: #cbd5e1; border-radius: 6px; padding: 4px 8px; font-size: 10px; font-weight: 700; } .tt-oferta .tt-sim { background: #0a2a3d; border-color: #38bdf8; color: #fff; }
+
+/* ===== menu principal (1.2.31 v3): MANUAL e TUTORIAL como botões pequenos no canto superior direito, abaixo do saldo.
+   Nenhum botão do menu existente muda de lugar nem de tamanho (COMO JOGAR segue ao lado de AJUSTES, como na 1.2.29). ===== */
+.tela-inicio > .mp-atalhos { position: absolute; top: 52px; right: max(18px, env(safe-area-inset-right)); width: auto; display: flex; flex-direction: row; gap: 6px; z-index: 3; }
+.mp18.mp-atalhos .mpb { min-height: 30px; padding: 4px 10px 4px 8px; font-size: 10.5px; letter-spacing: .06em; gap: 5px; --ch: 7px; }
+.mp18.mp-atalhos .mpi { width: 14px; height: 14px; }
+/* v1.2.64 (Valter): MANUAL em tons militares — verde-oliva, cáqui, aço-canhão e latão */
+.tela-manual1231 { background: radial-gradient(ellipse at 15% 0%, rgba(92,104,62,.35), transparent 55%), linear-gradient(180deg, #1b1f17 0%, #11140f 100%) !important; color: #e4e1d2; }
+.tela-manual1231 .mn-cab h2 { color: #e9e2c3; text-shadow: 0 1px 0 #000; } .tela-manual1231 .mn-cab h2 small { color: #9a9572; }
+.tela-manual1231 .mn-mig { color: #b9b38f; } .tela-manual1231 .mn-ix { background: #23281c; border-color: rgba(200,178,122,.5); color: #d9c48a; }
+.tela-manual1231 .mn-card-cat { background: linear-gradient(180deg, #2a3021, #1d2117); border: 1px solid rgba(200,178,122,.28); border-left: 3px solid #8b7d3e; box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+.tela-manual1231 .mn-card-cat svg { stroke: #d4b65a; } .tela-manual1231 .mn-card-cat b { color: #ece5c6; } .tela-manual1231 .mn-card-cat small { color: #a9a483; } .tela-manual1231 .mn-card-cat em { color: #8e8a6a; }
+.tela-manual1231 .mn-nav button { background: #1f2419; border-color: rgba(200,178,122,.16); color: #cfc9a8; } .tela-manual1231 .mn-nav button.on { border-left-color: #d4b65a; background: #2e3524; color: #fff7da; }
+.tela-manual1231 .mn-art { background: linear-gradient(180deg, #1a1e15, #14170f); border-color: rgba(200,178,122,.22); color: #dcd8c4; }
+.tela-manual1231 .mn-art h3 { color: #d9c48a; border-bottom: 1px solid rgba(212,182,90,.35); padding-bottom: 4px; } .tela-manual1231 .mn-art b { color: #f3ecd0; } .tela-manual1231 .mn-art h4 { color: #e8dfb8; }
+.tela-manual1231 .mn-nota { border-left-color: #8b9a4a; background: #1e2416; } .tela-manual1231 .mn-rod, .tela-manual1231 .mn-dev { color: #9a9572; } .tela-manual1231 .mn-lnk { color: #d9c48a; border-color: rgba(200,178,122,.45); background: #23281c; }
+.tela-manual1231 .mn-art .cr-dev { display: none; } /* a linha "Responsável…" repetida em cada novidade fica só no rodapé */

@@ -1,0 +1,188 @@
+{
+ "R": {
+  "cenas": {
+   "voo-destro/21x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "voo-destro/20x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "voo-destro/19.5x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "voo-destro/18x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "voo-destro/16x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "voo-destro/4x3": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "voo-canhoto/21x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "voo-canhoto/20x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "voo-canhoto/19.5x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "voo-canhoto/18x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "voo-canhoto/16x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "voo-canhoto/4x3": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "pouso-destro/21x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "pouso-destro/20x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "pouso-destro/19.5x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "pouso-destro/18x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "pouso-destro/16x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "pouso-destro/4x3": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "pouso-canhoto/21x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "pouso-canhoto/20x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "pouso-canhoto/19.5x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "pouso-canhoto/18x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "pouso-canhoto/16x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "pouso-canhoto/4x3": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "abastecimento-destro/21x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "abastecimento-destro/20x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "abastecimento-destro/19.5x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "abastecimento-destro/18x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "abastecimento-destro/16x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "abastecimento-destro/4x3": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "abastecimento-canhoto/21x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "abastecimento-canhoto/20x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "abastecimento-canhoto/19.5x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "abastecimento-canhoto/18x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "abastecimento-canhoto/16x9": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   },
+   "abastecimento-canhoto/4x3": {
+    "sobreposicoes": 0,
+    "rotulos": 0,
+    "truncados": 0
+   }
+  },
+  "modoHeli": true
+ },
+ "falhas": []
+}

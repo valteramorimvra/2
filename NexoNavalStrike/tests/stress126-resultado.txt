@@ -1,0 +1,23 @@
+  base: {"nome":"base","quadros":19,"media":779.8,"p95":7999.7,"max":7999.7,"progNovos":0,"geoNovas":0,"texNovas":0,"heapMB":2,"objNovos":0,"luzes":0,"cpu":{"logica":{"media":25.1,"max":304.4},"logicaPorPasso":{"media":4.2,"max":50.7},"render":{"media":76.5,"max":751.6},"degrada":1,"descartadas":0},"pico":{"mis":0,"torp":0,"gran":20,"parts":133,"vozesMax":12}}
+  vls: {"nome":"vls","quadros":58,"media":319.2,"p95":383.4,"max":816.7,"progNovos":0,"geoNovas":0,"texNovas":0,"heapMB":1,"objNovos":0,"luzes":0,"cpu":{"logica":{"media":13.3,"max":27.3},"logicaPorPasso":{"media":2.2,"max":4.5},"render":{"media":19.4,"max":800.1},"degrada":0.65,"descartadas":58},"pico":{"mis":64,"torp":0,"gran":35,"parts":1172,"vozesMax":12}}
+  torpedos: {"nome":"torpedos","quadros":32,"media":329.7,"p95":383.3,"max":383.4,"progNovos":0,"geoNovas":0,"texNovas":0,"heapMB":0,"objNovos":0,"luzes":0,"cpu":{"logica":{"media":14.4,"max":30.7},"logicaPorPasso":{"media":2.4,"max":5.1},"render":{"media":6.3,"max":10.3},"degrada":0.65,"descartadas":138},"pico":{"mis":64,"torp":0,"gran":36,"parts":1463,"vozesMax":12}}
+  lf12: {"nome":"lf12","quadros":31,"media":334.4,"p95":400,"max":850,"progNovos":0,"geoNovas":0,"texNovas":0,"heapMB":1,"objNovos":0,"luzes":0,"cpu":{"logica":{"media":15.2,"max":24.4},"logicaPorPasso":{"media":2.6,"max":4.1},"render":{"media":32.9,"max":831.9},"degrada":0.65,"descartadas":196},"pico":{"mis":31,"torp":0,"gran":120,"parts":1446,"vozesMax":12}}
+✔ salva VLS: pico de 64 mísseis simultâneos
+✔ vls: 0 programas WebGL novos
+✔ vls: geometrias +0, texturas +0, objetos na cena +0, luzes +0
+✔ vls: heap JS +1 MB
+✔ vls: vozes de áudio no pico 12 (máx. 12)
+✔ vls: lógica por passo de 1/60 s média 2.2 ms / máx. 4.5 ms (por quadro máx. 27.3 ms com até 6 passos de recuperação) (frame total máx. 816.7 ms em SwiftShader; base p95 7999.7 ms)
+✔ torpedos: 0 programas WebGL novos
+✔ torpedos: geometrias +0, texturas +0, objetos na cena +0, luzes +0
+✔ torpedos: heap JS +0 MB
+✔ torpedos: vozes de áudio no pico 12 (máx. 12)
+✔ torpedos: lógica por passo de 1/60 s média 2.4 ms / máx. 5.1 ms (por quadro máx. 30.7 ms com até 6 passos de recuperação) (frame total máx. 383.4 ms em SwiftShader; base p95 7999.7 ms)
+✔ lf12: 0 programas WebGL novos
+✔ lf12: geometrias +0, texturas +0, objetos na cena +0, luzes +0
+✔ lf12: heap JS +1 MB
+✔ lf12: vozes de áudio no pico 12 (máx. 12)
+✔ lf12: lógica por passo de 1/60 s média 2.6 ms / máx. 4.1 ms (por quadro máx. 24.4 ms com até 6 passos de recuperação) (frame total máx. 850 ms em SwiftShader; base p95 7999.7 ms)
+✔ console sem erros
+
+17 passaram, 0 falharam
