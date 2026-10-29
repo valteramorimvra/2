@@ -270,3 +270,8 @@
 @media (max-height: 420px) { .tela-inicio .mw-cxs { height: 46px !important; align-items: center !important; overflow: hidden; } .tela-inicio .mw-cxs img { max-height: 44px; width: auto; } }
 /* v1.2.58: seletor de pintura dos bombardeiros (Ajustes) */
 .aj-sel { width: 100%; margin-top: 6px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(148,163,184,.4); background: rgba(10,16,24,.85); color: #e2e8f0; font: inherit; font-size: 13px; }
+
+/* v1.2.59: botões de combate aéreo no painel de voo */
+.hud .hl-bts .cb.nk-aa { right: 92px; bottom: 222px; } .hud .hl-bts .cb.nk-fl { right: 214px; bottom: 100px; }
+.hud .nk-bts .cb.nk-aa i { color: #fca5a5; } .hud .nk-bts .cb.nk-fl i { color: #fde68a; } .hud .nk-bts .cb.nk-alerta { animation: nkPisca .45s steps(2) infinite; box-shadow: 0 0 0 3px #ef4444; }
+@keyframes nkPisca { 50% { box-shadow: 0 0 0 3px transparent; } }

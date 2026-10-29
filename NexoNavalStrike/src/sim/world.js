@@ -116,7 +116,7 @@ export class Sim {
       case 'uav': case 'esquadrilha': case 'heliLanca': case 'heliCtrl': case 'heliFlare': case 'iaNavio': case 'heliFogo': case 'heliVolta': case 'controle': comandoAereo(this, n, cmd); break;
       case 'nuclear': (n.C.missilNuclear ? lancaMissilNuclear1231 : lancaNuclear)(this, n, cmd); break; /* v1.2.31: míssil nuclear de navio */ /* v1.2.26 */
       case 'hidro': case 'hdPil': case 'hdMissil': case 'hdTorp': case 'hdFlare': case 'hdVolta': comandoHidro(this, n, cmd); break; /* v1.2.39 */
-      case 'nkPiloto': case 'nkEspera': case 'nkCtl': case 'nkThr': case 'nkMiraSolo': case 'nkTrava': case 'nkSolta': if (cmd.t === 'nkSolta' && n.hd && n.hd.pil && n.hd.noAr >= 0) { comandoHidro(this, n, cmd); break; } comandoNuclear(this, n, cmd); break; /* v1.2.26/28: pilotagem + acel + mira solo */
+      case 'nkPiloto': case 'nkEspera': case 'nkArAr': case 'nkFlare': case 'nkCtl': case 'nkThr': case 'nkMiraSolo': case 'nkTrava': case 'nkSolta': if (cmd.t === 'nkSolta' && n.hd && n.hd.pil && n.hd.noAr >= 0) { comandoHidro(this, n, cmd); break; } comandoNuclear(this, n, cmd); break; /* v1.2.26/28: pilotagem + acel + mira solo */
     }
   }
 

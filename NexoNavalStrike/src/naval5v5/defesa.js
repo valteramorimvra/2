@@ -124,8 +124,13 @@ export function lancaSam(sim, n, m) {
   s.ativo = 1; s.x = _o.x; s.y = _o.y; s.z = _o.z; s.vx = 0; s.vy = 45; s.vz = 0; s.dono = n.id; s.time = n.time; s.alvo = m.idx; s.t = 0; s.fase = 1; s.tipoAlvo = 'm'; m.samAlvo = s.idx + 1; if (m.perfil) m.samTent = (m.samTent || 0) + 1;
   sim.evento({ t: 'samLanc', id: n.id, cel: n.P.vls.length + cel, idx: s.idx, x: _o.x, y: _o.y, z: _o.z }); return s;
 }
+/** v1.2.59: MÍSSIL AR-AR lançado da aeronave que o jogador pilota (bombardeiro/hidroavião) — usa o mesmo guiamento do SAM (navegação proporcional com tempo-até-impacto), só contra alvos AÉREOS.
+ *  tipo 'h' = helicóptero/caça (sim.helis) · 'q' = bombardeiro/hidroavião inimigo (sim.nukes). Nasce com a velocidade da aeronave lançadora. */
+export function lancaArAr(sim, q, alvo, tipo) { const s = livre(sim.sams); if (!s) return null; const v = Math.max(120, q.v || 150), cp = Math.cos(q.gam || q.pitch || 0);
+  s.ativo = 1; s.x = q.x; s.y = q.y - 2; s.z = q.z; s.vx = Math.sin(q.rumo) * v * cp; s.vy = 0; s.vz = -Math.cos(q.rumo) * v * cp; s.dono = q.dono; s.time = q.time; s.alvo = alvo.idx; s.t = 0; s.fase = 2; s.tipoAlvo = tipo; s.arAr = 1; alvo.samAlvo = s.idx + 1;
+  sim.evento({ t: 'arArLanc', idx: s.idx, id: q.dono, q: q.idx, x: s.x, y: s.y, z: s.z, alvo: alvo.idx, tipo }); return s; }
 export function passoSams(sim, dt) {
-  for (const s of sim.sams) { if (!s.ativo) continue; s.t += dt; const m = s.tipoAlvo === 'h' ? sim.helis[s.alvo] : sim.misseis[s.alvo];
+  for (const s of sim.sams) { if (!s.ativo) continue; s.t += dt; const m = s.tipoAlvo === 'h' ? sim.helis[s.alvo] : s.tipoAlvo === 'q' ? sim.nukes[s.alvo] : sim.misseis[s.alvo];
     if (!m.ativo || s.t > 8) { s.ativo = 0; if (m.samAlvo === s.idx + 1) m.samAlvo = 0; sim.evento({ t: 'samFim', idx: s.idx, x: s.x, y: s.y, z: s.z }); continue; }
     let v = Math.hypot(s.vx, s.vy, s.vz); let ux = s.vx / v, uy = s.vy / v, uz = s.vz / v;
     if (s.fase === 1) { v = Math.min(v + 300 * dt, 140); if (s.t > 0.3) s.fase = 2; ux = 0; uy = 1; uz = 0; }
@@ -140,7 +145,8 @@ export function passoSams(sim, dt) {
       const nx = s.x - m.x, ny = s.y - m.y, nz = s.z - m.z; const dxs = nx - ox, dys = ny - oy, dzs = nz - oz; const L2 = dxs * dxs + dys * dys + dzs * dzs;
       const u = L2 > 0 ? clamp(-(ox * dxs + oy * dys + oz * dzs) / L2, 0, 1) : 1; const dmin = Math.hypot(ox + dxs * u, oy + dys * u, oz + dzs * u);
       if (dmin < SAM.espoleta) { const d = sim.navios[s.dono]; s.ativo = 0;
-        if (s.tipoAlvo === 'h') { if (sim.rng.next() < SAM.pk * 1.1 * (m.tFlare > 0 ? PARAM.heli.flareSam : 1)) { m.samAlvo = 0; derrubaAereo(sim, 'h', m, d); sim.evento({ t: 'samAbate', idx: s.idx, x: m.x, y: m.y, z: m.z, por: d.id, heli: 1 }); } else { m.samAlvo = 0; sim.evento({ t: 'samFalha', idx: s.idx, x: s.x, y: s.y, z: s.z }); } continue; }
+        if (s.tipoAlvo === 'q') { m.samAlvo = 0; if (sim.rng.next() < SAM.pk * 1.05 * (m.tFlareAte > sim.t ? 0.18 : 1)) { if (m.hidro) m.vida = 0; else if (sim.abateNk) sim.abateNk(m, d); sim.evento({ t: 'samAbate', idx: s.idx, x: m.x, y: m.y, z: m.z, por: d.id, heli: 1, arAr: s.arAr ? 1 : 0 }); } else sim.evento({ t: 'samFalha', idx: s.idx, x: s.x, y: s.y, z: s.z, flare: m.tFlareAte > sim.t ? 1 : 0 }); s.arAr = 0; continue; } /* v1.2.59: alvo bombardeiro/hidroavião */
+        if (s.tipoAlvo === 'h') { if (sim.rng.next() < SAM.pk * 1.1 * (m.tFlare > 0 ? PARAM.heli.flareSam : 1)) { m.samAlvo = 0; derrubaAereo(sim, 'h', m, d); sim.evento({ t: 'samAbate', idx: s.idx, x: m.x, y: m.y, z: m.z, por: d.id, heli: 1, arAr: s.arAr ? 1 : 0 }); s.arAr = 0; } else { m.samAlvo = 0; sim.evento({ t: 'samFalha', idx: s.idx, x: s.x, y: s.y, z: s.z }); } continue; }
         if (sim.rng.next() < SAM.pk * DEF.samPkMis * ((m.perfil && m.perfil.pkSam) || 1) * (d.mods.samPk || 1) * (m.pkMul || 1) * resAr(m)) { m.ativo = 0; d.stats.intercept++; regAereoInterc(sim, d, 'm', m, 'sam'); /* v1.2.30 item 15 */ sim.evento({ t: 'samAbate', idx: s.idx, mIdx: m.idx, x: m.x, y: m.y, z: m.z, por: d.id }); }
         else { m.samAlvo = 0; sim.evento({ t: 'samFalha', idx: s.idx, x: s.x, y: s.y, z: s.z }); } continue; } }
     if (s.y < alturaMar(s.x, s.z, sim.t) - 1) { s.ativo = 0; if (m.samAlvo === s.idx + 1) m.samAlvo = 0; sim.evento({ t: 'samFim', idx: s.idx, x: s.x, y: 0, z: s.z }); } }

@@ -23,6 +23,8 @@ const f1 = (v) => v.toFixed(1).replace('.', ',');
 const ANEL = '<svg viewBox="0 0 100 100" class="cb-anel"><circle cx="50" cy="50" r="46" class="cb-f"/><circle cx="50" cy="50" r="46" class="cb-a"/></svg>';
 const B = (a, ic, rot, cls = '') => `<button class="cb ${cls}" data-a="${a}" data-r="b_${a}">${ANEL}<i>${ic}</i><b>${rot}</b><em data-r="q_${a}"></em></button>`;
 const IC = { // ícones vetoriais simples (originais)
+  arAr: '<svg viewBox="0 0 24 24"><path d="M14.5 7.5l3.2-1.2 1.6 1.6-1.2 3.2-1.7.4-.4 2.3-1.3 1.3-.9-2.6-2.4-.9 1.3-1.3 2.3-.4z" fill="currentColor"/><path d="M3 21l7-7M5.2 21.2l6-6M2.8 18.8l6-6" stroke="currentColor" stroke-width="1.4"/><path d="M19.5 3.5l1 1.6 1.6.3-1.2 1.2.2 1.7-1.6-.7-1.5.8.2-1.7-1.2-1.2 1.7-.3z" fill="#f97316"/></svg>', /* v1.2.59: míssil atingindo a silhueta de um jato (abate aéreo) */
+  flare: '<svg viewBox="0 0 24 24"><path d="M12 3l1.6 3h-3.2z" fill="currentColor"/><g fill="#fbbf24"><circle cx="5" cy="13" r="1.7"/><circle cx="9" cy="17" r="1.7"/><circle cx="15" cy="17" r="1.7"/><circle cx="19" cy="13" r="1.7"/></g><path d="M12 7L5 13M12 7l-3 10M12 7l3 10M12 7l7 6" stroke="currentColor" stroke-width="1" stroke-dasharray="1.5 1.5" fill="none"/></svg>', /* v1.2.59: leque de flares */
   fogo: '<svg viewBox="0 0 24 24"><path d="M3 15h12l3-3h3v6h-3l-3-3M6 15v3M10 15v3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="7" cy="9" r="2.2" fill="currentColor"/></svg>',
   vls: '<svg viewBox="0 0 24 24"><path d="M12 2l3 5v10l2 3H7l2-3V7z" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>',
   torp: '<svg viewBox="0 0 24 24"><path d="M3 12c3-3 13-3 16 0-3 3-13 3-16 0zM19 12l3-3v6z" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>',
@@ -85,7 +87,7 @@ export class Hud {
   <div class="h-nkp" data-r="nkCtl" hidden><div class="nk-joy" data-r="nkJoy"><b data-r="nkJoyCur"></b></div>
   <div class="nk-acel" data-r="nkAcel"><button type="button" data-a="nkThrUp" class="nk-thr" aria-label="Acelerar">▲</button><b data-r="nkThrLbl">MEIA</b><button type="button" data-a="nkThrDn" class="nk-thr" aria-label="Desacelerar">▼</button></div>
   <div class="nk-info" data-r="nkInfo"></div><div class="nk-ccip" data-r="nkCcip" hidden></div><div class="nk-solo" data-r="nkSolo" hidden></div><div class="nk-alvo" data-r="nkAlvoM" hidden></div><div class="nk-fpv" data-r="nkFpv"></div>
-  <div class="hl-bts nk-bts">${B('nkSolta', IC.nuke, 'LANÇAR', 'cb-g')}${B('nkTrava', IC.travar, 'TRAVAR', 'a1 p0')}${B('nkIa', IC.ia, 'IA', 'a1 p1')}${B('nkSair', IC.navio, 'ESPERA', 'a1 p2')}${B('hdMissil', IC.vls, 'MÍSSIL', 'a1 p3 hdb')}${B('hdTorp', IC.torp, 'TORP', 'hdb hd-t')}${B('hdVolta', IC.volta, 'POUSAR', 'hdb hd-v')}</div></div>
+  <div class="hl-bts nk-bts">${B('nkSolta', IC.nuke, 'LANÇAR', 'cb-g')}${B('nkTrava', IC.travar, 'TRAVAR', 'a1 p0')}${B('nkIa', IC.ia, 'IA', 'a1 p1')}${B('nkSair', IC.navio, 'ESPERA', 'a1 p2')}${B('hdMissil', IC.vls, 'MÍSSIL', 'a1 p3 hdb')}${B('hdTorp', IC.torp, 'TORP', 'hdb hd-t')}${B('hdVolta', IC.volta, 'POUSAR', 'hdb hd-v')}${B('nkArAr', IC.arAr, 'AR-AR', 'nk-aa')}${B('nkFlare', IC.flare, 'FLARE', 'nk-fl')}</div></div>
 <div class="h-dica" data-r="dica" hidden></div>
 <div class="h-marcas" data-r="marcas"></div>
 <div class="h-alvo" data-r="caixa" hidden><i></i><span data-r="caixaTxt"></span></div>

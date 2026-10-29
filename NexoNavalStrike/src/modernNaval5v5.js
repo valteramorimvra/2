@@ -103,6 +103,7 @@ export class Naval5v5 {
     const j = this.j, fx = j.fx, A = j.audio, eu = j.eu, sim = j.S.sim;
     switch (e.t) {
       case 'samLanc': { const r = j.navios[e.id]; if (r && r.tampaT) r.tampaT[e.cel] = 2.2; for (let k = 0; k < 4; k++) fx.fumaca.emite(e.x, e.y + 1, e.z, (Math.random() - 0.5) * 6, 3 + Math.random() * 3, (Math.random() - 0.5) * 6, '#eef0f2', 0.45, 4, 2.4, 4, 0, 0.8); /* v1.2.14: −30% */ A.toca('vls_lancamento', { d, pan, vol: 0.7, rate: 1.25 }); if (e.id === eu.id) j.hud.msg('SAM lançado — interceptando míssil', 1.6, '#22c55e'); return true; }
+      case 'samAbate': if (e.arAr) { if (e.por === eu.id) { j.hud.msg('✈✖ AERONAVE INIMIGA ABATIDA — míssil ar-ar', 2.2, '#4ade80'); j.hud.logDefesa && j.hud.logDefesa('Abate ar-ar ✈'); } j.fx && j.fx.abateAereo && j.fx.abateAereo(e.x, e.y, e.z, 0, 0, 0, 1.4); return true; } /* v1.2.59: ícone de abate aéreo */
       case 'samAbate': if (!e.heli) j.abateAereo(e, d, pan, 1); /* heli derrubado tem a queda própria (derrubaAereo) */ /* v1.2.21 item 18: explosão no ar (mesmo efeito do CIWS, ogiva do SAM: um pouco mais forte) */ { const n = sim.navios[e.por]; if (n && n.time === eu.time && d < 6000) j.hud.logDefesa(n === eu ? 'SAM interceptou míssil' : 'SAM da frota interceptou'); } return true;
       case 'samFalha': case 'samFim': fx.faiscas(e.x, e.y, e.z); return true;
       case 'droneLanc': if (sim.navios[e.id] && sim.navios[e.id].time !== eu.time && !this._avisoDrone) { this._avisoDrone = 1; j.hud.msg('Drone inimigo lançado — CIWS e 30 mm em alerta', 2.2, '#f59e0b'); } return true;
