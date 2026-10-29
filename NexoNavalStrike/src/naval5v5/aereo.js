@@ -64,7 +64,7 @@ const cabeLado = (sim, n) => noArLado(sim, n.time) < limiteArLado(sim) + (n.libM
 const noAr = (sim, n) => { let c = 0; for (const i of n.helis) { const e = sim.helis[i].estado; if (e >= EST.DECOLA && e <= EST.POUSO) c++; } return c; };
 /** Bot: conta também CONVOO (já comprometidos a decolar) — evita estouro do teto na catapulta. */
 const noArCap = (sim, n) => { let c = 0; for (const i of n.helis) { const e = sim.helis[i].estado; if (e >= EST.CONVOO && e <= EST.POUSO) c++; } return c; };
-const maxArNavio = (n) => { const m = n.C.maxAr || 16; return (n.papel === 'jogador') ? Math.max(m, n.libMax || 0) : Math.min(m, EQ_AR.maxArBotPA); };
+const maxArNavio = (n) => { if (n.pistaFora) return 0; /* v1.2.60: pista da base destruída */ const m = n.C.maxAr || 16; return (n.papel === 'jogador') ? Math.max(m, n.libMax || 0) : Math.min(m, EQ_AR.maxArBotPA); };
 /** Contagem global no ar por time do jogador (amigo) vs inimigo — HUD. */
 export function contagemAr(sim, timeJog) {
   let amigo = 0, inimigo = 0;

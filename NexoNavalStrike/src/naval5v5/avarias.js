@@ -1,5 +1,6 @@
 // v1.2.0 — Avarias por área/módulo, incêndio e alagamento (danos contínuos), equipe de reparo, recarga das iscas e
 import { PARAM } from '../armasParametros.js';
+import { danoSetor } from './megabase.js'; /* v1.2.60 */
 // AFUNDAMENTO realista (jogador e bots). Determinístico (só sim.rng). Sem tripulação visível, sem gore.
 // Módulos (0..1): motor (popa), leme (popa extrema), canhao (proa), vls (meia-nau/proa). Em 0 o módulo fica INOPERANTE
 // (abaixo de 30% = inoperante — motor: 55% da velocidade; leme: 45% da taxa de giro; canhão: recarga 2,2×; VLS: não lança) e se recupera sozinho
@@ -26,7 +27,7 @@ export function moduloExato(n, hit) { const C = n.C, P = n.P, u = (C.L / 2 - hit
   const sp = P.sup; if (sp && hit.lz > Math.min(sp.z0, sp.z1) - 2 && hit.lz < Math.max(sp.z0, sp.z1) + 2 && hit.ly > C.F + 0.5) return { mod: hit.ly > C.F + sp.h * 0.8 ? 'radar' : 'ponte', torre };
   if (u < 0.08) return { mod: 'leme', torre }; if (u < 0.3) return { mod: 'motor', torre }; return { mod: null, torre }; }
 export function danoLocal(sim, n, hit, d, como, g) {
-  if (n.morto) return; const C = n.C, u = (C.L / 2 - hit.lz) / C.L; /* 0 popa .. 1 proa */ n.ultHit.lx = hit.lx; n.ultHit.lz = hit.lz; n.ultHit.como = como;
+  if (n.morto) return; const C = n.C, u = (C.L / 2 - hit.lz) / C.L; /* 0 popa .. 1 proa */ n.ultHit.lx = hit.lx; n.ultHit.lz = hit.lz; n.ultHit.como = como; if (C.base) danoSetor(sim, n, hit.lx, hit.lz, d); /* v1.2.60: setores da megabase */
   const fr = d / (C.vida * 0.12); // fração de "pancada" relativa ao navio
   let mod = null; if (u < 0.08) mod = 'leme'; else if (u < 0.3) mod = 'motor'; else if (u > 0.66) mod = 'canhao'; else if (u > 0.48) mod = 'vls';
   if (g && g.livre && !g.rbu && !g.foguete && como === 'canhao') { const mz = moduloExato(n, hit); n.ultHit.mod = mz.mod; if (mz.torre >= 0 && n.torres[mz.torre]) { const t = n.torres[mz.torre]; t.rec = Math.max(t.rec || 0, 6 + 10 * clamp(fr, 0, 1)); t.atingida = sim.t; } /* torre atingida: fica fora de ação alguns segundos */

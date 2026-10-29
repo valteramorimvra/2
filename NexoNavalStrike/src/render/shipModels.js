@@ -18,7 +18,7 @@ import { MASC_PRE } from '../sim/mascarasLT.js';
 import { MASC, geraMascaras } from '../sim/linhaTiro.js';
 import { extras1225 } from './extras1225.js'; /* v1.2.25 itens 12/14 */
 import { mesclaFilhos, mesclaLuzes } from './mescla1230.js'; /* v1.2.30 FPS */
-import { extras1226 } from './extras1226.js'; /* v1.2.26: parque instanciado dos porta-aviões gigantes + canhão eletromagnético */
+import { extras1226 } from './extras1226.js'; import { extrasMegabase } from './megabase3d.js'; /* v1.2.26: parque instanciado dos porta-aviões gigantes + canhão eletromagnético */
 import { NOMES_OURO_1225 } from '../sim/classes1225.js';
 /** v1.2.19 item 5: caixas (AABB local) de cada peça FIXA do modelo: casaria, mastros, chaminés, torres, VLS, hangar, radares, outras montagens.
  *  Fora: casco e convés (tratados analiticamente pela planta real), linhas, peças finas (< 15 cm: balaústres, antenas-fio), canos móveis das torres. */
@@ -389,6 +389,7 @@ function montaModelo(tipo, time, mais = 0) {
     const sp = new THREE.Sprite(matHalo('#fff8e7')); sp.scale.setScalar(Math.max(1.8, L / 85)); sp.position.copy(lt.position); sp.userData.luz = 1; sp.userData.setor = 'topo'; sp.renderOrder = 4; g.add(sp); /* halo contido (sem excesso de brilho) */
     g.userData.topoMastro = T.clone(); g.userData.luzTopo = lt.position.clone(); g.userData.raioLuz = rL; }
   if (!MASC[C.id] && (globalThis.__ltGera || !MASC_PRE[C.id])) MASC[C.id] = mascarasDoModelo(g, C, P, mc, M); /* v1.2.19: no app as máscaras vêm PRÉ-CALCULADAS (src/sim/mascarasLT.js): 0 ms na carga */ /* v1.2.19 item 5: linha de tiro livre das antiaéreas (1× por classe) */
+  if (C.base) extrasMegabase(g, C, P, dY); /* v1.2.60: megabase flutuante (pontão, módulo militar e comercial) */
   g.userData.matCasco = mc; g.userData.matSup = M.sup; g.userData.matConves = M.conves; return funde(g);
 }
 

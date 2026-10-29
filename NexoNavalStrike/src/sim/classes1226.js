@@ -75,9 +75,17 @@ export function adiciona1226(CLASSES, { D, CAN, VIDA }) {
     canhao: CAN({ cal: 76, V0: 980, cad: 0.5, dano: 7.5, alc: 9500, torres: 2, canos: 1, som: 'medio', frenteDupla: 0, embutido: 1 }), /* v1.2.27: 76 mm = medio como os antigos (não rapido) */
     vls: 48, sam: 64, ciws: 6, ciwsLug: [0, 1, 2, 3, 4, 5], a30: 6, laser: 4, chaff: 24, heli: 40, maxAr: 18, nuclear: { bombas: 4 } /* v1.2.28: várias bombas por surtida; recarrega ao pousar */ /* v1.2.26: gancho do módulo nuclear (bombardeiro único 'bombardeiroNuclear' = Urubu-rei) */, alaTotal: 120, parque: 111,
     helisPadrao: ala(40, { 4: 'coruja', 14: 'coruja' }) }));
+  /* v1.2.60: MEGABASE AERONAVAL FLUTUANTE (militar + comercial) — 1 por equipe, atrás da linha inicial, ancorada (quase parada). Herda do porta-aviões gigante o convés de operações
+     (catapultas, elevadores, parque e ala aérea que decola sozinha como CAP), os SAM/CIWS/30 mm/laser de defesa e o sistema de dano/incêndio/afundamento. Sem VLS ofensivo.
+     Não conta para a vitória por aniquilação e não é selecionável/comprável. Setores de integridade (pistas, tanques, defesas, terminal) em naval5v5/megabase.js. */
+  CLASSES.megabase = D('chapada', 'megabase', { nome: 'Base Aeronaval Flutuante', classe: 'Megabase Flutuante Mista', nomeOriginal: 'Base Aeronaval Flutuante', num: 'B 01', base: 1, est25: 'pa1',
+    papel: 'Megabase flutuante mista: módulo militar (pista reforçada, catapultas, elevadores, hangares em arco, radares, tanques de combustível) e módulo comercial conectado (terminal com pontes de embarque, torre de controle envidraçada e aviões de linha). Defesas: 64 SAM, 6 CIWS, 6 reparos de 30 mm, 4 lasers. Ala de patrulha (CAP) que decola sozinha.',
+    L: 560, B: 96, T: 12, F: 16, hHangar: 7.5, vmax: 0.6, acel: 0.03, giro: 0.02, vida: VIDA(4200), blind: 3.2, rcs: 6, radar: 30000, desl: 900000,
+    vls: 0, missil: undefined, salva: 0, sam: 64, ciws: 6, ciwsLug: [0, 1, 2, 3, 4, 5], a30: 6, laser: 4, chaff: 32, heli: 24, maxAr: 10, nuclear: undefined, alaTotal: 60, parque: 52,
+    helisPadrao: ala(24, { 0: 'tesourao', 1: 'tuiuiu', 2: 'tesourao', 3: 'tuiuiu', 4: 'coruja', 5: 'tesourao', 6: 'tuiuiu', 7: 'beijaflor', 8: 'tesourao', 9: 'tuiuiu', 10: 'tesourao', 11: 'beijaflor', 12: 'tesourao', 13: 'tuiuiu', 14: 'coruja', 15: 'tesourao', 16: 'tuiuiu', 17: 'marimbondo', 18: 'tesourao', 19: 'tuiuiu', 20: 'tesourao', 21: 'beijaflor', 22: 'tesourao', 23: 'tuiuiu' }) });
 }
 /** Nação, tier e pintura de fábrica (mesclar no META de classes.js ANTES do laço `for (const k in META)`). */
-export const META_1226 = { ilhabela: ['BRA', 4, 'lend_grafite'], jericoacoara: ['BRA', 4, 'lend_aco'], aparados: ['BRA', 4, 'lend_basalto'], itatiaia: ['BRA', 4, 'lend_titanio'], neblina: ['BRA', 4, 'slend_negro'], canastra: ['BRA', 4, 'slend_rubi'], chapada: ['BRA', 4, 'slend_safira'], lencois: ['BRA', 4, 'slend_azul'] };
+export const META_1226 = { megabase: ['BRA', 4, 'cinza_naval'], /* v1.2.60 */ ilhabela: ['BRA', 4, 'lend_grafite'], jericoacoara: ['BRA', 4, 'lend_aco'], aparados: ['BRA', 4, 'lend_basalto'], itatiaia: ['BRA', 4, 'lend_titanio'], neblina: ['BRA', 4, 'slend_negro'], canastra: ['BRA', 4, 'slend_rubi'], chapada: ['BRA', 4, 'slend_safira'], lencois: ['BRA', 4, 'slend_azul'] };
 // Economia (navalTechTreeEconomy.js): PRECO em ouro, BONUS_PREMIUM, TIPO_NAVIO e as pinturas lend_basalto / slend_safira.
 export const NOMES_PADRAO_1226 = {};
 export const NOMES_OURO_1226 = { ilhabela: 'ILHABELA', jericoacoara: 'JERICOACOARA', aparados: 'APARADOS DA SERRA', itatiaia: 'ITATIAIA', neblina: 'PICO DA NEBLINA', canastra: 'SERRA DA CANASTRA', chapada: 'CHAPADA DIAMANTINA', lencois: 'LENÇÓIS MARANHENSES' };
@@ -91,6 +99,10 @@ Object.assign(PLANO_PA, {
     be: [[-0.99, 0.36], [-0.9, 0.7], [-0.72, 1.04], [-0.48, 1.26], [0.9, 1.26], [1, 1.14]],
     ang: 0.13, xPopa: 0.06, cat: [[-3.5, 0], [9.5, 0]], ilhas: [[0.06, 0.14, 'princ']],
     elev: [['be', -0.3, 0.042], ['be', -0.19, 0.042], ['be', -0.03, 0.042], ['be', 0.2, 0.042], ['bb', 0.3, 0.042], ['bb', 0.4, 0.042]] },
+  megabase: { bb: [[-1, -0.96], [-0.97, -1.0], [0.97, -1.0], [1, -0.96]], /* v1.2.60: convés RETANGULAR de pontão (pista reforçada), sem proa afilada */
+    be: [[-1, 0.96], [-0.97, 1.0], [0.97, 1.0], [1, 0.96]],
+    ang: 0.05, xPopa: 0.0, cat: [[-12, 0], [12, 0]], ilhas: [[0.04, 0.12, 'princ']],
+    elev: [['be', -0.3, 0.042], ['be', -0.12, 0.042], ['be', 0.2, 0.042], ['bb', 0.28, 0.042], ['bb', 0.38, 0.042]] },
   lencois: { bb: [[-0.99, -0.36], [-0.9, -0.77], [-0.72, -1.1], [-0.6, -1.22], [-0.23, -2.1], [0.12, -1.98], [0.38, -1.8], [0.62, -1.56], [0.9, -1.34], [1, -1.1]],
     be: [[-0.99, 0.36], [-0.9, 0.72], [-0.72, 1.06], [-0.47, 1.28], [0.9, 1.28], [1, 1.16]],
     ang: 0.13, xPopa: 0.06, cat: [[-3.5, 0], [9.5, 0]], ilhas: [[-0.1, -0.025, 'nav'], [0.12, 0.17, 'ar']],
