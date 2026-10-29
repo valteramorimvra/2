@@ -57,7 +57,7 @@ export function passoHidro(sim, n, dt) {
   if (n.v < -0.25 || (u < 0 && n.v < 0.3)) n.re = 1; else if (n.v > 0.05 && u >= 0) n.re = 0; /* máquina dando atrás (telégrafo em ré) também desliga o piloto */
   if (n.rumoAlvo != null) n.lemeCmd = n.re ? 0 : clamp(ang(n.rumoAlvo - n.rumo) * PNg.apKp - n.w * PNg.apKd, -1, 1);
   // leme: até 35° em ~1 s (servo). + = boreste (rumo aumenta → vira à direita); − = bombordo
-  const lAlvo = n.lemeCmd * LEME_MAX; const tL = PNg.lemeTaxa * (1.12 - 0.24 * clamp((C.L - PNg.Lpequeno) / (PNg.Lgrande - PNg.Lpequeno), 0, 1.4)); n.leme += clamp(lAlvo - n.leme, -tL * dt, tL * dt); /* v1.2.11: servo do leme mais lento nos navios grandes (mais natural) */
+  const lAlvo = n.lemeCmd * LEME_MAX; const tL = PNg.lemeTaxa * (1.12 - 0.24 * clamp((C.L - PNg.Lpequeno) / (PNg.Lgrande - PNg.Lpequeno), 0, 1.4)); n.leme += clamp((lAlvo - n.leme) * Math.min(1, 7 * dt), -tL * dt, tL * dt); /* v1.2.40: leme chega ao ângulo com desaceleração suave (sem tranco no fim) */ /* v1.2.11: servo do leme mais lento nos navios grandes (mais natural) */
   const ef = eficaciaLeme(C, n.v, u / (piv ? 0.12 : 1));
   let wAlvo = n.v >= 0 ? (n.v / raioGiro(C, n.v)) * (n.leme / LEME_MAX) * ef
     /* v1.2.17 itens 37/37b: A RÉ o leme é INVERTIDO (leme a BE → popa para BE, proa para BB: o sinal sai do próprio v < 0), FRACO (≈ 40% — a popa conduz, o
