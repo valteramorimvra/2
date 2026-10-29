@@ -11,7 +11,7 @@ import { modeloHeli } from './aereo3d.js'; import { Particulas } from './fx.js';
 const ss = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const Y0 = 150; // altura da rajada (= NUK.hRajada)
 /* v1.2.33: esquadrilha nuclear — fumaça de jato (verde líder, azul 2º, amarela 3º) e pintura metálica nas mesmas cores, com reflexo do céu */
-const NK_FUMACA = ['#1ee46e', '#2a7dff', '#ffd21a'];
+const NK_FUMACA = ['#1ee46e', '#2a7dff', '#ffd21a']; const NK_PALIDA = ['#bfe9cf', '#c2d6f2', '#f1e6b8']; /* v1.2.49: véu externo da fumaça (cor diluída no ar) */
 const NK_METAL = [{ c: '#3f9a68', e: '#1f2a24' }, { c: '#3f6fc4', e: '#1d2433' }, { c: '#c9a443', e: '#2d281c' }];
 const papelFila = (q) => (q.lider >= 0 ? (q.ala === 1 ? 1 : 2) : 0);
 /** Curvas do cogumelo (m, s) — exportadas para teste/documentação */
@@ -241,11 +241,13 @@ export class NuclearFx {
       o.material = m; }); }
   /** v1.2.33: fumaça de jato contínua saindo da cauda — puffs a cada 3 m ao longo do caminho percorrido (contínua mesmo com quadro lento). */
   trilha(q, P, b) { const c = this.camRef; if (c && Math.hypot(c.position.x - P.x, c.position.y - P.y, c.position.z - P.z) > 8000) { b._tx = null; return; }
-    let T = this._trl; if (!T) { if (!this.fx || !this.fx.tex) return; T = this._trl = new Particulas(this.cena, 2400, false, 3, this.fx.tex); }
+    let T = this._trl; if (!T) { if (!this.fx || !this.fx.tex) return; T = this._trl = new Particulas(this.cena, 6000, false, 3, this.fx.tex); }
     const cp = Math.cos(P.pitch || 0), fx = Math.sin(P.rumo) * cp, fy = Math.sin(P.pitch || 0), fz = -Math.cos(P.rumo) * cp, x = P.x - fx * 13.8, y = P.y + 1.6 - fy * 13.8, z = P.z - fz * 13.8, cor = NK_FUMACA[papelFila(q)];
     if (b._tx == null || Math.hypot(x - b._tx, y - b._ty, z - b._tz) > 400) { b._tx = x; b._ty = y; b._tz = z; return; }
-    const dx = x - b._tx, dy = y - b._ty, dz = z - b._tz, d = Math.hypot(dx, dy, dz), passo = 3; if (d < passo) return; const N = Math.min(24, Math.floor(d / passo));
-    for (let k = 1; k <= N; k++) { const f = (k * passo) / d; T.emite(b._tx + dx * f, b._ty + dy * f, b._tz + dz * f, (Math.random() - 0.5) * 0.6, (Math.random() - 0.5) * 0.4, (Math.random() - 0.5) * 0.6, cor, 0.8, 3.2, 6, 3, -0.04, 0.35); }
+    const dx = x - b._tx, dy = y - b._ty, dz = z - b._tz, d = Math.hypot(dx, dy, dz), passo = 1.8; if (d < passo) return; const N = Math.min(60, Math.floor(d / passo)); const pal = NK_PALIDA[papelFila(q)];
+    for (let k = 1; k <= N; k++) { const f = (k * passo) / d, px = b._tx + dx * f, py = b._ty + dy * f, pz = b._tz + dz * f, r = Math.random(); /* v1.2.49: fumaça de demonstração realista — núcleo denso colorido + véu pálido que se expande e se desfaz no vento */
+      T.emite(px, py, pz, (r - 0.5) * 1.2, (Math.random() - 0.5) * 0.8, (Math.random() - 0.5) * 1.2, cor, 0.72, 2.6 + r * 1.2, 7 + r * 3, 3.6, -0.03, 0.3);
+      if (k % 2 === 0) T.emite(px, py, pz, (Math.random() - 0.5) * 2.4 + this.vento.x * 0.3, (Math.random() - 0.3) * 1.2, (Math.random() - 0.5) * 2.4 + this.vento.z * 0.3, pal, 0.34, 4.2 + r * 2, 11 + r * 5, 5.2, -0.05, 0.25); }
     const f = (N * passo) / d; b._tx += dx * f; b._ty += dy * f; b._tz += dz * f; }
   passoSams(dt, sim) { for (const s of this.sams) { if (s.t < 0) continue; s.t += dt; const q = sim.nukes && sim.nukes[s.idx]; if (!q || s.t > s.tv) { s.t = -1; continue; } const u = s.t / s.tv, x = s.x + (q.x - s.x) * u, y = s.y + (q.y - s.y) * u * u, z = s.z + (q.z - s.z) * u; this.fx.fumaca.emite(x, y, z, 0, 0, 0, '#e8eaec', 0.45, 5, 3.5, 4, 0, 0.2); this.fx.brilho.emite(x, y, z, 0, 0, 0, '#ffd27a', 1, 3, 0.08, 0); } }
   /** Cache InstancedMesh arvNuke no 1º uso (REVISAO #11). */

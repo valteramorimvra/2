@@ -246,3 +246,25 @@
 .pv-acoes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; } .pv-acoes .btn { flex: 1; text-align: center; justify-content: center; }
 .pv-papel { margin: 0; font-size: 12px; color: #b8c4d0; line-height: 1.35; }
 .fn-num { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; } .fn-num span { display: flex; flex-direction: column; align-items: center; padding: 6px 2px; border-radius: 4px; background: rgba(255,255,255,.05); font-size: 9.5px; color: #8fa3b5; text-transform: uppercase; } .fn-num b { font-size: 13px; color: #fff; }
+/* v1.2.49: menu inicial igual à arte do Valter — botões mais compactos; árvore sobre as abas NAVIOS/ÁRVORE/MERCADO; versão no canto */
+.tela-inicio .mw-at { width: 38px; height: 38px; } .tela-inicio .mw-at svg { width: 20px; height: 20px; }
+.tela-inicio .mw-icones { gap: 6px; } .tela-inicio .mw-icones button { width: 40px; height: 40px; } .tela-inicio .mw-icones svg { width: 21px; height: 21px; }
+.tela-inicio .mw-gratis { width: 48px !important; height: 44px !important; }
+.tela-inicio .mw-moedas { padding: 5px 6px 5px 12px !important; } .tela-inicio .mw-moedas .cart-mais { width: 28px; height: 28px; font-size: 17px; }
+.tela-inicio .mw-atalhos { top: 74px; gap: 8px; }
+.tela-inicio .mw-esq { top: 122px; width: 214px; gap: 7px; }
+.tela-inicio .mw-dir { width: 214px; gap: 7px; } .tela-inicio .mw-of { height: 74px; } .tela-inicio .mw-g { padding: 4px 2px !important; } .tela-inicio .mw-g b { font-size: 12px !important; }
+.mw-base { position: absolute; left: max(16px, env(safe-area-inset-left)); bottom: 10px; display: flex; flex-direction: column; width: 228px; }
+.mw-base .mw-arv { display: block; width: 100%; padding: 5px 10px; border: 1px solid rgba(170,180,195,.22); border-bottom: 0; border-radius: 3px 3px 0 0; color: #cfd6de; font-size: 11.5px; line-height: 1.25; text-align: center; background: linear-gradient(180deg, rgba(30,34,42,.88), rgba(16,19,24,.88)) !important; }
+.mw-base .mw-abas { position: static; gap: 0 !important; }
+.tela-inicio .mw-abas button { width: 76px !important; height: 56px !important; gap: 1px; } .tela-inicio .mw-abas-d button { width: 92px !important; }
+.tela-inicio .mw-abas svg { width: 22px !important; height: 22px !important; } .tela-inicio .mw-abas button b { font-size: 11px !important; }
+.tela-inicio .mw-armas { min-width: 250px !important; padding: 5px 20px 6px !important; } .tela-inicio .mw-armas b { font-size: 23px !important; } .tela-inicio .mw-armas small { font-size: 10.5px !important; }
+.tela-inicio .mw-emb { width: 64px; height: 32px; } .tela-inicio .mw-patente b { font-size: 11.5px; }
+.tela-inicio .versao { left: auto !important; right: max(8px, env(safe-area-inset-right)) !important; bottom: 2px !important; transform: none !important; }
+@media (max-height: 420px) { .tela-inicio .mw-esq { top: 116px; width: 196px; } .tela-inicio .mw-dir { width: 200px; top: 60px; } .tela-inicio .mw-of { height: 62px; } .tela-inicio .mw-cxs { height: 48px !important; }
+  .mw-base { width: 210px; } .tela-inicio .mw-abas button { width: 70px !important; height: 50px !important; } .tela-inicio .mw-abas-d button { width: 84px !important; } .tela-inicio .mw-armas { min-width: 220px !important; } }
+.tela-inicio .mw-moedas { right: calc(max(16px, env(safe-area-inset-right)) + 248px) !important; }
+.tela-inicio .mw-ct b, .tela-inicio .mw-cb span { white-space: nowrap; } .tela-inicio .mw-ct small { white-space: nowrap; }
+@media (max-height: 420px) { .tela-inicio .mw-esq { width: 214px; } .tela-inicio .mw-passe .mw-ct b, .tela-inicio .mw-carga .mw-ct b { font-size: 12px; } .tela-inicio .mw-cb { font-size: 11.5px; } .tela-inicio .mw-passe .mw-ic { width: 32px; height: 32px; font-size: 18px; } .tela-inicio .mw-cxs { height: 40px !important; } .tela-inicio .mw-cl { padding: 3px 8px 5px; font-size: 11px; } .mw-base { width: 214px; } }
+@media (max-height: 420px) { .tela-inicio .mw-cxs { height: 46px !important; align-items: center !important; overflow: hidden; } .tela-inicio .mw-cxs img { max-height: 44px; width: auto; } }

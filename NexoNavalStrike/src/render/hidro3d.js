@@ -55,7 +55,7 @@ function mats(S) { if (CACHE.has(S.id)) return CACHE.get(S.id);
   CACHE.set(S.id, m); return m; }
 
 /** Malha a partir de anéis (cada anel = lista de [x,y,z] com o mesmo nº de pontos); fecha as pontas com leque. */
-function loft(aneis, fechaIni = true, fechaFim = true, uvU = null) { const n = aneis.length, m = aneis[0].length; const pos = [], uv = [], idx = [];
+export function loft(aneis, fechaIni = true, fechaFim = true, uvU = null) { const n = aneis.length, m = aneis[0].length; const pos = [], uv = [], idx = [];
   for (let i = 0; i < n; i++) for (let j = 0; j < m; j++) { const p = aneis[i][j]; pos.push(p[0], p[1], p[2]); uv.push(uvU ? uvU[i] : i / (n - 1), j / (m - 1)); }
   for (let i = 0; i < n - 1; i++) for (let j = 0; j < m - 1; j++) { const a = i * m + j, b = a + 1, c = a + m, d = c + 1; idx.push(a, c, b, b, c, d); }
   const tampa = (i, inv) => { const cx = aneis[i].reduce((s, p) => s + p[0], 0) / m, cy = aneis[i].reduce((s, p) => s + p[1], 0) / m, cz = aneis[i].reduce((s, p) => s + p[2], 0) / m; const k = pos.length / 3; pos.push(cx, cy, cz); uv.push(i ? 1 : 0, 0.5); for (let j = 0; j < m - 1; j++) { const a = i * m + j; if (inv) idx.push(k, a + 1, a); else idx.push(k, a, a + 1); } };
@@ -76,15 +76,15 @@ function geoCasco(S) { const L = S.L, W = L * (S.larg || 0.052), z0 = -L / 2, NS
       anel.push([x, y, z0 + s * L]); } aneis.push(anel); }
   return loft(aneis, true, true, us); }
 /** Perfil aerodinâmico (NACA 00xx simplificado) de corda c e espessura t; devolve pontos [x(corda), y(espessura)] fechados. */
-function perfil(c, t, n = 14) { const sup = [], inf = []; for (let i = 0; i <= n; i++) { const xc = (1 - Math.cos((i / n) * Math.PI)) / 2; const yt = 5 * t * (0.2969 * Math.sqrt(xc) - 0.126 * xc - 0.3516 * xc * xc + 0.2843 * xc ** 3 - 0.1036 * xc ** 4); sup.push([xc * c, yt * c]); inf.push([xc * c, -yt * c]); }
+export function perfil(c, t, n = 14) { const sup = [], inf = []; for (let i = 0; i <= n; i++) { const xc = (1 - Math.cos((i / n) * Math.PI)) / 2; const yt = 5 * t * (0.2969 * Math.sqrt(xc) - 0.126 * xc - 0.3516 * xc * xc + 0.2843 * xc ** 3 - 0.1036 * xc ** 4); sup.push([xc * c, yt * c]); inf.push([xc * c, -yt * c]); }
   return sup.concat(inf.reverse().slice(1)); }
 /** Superfície (asa/estabilizador): da raiz (span 0) à ponta, com corda/espessura/enflechamento/diedro; 'vertical' para deriva. */
-function geoSuperficie({ span, cR, cP, tR = 0.13, tP = 0.1, enf = 0, died = 0, vertical = false, n = 12 }) { const aneis = []; const ps = []; for (let i = 0; i <= n; i++) { const f = i / n, fe = f < 0.92 ? f : 0.92 + (f - 0.92) * 0.5; ps.push(fe); }
+export function geoSuperficie({ span, cR, cP, tR = 0.13, tP = 0.1, enf = 0, died = 0, vertical = false, n = 12 }) { const aneis = []; const ps = []; for (let i = 0; i <= n; i++) { const f = i / n, fe = f < 0.92 ? f : 0.92 + (f - 0.92) * 0.5; ps.push(fe); }
   for (let i = 0; i <= n; i++) { const f = ps[i]; const tip = sst(0.9, 1, f); const c = (cR + (cP - cR) * f) * (1 - tip * 0.55), t = tR + (tP - tR) * f, le = enf * f * span + (cR - c) * 0.25 * (tip > 0 ? 1 : 0.3);
     const pr = perfil(c, t); const anel = pr.map(([xc, yc]) => vertical ? [yc, f * span, le + xc] : [f * span, f * span * died + yc, le + xc]); aneis.push(anel); }
   return loft(aneis, true, true); }
 /** Nacele torneada (perfil girado) de comprimento l e raio r; abre para −z. */
-function geoNacele(l, r, jato) { const pts = []; const n = 14; for (let i = 0; i <= n; i++) { const f = i / n; const rr = jato ? r * (0.86 + 0.14 * Math.sin(Math.min(1, f * 1.6) * Math.PI / 2)) * (1 - sst(0.8, 1, f) * 0.28) : r * Math.sin(Math.min(1, (f + 0.04) * 1.3) * Math.PI / 2) * (1 - sst(0.55, 1, f) * 0.75); pts.push(new THREE.Vector2(Math.max(0.02, rr), f * l)); }
+export function geoNacele(l, r, jato) { const pts = []; const n = 14; for (let i = 0; i <= n; i++) { const f = i / n; const rr = jato ? r * (0.86 + 0.14 * Math.sin(Math.min(1, f * 1.6) * Math.PI / 2)) * (1 - sst(0.8, 1, f) * 0.28) : r * Math.sin(Math.min(1, (f + 0.04) * 1.3) * Math.PI / 2) * (1 - sst(0.55, 1, f) * 0.75); pts.push(new THREE.Vector2(Math.max(0.02, rr), f * l)); }
   pts.unshift(new THREE.Vector2(0, 0)); pts.push(new THREE.Vector2(0, l)); /* v1.2.44: nacele FECHADA nas duas pontas (antes dava para ver o lado de dentro por trás) */
   const g = new THREE.LatheGeometry(pts, 24); g.rotateX(Math.PI / 2); g.translate(0, 0, -l * 0.5); return g; }
 

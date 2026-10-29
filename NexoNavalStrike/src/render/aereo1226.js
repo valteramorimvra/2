@@ -4,6 +4,7 @@
 //     luzes de posição BB vermelha / BE verde e estrobo em userData.estrobo; materiais = mats(camo) de aereo3d, sem programa novo).
 //   · geoParque1226(tipo): geometrias FUNDIDAS por material ('c' corpo, 'esc' escuro, 'vid' vidro) para o parque INSTANCIADO
 //     no convés (render/extras1226.js: 1 InstancedMesh por tipo×material → ~18 chamadas para 100+ aeronaves).
+import { loft, geoSuperficie, geoNacele } from './hidro3d.js'; /* v1.2.49 */
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { matsAeronave1226, FURTIVO_1226 } from './realismo1226.js'; /* v1.2.26: materiais PBR das aeronaves */
@@ -74,15 +75,19 @@ const TIPOS = {
     const se = ms(new THREE.SphereGeometry(0.3, 8, 6).scale(1, 0.5, 1), M.vid); se.position.set(0, y - 0.05, -4.8); g.add(se); /* janela do sensor eletro-óptico */
     if (!voo) trem(g, ms, M, [[0, -3.8], [-1.6, 0.9], [1.6, 0.9]], 0.9); g.userData.luzes = [7.3, y + 0.15, 2.8, y + 0.7, 3.4]; return g; },
   /** Urubu-rei ('bombardeiroNuclear'): bombardeiro embarcado bimotor — asa alta enflechada, motores dorsais na raiz, baia interna, cauda em V. 26 × 22 m */
-  bombardeiroNuclear(M, ms, voo) { const g = new THREE.Group(), y = voo ? 0.4 : 1.55;
-    const f = ms(chapa(espelha([[0, -13.0], [0.9, -11.0], [1.6, -7.0], [1.9, 0], [1.6, 9.5], [0.6, 12.4]]), 1.5), M.c); f.position.y = y + 1.5; g.add(f);
-    const nz = ms(new THREE.ConeGeometry(0.95, 3.0, 8).scale(1, 0.85, 1).rotateX(-Math.PI / 2), M.c); nz.position.set(0, y + 0.8, -14.3); g.add(nz);
-    const cp = ms(new THREE.BoxGeometry(1.7, 0.7, 2.8), M.vid); cp.position.set(0, y + 1.75, -9.6); cp.rotation.x = 0.22; g.add(cp);
-    asa(g, ms, M.c2, [[0, -2.4], [1.6, -2.4], [11.0, 4.6], [11.0, 6.0], [1.8, 4.2], [0, 4.2]], 0.34, y + 1.6, 5.6, voo);
-    for (const sx of [-1, 1]) { const nc = ms(cilZ(1.05, 0.9, 7.4, 12), M.c2); nc.position.set(sx * 1.75, y + 2.2, 3.4); g.add(nc); const bo = ms(cilZ(0.8, 0.8, 0.5, 12), M.esc); bo.position.set(sx * 1.75, y + 2.2, 7.2); g.add(bo); const ea = ms(new THREE.BoxGeometry(1.3, 1.2, 0.3), M.esc); ea.position.set(sx * 1.75, y + 2.2, -0.35); g.add(ea);
-      const dv = ms(deriva([[0, 8.4], [0, 12.2], [4.0, 13.4], [4.0, 11.2]], 0.18), M.c2); dv.rotation.z = -sx * 0.62; dv.position.set(sx * 0.9, y + 1.4, 0); g.add(dv); }
-    const bb = ms(new THREE.BoxGeometry(1.9, 0.08, 6.0), M.esc); bb.position.set(0, y - 0.02, -1.0); g.add(bb); /* portas da baia interna */
-    if (!voo) trem(g, ms, M, [[0, -9.5], [-2.3, 1.5], [2.3, 1.5], [-2.3, 3.2], [2.3, 3.2]], 1.5); g.userData.luzes = [11.0, y + 1.6, 5.2, y + 3.2, 12.6]; return g; },
+  bombardeiroNuclear(M, ms, voo) { const g = new THREE.Group(), y = voo ? 0.4 : 1.55; /* v1.2.49: Urubu-rei refeito com superfícies LISAS (fuselagem em loft, asas e cauda com perfil aerodinâmico, naceles torneadas) */
+    { const NS = 40, NT = 22, an = [], us = []; for (let i = 0; i < NS; i++) { const u = i / (NS - 1), z = -14.6 + u * 27.4; us.push(u);
+        const nar = Math.pow(Math.min(1, u / 0.2), 0.55), cau = 1 - Math.pow(Math.max(0, (u - 0.62) / 0.38), 1.6) * 0.82; const w = 1.95 * nar * cau, hT = 1.55 * nar * (1 - Math.max(0, (u - 0.7) / 0.3) * 0.45), hB = 1.25 * nar * cau, cy = y + 1.5 + Math.max(0, (u - 0.6)) * 1.2 - (u < 0.08 ? (0.08 - u) * 3 : 0);
+        const anel = []; for (let j = 0; j < NT; j++) { const th = -Math.PI / 2 + (j / (NT - 1)) * Math.PI * 2, c = Math.cos(th), sn = Math.sin(th); anel.push([w * c * (sn < 0 ? 1 : 0.92 + 0.08 * Math.abs(c)), cy + (sn >= 0 ? hT * Math.pow(sn, 0.85) : hB * -Math.pow(-sn, 1.1)), z]); } an.push(anel); }
+      g.add(ms(loft(an, true, true, us), M.c)); }
+    { const cab = new THREE.SphereGeometry(1.15, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.45); cab.scale(0.95, 0.62, 2.5); const cp = ms(cab, M.vid); cp.position.set(0, y + 2.55, -9.4); g.add(cp); }
+    for (const s of [-1, 1]) { const ag = geoSuperficie({ span: 10.2, cR: 7.6, cP: 1.9, enf: 0.62, died: -0.035, tR: 0.13, tP: 0.09, n: 10 }); const a = ms(s < 0 ? ag.clone() : ag, M.c2); a.position.set(s * 1.3, y + 2.5, -3.2); a.scale.x = s; g.add(a);
+      const nc = ms(geoNacele(7.6, 1.05, true), M.c2); nc.position.set(s * 2.05, y + 3.15, 3.2); g.add(nc); const ent = ms(new THREE.CircleGeometry(0.88, 18).rotateY(Math.PI), M.esc); ent.position.set(s * 2.05, y + 3.15, -0.62); g.add(ent);
+      const bo = ms(new THREE.CylinderGeometry(0.62, 0.78, 0.6, 16).rotateX(Math.PI / 2), M.esc); bo.position.set(s * 2.05, y + 3.15, 7.15); g.add(bo);
+      const pl = ms(geoSuperficie({ span: 0.9, cR: 4.2, cP: 3.8, tR: 0.14, tP: 0.14, vertical: true, n: 2 }), M.c2); pl.position.set(s * 2.05, y + 2.3, 1.2); g.add(pl);
+      const dv = ms(geoSuperficie({ span: 4.2, cR: 3.6, cP: 1.5, enf: 0.62, tR: 0.11, tP: 0.09, vertical: true, n: 6 }), M.c2); dv.rotation.z = -s * 0.62; dv.position.set(s * 0.55, y + 2.4, 8.1); g.add(dv); }
+    const bb = ms(new THREE.BoxGeometry(1.9, 0.06, 6.0), M.esc); bb.position.set(0, y + 0.26, -1.0); g.add(bb); /* portas da baia interna */
+    if (!voo) trem(g, ms, M, [[0, -9.5], [-2.3, 1.5], [2.3, 1.5], [-2.3, 3.2], [2.3, 3.2]], 1.5); g.userData.luzes = [11.2, y + 2.2, 5.6, y + 4.4, 12.6]; return g; },
 };
 export const TIPOS_1226 = Object.keys(TIPOS);
 /** Modelo em voo (aereo3d.modeloHeli). */
