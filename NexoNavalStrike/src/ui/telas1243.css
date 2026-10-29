@@ -294,3 +294,9 @@
 .tela-arvore .ar-linha { border-bottom: 1px solid rgba(212,175,55,.14) !important; } .tela-arvore .ar-linha:nth-child(even):not(.ar-cab) { background: rgba(255,255,255,.018); }
 .tela-arvore .ar-tipo { justify-content: center; text-align: center; color: #f1f5f9; letter-spacing: .1em; background: linear-gradient(90deg, rgba(10,18,30,.98), rgba(12,20,32,.9)) !important; border-right: 0 !important; box-shadow: inset -3px 0 0 rgba(212,175,55,.55); }
 .tela-arvore .ar-card { box-shadow: 0 4px 12px rgba(0,0,0,.45); }
+/* v1.2.63 (Valter): "Às armas!" menor (não encosta no HANGAR) e saldo ainda mais compacto */
+.tela-inicio .mw-armas { min-width: 0 !important; width: 210px !important; padding: 4px 14px 5px !important; } .tela-inicio .mw-armas b { font-size: 20px !important; } .tela-inicio .mw-armas small { font-size: 9.5px !important; max-width: 182px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tela-inicio .mw-armas::before, .tela-inicio .mw-armas::after { transform: scale(.8); }
+.tela-inicio .mw-moedas { font-size: 11.5px !important; gap: 8px !important; padding: 2px 3px 2px 8px !important; } .tela-inicio .mw-moedas .cart-mais { width: 22px !important; height: 22px !important; font-size: 14px !important; }
+.tela-inicio .mw-centro { right: auto !important; left: 50% !important; transform: translateX(-50%) !important; }
+.tela-previa .pv-painel { pointer-events: auto; }
