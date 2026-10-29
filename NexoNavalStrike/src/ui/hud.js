@@ -17,7 +17,7 @@ import { CONS, ORDEM_CONS } from '../naval5v5/consumiveis.js';
 const ROT_CONS = { kit: 'KIT', controle: 'AVAR.', bomba: 'BOMBA', reparoHeli: 'HELI', abastece: 'ABAST.' };
 
 /** v1.2.5: texto do próprio botão VLS/TORP conforme a prontidão. */
-const rotuloPr = (p, n) => p.ok ? `PRONTO ${n}` : p.motivo === 'fora' ? `FORA ${(p.falta / 1000).toFixed(1).replace('.', ',')} km` : p.motivo === 'perto' ? 'PRONTO' /* fiscal nukefumaca (item 8): sem aviso PERTO DEMAIS */ : p.motivo === 'vazio' ? 'VAZIO' : p.motivo === 'mira' ? 'MIRE' : p.motivo === 'travando' ? 'TRAVANDO' : p.motivo === 'travandoMis' ? `TRAVANDO ${Math.round((p.prog || 0) * 100)}%` : 'SEM ALVO';
+const rotuloPr = (p, n) => p.ok ? `PRONTO ${n}` : p.motivo === 'fora' ? `FORA ${(p.falta / 1000).toFixed(1).replace('.', ',')} km` : p.motivo === 'perto' ? 'PRONTO' /* fiscal nukefumaca (item 8): sem aviso PERTO DEMAIS */ : p.motivo === 'vazio' ? (n > 0 ? 'DESTRUÍDO' : 'VAZIO') : p.motivo === 'mira' ? 'MIRE' : p.motivo === 'travando' ? 'TRAVANDO' : p.motivo === 'travandoMis' ? `TRAVANDO ${Math.round((p.prog || 0) * 100)}%` : 'SEM ALVO';
 const h = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
 const f1 = (v) => v.toFixed(1).replace('.', ',');
 const ANEL = '<svg viewBox="0 0 100 100" class="cb-anel"><circle cx="50" cy="50" r="46" class="cb-f"/><circle cx="50" cy="50" r="46" class="cb-a"/></svg>';

@@ -247,3 +247,83 @@ Proteções que já existem:
   - Estalo, estrondo e rolamento.
   - **Vento de retorno**: ruído rosa com banda de 180 a 880 Hz, 7 s, que chega 3,5 a 7,5 s depois da frente.
 - **Concorrência de áudio:** os sons sintetizados (ruído e osciladores) entram no mesmo controle de concorrência (teto de 28 nós; acima de 18, as camadas abaixo de −22 dB viram virtuais).
+
+---
+
+## 8. Refinos da v1.2.56 (pedido com prints da partida)
+
+### 8.1 Frente de choque oceânica: lâmina contínua (substitui os tufos)
+
+Malha `CylinderGeometry(1, 1, 1, 160, 1, aberta)` com shader `VS_CORT`/`FS_CORT` em `nuclearFx.js`. São duas instâncias.
+
+| Parâmetro | Lâmina do choque | Base surge |
+|---|---|---|
+| Raio | $\sqrt{R_{choque}(T)^2 - y_0^2}$ (viaja com a frente física) | `CURVA.surge(T)` |
+| Altura | 30 + 70·k (k = 1 − smoothstep(5, 14, T)) | 60 + 160·(1 − e^(−(T−2)/5)), cai à metade entre 25 e 60 s |
+| Abertura para fora (topo) | +12% | +20% |
+| Alfa máximo | 0,85 × 0,75 (≈ 0,64), só rente à água: $(1-y)^{1,8}$ | 0,7 × 0,75 |
+| Textura | ruído de valor em 3 escalas, esticado na vertical (420 × 3, 1134 × 6,6, 2940 × 15): filetes de micro-gotas, nada esférico | idem |
+| Dissipação | fade entre 5 e 14 s | entre 28 e 70 s |
+
+O spray no casco dos navios atingidos usa gotas finas: tamanho 2,5–6 m e alfa 0,4.
+
+### 8.2 Colunas d'água translúcidas
+
+Pool de água com textura de spray.
+
+- O miolo (alfa da textura > 0,5) recebe **cor de luz atravessando a água** (0,60; 0,83; 0,86) e **50% menos opacidade**.
+- O branco fica só nas bordas rasgadas e nas gotas.
+- Alfa global × 0,85.
+- Arrasto quadrático $k = 0{,}004\ \text{m}^{-1}$.
+- A gota que volta ao mar morre na hora.
+- O colapso gera ondas reais na malha (§1.4).
+
+### 8.3 Rastros
+
+| Rastro | Tamanho inicial | Crescimento | Alfa | Comportamento |
+|---|---|---|---|---|
+| Míssil, booster | 1,5 m (estreito no bocal) | 2,8 m/s | 0,36 | abre em leque |
+| Míssil, cruzeiro | 1,1 m | 2,1 m/s | 0,28 | abre em leque |
+| Bombardeiro, núcleo | 1,0–1,6 m | 4,6 m/s | 0,55 | vida 9–13 s |
+| Bombardeiro, véu | — | — | 0,18 | — |
+
+Comum aos rastros:
+
+- Turbulência tipo curl noise (`uTurb` = 1).
+- **Dessaturação** (`desat`): a cor relaxa para névoa (0,84; 0,85; 0,86) à taxa $0{,}22(1-t)$ por segundo.
+
+### 8.4 Disparo de mísseis (máquina de estados)
+
+```js
+// world.js — prontidão: VLS só bloqueia DESTRUÍDO (avaria < 0,08); avariado (< 0,3) dispara 1 por vez com recarga ×2
+const tem = n.C.vls && n.C.missil && n.vls > 0 && (!n.avaria || n.avaria.vls >= 0.08);
+// lancaMissil: if (n.avaria.vls < 0.3) qtd = 1;  ...  n.tVls = recargaVlsSeg(n.tipo) * (n.avaria.vls < 0.3 ? 2 : 1);
+
+// combat3D — FILA de re-engajamento: recarregando / travando / mirando → o pedido fica 8 s na fila e sai sozinho
+if (n.tVls > 0 || !pr.ok) { if (n.tVls > 0 || /^(travando|travandoMis|mira)$/.test(pr.motivo)) this._filaVls = { alvo: n.alvoId, ate: sim.t + 8 }; return; }
+// a cada quadro: if (prVls.ok && n.tVls <= 0) dispara; descarta se trocar de alvo ou expirar
+
+// passoMisseis — ALVO PERDIDO: 1 tentativa de readquirir inimigo no cone ±30° até 4 km; senão deriva balística
+```
+
+- O lançador nunca fica preso por haver mísseis em voo ou na fase terminal. O jogo não tinha esse limite; o bloqueio real era o VLS avariado aparecendo como "VAZIO".
+- O HUD agora mostra **DESTRUÍDO** quando o VLS está destruído com mísseis no paiol.
+
+### 8.5 Perfil de mixagem dos canhões
+
+| Etapa | Valor |
+|---|---|
+| Ganho base, categoria `canhao` | 0,56 → **0,36** (−3,8 dB) |
+| `ganhoCalibre` | ×1,25 → ×0,9 (−2,9 dB) |
+| Camada grave `ganhoCamCanhao` | ×1,22 → ×0,95 (−2,2 dB) |
+| **Total** | **≈ −7 dB nos canhões (−9 dB na camada grave)** |
+| Atenuação de agudos com a distância | $f_c = \max(280,\ 20000/(1+d/320))$ Hz. A 320 m: 10 kHz; 1 km: 4,8 kHz; 3 km: 1,9 kHz; 6 km: 1 kHz |
+| Barramento de armamento (canhão + lançadores) | prateleira −4 dB acima de 5,5 kHz → compressor (limiar −20 dB, joelho 12 dB, 4:1, ataque 3 ms, soltura 250 ms) → ganho de compensação +1,9 dB |
+| Mestre (inalterado) | passa-alta 85 Hz (2×), limitador −8 dB, softclip tanh 0,84 |
+| Pico medido | **0,541** (antes 0,567) |
+
+### 8.6 Pintura dos bombardeiros
+
+- **Cores do Brasil mescladas:** faixas onduladas no espaço do modelo (verde #009c3b, amarelo #ffdf00, azul #002776 e filete branco), com semente diferente por papel.
+- **Iniciais** V (líder), R (ala 1) e A (ala 2) no dorso e nas duas asas, com o mesmo degradê, contorno branco e escuro.
+- Os decalques são colados por raycast na superfície real do modelo.
