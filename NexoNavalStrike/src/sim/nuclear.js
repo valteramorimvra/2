@@ -150,7 +150,7 @@ function passoBombardeiro(sim, q, dt) { guardaPose(q); q.t += dt; if (q.tPrep > 
   /* v1.2.29 AUTO: com alvo travado e auto=1, IA dirige ao alvo; jogador reassumindo (manual) cancela auto */
   if (q.manual) q.auto = 0; else {
     /* fiscal nukefumaca (item 3): se bomber sem trava própria, herda n.alvoId do navio */
-    if (q.alvo < 0 && q.fase === 2) { const don = sim.navios[q.dono]; if (don && don.alvoId >= 0) { const a0 = sim.navios[don.alvoId]; if (a0 && !a0.morto && a0.time !== don.time) { q.alvo = a0.id; q.ax = a0.x; q.az = a0.z; q.miraSolo = 0; q.auto = 1; q.espera = 0; } } }
+    if (q.alvo < 0 && q.fase === 2 && !q.miraSolo) { const don = sim.navios[q.dono]; /* v1.2.58: ponto marcado no mapa tem prioridade sobre o alvo do navio */ if (don && don.alvoId >= 0) { const a0 = sim.navios[don.alvoId]; if (a0 && !a0.morto && a0.time !== don.time) { q.alvo = a0.id; q.ax = a0.x; q.az = a0.z; q.miraSolo = 0; q.auto = 1; q.espera = 0; } } }
     if (q.auto && q.alvo >= 0 && q.fase === 2) { const a = sim.navios[q.alvo]; if (a && !a.morto) { q.ax = a.x; q.az = a.z; } }
   }
   if (q.fase === 1) { // corrida no convés (catapulta) acompanhando o navio, depois sai pela proa subindo
@@ -181,7 +181,7 @@ function passoBombardeiro(sim, q, dt) { guardaPose(q); q.t += dt; if (q.tPrep > 
   interceptaBombardeiro(sim, q, dt); }
 
 /** v1.2.26 item K: voo MANUAL — manche suavizado (inércia de comando), rolagem com taxa limitada, curva coordenada (taxa ∝ g·tan(inclinação)/v), ângulo de trajetória com taxa limitada, piso/teto de altitude suaves e energia (sobe perde, desce ganha velocidade). */
-function voaManual(q, dt, sim) { const P = NUK; q.sx += (q.jx - q.sx) * Math.min(1, 5 * dt); q.sy += (q.jy - q.sy) * Math.min(1, 6 * dt); /* v1.2.32: manche suavizado exponencial */
+function voaManual(q, dt, sim) { const P = NUK; q.sx += (q.jx - q.sx) * Math.min(1, 2.6 * dt); q.sy += (q.jy - q.sy) * Math.min(1, 3 * dt); /* v1.2.58: manche ainda mais suave */ /* v1.2.32: manche suavizado exponencial */
   q.bank += clamp((q.sx * P.manBank - q.bank) * 2.6 * dt, -P.manTaxaRol * dt, P.manTaxaRol * dt); let gA = q.sy * P.manPitch;
   if (q.y < P.manAltMin + 160) gA = Math.max(gA, (P.manAltMin + 160 - q.y) / 300); if (q.y > P.manAltMax - 200) gA = Math.min(gA, -(q.y - P.manAltMax + 200) / 800);
   q.gam += clamp((gA - q.gam) * 4 * dt, -P.manTaxaPitch * dt, P.manTaxaPitch * dt); const v = Math.max(1, q.v);
@@ -205,7 +205,7 @@ export function comandoNuclear(sim, n, cmd) { const q = nkBombardeiroDe(sim, n);
   else if (cmd.t === 'nkEspera') { const v = cmd.v ? 1 : 0; if (v) { if (q.manual) { q.manual = 0; q.tAssume = NUK.assume; } q.espera = q.fase <= 2 ? 1 : 0; q.manualPend = 0; q.espC = null; } else q.espera = 0; sim.evento({ t: 'nkEspera', idx: q.idx, id: n.id, v: q.espera }); }
   else if (cmd.t === 'nkCtl') { q.jx = clamp(+cmd.jx || 0, -1, 1); q.jy = clamp(+cmd.jy || 0, -1, 1); }
   else if (cmd.t === 'nkThr') { q.thr = Math.max(0, Math.min(4, cmd.v | 0)); sim.evento({ t: 'nkThr', idx: q.idx, id: n.id, v: q.thr }); } /* v1.2.28: acelerador 0–4 */
-  else if (cmd.t === 'nkMiraSolo') { /* v1.2.28: retícula no mar/terra — ponto onde a bomba deve cair */ if (Number.isFinite(cmd.px) && Number.isFinite(cmd.pz)) { q.ax = +cmd.px; q.az = +cmd.pz; q.alvo = -1; q.miraSolo = 1; sim.evento({ t: 'nkMiraSolo', idx: q.idx, id: n.id, px: q.ax, pz: q.az }); } }
+  else if (cmd.t === 'nkMiraSolo') { /* v1.2.28: retícula no mar/terra — ponto onde a bomba deve cair */ if (Number.isFinite(cmd.px) && Number.isFinite(cmd.pz)) { q.ax = +cmd.px; q.az = +cmd.pz; q.alvo = -1; q.miraSolo = 1; q.espera = 0; q.pontoFixo = 1; q.auto = 1; /* v1.2.58: IA leva até o ponto e lança */ sim.evento({ t: 'nkMiraSolo', idx: q.idx, id: n.id, px: q.ax, pz: q.az }); } }
   else if (cmd.t === 'nkTrava') { const a = cmd.alvo != null && cmd.alvo >= 0 ? sim.navios[cmd.alvo] : null; if (a && !a.morto && a.time !== n.time) { q.alvo = a.id; q.ax = a.x; q.az = a.z; q.miraSolo = 0; q.espera = 0; q.auto = 1; q.pontoFixo = 0; /* fiscal nukefumaca (item 3): ao travar → DIRETO ao alvo (sem órbita) */ } /* toque SÓ trava; soltar só trocando de alvo (ignora alvo:-1) */ sim.evento({ t: 'nkTravado', idx: q.idx, id: n.id, alvo: q.alvo }); }
   else if (cmd.t === 'nkSolta') { if (q.hidro) return; /* v1.2.39: hidroavião solta pela rota própria (world.js → soltaBombaHidro) */ if (q.fase === 2 && q.y > NUK.hRajada + 120 && (q.cargas | 0) > 0) solta(sim, q); } }
 /** v1.2.39: a mesma bomba atômica, usada pelo hidroavião (sim/hidroaviao.js). */

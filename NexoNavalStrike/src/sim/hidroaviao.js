@@ -43,7 +43,7 @@ export function hidroDe(sim, n) { const k = n && n.hd; if (!k || k.noAr < 0 || !
 export function lancaHidro(sim, n) { const mot = motivoHidro(sim, n); if (mot) { sim.evento({ t: 'hdNegado', id: n.id, motivo: mot }); return 0; }
   const k = estadoHidro(n), S = HIDROS[k.tipo] || HIDROS.albatroz; const q = sim.nukes.find((x) => !x.ativo && !x.b.ativo && !(x.espDec > 0)); if (!q) { sim.evento({ t: 'hdNegado', id: n.id, motivo: 'pool' }); return 0; }
   const lado = (n.C.B * 0.5 + S.env * 0.5 + 18); sim.mundo(n, lado, 0, -n.C.L * 0.1, _o);
-  Object.assign(q, { ativo: 1, hidro: S.id, fase: 1, dono: n.id, time: n.time, t: 0, alvo: n.alvoId >= 0 ? n.alvoId : -1, ax: _o.x, az: _o.z, tSam: 0, deck: 0, v: Math.max(0, n.v || 0), manual: 0, manualPend: 0, tMan: 0, espera: 0, devolve: 0, cargas: 99, thr: 3, miraSolo: 0,
+  Object.assign(q, { ativo: 1, miraSolo: 0, pontoFixo: 0, hidro: S.id, fase: 1, dono: n.id, time: n.time, t: 0, alvo: n.alvoId >= 0 ? n.alvoId : -1, ax: _o.x, az: _o.z, tSam: 0, deck: 0, v: Math.max(0, n.v || 0), manual: 0, manualPend: 0, tMan: 0, espera: 0, devolve: 0, cargas: 99, thr: 3, miraSolo: 0,
     jx: 0, jy: 0, sx: 0, sy: 0, w: 0, bank: 0, gam: 0, tAssume: 0, nSoltas: 0, tPrep: 0, auto: n.alvoId >= 0 ? 1 : 0, lider: -1, ala: 0, pontoFixo: 0, soltaEm: 0,
     vida: S.vida, vidaMax: S.vida, misseis: S.misseis, torps: S.torps, flares: S.flares, tFlare: 0, tFlareCad: 0, tMis: 0, tTorp: 0, pend: q.pend || [], sobFogo: 0, pousando: 0, fuga: 0 });
   q.pend.length = 0; q.sams.length = 0;
@@ -83,7 +83,7 @@ function entraTorpedo(sim, q, p) { const n = sim.navios[q.dono]; const tp = sim.
 function soltaFlare(sim, q) { if (q.flares <= 0 || q.tFlare > 0) return 0; q.flares--; q.tFlare = HD.flareDur; q.tFlareCad = HD.flareCad; sim.evento({ t: 'hdFlare', idx: q.idx, id: q.dono, x: q.x, y: q.y, z: q.z }); return 1; }
 
 /** Voo MANUAL — mesma lógica do bombardeiro (manche suavizado, curva coordenada, nivelamento automático), com os limites do hidroavião. */
-function voaManualH(q, S, dt) { q.sx += (q.jx - q.sx) * Math.min(1, 5 * dt); q.sy += (q.jy - q.sy) * Math.min(1, 6 * dt);
+function voaManualH(q, S, dt) { q.sx += (q.jx - q.sx) * Math.min(1, 2.6 * dt); q.sy += (q.jy - q.sy) * Math.min(1, 3 * dt); /* v1.2.58: mais suave */
   const bankMax = 0.9 * S.giro; if (Math.abs(q.jx) < 0.05) q.sx *= 1 - Math.min(1, 1.6 * dt); /* nivelamento automático */ q.bank += clamp((q.sx * bankMax - q.bank) * 2.6 * dt, -0.9 * dt, 0.9 * dt);
   let gA = q.sy * 0.42; if (q.y < HD.altMin + 60) gA = Math.max(gA, (HD.altMin + 60 - q.y) / 200); if (q.y > HD.altTeto - 150) gA = Math.min(gA, -(q.y - HD.altTeto + 150) / 600); if (Math.abs(q.jy) < 0.05) gA *= 0.5;
   q.gam += clamp((gA - q.gam) * 4 * dt, -0.6 * dt, 0.6 * dt); const v = Math.max(1, q.v); q.w = (q.w || 0) + (clamp(G * Math.tan(q.bank) / v * 4.5, -0.42 * S.giro, 0.42 * S.giro) - (q.w || 0)) * Math.min(1, 3 * dt);
@@ -125,6 +125,8 @@ function passoHidro(sim, q, dt) { const S = HIDROS[q.hidro] || HIDROS.albatroz, 
   else if (q.fase === 3) { /* REGRESSO: aproxima pela popa do navio, desce e pousa na água */ const m = n && !n.morto ? n : null; if (!m) { voaAuto(q, S, q.x + Math.sin(q.rumo) * 4000, q.z - Math.cos(q.rumo) * 4000, 300, S.vCruz, dt); }
     else { const tx = m.x - Math.sin(m.rumo) * 900 + Math.cos(m.rumo) * (m.C.B + 40), tz = m.z + Math.cos(m.rumo) * 900 + Math.sin(m.rumo) * (m.C.B + 40); const d = Math.hypot(tx - q.x, tz - q.z); voaAuto(q, S, tx, tz, d > 2500 ? 300 : Math.max(8, d * 0.08), d > 2500 ? S.vCruz : S.vDecola * 1.15, dt); if (d < 260 && q.y < 25) { q.fase = 4; sim.evento({ t: 'hdPouso', idx: q.idx, id: q.dono }); } } }
   else if (q.espera) { const cx = n && !n.morto ? n.x : q.x, cz = n && !n.morto ? n.z : q.z, R = 2600, a = Math.atan2(q.x - cx, -(q.z - cz)) + 0.5; voaAuto(q, S, cx + Math.sin(a) * R, cz - Math.cos(a) * R, HD.altCruz, S.vCruz * 0.85, dt); }
+  else if (q.miraSolo && q.fase === 2) { /* v1.2.58: PONTO MARCADO NO MAPA — piloto automático leva o hidroavião até lá e lança a bomba no ponto (ou o mais perto possível) */ const d = Math.hypot(q.ax - q.x, q.az - q.z), brg = marcacao(q.x, q.z, q.ax, q.az); voaAuto(q, S, q.ax, q.az, HD.altCruz, S.vMax * 0.9, dt);
+    if (Math.abs(ang(brg - q.rumo)) < 0.3 && d < 9000) { const I = impactoNuclear(q, _imp); if (I.ok && Math.hypot(I.x - q.ax, I.z - q.az) < 300 + d * 0.02 && soltaBombaHidro(sim, q)) { q.miraSolo = 0; q.fuga = 12; sim.evento({ t: 'hdMiraSoloOk', idx: q.idx, id: q.dono }); } } }
   else { /* IA / AUTO: vai ao alvo travado e usa as armas; sem alvo, patrulha à frente do navio */ const a = alvoDe(sim, q);
     if (a) { /* ataque com STAND-OFF: aproxima, dispara, ESCAPA para fora da antiaérea (> 5,5 km) e volta quando a arma recarrega */
       const d = Math.hypot(a.x - q.x, a.z - q.z), brg = marcacao(q.x, q.z, a.x, a.z), alin = Math.abs(ang(brg - q.rumo)) < 0.25; const fogeX = a.x - Math.sin(brg) * 6500, fogeZ = a.z + Math.cos(brg) * 6500;

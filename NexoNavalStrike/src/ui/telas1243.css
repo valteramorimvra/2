@@ -268,3 +268,5 @@
 .tela-inicio .mw-ct b, .tela-inicio .mw-cb span { white-space: nowrap; } .tela-inicio .mw-ct small { white-space: nowrap; }
 @media (max-height: 420px) { .tela-inicio .mw-esq { width: 214px; } .tela-inicio .mw-passe .mw-ct b, .tela-inicio .mw-carga .mw-ct b { font-size: 12px; } .tela-inicio .mw-cb { font-size: 11.5px; } .tela-inicio .mw-passe .mw-ic { width: 32px; height: 32px; font-size: 18px; } .tela-inicio .mw-cxs { height: 40px !important; } .tela-inicio .mw-cl { padding: 3px 8px 5px; font-size: 11px; } .mw-base { width: 214px; } }
 @media (max-height: 420px) { .tela-inicio .mw-cxs { height: 46px !important; align-items: center !important; overflow: hidden; } .tela-inicio .mw-cxs img { max-height: 44px; width: auto; } }
+/* v1.2.58: seletor de pintura dos bombardeiros (Ajustes) */
+.aj-sel { width: 100%; margin-top: 6px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(148,163,184,.4); background: rgba(10,16,24,.85); color: #e2e8f0; font: inherit; font-size: 13px; }
