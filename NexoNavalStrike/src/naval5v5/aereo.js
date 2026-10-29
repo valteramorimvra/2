@@ -116,10 +116,13 @@ export function noConvesVisivel(h) { return !!h.usado && (h.estado === EST.CONVO
 /** v1.2.30 item 12: a onda de choque ARRANCA a aeronave do convés → corpo físico (ramo ABATIDO: gravidade, splash na água, colisão com terreno). Nada some: continua em sim.helis/n.helis e o contador ✈ a conta em perdidas. */
 /** v1.2.30 item 12: queda de aeronave abatida/arrancada. Terreno: varredura do ponto anterior ao atual (sem atravessar). Splash na água. */
 function caiAbatida(sim, h, dt) {
+  if (h.caiu && !h.terra) { /* v1.2.50: destroço NA ÁGUA — o mar freia o impacto (arrasto ~1,8/s), flutua alguns segundos queimando na superfície e afunda devagar; antes seguia em queda livre e a fumaça/fogo saíam debaixo d'água */
+    h.tAgua = (h.tAgua || 0) + dt; h.vx *= 1 - Math.min(1, dt * 1.8); h.vz *= 1 - Math.min(1, dt * 1.8); h.x += h.vx * dt; h.z += h.vz * dt; h.vy = 0;
+    h.y = alturaMar(h.x, h.z, sim.t) - (h.tAgua < 7 ? 0.7 + h.tAgua * 0.12 : 1.54 + (h.tAgua - 7) * 0.9); return; }
   const ax = h.x, ay = h.y, az = h.z; h.vy -= G * dt; h.x += h.vx * dt; h.y += h.vy * dt; h.z += h.vz * dt; h.vx *= 1 - dt * 0.3; h.vz *= 1 - dt * 0.3;
   { const ex = h.x - ax, ey = h.y - ay, ez = h.z - az, ns = Math.max(1, Math.ceil(Math.hypot(ex, ey, ez) / 1.5));
     for (let k = 1; k <= ns; k++) { const f = k / ns, qx = ax + ex * f, qy = ay + ey * f, qz = az + ez * f, ht = alturaTerreno(sim.T, qx, qz); if (ht > 0 && qy <= ht) { h.x = qx; h.z = qz; h.y = ht + 0.4; h.vx = h.vy = h.vz = 0; h.v = 0; h.terra = 1; h.tTerra = 0; h.caiu = 1; sim.evento({ t: 'terra', x: h.x, y: h.y, z: h.z, cal: 120, dono: -1 }); break; } } }
-  if (!h.terra && h.y <= alturaMar(h.x, h.z, sim.t) && !h.caiu) { h.caiu = 1; sim.evento({ t: 'agua', x: h.x, y: 0, z: h.z, cal: 120, dono: -1 }); }
+  if (!h.terra && h.y <= alturaMar(h.x, h.z, sim.t) && !h.caiu) { const vq = Math.hypot(h.vx, h.vy, h.vz); h.caiu = 1; h.tAgua = 0; h.y = alturaMar(h.x, h.z, sim.t) - 0.7; h.vx *= 0.3; h.vz *= 0.3; h.vy = 0; sim.evento({ t: 'agua', x: h.x, y: 0, z: h.z, cal: 120, dono: -1, aero: 1, vq, vx: h.vx, vz: h.vz }); } /* v1.2.50: impacto de aeronave no mar (vq = velocidade de impacto → tamanho do borrifo) */
 }
 const CORR_TICK = 0.3; const REST_CASCO = 0.2, ATRITO_CASCO = 0.4;
 /** v1.2.30 item 12: contato FÍSICO da aeronave arrancada com o volume de um navio (casco = planta afinada do acertaNavio até o convés/convoo; superestrutura = caixa z0-2…z1+2 até C.F+h·2,6).
@@ -158,7 +161,7 @@ export function arrancaDoConves(sim, h, vx, vy, vz, por) { const n = sim.navios[
     const c = Math.cos(n.rumo), s = Math.sin(n.rumo), lx = (h.x - n.x) * c + (h.z - n.z) * s, lado = lx >= 0 ? 1 : -1, vsx = Math.sin(n.rumo) * n.v, vsz = -Math.cos(n.rumo) * n.v;
     const tC = Math.max(1.2, 2 * Math.max(vy, 6) / G), dist = Math.max(0, n.C.B * 0.5 * 1.05 + 5 - Math.abs(lx)) , need = dist * 0.3 / (1 - Math.exp(-0.3 * tC)) + 2; /* m/s lateral RELATIVO ao navio */
     const rl = ((vx - vsx) * c + (vz - vsz) * s) * lado; if (rl < need) { vx += (need - rl) * lado * c; vz += (need - rl) * lado * s; } }
-  h.estado = EST.ABATIDO; h.ativo = 1; h.oculto = 0; h.dk = null; h.ctrl = 'ia'; h.arrancado = 1; h.casco = 0; h.corrMax = 0; h.dsup = 1; h.tCasco = -9; h.caiu = 0; h.terra = 0; h.tTerra = 0; h.tRes = 0; h.vx = vx; h.vy = vy; h.vz = vz; h.v = Math.hypot(vx, vz);
+  h.estado = EST.ABATIDO; h.ativo = 1; h.oculto = 0; h.dk = null; h.ctrl = 'ia'; h.arrancado = 1; h.casco = 0; h.corrMax = 0; h.dsup = 1; h.tCasco = -9; h.caiu = 0; h.tAgua = 0; h.terra = 0; h.tTerra = 0; h.tRes = 0; h.vx = vx; h.vy = vy; h.vz = vz; h.v = Math.hypot(vx, vz);
   if (por && por.time !== h.time) { por.stats.menores = (por.stats.menores || 0) + 1; por.stats.helisAbatidos = (por.stats.helisAbatidos || 0) + 1; } /* crédito só por aeronave INIMIGA */ }
 
 function alvoHeli(sim, h, n) { // alvo: o travado pelo navio (se jogador) ou o contato mais próximo do helicóptero
@@ -285,7 +288,7 @@ export function passoAereo(sim, dt) { POOL_REF.s = sim; if (!sim.stConves) sim.s
   for (const h of sim.helis) { if (!h.usado) continue; h.px = h.x; h.py = h.y; h.pz = h.z; h.prumo = h.rumo; h.ppitch = h.pitch || 0; h.proll = h.roll || 0; /* v1.2.29: pose anterior p/ lerp câmera/mesh */ const n = sim.navios[h.dono]; h.fogoMg = 0; if (h.tArma > 0) h.tArma -= dt; if (h.tFlare > 0) h.tFlare -= dt; if (h.fogo > 0) h.fogo -= dt; h.tEst += dt;
     if (h.estado === EST.ABATIDO) { if (h.terra) { h.vx = h.vy = h.vz = 0; if ((h.tTerra += dt) > 30) { h.terra = 0; h.y = -6; } /* item 12: destroço parado na montanha 30 s; depois entra na reposição como o que afunda */ } else if (h.y > -5) passoAbatida(sim, h, dt); /* item 12: queda (terreno/água) + contato físico com cascos */
       else if (n && n.reservaAr > 0 && !n.morto && n.P.convoo) { h.tRes = (h.tRes || 0) + dt; if (h.tRes > REPOE_S) { n.reservaAr--; const H = h.H, fu = n.mods.heliFuel || 1; /* v1.2.26: reserva do gigante prepara outra aeronave do mesmo tipo no hangar */
-        Object.assign(h, { ativo: 0, estado: EST.HANGAR, caiu: 0, arrancado: 0, casco: 0, terra: 0, tTerra: 0, tRes: 0, fogo: 0, comb: H.comb * fu, combMax: H.comb * fu, mun: h.munMax, vida: H.vida, ctrl: 'ia', alt: ALT_IA, alvo: -1, tArma: 0, tEst: 0, v: 0, lancar: 0, oculto: 1, dk: null, dkE: -1, dkC: -1, esp: 0, ap: 0, apM: 0 }); pad(sim, n, h); sim.evento({ t: 'reservaAr', id: n.id, resta: n.reservaAr }); } }
+        Object.assign(h, { ativo: 0, estado: EST.HANGAR, caiu: 0, tAgua: 0, arrancado: 0, casco: 0, terra: 0, tTerra: 0, tRes: 0, fogo: 0, comb: H.comb * fu, combMax: H.comb * fu, mun: h.munMax, vida: H.vida, ctrl: 'ia', alt: ALT_IA, alvo: -1, tArma: 0, tEst: 0, v: 0, lancar: 0, oculto: 1, dk: null, dkE: -1, dkC: -1, esp: 0, ap: 0, apM: 0 }); pad(sim, n, h); sim.evento({ t: 'reservaAr', id: n.id, resta: n.reservaAr }); } }
       continue; }
     if (n.morto && h.estado !== EST.VOO && h.estado !== EST.RETORNO) { h.ativo = 0; h.estado = EST.HANGAR; h.usado = 0; continue; } // afundou com o navio
     if (h.estado === EST.HANGAR) { h.ativo = 0; escondido(sim, n, h); if (h.comb > 0 && h.tEst > (pista(n, h) ? 6 : n.esq ? 3 : 8) && (n.papel === 'jogador' ? noAr(sim, n) : noArCap(sim, n)) < maxArNavio(n) && cabeLado(sim, n) && !(dkN(n).pc.pa && recolhendo(sim, n) && !n.libMax)) sobeConves(sim, n, h); /* ciclo de recolhimento tem prioridade: ninguém sobe enquanto há aeronave aguardando pouso */ continue; } /* v1.2.26 item C: só sai do hangar com elevador/convoo LIVRE */
