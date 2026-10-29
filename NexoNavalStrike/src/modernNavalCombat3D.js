@@ -65,7 +65,7 @@ export class NavalCombat3D {
     window.__nns = this; this.PARAM = PARAM; this.criaNavio3D = criaNavio3D; this.CLASSES = CLASSES; // gancho de teste (sem efeito visível)
   }
   redimensiona() { const W = innerWidth, H = innerHeight; this.W = W; this.H = H; this.R.setSize(W, H, false); for (const c of [this.cam, this.vitrine && this.vitrine.cam]) if (c) { c.aspect = W / H; c.updateProjectionMatrix(); } }
-  nivelInicial() { const a = this.save.ajustes.qualidade; if (a !== 'auto') return { baixa: 0, media: 1, alta: 2 }[a] ?? 1; const dpr = devicePixelRatio || 1; const mem = navigator.deviceMemory || 4; return mem <= 2 ? 0 : dpr >= 2 && mem >= 4 ? 2 : 1; } /* v1.2.35: celular bom começa em ALTA (o auto rebaixa sozinho se o FPS cair < 40) */
+  nivelInicial() { const a = this.save.ajustes.qualidade; if (a !== 'auto') return { baixa: 0, media: 1, alta: 2 }[a] ?? 1; const dpr = devicePixelRatio || 1; const mem = navigator.deviceMemory || 4; return mem <= 2 ? 0 : dpr > 2.5 && mem >= 6 ? 2 : 1; } /* v1.2.38: volta à regra da 1.2.31 — ALTA automática (1.2.35) travava celulares */
   aplicaQualidade() { const n = this.Q.nivel; this.R.setPixelRatio(Math.min(devicePixelRatio || 1, [1.1, 1.6, 2][n]) /* v1.2.26 E */); this.R.setSize(this.W, this.H, false); this.R.shadowMap.enabled = n > 0;
     if (this.amb) { this.amb.sombras(n > 0, n === 2 ? 2048 : 1536); /* v1.2.26 E: sombra média menos pixelada */ this.amb.criaMar(n); } if (this.fx) this.fx.setFator([0.5, 0.8, 1][n]); if (this.cam) { this.cam.far = [16000, 22000, 26000][n]; this.cam.updateProjectionMatrix(); }
     this.cena && this.cena.traverse((o) => { if (o.material && o.material.isMeshStandardMaterial) o.material.needsUpdate = true; }); }
