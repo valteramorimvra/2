@@ -12,6 +12,17 @@ export const MEDALHAS = {
   asa_rotativa: { nome: 'Asa Rotativa', desc: 'Helicóptero acerta míssil/torpedo/foguetes ou derruba aeronave', icone: '✈', cor: '#22c55e', teste: (s) => (s.heliAcertos || 0) >= 1 || (s.helisAbatidos || 0) >= 1 },
   bombeiro: { nome: 'Bombeiro do Mar', desc: '2 reparos de emergência e sobreviveu', icone: '✚', cor: '#ef4444', teste: (s, r) => (s.reparos || 0) >= 2 && r.vidaFinal > 0 },
   bloqueio: { nome: 'Bloqueio Naval', desc: 'Afundou um navio mercante inimigo', icone: '⛴', cor: '#a855f7', teste: (s) => (s.mercantes || 0) >= 1 }, /* v1.2.11 */
+  /* v1.2.62: novas medalhas de batalha */
+  terror: { nome: 'Terror dos Mares', desc: '5+ navios afundados numa batalha', icone: '☠', cor: '#dc2626', teste: (s) => (s.abates || 0) >= 5 },
+  as_aereo: { nome: 'Ás da Defesa Aérea', desc: '3+ aeronaves inimigas derrubadas numa batalha', icone: '✈', cor: '#0ea5e9', teste: (s) => (s.helisAbatidos || 0) >= 3 },
+  guarda_chuva: { nome: 'Guarda-Chuva de Aço', desc: '12+ mísseis/drones interceptados numa batalha', icone: '☂', cor: '#38bdf8', teste: (s) => (s.intercept || 0) + (s.menores || 0) >= 12 },
+  mestre_misseis: { nome: 'Mestre dos Mísseis', desc: '4+ mísseis no alvo com 60%+ de aproveitamento', icone: '➶', cor: '#f97316', teste: (s) => (s.misAcertos || 0) >= 4 && s.misAcertos / Math.max(1, s.misLanc) >= 0.6 },
+  lobo_mar: { nome: 'Lobo do Mar', desc: '4+ acertos de torpedo numa batalha', icone: '≋', cor: '#16a34a', teste: (s) => (s.torpAcertos || 0) >= 4 },
+  tempestade: { nome: 'Tempestade de Aço', desc: '150+ disparos de canhão numa batalha', icone: '⁂', cor: '#a3a3a3', teste: (s) => (s.tiros || 0) >= 150 },
+  intocavel: { nome: 'Intocável', desc: 'Vencer sem sofrer nenhum dano', icone: '◇', cor: '#e5e7eb', teste: (s, r) => r.vitoria === true && !(s.danoRec > 0) },
+  relampago: { nome: 'Vitória Relâmpago', desc: 'Vencer em menos de 5 minutos', icone: 'ϟ', cor: '#facc15', teste: (s, r) => r.vitoria === true && r.tempo > 0 && r.tempo < 300 },
+  as_aviacao: { nome: 'Ás da Aviação Naval', desc: '4+ acertos das suas aeronaves numa batalha', icone: '✪', cor: '#22c55e', teste: (s) => (s.heliAcertos || 0) >= 4 },
+  corsario: { nome: 'Corsário', desc: '3+ mercantes inimigos afundados numa batalha', icone: '⚑', cor: '#7c3aed', teste: (s) => (s.mercantes || 0) >= 3 },
   mvp: { nome: 'MVP', desc: 'Melhor pontuação dos 16 navios', icone: '★', cor: '#d4af37', teste: (s, r) => r.mvp },
 };
 export const ORDEM_MEDALHAS = Object.keys(MEDALHAS);

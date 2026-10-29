@@ -275,3 +275,22 @@
 .hud .hl-bts .cb.nk-aa { right: 92px; bottom: 222px; } .hud .hl-bts .cb.nk-fl { right: 214px; bottom: 100px; }
 .hud .nk-bts .cb.nk-aa i { color: #fca5a5; } .hud .nk-bts .cb.nk-fl i { color: #fde68a; } .hud .nk-bts .cb.nk-alerta { animation: nkPisca .45s steps(2) infinite; box-shadow: 0 0 0 3px #ef4444; }
 @keyframes nkPisca { 50% { box-shadow: 0 0 0 3px transparent; } }
+/* v1.2.62 (Valter): faixa escura da esquerda mais leve; saldo compacto (não cobre o nome); nível do perfil clicável com barra de XP; troféus da vitrine ao lado do nome */
+.tela-inicio::before { width: min(46vw, 430px) !important; background: linear-gradient(90deg, rgba(1,3,6,.5) 0%, rgba(1,3,6,.3) 50%, rgba(1,3,6,0) 100%) !important; }
+.tela-inicio .mw-moedas { top: 12px !important; padding: 3px 4px 3px 10px !important; gap: 10px !important; font-size: 12.5px !important; font-weight: 700 !important; background: linear-gradient(180deg, rgba(34,40,50,.82), rgba(14,18,24,.82)) !important; }
+.tela-inicio .mw-moedas .cart-mais { width: 24px !important; height: 24px !important; font-size: 15px !important; }
+.tela-inicio .mw-nivel, .tela-inicio .mw-av, .tela-inicio .mw-nome { cursor: pointer; }
+.tela-inicio .mw-nivel .mw-ex { position: absolute; top: -2px; right: 2px; min-width: 16px; height: 16px; padding: 0 3px; border-radius: 8px; font-size: 10px; display: grid; place-items: center; }
+.mw-xp { position: absolute; left: 12px; right: 12px; bottom: -3px; height: 3px; border-radius: 2px; background: rgba(255,255,255,.14); overflow: hidden; text-decoration: none; } .mw-xp s { display: block; height: 100%; background: linear-gradient(90deg, #b8902a, #f6d36b); }
+.mw-vit { font-style: normal; margin-left: 4px; } .mw-vit em { font-style: normal; color: var(--c); margin-right: 3px; text-shadow: 0 0 6px color-mix(in srgb, var(--c) 60%, transparent); }
+.rs-pf b.up { color: #f6d36b; }
+/* v1.2.62 (Valter): ÁRVORE mais organizada — linha divisória DOURADA entre os tiers, cabeçalho dourado, faixas por tipo e fundo de marinha de guerra */
+.tela-arvore { background: linear-gradient(180deg, rgba(3,9,18,.42) 0%, rgba(3,9,18,.2) 45%, rgba(3,8,15,.6) 100%) !important; }
+.tela-arvore .ar-wrap { background: linear-gradient(180deg, rgba(6,13,24,.5), rgba(4,9,16,.66)) !important; border-color: rgba(212,175,55,.28) !important; box-shadow: 0 10px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.05); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+.tela-arvore .ar-cab { background: linear-gradient(180deg, rgba(14,22,36,.98), rgba(8,14,24,.96)) !important; border-bottom: 2px solid rgba(212,175,55,.75) !important; box-shadow: 0 2px 12px rgba(212,175,55,.15); }
+.tela-arvore .ar-cab .ar-cel b { color: #f3d77a; text-shadow: 0 0 8px rgba(246,211,107,.35); } .tela-arvore .ar-cab .lend b { color: #c4b5fd; } .tela-arvore .ar-cab .slend b { color: #fde68a; }
+.tela-arvore .ar-cel { justify-content: center; align-content: center; gap: 8px; padding: 9px 8px; border-left: 0 !important; position: relative; }
+.tela-arvore .ar-cel::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, rgba(212,175,55,.15), #d4af37 18%, #f6d36b 50%, #d4af37 82%, rgba(212,175,55,.15)); box-shadow: 0 0 6px rgba(246,211,107,.35); }
+.tela-arvore .ar-linha { border-bottom: 1px solid rgba(212,175,55,.14) !important; } .tela-arvore .ar-linha:nth-child(even):not(.ar-cab) { background: rgba(255,255,255,.018); }
+.tela-arvore .ar-tipo { justify-content: center; text-align: center; color: #f1f5f9; letter-spacing: .1em; background: linear-gradient(90deg, rgba(10,18,30,.98), rgba(12,20,32,.9)) !important; border-right: 0 !important; box-shadow: inset -3px 0 0 rgba(212,175,55,.55); }
+.tela-arvore .ar-card { box-shadow: 0 4px 12px rgba(0,0,0,.45); }
