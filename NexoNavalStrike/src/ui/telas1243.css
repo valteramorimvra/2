@@ -91,3 +91,7 @@
 .tela-arvore h2 small, .tela-mercado h2 small, .tela-loja h2 small { display: none; } @media (min-width: 1100px) { .tela-arvore h2 small, .tela-mercado h2 small, .tela-loja h2 small { display: inline; } }
 .mk-of .btn.primario, .mk-cx .btn.primario, .lj-p .btn.primario { background: linear-gradient(180deg, #0ea5e9, #0369a1) !important; border-color: #7dd3fc !important; color: #fff; text-align: center; justify-content: center; }
 .mk-of .btn.primario[disabled] { background: linear-gradient(180deg, #166534, #14532d) !important; border-color: #4ade80 !important; }
+/* v1.2.44: carteira com 3 moedas — botões da vitrine do estaleiro descem para não ficarem sob ela; carteira compacta em telas estreitas */
+.tela-estaleiro .es-vista { top: 58px !important; left: 50% !important; transform: translateX(-50%) !important; }
+.tela-estaleiro .es-info { top: 58px; }
+@media (max-width: 960px) { .carteira { gap: 9px; font-size: 12px; padding: 5px 6px 5px 11px; } }

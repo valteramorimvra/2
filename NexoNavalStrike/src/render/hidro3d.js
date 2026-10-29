@@ -11,15 +11,18 @@ const sst = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a)))
 const CACHE = new Map();
 
 /** Textura de pintura do casco (u = comprimento nariz→cauda, v = volta da seção, v=0.25 topo, 0.75 quilha). */
+const ESP_MATR = [[-1, 1], [1, -1]]; /* [escalaX, escalaY] da matrícula em boreste e bombordo */
 function texCasco(S) { const W = 1024, H = 256, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
   /* v1.2.40: textura NEUTRA de detalhes (branca) — a cor vem da plumagem por vértice; a textura só escurece painéis, rebites, janelas e portas */
   x.fillStyle = '#ffffff'; x.fillRect(0, 0, W, H);
   x.strokeStyle = 'rgba(0,0,0,0.09)'; x.lineWidth = 1; for (let i = 1; i < 40; i++) { const u = i / 40 * W; x.beginPath(); x.moveTo(u, 0); x.lineTo(u, H); x.stroke(); } for (const v of [0.18, 0.32, 0.45, 0.55, 0.68, 0.82]) { x.beginPath(); x.moveTo(0, v * H); x.lineTo(W, v * H); x.stroke(); }
   x.fillStyle = 'rgba(0,0,0,0.12)'; for (let i = 0; i < 420; i++) x.fillRect(Math.random() * W, Math.random() * H, 1, 1);
-  /* linha d'água discreta (desgaste) */ const gr = x.createLinearGradient(0, H * 0.6, 0, H * 0.66); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(40,50,40,0.12)'); x.fillStyle = gr; x.fillRect(0, H * 0.6, W, H * 0.3);
-  for (const v of [0.4, 0.6]) { x.fillStyle = '#0e1a26'; for (let i = 0; i < (S.janelas || 9); i++) { const u = W * (0.24 + i * 0.035); x.beginPath(); x.ellipse(u, v * H, 5, 7, 0, 0, Math.PI * 2); x.fill(); }
-    x.strokeStyle = 'rgba(0,0,0,0.35)'; x.lineWidth = 1.5; x.strokeRect(W * 0.17, v * H - 18, 26, 36); x.strokeRect(W * 0.62, v * H - 16, 30, 32); }
-  x.fillStyle = 'rgba(0,0,0,0.42)'; x.font = 'bold 22px sans-serif'; x.textAlign = 'center'; for (const v of [0.47, 0.53]) x.fillText(S.matr || 'NX-' + S.id.toUpperCase(), W * 0.52, v * H + 8);
+  /* v1.2.44: costura na quilha → v .25 = boreste, .75 = bombordo (y do canvas = (1 − v)·H) */ const Y = (v) => (1 - v) * H;
+  /* linha d'água discreta (desgaste) perto da quilha */ for (const [a, b] of [[0.85, 1], [0, 0.15]]) { const gr = x.createLinearGradient(0, a * H, 0, b * H); gr.addColorStop(a > 0.5 ? 0 : 1, 'rgba(0,0,0,0)'); gr.addColorStop(a > 0.5 ? 1 : 0, 'rgba(40,50,40,0.14)'); x.fillStyle = gr; x.fillRect(0, a * H, W, (b - a) * H); }
+  for (const v of [0.31, 0.69]) { const y = Y(v); x.fillStyle = '#0e1a26'; for (let i = 0; i < (S.janelas || 9); i++) { const u = W * (0.24 + i * 0.035); x.beginPath(); x.ellipse(u, y, 5, 7, 0, 0, Math.PI * 2); x.fill(); }
+    x.strokeStyle = 'rgba(0,0,0,0.35)'; x.lineWidth = 1.5; x.strokeRect(W * 0.17, y - 18, 26, 36); x.strokeRect(W * 0.62, y - 16, 30, 32); }
+  /* matrícula nos dois costados, sempre legível (um lado desenhado espelhado para compensar o sentido da volta) */ x.fillStyle = 'rgba(0,0,0,0.42)'; x.font = 'bold 22px sans-serif'; x.textAlign = 'center'; const mt = S.matr || 'NX-' + S.id.toUpperCase();
+  for (const [v, esp] of [[0.235, ESP_MATR[0]], [0.765, ESP_MATR[1]]]) { x.save(); x.translate(W * 0.52, Y(v)); x.scale(esp[0], esp[1]); x.fillText(mt, 0, 8); x.restore(); }
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; }
 /** v1.2.40: PLUMAGEM — camuflagem metálica suave inspirada na ave de cada hidroavião (contra-sombreamento: dorso escuro, ventre claro,
  *  pontas das asas escuras, bico no nariz, leve textura de penas). Cores em gradiente, sem contorno de desenho animado. */
@@ -68,7 +71,7 @@ function geoCasco(S) { const L = S.L, W = L * (S.larg || 0.052), z0 = -L / 2, NS
     const top = W * 1.08 * (0.62 + 0.38 * sst(0.02, 0.2, s)) * (1 - sst(0.62, 1, s) * 0.55) * Math.max(0.06, nar);
     const deg = s > 0.55 ? 0.72 : 1; const bot = W * 1.18 * Math.max(0.05, nar) * (s < 0.55 ? 1 : deg * (1 - sst(0.56, 0.98, s) * 0.85));
     const cy = W * 1.15 + sst(0.58, 1, s) * yCauda + (s < 0.1 ? (0.1 - s) * W * 1.2 : 0);
-    const anel = []; for (let j = 0; j < NT; j++) { const th = (j / (NT - 1)) * Math.PI * 2, cs = Math.cos(th), sn = Math.sin(th); let x = w * cs, y;
+    const anel = []; for (let j = 0; j < NT; j++) { const th = -Math.PI / 2 + (j / (NT - 1)) * Math.PI * 2 /* v1.2.44: costura na QUILHA (v: 0 quilha · .25 boreste · .5 topo · .75 bombordo) */, cs = Math.cos(th), sn = Math.sin(th); let x = w * cs, y;
       if (sn >= 0) y = cy + top * Math.pow(sn, 0.8); else { const u = Math.abs(cs); const quina = u > 0.86 ? 1 - (u - 0.86) / 0.14 * 0.18 : 1; y = cy - bot * Math.pow(1 - u, 0.55) * quina; x *= u > 0.86 ? 1 : 0.98 + 0.02 * u; }
       anel.push([x, y, z0 + s * L]); } aneis.push(anel); }
   return loft(aneis, true, true, us); }
@@ -82,6 +85,7 @@ function geoSuperficie({ span, cR, cP, tR = 0.13, tP = 0.1, enf = 0, died = 0, v
   return loft(aneis, true, true); }
 /** Nacele torneada (perfil girado) de comprimento l e raio r; abre para −z. */
 function geoNacele(l, r, jato) { const pts = []; const n = 14; for (let i = 0; i <= n; i++) { const f = i / n; const rr = jato ? r * (0.86 + 0.14 * Math.sin(Math.min(1, f * 1.6) * Math.PI / 2)) * (1 - sst(0.8, 1, f) * 0.28) : r * Math.sin(Math.min(1, (f + 0.04) * 1.3) * Math.PI / 2) * (1 - sst(0.55, 1, f) * 0.75); pts.push(new THREE.Vector2(Math.max(0.02, rr), f * l)); }
+  pts.unshift(new THREE.Vector2(0, 0)); pts.push(new THREE.Vector2(0, l)); /* v1.2.44: nacele FECHADA nas duas pontas (antes dava para ver o lado de dentro por trás) */
   const g = new THREE.LatheGeometry(pts, 24); g.rotateX(Math.PI / 2); g.translate(0, 0, -l * 0.5); return g; }
 
 /** Monta o hidroavião S (ficha de sim/hidroaviao.js HIDROS). */
