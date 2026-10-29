@@ -14,7 +14,7 @@ const n0 = (v) => Math.round(v).toLocaleString('pt-BR');
 const precoTxt = (a) => (a.preco.ouro ? `● ${n0(a.preco.ouro)}` : a.preco.prata ? `◎ ${n0(a.preco.prata)}` : 'GRÁTIS');
 const SVG = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
 
-export function telaHangar({ jogo, eco, save, som, eventoCompra, mostra, TELAS }) {
+export function telaHangar({ jogo, eco, save, som, eventoCompra, mostra, TELAS, testeDriveAero }) {
   const H = jogo.abreHangar(); if (!H) { TELAS.estaleiro(); return; }
   const st = (save.d.hangar = save.d.hangar || {}); let sel = AERO[st.sel] ? st.sel : 'raio', cat = st.cat || 'todas', aba = st.aba || 'aeronaves';
   const emUso = (id) => { const a = AERO[id]; if (a.modelo.hidro) return (save.ultimo.hidro || 'albatroz') === a.modelo.hidro; const k = save.ultimo.classe; return ehHeliNavio(id) && CLASSES[k] && CLASSES[k].heli ? eco.helisDe(k)[0] === id : false; };
@@ -24,7 +24,7 @@ export function telaHangar({ jogo, eco, save, som, eventoCompra, mostra, TELAS }
   <aside class="hg-ficha"></aside>
   <div class="hg-360"><i></i><b>360°</b></div>
   <nav class="hg-lista"></nav>
-  <div class="hg-acoes"><button data-a="rot" class="hg-ac">${SVG('<path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4.5h-4.5"/>')}<b>ROTAÇÃO</b></button><button data-a="upg" class="hg-ac">${SVG('<path d="M12 19V6M6 11l6-6 6 6"/><path d="M5 21h14"/>')}<b>UPGRADE</b><small></small></button></div>
+  <div class="hg-acoes"><button data-a="rot" class="hg-ac">${SVG('<path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4.5h-4.5"/>')}<b>ROTAÇÃO</b></button><button data-a="upg" class="hg-ac">${SVG('<path d="M12 19V6M6 11l6-6 6 6"/><path d="M5 21h14"/>')}<b>UPGRADE</b><small></small></button><button data-a="teste" class="hg-ac hg-teste">${SVG('<path d="M3 15l9-9 3 3-9 9H3z"/><path d="M14 4l6 6"/><path d="M16 14l4 4"/>')}<b>TESTE DRIVE</b><small>sai da base</small></button></div>
   <section class="hg-baixo"><nav class="hg-abas"><button data-aba="armas">ARMAS</button><button data-aba="aeronaves">AERONAVES</button><button data-aba="misseis">MÍSSEIS</button></nav><div class="hg-cards"></div></section>
   <div class="hg-atalhos"><button class="hg-big" data-ir="loja">${SVG('<path d="M5 8h14l-1.2 12H6.2z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>')}<b>LOJA</b></button><button class="hg-big" data-ir="arvore">${SVG('<circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M6 8.2v3.3h12V8.2M12 11.5v4.3"/>')}<b>ÁRVORE TECNOLÓGICA</b></button></div>`, { transp: true });
   const $ = (s) => el.querySelector(s), lista = () => AERONAVES.filter((a) => cat === 'todas' || a.cat === cat);
@@ -56,6 +56,7 @@ export function telaHangar({ jogo, eco, save, som, eventoCompra, mostra, TELAS }
     else if (d.aba) { som(); aba = st.aba = d.aba; save.salva(); desenhaCards(); }
     else if (d.cat) { som(); cat = st.cat = d.cat; save.salva(); if (cat !== 'todas' && AERO[sel].cat !== cat) escolhe(lista()[0].id); else tudo(); }
     else if (d.a === 'volta') { som(); TELAS.inicio(); }
+    else if (d.a === 'teste') { som(); if (/sem armas/i.test(AERO[sel].armas[0]) && !AERO[sel].modelo.heli) return; if (testeDriveAero) testeDriveAero(sel); }
     else if (d.a === 'rot') { som(); H.auto = !H.auto; H.tAuto = 0; desenhaFicha(); }
     else if (d.a === 'upg') { const r = upgradeAero(eco, sel); eventoCompra(r.ok, r.msg); if (r.ok) save.salva(); tudo(); }
     else if (d.a === 'compra') { const r = compraAero(eco, sel); eventoCompra(r.ok, r.msg); if (r.ok) save.salva(); tudo(); }
