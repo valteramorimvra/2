@@ -2,7 +2,7 @@
 // (botão LANÇAR DRONE). Determinístico (sim.rng), pools fixos. O jogador pode ASSUMIR um helicóptero (a IA assume o navio)
 // e voltar ao navio (a IA assume o helicóptero: patrulha, ataca, volta para pousar e rearmar). Podem ser abatidos por
 // CIWS, 30 mm e SAM inimigos. Sensores elevados enxergam por cima das ilhas e plotam no radar da frota (data-link).
-import { bonusNivel } from '../aeronaves.js';
+import { bonusNivel, perfilArma } from '../aeronaves.js';
 import { clamp, ang, marcacao, G } from '../sim/util.js';
 import { HELIS, UAV, MISSEIS, TORPEDO } from '../sim/classes.js';
 import { alturaMar } from '../sim/ocean.js';
@@ -50,7 +50,7 @@ export function instalaAereo(sim) {
 export function instalaHelisNavio(sim, n, modelos) {
   n.helis = []; n.tUav = 0; n.uav = -1; n.controle = -1; /* −1 = navio; k = helicóptero k */ n.controleIA = 0; const nh = n.Cb.heli || 0; if (!nh || !n.P.convoo) return;
   const lista = (n.C.helisPadrao ? n.C.helisPadrao : modelos && modelos.length ? modelos : ['multi', 'asw']).slice(0, nh); /* v1.2.11: porta-aviões usam a ala aérea própria (caças VTOL) */
-  lista.forEach((mod, k) => { const h = sim.helis.find((q) => !q.usado); if (!h) return; let H = HELIS[mod] || HELIS.leve; const nvA = n.aeroNv && n.aeroNv[H.id]; if (nvA > 1) { const b = bonusNivel(nvA); H = Object.assign({}, H, { vmax: H.vmax * b.vel, vida: Math.round(H.vida * b.vida), recarga: H.recarga ? H.recarga * b.recarga : H.recarga }); } /* v1.2.61: evolução do hangar */ const fu = n.mods.heliFuel || 1;
+  lista.forEach((mod, k) => { const h = sim.helis.find((q) => !q.usado); if (!h) return; let H = HELIS[mod] || HELIS.leve; const nvA = n.aeroNv && n.aeroNv[H.id]; if (nvA > 1) { const b = bonusNivel(nvA); H = Object.assign({}, H, { vmax: H.vmax * b.vel, vida: Math.round(H.vida * b.vida), recarga: H.recarga ? H.recarga * b.recarga : H.recarga }); } /* v1.2.61: evolução do hangar */ const nmA = n.aeroArma && n.aeroArma[H.id], PA = nmA ? perfilArma(nmA, H) : null; if (PA) H = Object.assign({}, H, PA.arma ? { arma: PA.arma, mun: PA.mun, alc: PA.alc, dano: PA.dano } : {}, { a2a: PA.a2a || 1, a2aAlc: PA.a2aAlc || 1, armaNome: nmA }); /* v1.2.65: arma principal escolhida no hangar */ const fu = n.mods.heliFuel || 1;
     Object.assign(h, { usado: 1, ativo: 0, estado: k === 0 ? EST.CONVOO : EST.HANGAR, slot: k, dono: n.id, time: n.time, modelo: H.id, camo: n.camoAereo || 'padrao' /* v1.2.17 13i */, H, comb: H.comb * fu, combMax: H.comb * fu, mun: Math.round(H.mun * (n.mods.heliMun || 1)), munMax: Math.round(H.mun * (n.mods.heliMun || 1)), vida: H.vida, ctrl: 'ia', alt: ALT_IA, alvo: -1, tArma: 0, tEst: 0, auto: n.papel !== 'jogador' ? 1 : 0, rumo: n.rumo, v: 0 });
     h.lancar = 0; h.oculto = 1; h.dkE = -1; h.dkC = -1; h.esp = 0; h.tEspera = 0; n.helis.push(h.idx); iniConves(sim, n, h, k); });
   n.reservaAr = n.C.alaTotal ? Math.max(0, n.C.alaTotal - n.helis.length) : 0; /* v1.2.26: aeronaves de reserva no hangar dos gigantes (repõem abatidas) */
@@ -197,13 +197,13 @@ const _pa = { x: 0, y: 0, z: 0 }; function pontoArma(h, avante, lado, baixo) { c
 function disparaA2A(sim, h, ae, dt) {
   if (!ae || !ae.ativo || ae.time === h.time || ae.estado === EST.ABATIDO) return 0;
   const d = Math.hypot(ae.x - h.x, ae.z - h.z, (ae.y || 0) - (h.y || 0));
-  if (d > EQ_AR.a2aAlc) return 0;
+  if (d > EQ_AR.a2aAlc * ((h.H && h.H.a2aAlc) || 1)) return 0; /* v1.2.65: AR-AR longo do hangar estende o alcance */
   const b = marcacao(h.x, h.z, ae.x, ae.z);
   const off = Math.abs(ang(b - h.rumo));
   if (d > 500 && off > EQ_AR.a2aCone) return 0; /* ≤500 m: snap shot qualquer aspecto */
   if (d <= 500 && off > 2.2) return 0;
   h.fogoMg = 1; h.alvoMg = -1;
-  const dps = (h.H && h.H.aviao ? EQ_AR.a2aDpsAviao : EQ_AR.a2aDpsHeli) * (h.H && h.H.arma === 'mg' ? 1.15 : 1);
+  const dps = (h.H && h.H.aviao ? EQ_AR.a2aDpsAviao : EQ_AR.a2aDpsHeli) * (h.H && h.H.a2a ? h.H.a2a : h.H && h.H.arma === 'mg' ? 1.15 : 1); /* v1.2.65: AR-AR escolhido no hangar */
   const hit = dps * dt; ae.vida -= hit;
   if (!h._a2aAcc) h._a2aAcc = 0; h._a2aAcc += hit;
   if (h._a2aAcc >= 4) { sim.evento({ t: 'a2aHit', idx: h.idx, vitima: ae.idx, x: ae.x, y: ae.y, z: ae.z, dps: +dps.toFixed(1) }); h._a2aAcc = 0; }
@@ -317,7 +317,7 @@ export function passoAereo(sim, dt) { POOL_REF.s = sim; if (!sim.stConves) sim.s
       else if ((() => { /* v1.2.29 item 13: dogfight — prioridade sobre CAP/ataque se inimigo no envelope; busca stagger 3 ticks (FPS) */
         let ae = h._ae, ad = h._ad != null ? h._ad : 9e6;
         if ((sim.tick + h.idx) % 3 === 0 || !ae || !ae.ativo) { ae = null; ad = 9e6; for (const q of sim.helis) { if (!q.ativo || q.time === h.time || q.estado < EST.DECOLA || q.estado > EST.RETORNO) continue; const d2 = (q.x - h.x) ** 2 + (q.z - h.z) ** 2; if (d2 < ad) { ad = d2; ae = q; } } h._ae = ae; h._ad = ad; }
-        if (!(ae && ad < EQ_AR.a2aAlc * EQ_AR.a2aAlc * 1.6)) return false;
+        const ra = EQ_AR.a2aAlc * (h.H.a2aAlc || 1); if (!(ae && ad < ra * ra * 1.6)) return false;
         if (!iaTatica(sim, n, h, a, dt)) voa(h, marcacao(h.x, h.z, ae.x, ae.z), h.H.vmax, Math.max(60, ae.y || 80), dt, sim);
         disparaA2A(sim, h, ae, dt); return true;
       })()) { /* dogfight */ }

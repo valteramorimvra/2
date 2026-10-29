@@ -1,8 +1,8 @@
 // v1.2.61 — TELA DO HANGAR (layout do modelo do Valter): barra superior (← HANGAR · LOJA · ÁRVORE TECNOLÓGICA), coluna direita com
 // as aeronaves (miniaturas 3D reais), ficha à esquerda, ROTAÇÃO / UPGRADE embaixo à esquerda, abas ARMAS · AERONAVES · MÍSSEIS e indicador 360°.
 // O galpão 3D (render/hangar3d.js) usa o mesmo renderizador do jogo; arrastar = girar 360°, pinça/roda = aproximar.
-import { AERONAVES, AERO, CAT_AERO, MISSEIS_AERO, fichaAero, possuiAero, compraAero, nivelAero, custoUpgrade, upgradeAero, ehHeliNavio } from '../aeronaves.js';
-import { CLASSES } from '../sim/classes.js';
+import { AERONAVES, AERO, CAT_AERO, MISSEIS_AERO, fichaAero, perfilArma, armaAero, escolheArmaAero, armaFixaNoVoo, possuiAero, compraAero, nivelAero, custoUpgrade, upgradeAero, ehHeliNavio } from '../aeronaves.js';
+import { CLASSES, HELIS } from '../sim/classes.js';
 import './hangar.css';
 
 const MINI = new Map(); /* miniaturas já renderizadas (data URL) — guardadas no aparelho: Comércio e Árvore mostram a foto 3D real */
@@ -38,7 +38,10 @@ export function telaHangar({ jogo, eco, save, som, eventoCompra, mostra, TELAS }
       <div class="hg-nv">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= nv ? 'on' : ''}"></i>`).join('')}<span>Nível ${nv}/5</span></div>${acao}`;
     const bu = $('[data-a="upg"]'); bu.classList.toggle('off', !tem || nv >= 5); bu.querySelector('small').textContent = tem && nv < 5 ? '◎ ' + n0(custoUpgrade(sel, nv)) : nv >= 5 ? 'MÁXIMO' : ''; $('[data-a="rot"]').classList.toggle('on', !!H.auto); };
   const desenhaCards = () => { el.querySelectorAll('[data-aba]').forEach((b) => b.classList.toggle('on', b.dataset.aba === aba)); const a = AERO[sel]; let h;
-    if (aba === 'armas') h = `<div class="hg-card on"><b>Inspiração</b><small>${a.insp}</small></div>` + a.armas.map((w) => `<div class="hg-card"><b>${w}</b><small>${/canh|metralh/i.test(w) ? 'Tiro contínuo' : /bomba/i.test(w) ? 'Lançamento sobre o alvo' : /torp/i.test(w) ? 'Submarino / casco' : /foguete/i.test(w) ? 'Salva de foguetes' : /sem armas/i.test(w) ? 'Apoio' : 'Míssil guiado'}</small></div>`).join('');
+    if (aba === 'armas') { const fixa = armaFixaNoVoo(sel), ia = armaAero(eco, sel), H0 = HELIS[a.modelo.heli] || null;
+      h = a.armas.map((w, i) => { const P = perfilArma(w, H0), on = fixa ? !/sem armas/i.test(w) : i === ia, det = P ? (P.arma ? `${P.rotulo} · alcance ${(P.alc / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} km` : P.rotulo) : 'Apoio — revela alvos';
+        return `<button class="hg-card hg-arma${on ? ' on' : ''}${fixa ? ' fixa' : ''}" data-arma="${i}"><b>${w}</b><small>${det}</small><em>${fixa ? (P ? 'A BORDO' : 'RADAR') : on ? 'ARMA PRINCIPAL ✓' : 'TOQUE PARA USAR'}</em></button>`; }).join('')
+        + `<div class="hg-card hg-insp"><b>${fixa ? 'Escolha no voo' : 'Inspiração'}</b><small>${fixa ? 'Leva todas as armas; você escolhe nos botões ao pilotar' : a.insp}</small></div>`; }
     else if (aba === 'misseis') { const tem = (m) => a.armas.some((w) => w.toLowerCase().startsWith(m[1].split(' (')[0].toLowerCase().slice(0, 9))); h = MISSEIS_AERO.map((m) => `<div class="hg-card${tem(m) ? ' on' : ' off'}"><b>${m[1]}</b><small>${m[2]}</small><em>${tem(m) ? 'NESTA AERONAVE' : 'não leva'}</em></div>`).join(''); }
     else h = [['todas', 'Todas'], ...CAT_AERO].map(([c, nm]) => `<button class="hg-card hg-cat-b${c === cat ? ' on' : ''}" data-cat="${c}"><b>${nm}</b><small>${c === 'todas' ? AERONAVES.length : AERONAVES.filter((q) => q.cat === c).length} aeronaves</small></button>`).join('');
     $('.hg-cards').innerHTML = h; };
@@ -49,6 +52,7 @@ export function telaHangar({ jogo, eco, save, som, eventoCompra, mostra, TELAS }
   const fila = AERONAVES.filter((a) => !MINI.has(a.id)).map((a) => a.id); const proxima = () => { if (!H.ativo || !fila.length) return; const id = fila.shift(); try { MINI.set(id, H.miniatura(AERO[id])); const b = el.querySelector(`.hg-it[data-id="${id}"] .hg-mini`); if (b) b.style.backgroundImage = `url(${MINI.get(id)})`; if (!fila.length) guardaMini(); } catch (e) { /* segue sem miniatura */ } setTimeout(proxima, 70); }; setTimeout(proxima, 400);
   el.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; const d = b.dataset;
     if (d.id) { som(); escolhe(d.id); }
+    else if (d.arma != null) { som(); if (armaFixaNoVoo(sel)) { eventoCompra(true, 'Leva todas as armas — escolha nos botões durante o voo'); return; } const r = escolheArmaAero(eco, sel, +d.arma); eventoCompra(r.ok, r.msg); if (r.ok) save.salva(); desenhaCards(); }
     else if (d.aba) { som(); aba = st.aba = d.aba; save.salva(); desenhaCards(); }
     else if (d.cat) { som(); cat = st.cat = d.cat; save.salva(); if (cat !== 'todas' && AERO[sel].cat !== cat) escolhe(lista()[0].id); else tudo(); }
     else if (d.a === 'volta') { som(); TELAS.inicio(); }
@@ -59,7 +63,7 @@ export function telaHangar({ jogo, eco, save, som, eventoCompra, mostra, TELAS }
       else if (CLASSES[k] && CLASSES[k].heli) { eco.escolherHeli(k, 0, sel); eventoCompra(true, `${fichaAero(sel).nome} no hangar 1 do ${CLASSES[k].nome}`); } else eventoCompra(false, `O ${CLASSES[k] ? CLASSES[k].nome : 'navio atual'} não tem hangar — escolha um navio com helicóptero`); tudo(); } });
   /* toque: 1 dedo gira 360° (fora dos painéis), 2 dedos = pinça; roda do mouse = zoom */
   const pts = new Map(); let d0 = 0;
-  el.addEventListener('pointerdown', (e) => { if (e.target.closest('button,aside,nav,section,header')) return; pts.set(e.pointerId, [e.clientX, e.clientY]); if (pts.size === 2) { const [p, q] = [...pts.values()]; d0 = Math.hypot(p[0] - q[0], p[1] - q[1]); } });
+  el.addEventListener('pointerdown', (e) => { const pn = e.target.closest('button,aside,nav,section,header'); if (pn && pn !== el) return; /* v1.2.65: a própria tela é uma <section> — antes todo toque era ignorado e o 360° não girava com o dedo */ try { el.setPointerCapture(e.pointerId); } catch (er) { /* sem captura: segue */ } pts.set(e.pointerId, [e.clientX, e.clientY]); if (pts.size === 2) { const [p, q] = [...pts.values()]; d0 = Math.hypot(p[0] - q[0], p[1] - q[1]); } });
   el.addEventListener('pointermove', (e) => { const p0 = pts.get(e.pointerId); if (!p0) return; if (pts.size === 1) H.arrasta(e.clientX - p0[0], e.clientY - p0[1]); pts.set(e.pointerId, [e.clientX, e.clientY]);
     if (pts.size === 2) { const [p, q] = [...pts.values()], d = Math.hypot(p[0] - q[0], p[1] - q[1]); if (d0 > 0) H.zoom(d0 / d); d0 = d; } });
   const fim = (e) => { pts.delete(e.pointerId); d0 = 0; }; el.addEventListener('pointerup', fim); el.addEventListener('pointercancel', fim);

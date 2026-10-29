@@ -47,6 +47,25 @@ export function compraAero(eco, id) { const a = AERO[id]; if (!a || possuiAero(e
 export const nivelAero = (eco, id) => (est(eco)[id] && est(eco)[id].nivel) || 1;
 export const custoUpgrade = (id, nv) => Math.round((AERO[id] ? AERO[id].tier : 1) * 180000 * nv * nv);
 export function upgradeAero(eco, id) { if (!possuiAero(eco, id)) return { ok: false, msg: 'Compre a aeronave primeiro' }; const nv = nivelAero(eco, id); if (nv >= 5) return { ok: false, msg: 'Nível máximo' }; const c = custoUpgrade(id, nv); if (!eco.gasta('prata', c)) return { ok: false, msg: 'Prata insuficiente' }; const S = est(eco); S[id] = Object.assign(S[id] || { tem: 1 }, { nivel: nv + 1 }); return { ok: true, msg: `Nível ${nv + 1}: +6% velocidade, +8% vida, recarga −5%` }; }
+/* v1.2.65 (Valter): ARMA PRINCIPAL escolhida no hangar — cada cartão vira um perfil real na batalha (tipo de arma, munição por surtida,
+   alcance e dano). Valores no padrão das armas que o jogo já usa (HELIS); a escolha fica salva por aeronave. */
+export function perfilArma(nome, H) { const w = String(nome).toLowerCase(), base = H || {};
+  if (/sem armas/.test(w)) return null;
+  if (/ar-ar/.test(w)) { const longo = /longo/.test(w); return { tipo: 'ar', a2a: longo ? 1.25 : 1.5, a2aAlc: longo ? 2.4 : 1.35, rotulo: longo ? 'Interceptação além do alcance visual' : 'Combate aéreo aproximado' }; }
+  if (/torpedo/.test(w)) return { tipo: 'torpedo', arma: 'torpedo', mun: /×2/.test(w) ? 2 : base.arma === 'torpedo' ? base.mun : 2, alc: 1800, dano: 38, rotulo: 'Lançado perto do alvo, corre sob a água' };
+  if (/foguete/.test(w)) return { tipo: 'foguete', arma: 'foguete', mun: 24, alc: 2400, dano: 10, rotulo: 'Salva de foguetes não guiados' };
+  if (/canh|metralh/.test(w)) { const cal = +((w.match(/(\d+(?:,\d+)?)\s*mm/) || [])[1] || (/metralh/.test(w) ? '12,7' : '20')).replace(',', '.'); return { tipo: 'mg', arma: 'mg', mun: 400, alc: cal >= 20 ? 1800 : 1100, dano: cal >= 30 ? 2.2 : cal >= 20 ? 1.6 : cal >= 12 ? 1.0 : 0.6, a2a: 1.15, rotulo: `Tiro contínuo ${String(cal).replace('.', ',')} mm` }; }
+  if (/bomba guiada/.test(w)) return { tipo: 'missil', arma: 'missil', mun: 2, alc: 4500, dano: 32, rotulo: 'Planeia até o alvo marcado' };
+  if (/pesado|cruzeiro/.test(w)) return { tipo: 'missil', arma: 'missil', mun: Math.max(1, (base.arma === 'missil' ? base.mun : 2) - 1), alc: Math.max(9000, base.alc || 0), dano: Math.round((base.dano || 24) * 1.35), rotulo: 'Ogiva grande, mais lento' };
+  if (/anticarro/.test(w)) return { tipo: 'missil', arma: 'missil', mun: 8, alc: 5000, dano: 14, rotulo: 'Míssil guiado de precisão' };
+  return { tipo: 'missil', arma: 'missil', mun: base.arma === 'missil' ? base.mun : /×2/.test(w) ? 2 : 2, alc: base.arma === 'missil' ? base.alc : 6000, dano: base.arma === 'missil' ? base.dano : 22, rotulo: 'Míssil guiado rasante' };
+}
+/** Hidroaviões e o bombardeiro levam TODAS as armas e o piloto escolhe no voo (botões MÍSSIL/TORP/BOMBA); as demais aeronaves voam pela IA com UMA arma principal escolhida aqui. */
+export const armaFixaNoVoo = (id) => { const a = AERO[id]; return !!(a && (a.modelo.hidro || a.cat === 'bomb' || a.cat === 'apoio')); };
+export const armaAero = (eco, id) => { const a = AERO[id], i = est(eco)[id] && est(eco)[id].arma; return a && Number.isInteger(i) && i >= 0 && i < a.armas.length ? i : 0; };
+export function escolheArmaAero(eco, id, i) { const a = AERO[id]; if (!a || !(i >= 0 && i < a.armas.length)) return { ok: false, msg: 'Arma inválida' }; if (/sem armas/i.test(a.armas[i])) return { ok: false, msg: 'Aeronave de radar — sem armas' }; const S = est(eco); S[id] = Object.assign(S[id] || {}, { arma: i }); return { ok: true, msg: `${a.armas[i]} — arma principal` }; }
+/** Perfis das armas escolhidas (só as diferentes da 1ª), por id do modelo de batalha — vai para a sessão do jogador. */
+export const armasDoJogador = (eco) => Object.fromEntries(AERONAVES.filter((a) => !armaFixaNoVoo(a.id) && armaAero(eco, a.id) > 0).map((a) => [a.modelo.heli || a.modelo.hidro, a.armas[armaAero(eco, a.id)]]));
 /** Bônus do nível de evolução (aplicado na batalha às aeronaves do jogador). */
 export const bonusNivel = (nv) => ({ vel: 1 + 0.06 * (nv - 1), vida: 1 + 0.08 * (nv - 1), recarga: 1 - 0.05 * (nv - 1) });
 export const ehHeliNavio = (id) => ORDEM_HELIS.includes(id);
