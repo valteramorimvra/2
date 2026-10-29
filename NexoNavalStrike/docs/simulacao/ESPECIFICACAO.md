@@ -219,3 +219,31 @@ Proteções que já existem:
 - LOD de efeitos por distância.
 - Qualidade BAIXA/MÉDIA/ALTA por memória do aparelho.
 - Nenhuma alocação por quadro nos efeitos.
+
+---
+
+## 7. Evolução da detonação (v1.2.54, com base nos vídeos de referência do Valter)
+
+- **Fase 0:**
+  - Véu do clarão com queda radial (sem branco chapado) e aberração cromática nas bordas.
+  - Reflexos de lente (7 fantasmas de bokeh na linha entre a bola de fogo e o centro da tela).
+  - Faixa de brilho da bola de fogo no mar.
+- **Fase 1:**
+  - Cúpula do choque visível como vidro ondulado.
+  - **Dupla** nuvem de Wilson: a frente direta e a reflexão no mar, mais baixa e 0,35 s atrasada.
+  - Coroa de spray branco onde a frente toca a água, no arco voltado para a câmera.
+  - Cortina de spray no casco de cada navio atingido.
+  - Destroços lançados da haste.
+- **Fase 2:**
+  - Bola de fogo com convecção turbulenta (domain warping) e bolsões de fuligem ao esfriar.
+  - Capa em couve-flor (lóbulos de Rayleigh-Taylor), de fuligem cinza-escura com brasas, que clareia com a condensação (45 a 130 s).
+  - Haste escura com fogo por dentro.
+  - Anel de condensação fino em volta da haste.
+  - Base de fumaça escura rolando.
+  - Muralha de spray branco na frente da onda de superfície.
+  - Borda prateada (Henyey-Greenstein) contra o sol.
+- **Som:**
+  - Silêncio do ambiente (15%) entre o clarão e a chegada da frente.
+  - Estalo, estrondo e rolamento.
+  - **Vento de retorno**: ruído rosa com banda de 180 a 880 Hz, 7 s, que chega 3,5 a 7,5 s depois da frente.
+- **Concorrência de áudio:** os sons sintetizados (ruído e osciladores) entram no mesmo controle de concorrência (teto de 28 nós; acima de 18, as camadas abaixo de −22 dB viram virtuais).

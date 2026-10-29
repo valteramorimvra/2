@@ -68,6 +68,6 @@ function coluna(sr, s) { const n = Math.round(14 * sr), O = [];
     const rv = reverb(y, sr, 2.2, 0.4, 1.2); for (let i = 0; i < n; i++) y[i] = 0.75 * y[i] + 0.5 * rv[i]; rampas(y, sr, 0.3, 1.5); O.push(y); }
   normaliza(O[0], O[1], 0.8); return O; }
 
-export const NOMES_NUCLEAR = ['nk:estalo', 'nk:estrondo', 'nk:rolamento', 'nk:coluna'];
+export const NOMES_NUCLEAR = ['nk:estalo', 'nk:estrondo', 'nk:rolamento', 'nk:coluna', 'nk:retorno']; /* v1.2.54: + vento de retorno */
 /** Gera um som nuclear estéreo [L, R] na taxa sr (pico ≤ 0,89 → sem clipping mesmo somando os 3 com o ganho de distância ≤ 1). */
 export function geraNuclear(nome, sr) { if (nome === 'nk:estalo') return estalo(sr, 1226); if (nome === 'nk:estrondo') return estrondo(sr, 2612); if (nome === 'nk:rolamento') return rolamento(sr, 6221); if (nome === 'nk:coluna') return coluna(sr, 1500); throw new Error('som nuclear desconhecido ' + nome); }
