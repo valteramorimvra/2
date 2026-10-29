@@ -1,0 +1,93 @@
+/* v1.2.43 — VISUAL PROFISSIONAL: tema único (vidro escuro + aço + ciano), menu inicial em 3 zonas, carteira com Nexos,
+   ÁRVORE com fotos (nível × tipo), MERCADO e LOJA. Também acerta Manual, Novidades/Créditos, Como jogar e Ajustes. */
+:root { --nx: #6ee7d8; --nx2: #14b8a6; --aco1: rgba(17, 24, 33, .78); --aco2: rgba(8, 12, 18, .86); --fio: rgba(148, 197, 230, .22); --brilho: rgba(125, 211, 252, .55); --raio: 12px; }
+.moeda.n { color: var(--nx); }
+
+/* ---------- carteira (topo direito) ---------- */
+.carteira { gap: 14px; padding: 6px 8px 6px 14px; border-radius: 999px; background: linear-gradient(180deg, rgba(22, 30, 42, .9), rgba(8, 12, 18, .9)); border: 1px solid var(--fio); box-shadow: 0 6px 24px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .06); align-items: center; }
+.carteira .cart-mais { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--nx2); background: linear-gradient(180deg, #0f766e, #134e4a); color: #ecfeff; font-weight: 900; line-height: 1; padding: 0; display: grid; place-items: center; }
+
+/* ---------- MENU INICIAL: topo (logo) · navegação à esquerda · BATALHA grande à direita · perfil embaixo ---------- */
+.tela-inicio .mi-topo { position: absolute; left: max(22px, env(safe-area-inset-left)); top: max(10px, env(safe-area-inset-top)); }
+.tela-inicio .mi-topo .logo { margin: 0; } .tela-inicio .mi-topo .logo-ic { width: 40px; height: 40px; } .tela-inicio .mi-topo h1 { font-size: 17px; letter-spacing: .1em; white-space: nowrap; } .tela-inicio .mi-topo p { margin: 2px 0 0; font-size: 10.5px; color: #9fb3c4; letter-spacing: .06em; }
+.tela-inicio .mi-nav { position: absolute; left: max(22px, env(safe-area-inset-left)); top: 64px; bottom: 64px; overflow-y: auto; scrollbar-width: none; width: 252px; padding: 2px 4px 2px 0; }
+.tela-inicio .mi-nav::-webkit-scrollbar { display: none; }
+.tela-inicio .mi-perfil { position: absolute; left: max(22px, env(safe-area-inset-left)); bottom: 12px; display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; background: var(--aco2); border: 1px solid var(--fio); max-width: 360px; }
+.mi-perfil .mi-av { width: 38px; height: 38px; border-radius: 50%; background: #1e293b center/cover; border: 1px solid var(--brilho); flex: none; }
+.mi-perfil b { display: block; font-size: 13px; letter-spacing: .06em; } .mi-perfil span { font-size: 10.5px; color: #9fb3c4; }
+.tela-inicio .mi-batalha { position: absolute; right: max(22px, env(safe-area-inset-right)); bottom: 14px; min-width: 250px; padding: 10px 22px 12px; text-align: right; border: 0; border-radius: 14px; color: #fff;
+  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 55%, #c2410c 100%); box-shadow: 0 10px 30px rgba(234, 88, 12, .45), inset 0 1px 0 rgba(255, 255, 255, .35); display: flex; flex-direction: column; align-items: flex-end; gap: 2px; animation: mi-pulsa 2.6s ease-in-out infinite; }
+.mi-batalha b { font-size: 30px; letter-spacing: .2em; line-height: 1; text-shadow: 0 2px 10px rgba(0, 0, 0, .35); } .mi-batalha > small { font-size: 11px; font-weight: 700; letter-spacing: .1em; opacity: .9; }
+.mi-batalha .mi-nv { font-size: 12px; font-weight: 800; letter-spacing: .04em; display: flex; flex-direction: column; align-items: flex-end; } .mi-batalha .mi-nv small { font-size: 10px; font-weight: 600; opacity: .85; }
+.mi-batalha:active { transform: scale(.97); }
+@keyframes mi-pulsa { 0%, 100% { box-shadow: 0 10px 30px rgba(234, 88, 12, .4), inset 0 1px 0 rgba(255, 255, 255, .35); } 50% { box-shadow: 0 10px 42px rgba(245, 158, 11, .7), inset 0 1px 0 rgba(255, 255, 255, .35); } }
+@media (prefers-reduced-motion: reduce) { .mi-batalha { animation: none; } }
+.tela-inicio .versao { right: max(22px, env(safe-area-inset-right)); bottom: auto; top: 56px; }
+@media (max-height: 380px) { .tela-inicio .mi-nav { top: 58px; bottom: 56px; } .mi-batalha b { font-size: 24px; } .tela-inicio .mi-batalha { min-width: 210px; padding: 8px 16px 9px; } }
+
+/* ---------- títulos e painéis comuns (todas as telas) ---------- */
+.tela h2 { font-size: 21px; letter-spacing: .1em; text-transform: uppercase; background: linear-gradient(90deg, #f8fafc, #9fd8f5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.tela h2 small { -webkit-text-fill-color: #8fa3b5; text-transform: none; letter-spacing: .02em; }
+.btn-voltar { border-radius: 999px; padding: 7px 16px; background: linear-gradient(180deg, rgba(22, 30, 42, .92), rgba(8, 12, 18, .92)); border: 1px solid var(--fio); letter-spacing: .06em; }
+.texto, .creditos, .manual { background: linear-gradient(180deg, var(--aco1), var(--aco2)) !important; border: 1px solid var(--fio); border-radius: var(--raio); padding: 12px 16px !important; box-shadow: 0 10px 30px rgba(0, 0, 0, .3); }
+.texto section, .creditos section { padding: 10px 0 12px; border-bottom: 1px solid rgba(148, 197, 230, .12); } .texto section:last-child, .creditos section:last-child { border-bottom: 0; }
+.texto h3, .creditos h3 { color: #7dd3fc; letter-spacing: .12em; }
+.tela-ajustes .aj-chave, .aj-chave { border-radius: 10px !important; border: 1px solid var(--fio) !important; background: linear-gradient(180deg, var(--aco1), var(--aco2)) !important; }
+.seg button.on, .es-abas button.on, .mk-abas button.on { background: linear-gradient(180deg, #0e7490, #0b4f6c) !important; border-color: #7dd3fc !important; color: #fff; }
+
+/* ---------- ÁRVORE TECNOLÓGICA (nível × tipo, com fotos) ---------- */
+.tela-arvore .ar-wrap { position: relative; flex: 1; min-height: 0; overflow: auto; border-radius: var(--raio); border: 1px solid var(--fio); background: linear-gradient(180deg, rgba(10, 16, 24, .9), rgba(4, 8, 12, .94)); }
+.ar-grade { display: flex; flex-direction: column; min-width: max-content; }
+.ar-linha { display: grid; grid-template-columns: 116px repeat(6, 314px); border-bottom: 1px solid rgba(148, 197, 230, .1); }
+.ar-cab { position: sticky; top: 0; z-index: 2; background: rgba(8, 12, 18, .96); } .ar-cab .ar-cel { padding: 7px 8px; font-size: 10.5px; letter-spacing: .16em; color: #9fd8f5; text-align: center; } .ar-cab .lend b { color: #c4b5fd; } .ar-cab .slend b { color: #fde68a; }
+.ar-tipo { position: sticky; left: 0; z-index: 1; display: flex; align-items: center; padding: 6px 10px; font-size: 11px; font-weight: 800; letter-spacing: .08em; color: #e2e8f0; text-transform: uppercase; background: linear-gradient(90deg, rgba(14, 22, 32, .98), rgba(14, 22, 32, .88)); border-right: 1px solid var(--fio); }
+.ar-cel { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; align-content: flex-start; border-left: 1px dashed rgba(148, 197, 230, .08); }
+.ar-card { position: relative; width: 146px; height: 96px; padding: 0; border-radius: 9px; overflow: hidden; border: 1px solid rgba(148, 197, 230, .28); background: #0b1220; text-align: left; color: #fff; display: flex; flex-direction: column; justify-content: flex-end; }
+.ar-card .ar-foto { position: absolute; inset: 0; background: #0b1220 center/cover no-repeat; transition: transform .25s; }
+.ar-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, .82) 100%); }
+.ar-card b, .ar-card small, .ar-card em { position: relative; z-index: 1; } .ar-card b { font-size: 11.5px; padding: 0 7px; line-height: 1.15; } .ar-card small { font-size: 9.5px; padding: 1px 7px 5px; color: #cbd5e1; }
+.ar-card .ar-tag { position: absolute; top: 5px; right: 5px; font-style: normal; font-size: 8.5px; font-weight: 900; letter-spacing: .1em; padding: 1px 5px; border-radius: 4px; background: linear-gradient(180deg, #fde68a, #d4af37); color: #1c1300; }
+.ar-card.st-possui { border-color: rgba(74, 222, 128, .6); } .ar-card.st-possui small { color: #86efac; } .ar-card.st-bloq .ar-foto { filter: grayscale(.85) brightness(.6); }
+.ar-card.lend { border-color: rgba(167, 139, 250, .8); box-shadow: 0 0 14px rgba(167, 139, 250, .25); } .ar-card.slend { border-color: rgba(253, 230, 138, .9); box-shadow: 0 0 16px rgba(253, 230, 138, .3); }
+.ar-card:active .ar-foto { transform: scale(1.06); }
+
+/* ---------- MERCADO ---------- */
+.mk-abas { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; } .mk-abas button { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--fio); background: rgba(12, 18, 26, .85); font-weight: 800; font-size: 11.5px; letter-spacing: .1em; }
+.mk-abas .mk-loja { margin-left: auto; border-color: var(--nx2); color: var(--nx); }
+.mk-corpo { flex: 1; min-height: 0; overflow: auto; }
+.mk-ofertas { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 9px; }
+.mk-of { position: relative; display: flex; flex-direction: column; gap: 3px; padding: 8px; border-radius: var(--raio); border: 1px solid var(--fio); background: linear-gradient(180deg, var(--aco1), var(--aco2)); }
+.mk-of.dest { grid-column: span 2; border-color: rgba(245, 158, 11, .7); box-shadow: 0 0 22px rgba(245, 158, 11, .18); } .mk-of.feito { opacity: .55; }
+.mk-foto { display: block; height: 92px; border-radius: 8px; background: #0b1220 center/cover no-repeat; } .mk-of.dest .mk-foto { height: 128px; }
+.mk-foto.ic { background: radial-gradient(circle at 50% 45%, rgba(110, 231, 216, .35), rgba(8, 12, 18, .9) 70%); position: relative; } .mk-foto.ic::after { content: '◆'; position: absolute; inset: 0; display: grid; place-items: center; font-size: 40px; color: var(--nx); }
+.mk-foto.ic-lotes::after { content: '▤'; color: #fbbf24; } .mk-foto.ic-caixa::after { content: '▣'; color: #fde68a; } .mk-foto.ic-moeda::after { content: '●'; color: #fbbf24; }
+.mk-desc { position: absolute; top: 12px; left: 12px; font-style: normal; font-weight: 900; font-size: 12px; padding: 2px 7px; border-radius: 6px; background: #dc2626; color: #fff; }
+.mk-of b { font-size: 13px; } .mk-of small { font-size: 10.5px; color: #9fb3c4; }
+.mk-preco { display: flex; gap: 8px; align-items: baseline; } .mk-preco s { opacity: .55; font-size: 11px; }
+.mk-rel { margin-top: 8px; }
+.mk-caixas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.mk-cx { display: flex; flex-direction: column; gap: 4px; padding: 10px; border-radius: var(--raio); border: 1px solid color-mix(in srgb, var(--cx) 55%, transparent); background: linear-gradient(180deg, color-mix(in srgb, var(--cx) 16%, rgba(12, 18, 26, .9)), var(--aco2)); }
+.mk-cxi { height: 64px; border-radius: 8px; background: linear-gradient(135deg, color-mix(in srgb, var(--cx) 85%, #fff), var(--cx) 45%, color-mix(in srgb, var(--cx) 60%, #000)); box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .25); position: relative; }
+.mk-cxi::after { content: ''; position: absolute; left: 0; right: 0; top: 44%; height: 9px; background: rgba(0, 0, 0, .28); }
+.mk-cx ul { margin: 2px 0; padding-left: 16px; font-size: 10.5px; color: #cbd5e1; } .mk-cx > small { font-size: 10px; color: #9fb3c4; }
+.mk-cambio { display: grid; gap: 10px; max-width: 640px; } .mk-tr { padding: 10px 12px; border-radius: var(--raio); border: 1px solid var(--fio); background: linear-gradient(180deg, var(--aco1), var(--aco2)); } .mk-q { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.mk-premio { position: absolute; inset: 0; z-index: 40; display: grid; place-items: center; background: rgba(0, 0, 0, .7); animation: hentra .2s; }
+.mk-pcx { position: relative; min-width: 280px; max-width: 86vw; padding: 18px 20px; border-radius: 16px; text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center; border: 1px solid var(--cx); background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--cx) 40%, transparent), rgba(8, 12, 18, .96) 70%); overflow: hidden; }
+.mk-pcx b { font-size: 19px; } .mk-pcx .mk-foto { width: 240px; height: 120px; } .mk-premio.raro .mk-pcx { box-shadow: 0 0 60px color-mix(in srgb, var(--cx) 60%, transparent); }
+.mk-brilho { position: absolute; inset: -40%; background: conic-gradient(from 0deg, transparent, color-mix(in srgb, var(--cx) 35%, transparent), transparent 30%); animation: mk-gira 3s linear infinite; z-index: -1; }
+@keyframes mk-gira { to { transform: rotate(360deg); } }
+
+/* ---------- LOJA ---------- */
+.lj-pacotes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; flex: 1; min-height: 0; overflow: auto; align-content: start; }
+.lj-p { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 10px 10px; border-radius: 14px; border: 1px solid var(--fio); background: linear-gradient(180deg, var(--aco1), var(--aco2)); text-align: center; }
+.lj-p.destq { border-color: rgba(245, 158, 11, .8); box-shadow: 0 0 20px rgba(245, 158, 11, .2); } .lj-p em { position: absolute; top: -8px; font-style: normal; font-size: 9.5px; font-weight: 900; letter-spacing: .08em; padding: 2px 8px; border-radius: 999px; background: #f59e0b; color: #1c1300; }
+.lj-ic { width: calc(46px + var(--n) * 6px); height: calc(46px + var(--n) * 6px); border-radius: 50%; margin: 4px 0; }
+.lj-nexos .lj-ic { background: radial-gradient(circle at 35% 30%, #ccfbf1, #14b8a6 45%, #0f3d3a); box-shadow: 0 0 18px rgba(20, 184, 166, .45); } .lj-ouro .lj-ic { background: radial-gradient(circle at 35% 30%, #fef3c7, #f59e0b 45%, #78350f); box-shadow: 0 0 18px rgba(245, 158, 11, .45); } .lj-prata .lj-ic { background: radial-gradient(circle at 35% 30%, #f8fafc, #94a3b8 45%, #334155); box-shadow: 0 0 18px rgba(148, 163, 184, .4); }
+.lj-p b { font-size: 16px; } .lj-p small { font-size: 10.5px; color: #86efac; } .lj-teste { font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 4px; background: rgba(0, 0, 0, .3); margin-left: 4px; letter-spacing: .06em; }
+.lj-nota { margin-top: 8px; }
+
+.tela-inicio .mi-topo p { white-space: nowrap; } .tela-inicio .mi-nav .mp-2 .mpb { font-size: 10.5px; letter-spacing: .05em; }
+
+.tela-arvore h2 small, .tela-mercado h2 small, .tela-loja h2 small { display: none; } @media (min-width: 1100px) { .tela-arvore h2 small, .tela-mercado h2 small, .tela-loja h2 small { display: inline; } }
+.mk-of .btn.primario, .mk-cx .btn.primario, .lj-p .btn.primario { background: linear-gradient(180deg, #0ea5e9, #0369a1) !important; border-color: #7dd3fc !important; color: #fff; text-align: center; justify-content: center; }
+.mk-of .btn.primario[disabled] { background: linear-gradient(180deg, #166534, #14532d) !important; border-color: #4ade80 !important; }
