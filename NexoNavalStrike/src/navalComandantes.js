@@ -24,9 +24,10 @@ export const COMANDANTES = [
   { id: 'c09', nome: 'Cmte. Paula Ramos', esp: 'defesa', ret: 2, ouro: 3200, var: 'sepia(0.15) brightness(1.04)', espelho: 1, bio: 'Defesa de frota; especialista em interceptação por SAM.' },
   { id: 'c10', nome: 'Cmte. Caio Brandão', esp: 'navegacao', ret: 1, ouro: 2600, var: 'saturate(0.85) contrast(1.05)', espelho: 1, bio: 'Manobras em águas restritas e canais entre ilhas.' },
   { id: 'c11', nome: 'Cmte. Lúcia Teixeira', esp: 'avarias', ret: 5, ouro: 2700, var: 'hue-rotate(8deg) brightness(1.03)', espelho: 1, bio: 'Engenheira naval: mantém motores e leme operando sob fogo.' },
+  { id: 'kleber', nome: 'Cmte. Kleber', esp: 'avarias', ret: 0, img: 'cmd_kleber.webp', ouro: 0, estado: 'PA', mercante: 1, bio: 'Capitão de Longo Curso da Marinha Mercante, natural do Pará. Comanda o Parcel das Paredes: combate a incêndio com canhões d’água, apoio offshore e manobra fina em águas restritas.' }, /* v1.2.42 */
   { id: 'c12', nome: 'Ten. Bruno Azevedo', esp: 'aviacao', ret: 4, ouro: 2700, var: 'brightness(0.95) contrast(1.06)', espelho: 1, bio: 'Instrutor de voo embarcado; pousos em convés com mar grosso.' },
 ];
-export const retratoUrl = (c) => `retratos/cmd_naval_0${c.ret}.webp`;
+export const retratoUrl = (c) => c.img ? `retratos/${c.img}` : `retratos/cmd_naval_0${c.ret}.webp`;
 export const retratoCss = (c) => `${c.var ? 'filter:' + c.var + ';' : ''}${c.espelho ? 'transform:scaleX(-1);' : ''}`;
 export const NIVEL_MAX = 10;
 export const xpPara = (nv) => Math.round(1000 * Math.pow(nv, 1.6)); // XP acumulado para chegar ao nível nv+1

@@ -38,7 +38,7 @@ let TV = null, TVE = null;
 /** Faixa de vigias (escotilhas redondas) — cor e mapa de emissão (luz interna). Repete na horizontal. */
 /** v1.2.16: nome em ouro metálico nos dois costados a vante e na popa (lendários com nome próprio). */
 /** v1.2.16 item 34: nomes FICTÍCIOS padrão (sóbrios, em PT, sem religiosos, inventados — não são nomes de navios reais) para os navios sem nome próprio. */
-export const NOMES_OURO = { tamandare: 'ALMIRANTE TAMANDARÉ', barroso: 'ALMIRANTE BARROSO', isakov: 'ALMIRANTE ISAKOV', /* v1.2.33 */ colosso: 'VALTER AMORIM', baluarte: 'RAFAELLA', marcos: 'MARCOS VINÍCIUS', rodolfo: 'COMANDANTE RODOLFO', antonia: 'CAPITÃ ANTÔNIA', atlantico: 'ATLÂNTICO', kelly: 'CAPITÃ KELLY', laiane: 'CAPITÃ LAIANE', klevton: 'ALMIRANTE KLEVTON', ananery: 'CAPITÃ ANA NERY', trajano: 'REI TRAJANO', leidevaldo: 'ALMIRANTE LEIDEVALDO', ronaldo: 'ALMIRANTE RONALDO' }; Object.assign(NOMES_OURO, NOMES_OURO_1225); /* v1.2.25 */ /* v1.2.18 item 14: nomes no casco dos 7 cruzeiros pesados */
+export const NOMES_OURO = { parcel: 'PARCEL DAS PAREDES', /* v1.2.42 */ tamandare: 'ALMIRANTE TAMANDARÉ', barroso: 'ALMIRANTE BARROSO', isakov: 'ALMIRANTE ISAKOV', /* v1.2.33 */ colosso: 'VALTER AMORIM', baluarte: 'RAFAELLA', marcos: 'MARCOS VINÍCIUS', rodolfo: 'COMANDANTE RODOLFO', antonia: 'CAPITÃ ANTÔNIA', atlantico: 'ATLÂNTICO', kelly: 'CAPITÃ KELLY', laiane: 'CAPITÃ LAIANE', klevton: 'ALMIRANTE KLEVTON', ananery: 'CAPITÃ ANA NERY', trajano: 'REI TRAJANO', leidevaldo: 'ALMIRANTE LEIDEVALDO', ronaldo: 'ALMIRANTE RONALDO' }; Object.assign(NOMES_OURO, NOMES_OURO_1225); /* v1.2.25 */ /* v1.2.18 item 14: nomes no casco dos 7 cruzeiros pesados */
 function texVigias(emis) { if (emis ? TVE : TV) return emis ? TVE : TV; const c = document.createElement('canvas'); c.width = 64; c.height = 32; const x = c.getContext('2d'); x.clearRect(0, 0, 64, 32);
   for (let i = 0; i < 2; i++) { x.fillStyle = emis ? (i ? '#ffe2b0' : '#ffc06a') : '#1e252c'; x.beginPath(); x.arc(16 + i * 32, 16, 8, 0, Math.PI * 2); x.fill(); if (!emis) { x.strokeStyle = '#8b949c'; x.lineWidth = 2; x.stroke(); } }
   const t = new THREE.CanvasTexture(c); t.wrapS = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; if (emis) TVE = t; else TV = t; return t; }
@@ -393,7 +393,7 @@ function montaModelo(tipo, time, mais = 0) {
 }
 
 /** v1.2.11: convés de voo (porta-aviões / cruzador porta-aeronaves), ilha deslocada a boreste, caças estacionados e reparos LASER. */
-function extras1211(g, C, P, M, dY, meia) { const L = C.L, s = P.sup;
+function extras1211(g, C, P, M, dY, meia) { const L = C.L, s = P.sup; if (C.osv) extrasOSV(g, C, P, M, dY, meia);
   if (C.mercante) { const cores = ['#9a3b2e', '#2f5d8a', '#c08a2e', '#4d6b3c', '#7a7f86', '#a34d1f', '#2e6f6a']; const mats = cores.map((c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.75, metalness: 0.25 })); const geo = caixa(2.35, 2.5, 12);
     let k = 0; for (let z = -L * 0.36; z < s.z0 - 8; z += 12.8) { const nb = Math.max(2, Math.floor(meia(z) * 2 / 2.5) - 1); const alt = 2 + ((k * 7) % 3); for (let i = 0; i < nb; i++) for (let h = 0; h < alt; h++) { const q = mesh(geo, mats[(i * 3 + h * 5 + k) % mats.length]); q.position.set((i - (nb - 1) / 2) * 2.5, dY(z) + 1.3 + h * 2.55, z + 6); g.add(q); } k++; }
     for (const z of [-L * 0.2, L * 0.02]) { const gu = mesh(caixa(0.8, 14, 0.8), M.sup); gu.position.set(0, dY(z) + 7, z); g.add(gu); } } /* contêineres empilhados + mastros de carga */
@@ -414,6 +414,34 @@ function extras1211(g, C, P, M, dY, meia) { const L = C.L, s = P.sup;
   for (const [il, l] of (P.laser || []).entries()) { const lg = new THREE.Group(); lg.name = 'laser' + il; /* v1.2.19 item 5: nome p/ a máscara de linha de tiro */ lg.position.set(l.x, l.y - 1.2, l.z); const pe = mesh(cil(0.9, 1.1, 1.6, 12), M.sup); pe.position.y = 0.8; lg.add(pe);
     const hd = mesh(new THREE.SphereGeometry(1.05, 14, 10).scale(1, 0.85, 1), M.aa); hd.position.y = 2.1; lg.add(hd); const ln = mesh(cil(0.42, 0.42, 0.5, 14).rotateX(Math.PI / 2), M.vidro); ln.position.set(0, 2.15, -0.95); lg.add(ln);
     for (const sx of [-1, 1]) { const rd = mesh(caixa(0.12, 0.8, 0.9), M.escuro); rd.position.set(sx * 1.05, 2.1, 0); lg.add(rd); } g.add(lg); }
+}
+/** v1.2.42: navio de APOIO OFFSHORE (Parcel das Paredes): passadiço alto de 4 pavimentos com janelas corridas e asas, mastro treliçado com radomes,
+ *  chaminés laterais, convés de carga aberto à ré com balaustrada amarela, contêineres coloridos, guindaste articulado e pórtico (A-frame) de popa, bote de resgate laranja. */
+const MAT_OSV = {}; const mOSV = (c, r = 0.6, m = 0.3) => MAT_OSV[c] || (MAT_OSV[c] = new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: m }));
+function extrasOSV(g, C, P, M, dY, meia) { const L = C.L, s = P.sup, cS = s.z1 - s.z0, h = s.h, zS = (s.z0 + s.z1) / 2, y0 = dY(zS), wS = meia(zS) * 2 * 0.9;
+  const add = (geo, mat, x, y, z, det) => { const o = mesh(geo, mat); o.position.set(x, y, z); if (det) o.userData.det = 1; g.add(o); return o; };
+  /* pavimentos 3 e 4 (passadiço com asas) */ add(bloco(wS * 0.92, cS * 0.78, h, 0.9, 0.12), M.sup, 0, y0 + h * 2, s.z0 + cS * 0.42);
+  add(bloco(wS * 1.12, cS * 0.5, h, 0.94, 0.08), M.sup, 0, y0 + h * 3, s.z0 + cS * 0.3);
+  const jb = add(caixa(wS * 1.13, h * 0.42, cS * 0.51), M.vidro, 0, y0 + h * 3.55, s.z0 + cS * 0.3); /* janelas corridas do passadiço */
+  for (const yy of [1.5, 2.5]) add(caixa(wS * 0.94, h * 0.22, cS * 0.8), M.vidro, 0, y0 + h * yy, s.z0 + cS * 0.42, 1); /* vigias dos camarotes */
+  add(caixa(wS * 1.16, 0.25, cS * 0.54), M.sup, 0, y0 + h * 4, s.z0 + cS * 0.3); /* teto */
+  for (const sx of [-1, 1]) for (let k = 0; k < 7; k++) add(caixa(0.06, 1.0, 0.06), mOSV('#e3b02a', 0.5, 0.4), sx * wS * 0.56, y0 + h * 4 + 0.5, s.z0 + cS * (0.08 + k * 0.07), 1); /* balaustre amarelo do teto */
+  /* mastro treliçado com radomes e radar */ { const zm = s.z0 + cS * 0.52, ym = y0 + h * 4, Hm = 10, aM = 0.9; const ac = mOSV('#1b1d21', 0.5, 0.6);
+    for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(cil(0.09, 0.09, Hm, 6), ac, dx * aM, ym + Hm / 2, zm + dz * aM);
+    for (let k = 1; k < 6; k++) { const yy = ym + k * Hm / 6; add(caixa(aM * 2.2, 0.12, 0.12), ac, 0, yy, zm - aM); add(caixa(aM * 2.2, 0.12, 0.12), ac, 0, yy, zm + aM); add(caixa(0.12, 0.12, aM * 2.2), ac, -aM, yy, zm); add(caixa(0.12, 0.12, aM * 2.2), ac, aM, yy, zm); add(caixa(aM * 2.4, 0.08, aM * 2.4), mOSV('#e3b02a', 0.5, 0.4), 0, yy - 0.05, zm, 1); }
+    const rd = add(new THREE.SphereGeometry(0.75, 16, 12), mOSV('#f2f4f5', 0.35, 0.1), 0.6, ym + Hm + 0.7, zm); rd.userData.det = 1; add(new THREE.SphereGeometry(0.5, 14, 10), mOSV('#f2f4f5', 0.35, 0.1), -1.6, ym + 1.0, s.z0 + cS * 0.85);
+    const rb = new THREE.Group(); rb.name = 'radar'; rb.position.set(0, ym + Hm * 0.62, zm - aM - 0.5); rb.add(mesh(caixa(4.2, 0.22, 0.35), ac)); g.add(rb); }
+  /* chaminés laterais à ré do passadiço */ for (const sx of [-1, 1]) { const ch = add(caixa(1.4, h * 1.5, 2.2), M.sup, sx * wS * 0.4, y0 + h * 2 + h * 0.75, s.z1 - 1.4); add(caixa(1.46, 0.5, 2.26), mOSV('#1b1d21'), sx * wS * 0.4, y0 + h * 3.5 + 0.25, s.z1 - 1.4); void ch; }
+  /* convés de carga: balaustrada amarela, contêineres, carretéis */ const z0 = s.z1 + 2, z1 = L / 2 - 6, amar = mOSV('#e3b02a', 0.5, 0.4);
+  for (const sx of [-1, 1]) { for (let z = z0; z < L / 2 - 1; z += 2.4) { const x = sx * (meia(z) - 0.25); add(caixa(0.08, 1.1, 0.08), amar, x, dY(z) + 0.55, z, 1); } add(caixa(0.1, 0.1, L / 2 - 1 - z0), amar, sx * (meia((z0 + L / 2) / 2) - 0.25), dY(z0) + 1.1, (z0 + L / 2 - 1) / 2, 1); }
+  const CT = ['#3f8f3a', '#e0752a', '#f3f4f2', '#3f8f3a', '#9aa3ab', '#e0752a', '#1e5aa6', '#f0c419'];
+  let k = 0; for (let z = z0 + 3; z < z1 - 8; z += 6.6) for (const sx of [-1, 1]) { if ((k * 7) % 5 === 1) { k++; continue; } const hC = 2.6, alt = 1 + ((k * 5) % 3 === 0 ? 1 : 0); for (let a = 0; a < alt; a++) { const c = add(caixa(2.45, hC, 6.05), mOSV(CT[(k + a * 3) % CT.length], 0.72, 0.3), sx * meia(z) * 0.42, dY(z) + hC / 2 + a * hC, z); void c; } k++; }
+  for (const sx of [-1, 1]) { const cr = add(cil(1.1, 1.1, 1.6, 14).rotateZ(Math.PI / 2), mOSV('#1f6fb5'), sx * meia(z1 - 6) * 0.35, dY(z1 - 6) + 1.2, z1 - 6); void cr; }
+  /* guindaste articulado (bombordo) */ { const zc = s.z1 + 3, xc = -meia(zc) * 0.62, yc = dY(zc); const azulG = mOSV('#1f6fb5'), branco = mOSV('#f1f3f4', 0.5, 0.3);
+    add(cil(0.9, 1.1, 3.2, 14), azulG, xc, yc + 1.6, zc); const b1 = add(caixa(0.9, 0.9, 13), branco, xc, yc + 5.5, zc + 5.2); b1.rotation.x = -0.32; const b2 = add(caixa(0.7, 0.7, 9), branco, xc, yc + 6.6, zc + 13.6); b2.rotation.x = 0.18; add(cil(0.03, 0.03, 6, 4), mOSV('#222'), xc, yc + 4.2, zc + 17.6); }
+  /* pórtico A-frame de popa */ { const zp = L / 2 - 2.5, yp = dY(zp), wA = meia(zp) * 1.5, aA = mOSV('#1f6fb5'); for (const sx of [-1, 1]) { const p = add(caixa(0.7, 9, 0.7), aA, sx * wA / 2, yp + 4.3, zp); p.rotation.x = 0.28; } add(caixa(wA + 0.7, 0.9, 0.9), mOSV('#f1f3f4', 0.5, 0.3), 0, yp + 8.6, zp + 1.25); }
+  /* bote de resgate laranja (boreste) */ { const zb = s.z1 - 4, xb = meia(zb) * 0.8; const b = add(new THREE.SphereGeometry(1, 14, 8).scale(1.1, 0.6, 3.2), M.bote, xb, y0 + h * 1.3, zb); void b; add(caixa(0.2, 1.8, 0.2), mOSV('#1b1d21'), xb - 0.7, y0 + h * 0.9, zb - 2.2, 1); add(caixa(0.2, 1.8, 0.2), mOSV('#1b1d21'), xb - 0.7, y0 + h * 0.9, zb + 2.2, 1); }
+  /* bombas de incêndio (FiFi) e tubulação vermelha no castelo */ for (const sx of [-1, 1]) add(cil(0.25, 0.25, 6, 8).rotateX(Math.PI / 2), mOSV('#c0392b', 0.5, 0.4), sx * wS * 0.4, y0 + h * 4 - 0.2, s.z0 + cS * 0.5, 1);
 }
 /** Funde as malhas estáticas por material (e separa as de detalhe para o LOD). */
 /** Inverte o sentido (winding) de uma geometria NÃO indexada: troca o 2º e o 3º vértice de cada triângulo em todos os atributos. */
