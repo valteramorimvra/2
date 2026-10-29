@@ -74,6 +74,13 @@ float espumaCasco(vec2 p){ float e = 0.0;
   return e; }
 /** v1.2.15: textura de espuma REAL — rede de bolhas (células de ruído) que se rompe conforme a espuma envelhece/afina (k = densidade). Sem textura nova. */
 float renda(vec2 p, float k){ float a = ns(p * 1.9 + uT * 0.07), b = ns(p * 4.3 - uT * 0.11), c = ns(p * 9.7 + vec2(uT * 0.05, 0.0)); float cel = abs(a - 0.5) * 1.3 + abs(b - 0.5) * 0.7 + c * 0.25; return smoothstep(1.0 - k, 1.0 - k + 0.35, cel + k * 0.55); }
+/** v1.2.35: REFLEXO do casco na água (barato): faixa espelhada e escura junto ao costado, com largura ∝ borda livre (D.w), ondulada pelas normais. */
+float reflexoCasco(vec2 p, vec3 N){ float r = 0.0;
+  for (int i = 0; i < ${MAX_CASCOS}; i++) { if (float(i) >= uNC) break; vec4 C = uCas[i]; vec4 D = uDim[i]; if (D.w < 0.5) continue; vec2 d = p - C.xy; float lim = D.x + D.w * 2.5 + 8.0; if (dot(d, d) > lim * lim) continue;
+    float lx = d.x * C.z + d.y * C.w; float lz = -d.x * C.w + d.y * C.z; float u = clamp((D.x - lz) / (2.0 * D.x), 0.0, 1.0); float w = D.y * meiaWl(u);
+    float sdf = max(abs(lx) - w, abs(lz) - D.x); if (sdf < 0.0) continue; float ond = (N.x * 3.0 + N.z * 2.0); float alc = D.w * 1.6 * (1.0 + ond * 0.35);
+    r = max(r, (1.0 - smoothstep(0.0, max(alc, 0.5), sdf)) * (0.75 + 0.25 * sin(lz * 0.35 + ond * 6.0))); }
+  return clamp(r, 0.0, 1.0); }
 /** v1.2.13: o mar NÃO é desenhado dentro do casco (planta da linha d'água um pouco recolhida, proa afilada). D.w = 1: navio vivo. */
 bool dentroCasco(vec2 p, float py){ for (int i = 0; i < ${MAX_CASCOS}; i++) { if (float(i) >= uNC) break; vec4 C = uCas[i]; vec4 D = uDim[i]; if (D.w < 0.5) continue; vec2 d = p - C.xy; if (dot(d, d) > D.x * D.x * 1.3) continue;
     /* v1.2.14: SEÇÃO DO CASCO NA ALTURA DA ÁGUA (D.w = borda livre): crista alta perto do convés usa a planta do convés (flare + lançamento da proa ~7%·L) */
@@ -123,14 +130,17 @@ void main(){ vec3 V = normalize(cameraPosition - vW); float dc = length(cameraPo
   vec3 R = reflect(-V, N); R.y = abs(R.y);
   vec2 sx = normalize(uSol.xz + vec2(1e-4)); vec2 rx = normalize(R.xz + vec2(1e-4)); float faixa = pow(max(dot(rx, sx), 0.0), 18.0) * (1.0 - uNoite); /* reflexo de cor só na FAIXA DO SOL */
   vec3 cr0 = ceu(R); float lum = dot(cr0, vec3(0.3, 0.45, 0.25)); vec3 ceuEsc = mix(vec3(0.05, 0.11, 0.19), vec3(0.18, 0.28, 0.4), clamp(lum, 0.0, 1.0)) * (0.55 + 0.45 * lum);
-  vec3 c = mix(base, mix(ceuEsc, cr0, 0.40 + 0.60 * faixa), clamp(fres, 0.0, 0.86)); /* v1.2.29 item 4: reflexo céu mais limpo */
+  vec3 c = mix(base, mix(ceuEsc, cr0, 0.40 + 0.60 * faixa), clamp(fres, 0.0, 0.86));
+#ifndef BARATO
+  { float rc = reflexoCasco(vW.xz, N) * (1.0 - smoothstep(250.0, 1600.0, dc)); c = mix(c, c * vec3(0.32, 0.35, 0.4) + vec3(0.012, 0.014, 0.018) * uLuzAgua, rc * (0.35 + 0.5 * fres)); } /* v1.2.35: reflexo do casco */
+#endif /* v1.2.29 item 4: reflexo céu mais limpo */
   /* especular: Blinn duro + lóbulo médio (aprox. GGX barato) nas cristas */
   vec3 H = normalize(V + uSol); float nh = max(dot(N, H), 0.0); float cristaW = 0.40 + 0.60 * smoothstep(0.28, 0.92, hn);
   float sp = (pow(nh, 520.0) * 2.1 + pow(nh, 64.0) * 0.28 + pow(nh, 10.0) * 0.04 * faixa) * cristaW * (0.22 + 0.78 * faixa);
   sp *= 1.0 - 0.8 * smoothstep(70.0, 230.0, cameraPosition.y);
   c += uCorSol * sp * (1.0 - uChuva * 0.8) * (1.0 - uNuvem * 0.75);
 #ifndef BARATO
-  { /* v1.2.33b: CINTILAÇÃO do sol — facetas minúsculas que piscam no caminho do sol (glitter) */ float gl = ns(vW.xz * 2.3 + vec2(uT * 1.7, -uT * 0.9)) * ns(vW.xz * 3.7 - vec2(uT * 1.3, -uT * 1.1)); float spk = smoothstep(0.62, 0.9, gl) * pow(nh, 36.0) * (0.15 + 0.85 * faixa) * (1.0 - smoothstep(80.0, 1400.0, dc)) * (1.0 - uNoite); c += uCorSol * spk * 2.2 * (1.0 - uNuvem * 0.85) * (1.0 - uChuva); }
+  { /* v1.2.33b: CINTILAÇÃO do sol — facetas minúsculas que piscam no caminho do sol (glitter) */ float gl = ns(vW.xz * 2.3 + vec2(uT * 1.7, -uT * 0.9)) * ns(vW.xz * 3.7 - vec2(uT * 1.3, -uT * 1.1)); float spk = smoothstep(0.55, 0.95, gl) * pow(nh, 30.0) * (0.15 + 0.85 * faixa) * (1.0 - smoothstep(80.0, 1400.0, dc)) * (1.0 - uNoite); c += uCorSol * spk * 1.4 * (1.0 - uNuvem * 0.85) * (1.0 - uChuva); }
 #endif
   // espuma: cristas (limiar de inclinação/altura), arrebentação e cascos
 #ifdef BARATO
