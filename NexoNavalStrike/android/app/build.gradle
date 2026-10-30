@@ -4,7 +4,7 @@ android {
     namespace "br.com.valteramorim.nexonaval"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "br.com.valteramorim.nexonaval"
+        applicationId "br.com.valteramorim.nexonavan" // ID publicado de 1.2.64 a 1.2.68 (com "n"): NÃO mudar, senão instala outro app ao lado
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 72
