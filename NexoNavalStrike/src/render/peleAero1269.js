@@ -26,13 +26,15 @@ const GLSL_COR = `float peleJ = 0.0, peleR = 0.0, peleS = 0.0;
 if (length(fwidth(vPM)) > 1e-7) { vec3 P = vPM; vec3 Nf = normalize(cross(dFdx(P), dFdy(P))); vec3 An = abs(Nf); /* sem posM (malha antiga) → pele desligada */
   vec2 q = (An.x > An.y && An.x > An.z) ? P.zy : (An.y > An.z ? P.zx : P.xy);
   float pe = length(fwidth(P)); float lod = 1.0 - smoothstep(0.014, 0.045, pe), lodR = 1.0 - smoothstep(0.004, 0.012, pe);
+  vec2 aa = fwidth(q) + 1e-5; /* derivadas FORA do desvio (fluxo uniforme) */
+  if (lod > 0.001) { /* v1.2.71: longe (sem juntas visíveis) não calcula painéis/rebites — mesmo visual, menos custo na GPU do celular */
   vec2 cel = vec2(1.7, 0.9); float fil = floor(q.y / cel.y); cel.x *= 0.75 + 0.6 * pH(vec2(fil, 9.1)); vec2 gq = q / cel; gq.x += pH(vec2(fil, 3.7)) * 0.5; vec2 f = fract(gq), id = floor(gq);
-  vec2 dm = min(f, 1.0 - f) * cel; vec2 aa = fwidth(q) + 1e-5; float wj = 0.006;
+  vec2 dm = min(f, 1.0 - f) * cel; float wj = 0.006;
   peleJ = max(1.0 - smoothstep(wj, wj + aa.x, dm.x), 1.0 - smoothstep(wj, wj + aa.y, dm.y));
   if (pH(id + uPSeed) < 0.1) { vec2 c0 = (f - 0.5) * cel, hs = cel * vec2(0.2, 0.26); float r = max(abs(c0.x) / hs.x, abs(c0.y) / hs.y); peleJ = max(peleJ, (1.0 - smoothstep(0.0, (wj + max(aa.x, aa.y)) / hs.x, abs(r - 1.0))) * 0.85); }
   peleJ *= lod;
   vec2 r1 = vec2(dm.x - 0.05, (fract(q.y / 0.12) - 0.5) * 0.12), r2 = vec2(dm.y - 0.045, (fract(q.x / 0.14) - 0.5) * 0.14); float ra = length(aa);
-  peleR = max(1.0 - smoothstep(0.009, 0.009 + ra, length(r1)), 1.0 - smoothstep(0.009, 0.009 + ra, length(r2))) * lodR;
+  if (lodR > 0.001) peleR = max(1.0 - smoothstep(0.009, 0.009 + ra, length(r1)), 1.0 - smoothstep(0.009, 0.009 + ra, length(r2))) * lodR; }
   float sj = pF(vec2(P.x * 0.5 + P.y * 0.3, P.z * 0.07) + uPSeed), mn = pF(P.xz * 0.33 + P.y * 0.21 + 11.0);
   peleS = smoothstep(0.56, 0.86, sj) * 0.6 + smoothstep(0.6, 0.9, mn) * 0.4;
   float vent = smoothstep(-0.12, -0.6, Nf.y);
