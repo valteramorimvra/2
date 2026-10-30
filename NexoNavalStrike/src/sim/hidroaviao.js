@@ -40,7 +40,7 @@ export function motivoHidro(sim, n) { if (!temHidro(n) && !(sim && sim.nkBotAtom
 export function hidroDe(sim, n) { const k = n && n.hd; if (!k || k.noAr < 0 || !sim.nukes) return null; const q = sim.nukes[k.noAr]; return q && q.ativo && q.hidro && q.dono === n.id ? q : null; }
 
 /** Comando { t:'hidro' } — decola (corrida na água ao lado do navio). */
-const hdNv = (n, S) => { const v = n.aeroNv && n.aeroNv[S.id]; return (v > 1 ? 1 + 0.08 * (v - 1) : 1) * (n.papel === 'jogador' ? 2 : 1); }; /* v1.2.69 (Valter): hidroavião do jogador com o dobro de vida */ /* v1.2.61: blindagem pelo nível do hangar */
+const hdNv = (n, S) => { const v = n.aeroNv && n.aeroNv[S.id]; return (v > 1 ? 1 + 0.08 * (v - 1) : 1) * (n.papel === 'jogador' ? 6 : 1); }; /* v1.2.72 (Valter): hidroavião do jogador quase indestrutível (×6) */ /* v1.2.61: blindagem pelo nível do hangar */
 export function lancaHidro(sim, n) { const mot = motivoHidro(sim, n); if (mot) { sim.evento({ t: 'hdNegado', id: n.id, motivo: mot }); return 0; }
   const k = estadoHidro(n), S = HIDROS[k.tipo] || HIDROS.albatroz; const q = sim.nukes.find((x) => !x.ativo && !x.b.ativo && !(x.espDec > 0)); if (!q) { sim.evento({ t: 'hdNegado', id: n.id, motivo: 'pool' }); return 0; }
   const lado = (n.C.B * 0.5 + S.env * 0.5 + 18); sim.mundo(n, lado, 0, -n.C.L * 0.1, _o);

@@ -259,7 +259,7 @@ export function disparaMissilNk(sim, q, n) { if (q.fase !== 2 || !(q.misseis > 0
     q.misseis--; k++; n.stats.misLanc = (n.stats.misLanc || 0) + 1; sim.evento({ t: 'hdMissil', idx: q.idx, id: n.id, m: m.idx, x: m.x, y: m.y, z: m.z }); }
   q.tMis = 4; return k; }
 /** v1.2.69 (Valter): o bombardeiro tem VIDA própria (barra no painel e sobre o avião) — cada interceptação tira uma parte; a onda nuclear derruba direto. */
-const DANO_NK = { sam: 0.2, defesa: 0.1, arar: 0.25 }; /* fração da vida por acerto: SAM 5 acertos, defesa de perto 10, ar-ar 4 */
+const DANO_NK = { sam: 0.04, defesa: 0.02, arar: 0.05 }; /* v1.2.72 (Valter: quase indestrutível): ~25 SAM, ~50 rajadas, ~20 ar-ar */ /* fração da vida por acerto: SAM 5 acertos, defesa de perto 10, ar-ar 4 */
 function abate(sim, q, por, arma) { if (!q.hidro && q.vidaMax > 0 && DANO_NK[arma]) { q.vida -= q.vidaMax * DANO_NK[arma]; sim.evento({ t: 'nkAtingido', idx: q.idx, id: q.dono, x: q.x, y: q.y, z: q.z, f: Math.max(0, q.vida / q.vidaMax) }); if (q.vida > 0) return; }
   q.ativo = 0; q.sams.length = 0; const n = sim.navios[q.dono], k = n && n.nk; if (k && k.noAr === q.idx) { if (q.fase === 2) k.perdidas++; quedaBombardeiro(sim, q); }
   if (por) { por.stats.menores = (por.stats.menores || 0) + 1; por.stats.helisAbatidos = (por.stats.helisAbatidos || 0) + 1; }

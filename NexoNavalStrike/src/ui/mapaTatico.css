@@ -20,3 +20,7 @@
 .ap-off { position: absolute; left: 50%; top: calc(66px + env(safe-area-inset-top)); translate: -50% 0; z-index: 90; display: flex; align-items: center; gap: 7px; padding: 6px 12px 6px 8px; border-radius: 4px; border: 1px solid #f59e0b; background: linear-gradient(180deg, rgba(120,53,15,.92), rgba(60,24,6,.92)); color: #fde68a; font-weight: 900; font-size: 11px; letter-spacing: .08em; box-shadow: 0 0 14px rgba(245,158,11,.35); }
 .ap-off svg { width: 20px; height: 20px; stroke: #fde68a; fill: none; stroke-width: 2; } .ap-off small { display: block; font-size: 9px; font-weight: 700; letter-spacing: .04em; color: #fcd34d; opacity: .85; }
 .ap-off[hidden] { display: none; }
+
+/* v1.2.72 (Valter): DESATIVAR menor, à direita, abaixo do contador de aeronaves */
+.ap-off { left: auto !important; translate: none !important; right: calc(var(--sr, 0px) + 42px); top: calc(52px + env(safe-area-inset-top)); padding: 3px 7px 3px 5px !important; gap: 4px !important; font-size: 9px !important; border-radius: 4px; }
+.ap-off svg { width: 13px !important; height: 13px !important; } .ap-off b { font-size: 9px; letter-spacing: .03em; } .ap-off small { font-size: 8px !important; }
