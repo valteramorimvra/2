@@ -30,4 +30,9 @@ if (q) { const fl0 = q.fl ?? 6; q.tFlareCd = 0; q.tFlareAte = 0; q.sams.push({ t
   const tiros = []; const ev0 = s3.evento.bind(s3); s3.evento = (x) => { if (x.t === 'hdMissil' && x.idx === h.idx) tiros.push(Math.hypot(e.x - h.x, e.z - h.z)); return ev0(x); };
   s3.aplica({ id: m.id, t: 'nkTrava', alvo: e.id }); s3.aplica({ id: m.id, t: 'nkPiloto', v: 0 }); for (let i = 0; i < 60 * 120 && !tiros.length; i++) s3.passo();
   ok(tiros.length > 0 && tiros[0] <= 6000 * 0.9 + 1, `piloto automático levou o heli ao alvo e disparou a ${tiros.length ? (tiros[0] / 1000).toFixed(1) : '—'} km (alcance 6 km)`); }
+/* Urubu-rei do PORTA-AVIÕES (Lençóis) intocado: sem vida própria, sem flare automático, sem mísseis, voo e altitude do bombardeiro */
+{ const s4 = new Sim({ arena: ARENA, seed: 6 }); s4.ameacas.ligadas = 0; const pa = s4.adicionaNavio('azul', 'lencois', P0.x, P0.z, 0, 'jogador'); for (let i = 0; i < 60 * 16; i++) s4.passo(); s4.aplica({ id: pa.id, t: 'nuclear', px: pa.x, pz: pa.z - 12000 }); s4.passo(); const b = s4.nukes[pa.nk.noAr];
+  ok(!!b && !b.aero && !b.vidaMax && !b.misseis && !b.rotor, 'Urubu-rei do porta-aviões: sem vida própria, sem mísseis, modelo original');
+  for (let i = 0; i < 60 * 30; i++) s4.passo(); const fl0 = b.fl ?? 6; b.sams.push({ t: s4.t + 1, por: 0 }); s4.passo(); ok((b.fl ?? 6) === fl0, 'Urubu-rei do porta-aviões: sem flare automático (só no botão)');
+  ok(Math.abs(b.y - 1253.6) < 0.5, `Urubu-rei do porta-aviões com a MESMA trajetória da 1.2.68: ${b.y.toFixed(1)} m após 30 s (1.2.68: 1253.6 m)`); }
 process.exit(falhas ? 1 : 0);

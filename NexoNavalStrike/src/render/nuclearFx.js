@@ -324,8 +324,8 @@ export class NuclearFx {
     if (b._tx == null || Math.hypot(x - b._tx, y - b._ty, z - b._tz) > 400) { b._tx = x; b._ty = y; b._tz = z; return; }
     const dx = x - b._tx, dy = y - b._ty, dz = z - b._tz, d = Math.hypot(dx, dy, dz), passo = 1.8; if (d < passo) return; const N = Math.min(60, Math.floor(d / passo)); const pal = NK_PALIDA[ic % 3];
     for (let k = 1; k <= N; k++) { const f = (k * passo) / d, px = b._tx + dx * f, py = b._ty + dy * f, pz = b._tz + dz * f, r = Math.random(); /* v1.2.49: fumaça de demonstração realista — núcleo denso colorido + véu pálido que se expande e se desfaz no vento */
-      T.emite(px, py, pz, (r - 0.5) * 1.6, (Math.random() - 0.5) * 1.0, (Math.random() - 0.5) * 1.6, cor, 0.5, 0.6 + r * 0.35, 5.5 + r * 2.5, 4.0, -0.03, 0.3); /* v1.2.56: estreito no bocal → leque largo · v1.2.70 (Valter: "muito grosso"): núcleo ~40% mais fino e abre menos */
-      if (k % 2 === 0) T.emite(px, py, pz, (Math.random() - 0.5) * 2.4 + this.vento.x * 0.3, (Math.random() - 0.3) * 1.2, (Math.random() - 0.5) * 2.4 + this.vento.z * 0.3, pal, 0.1, 1.4 + r * 0.9, 8 + r * 3, 5.2, -0.05, 0.25); } /* v1.2.70: véu mais leve e estreito */
+      T.emite(px, py, pz, (r - 0.5) * 1.6, (Math.random() - 0.5) * 1.0, (Math.random() - 0.5) * 1.6, cor, 0.55, 1.0 + r * 0.6, 9 + r * 4, 4.6, -0.03, 0.3); /* v1.2.56: estreito no bocal → leque largo */
+      if (k % 2 === 0) T.emite(px, py, pz, (Math.random() - 0.5) * 2.4 + this.vento.x * 0.3, (Math.random() - 0.3) * 1.2, (Math.random() - 0.5) * 2.4 + this.vento.z * 0.3, pal, 0.18, 2.4 + r * 1.5, 13 + r * 5, 6.4, -0.05, 0.25); }
     const f = (N * passo) / d; b._tx += dx * f; b._ty += dy * f; b._tz += dz * f; }
   passoSams(dt, sim) { for (const s of this.sams) { if (s.t < 0) continue; s.t += dt; const q = sim.nukes && sim.nukes[s.idx]; if (!q || s.t > s.tv) { s.t = -1; continue; } const u = s.t / s.tv, x = s.x + (q.x - s.x) * u, y = s.y + (q.y - s.y) * u * u, z = s.z + (q.z - s.z) * u; this.fx.fumaca.emite(x, y, z, 0, 0, 0, '#e8eaec', 0.45, 5, 3.5, 4, 0, 0.2); this.fx.brilho.emite(x, y, z, 0, 0, 0, '#ffd27a', 1, 3, 0.08, 0); } }
   /** Cache InstancedMesh arvNuke no 1º uso (REVISAO #11). */
