@@ -11,7 +11,7 @@ import { desviaTerreno, colideAereoTerreno } from './colisaoTerreno.js';
 import { alturaMar, emiteOndaNuclear } from './ocean.js';
 import { derrubaAereo, arrancaDoConves, noConvesVisivel } from '../naval5v5/aereo.js';
 import { LASER, lancaArAr } from '../naval5v5/defesa.js';
-import { SAM } from './classes.js';
+import { SAM, MISSEIS } from './classes.js';
 import { danoEstr } from './destruicao.js';
 
 export const NUK = Object.freeze({
@@ -69,7 +69,7 @@ function quedaBombardeiro(sim, q) { const n = sim.navios[q.dono], k = n && n.nk;
 const NB = 12; // pool fixo de bombardeiros/bombas (2 PA por lado × líder + 2 alas, com folga)
 const _o = { x: 0, y: 0, z: 0 };
 
-export function instalaNuclear(sim) { sim.abateNk = (q, por) => abate(sim, q, por, 'arar'); /* v1.2.59: gancho p/ o míssil ar-ar (evita import circular) */
+export function instalaNuclear(sim) { sim.abateNk = (q, por) => abate(sim, q, por, 'arar'); sim.autoFlareNk = (q) => autoFlareNk(sim, q); /* v1.2.69 */ /* v1.2.59: gancho p/ o míssil ar-ar (evita import circular) */
   sim.nukes = []; for (let i = 0; i < NB; i++) sim.nukes.push({ idx: i, ativo: 0, fase: 0, dono: -1, time: '', x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, rumo: 0, t: 0, alvo: -1, ax: 0, az: 0,
     b: { ativo: 0, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, t: 0, chute: 0, px: 0, py: 0, pz: 0 }, tSam: 0, sams: [], deck: 0, manual: 0, jx: 0, jy: 0, sx: 0, sy: 0, w: 0, bank: 0, gam: 0, tAssume: 0, px: 0, py: 0, pz: 0, prumo: 0, ppitch: 0, proll: 0 }); /* v1.2.29: pose anterior p/ lerp render */
   sim.nukeDet = []; // detonações (para o render consultar e para testes)
@@ -90,13 +90,13 @@ export function lancaNuclear(sim, n, cmd) { const k = prepara(n); const mot = mo
   if (Math.hypot(ax - n.x, az - n.z) > NUK.alcanceMax) { sim.evento({ t: 'nkNegado', id: n.id, motivo: 'alcance' }); return 0; }
   const q = sim.nukes.find((x) => !x.ativo && !x.b.ativo && !(x.espDec > 0)); if (!q) { sim.evento({ t: 'nkNegado', id: n.id, motivo: 'pool' }); return 0; }
   const nCarga = k.ilimitado ? NUK.bombasSurtida : Math.min(NUK.bombasSurtida, k.bombas); if (!k.ilimitado) k.bombas -= nCarga; k.usadas += nCarga; k.noAr = q.idx; const L = n.C.L, P = n.P || {}, dY = P.convoo && P.convoo.y != null ? P.convoo.y + 0.6 /* fiscal nukefumaca: convés de voo REAL (= aeronaves comuns, aereo.js pad/decolaPista); antes C.F+1.6 = 4–6 m DENTRO do casco/hangar */ : (P.deckY != null ? P.deckY : n.C.F) + 1.6;
-  q.ativo = 1; q.vidaMax = q.vida = NUK.vidaBomb; /* v1.2.69: vida própria */ q.aero = n.nkAero || null; /* v1.2.69: modelo desenhado (null = Urubu-rei) */ q.aa = 4; q.tAA = 0; q.fl = 6; q.tFlareCd = 0; q.tFlareAte = 0; q.fase = 1; q.dono = n.id; q.time = n.time; q.t = 0; q.alvo = a ? a.id : -1; q.ax = ax; q.az = az; q.tSam = 0; q.sams.length = 0; q.deck = dY; q.v = 0; q.manual = 0; q.manualPend = 0; q.tMan = 0; q.espera = 0; q.devolve = 0; q.cargas = nCarga; q.thr = 2; q.miraSolo = 0; q.jx = q.jy = q.sx = q.sy = q.w = q.bank = q.gam = q.tAssume = 0; q.nSoltas = 0; q.tPrep = NUK.tPrep1 || 10; q.auto = a ? 1 : 0; /* v1.2.29: AUTO se alvo travado; prep 1ª bomba 10 s */
+  q.ativo = 1; q.vidaMax = q.vida = NUK.vidaBomb; /* v1.2.69: vida própria */ q.aero = n.nkAero || null; /* v1.2.69: modelo desenhado (null = Urubu-rei) */ { const M = n.nkMis; q.misseis = M ? M.n : 0; q.misAlc = M ? M.alc : 0; q.misDano = M ? M.dano : 0; q.misNome = M ? M.nome : ''; q.tMis = 0; } /* v1.2.69: arma do hangar (mísseis com alcance real) */ q.aa = 4; q.tAA = 0; q.fl = 6; q.tFlareCd = 0; q.tFlareAte = 0; q.fase = 1; q.dono = n.id; q.time = n.time; q.t = 0; q.alvo = a ? a.id : -1; q.ax = ax; q.az = az; q.tSam = 0; q.sams.length = 0; q.deck = dY; q.v = 0; q.manual = 0; q.manualPend = 0; q.tMan = 0; q.espera = 0; q.devolve = 0; q.cargas = nCarga; q.thr = 2; q.miraSolo = 0; q.jx = q.jy = q.sx = q.sy = q.w = q.bank = q.gam = q.tAssume = 0; q.nSoltas = 0; q.tPrep = NUK.tPrep1 || 10; q.auto = a ? 1 : 0; /* v1.2.29: AUTO se alvo travado; prep 1ª bomba 10 s */
   sim.mundo(n, 0, dY, L * 0.38, _o); q.x = q.px = _o.x; q.y = q.py = _o.y; q.z = q.pz = _o.z; q.rumo = q.prumo = n.rumo; q.vx = q.vy = q.vz = 0; q.pitch = q.ppitch = 0; q.roll = q.proll = 0; // começa no terço de ré do convés, aproado
   sim.evento({ t: 'nkDecola', id: n.id, idx: q.idx, x: q.x, y: q.y, z: q.z, alvo: q.alvo, ax, az }); escoltaNuclear(sim, n, q); criaAlas(sim, q); return 1; }
 /** v1.2.32: reserva as 2 alas no pool; decolam do mesmo convés 2,6 s e 5,2 s depois do líder. */
 function criaAlas(sim, c) { c.pontoFixo = c.alvo < 0 ? 1 : 0; c.lider = -1; let k = 0;
   for (const w of sim.nukes) { if (k >= FILA.nAlas) break; if (w === c || w.ativo || w.b.ativo || w.espDec > 0) continue; k++;
-    w.ativo = 0; w.vidaMax = w.vida = NUK.vidaBomb; w.aero = c.aero; w.fase = 0; w.dono = c.dono; w.time = c.time; w.t = 0; w.alvo = c.alvo; w.ax = c.ax; w.az = c.az; w.tSam = 0; w.sams.length = 0; w.deck = c.deck; w.v = 0; w.manual = 0; w.manualPend = 0; w.tMan = 0; w.espera = 0; w.devolve = 0; w.cargas = c.cargas; w.thr = 2; w.miraSolo = 0;
+    w.ativo = 0; w.vidaMax = w.vida = NUK.vidaBomb; w.aero = c.aero; w.misseis = c.misseis; w.misAlc = c.misAlc; w.misDano = c.misDano; w.misNome = c.misNome; w.tMis = 0; w.fase = 0; w.dono = c.dono; w.time = c.time; w.t = 0; w.alvo = c.alvo; w.ax = c.ax; w.az = c.az; w.tSam = 0; w.sams.length = 0; w.deck = c.deck; w.v = 0; w.manual = 0; w.manualPend = 0; w.tMan = 0; w.espera = 0; w.devolve = 0; w.cargas = c.cargas; w.thr = 2; w.miraSolo = 0;
     w.jx = w.jy = w.sx = w.sy = w.w = w.bank = w.gam = w.tAssume = 0; w.nSoltas = 0; w.tPrep = 1e9; w.auto = 0; w.pontoFixo = c.pontoFixo; w.lider = c.idx; w.ala = k; w.espDec = FILA.decAla * k; w.soltaEm = 0; } }
 /** v1.2.33: líder soltou → alas soltam 4 s e 8 s depois; líder só tem a próxima bomba 10 s após a última da salva. */
 function agendaAlas(sim, L) { for (const w of sim.nukes) if (w.lider === L.idx && (w.ativo || w.espDec > 0) && (w.cargas | 0) > 0) { w.soltaEm = sim.t + FILA.intervalo * w.ala; L.tPrep = Math.max(L.tPrep || 0, FILA.intervalo * w.ala + FILA.rearme); } }
@@ -146,7 +146,7 @@ export function passoNuclear(sim, dt) { if (!sim.nukes) return;
 
 let _imp = null; /* scratch impactoNuclear AUTO */
 function guardaPose(q) { q.px = q.x; q.py = q.y; q.pz = q.z; q.prumo = q.rumo; q.ppitch = q.pitch || 0; q.proll = q.roll || 0; } /* v1.2.29 bombcam: pose do passo anterior */
-function passoBombardeiro(sim, q, dt) { guardaPose(q); q.t += dt; if (q.tPrep > 0) q.tPrep = Math.max(0, q.tPrep - dt); /* v1.2.29 prep */ const n = sim.navios[q.dono];
+function passoBombardeiro(sim, q, dt) { guardaPose(q); q.t += dt; if (q.tMis > 0) q.tMis -= dt; if (q.tPrep > 0) q.tPrep = Math.max(0, q.tPrep - dt); /* v1.2.29 prep */ const n = sim.navios[q.dono];
   /* v1.2.29 AUTO: com alvo travado e auto=1, IA dirige ao alvo; jogador reassumindo (manual) cancela auto */
   if (q.manual) q.auto = 0; else {
     /* fiscal nukefumaca (item 3): se bomber sem trava própria, herda n.alvoId do navio */
@@ -166,6 +166,7 @@ function passoBombardeiro(sim, q, dt) { guardaPose(q); q.t += dt; if (q.tPrep > 
     /* fiscal nukefumaca (item 3): sobe em ROTA RETA até a altitude (sem órbita de subida) */
     voaPara(q, tx, tz, NUK.altVoo, sobe ? NUK.vVoo * 0.7 : NUK.vVoo, dt, sim);
     const alinhado = Math.abs(ang(marcacao(q.x, q.z, q.ax, q.az) - q.rumo)) < 0.16;
+    if (q.misseis > 0 && a && !a.morto && !(q.tMis > 0)) { const dA = Math.hypot(a.x - q.x, a.z - q.z); if (dA < q.misAlc * 0.9 && Math.abs(ang(marcacao(q.x, q.z, a.x, a.z) - q.rumo)) < 0.35) disparaMissilNk(sim, q, n); } /* v1.2.69: IA dispara os mísseis só dentro do alcance real da arma, com o alvo à frente */
     if (!reto && !sobe && alinhado && d <= L.x + 120 && q.y > NUK.altVoo * 0.85) {
       /* v1.2.29: AUTO não solta se o ponto zero previsto cai perto de aliado (fogo amigo visual/choque) */
       const I = impactoNuclear(q, _imp || (_imp = {})); let okAl = 1;
@@ -210,6 +211,7 @@ export function comandoNuclear(sim, n, cmd) { const q = nkBombardeiroDe(sim, n);
     for (const h of sim.helis) { if (!h.ativo || h.time === q.time || h.estado < 2 || h.estado > 5) continue; const d = Math.hypot(h.x - q.x, h.y - q.y, h.z - q.z); if (d < 8000 && cone(h.x, h.z) && d < bs) { bs = d; best = h; tp = 'h'; } }
     for (const o of sim.nukes) { if (!o.ativo || o.time === q.time || o.fase < 2) continue; const d = Math.hypot(o.x - q.x, o.y - q.y, o.z - q.z); if (d < 8000 && cone(o.x, o.z) && d * 0.9 < bs) { bs = d * 0.9; best = o; tp = 'q'; } }
     if (!best) { sim.evento({ t: 'arArNeg', idx: q.idx, id: n.id, motivo: 'semAlvo' }); return; } if (lancaArAr(sim, q, best, tp)) { q.aa--; q.tAA = sim.t + 2.2; } }
+  else if (cmd.t === 'nkMissil') disparaMissilNk(sim, q, n); /* v1.2.69 */
   else if (cmd.t === 'nkFlare') { /* v1.2.59: FLARES/CHAFF — leque de flares; por 3,5 s cada míssil que chegar tem 80 % de chance de ser enganado */ if (q.fl == null) q.fl = 6; if (q.fl <= 0 || (q.tFlareCd || 0) > sim.t) return; q.fl--; q.tFlareAte = sim.t + 3.5; q.tFlareCd = sim.t + 6; q.tFlare = 3.5; sim.evento({ t: 'nkFlare', idx: q.idx, id: n.id, x: q.x, y: q.y, z: q.z, vx: q.vx || 0, vz: q.vz || 0 }); }
   else if (cmd.t === 'nkMiraSolo') { /* v1.2.28: retícula no mar/terra — ponto onde a bomba deve cair */ if (Number.isFinite(cmd.px) && Number.isFinite(cmd.pz)) { q.ax = +cmd.px; q.az = +cmd.pz; q.alvo = -1; q.miraSolo = 1; q.espera = 0; q.pontoFixo = 1; q.auto = 1; /* v1.2.58: IA leva até o ponto e lança */ sim.evento({ t: 'nkMiraSolo', idx: q.idx, id: n.id, px: q.ax, pz: q.az }); } }
   else if (cmd.t === 'nkTrava') { const a = cmd.alvo != null && cmd.alvo >= 0 ? sim.navios[cmd.alvo] : null; if (a && !a.morto && a.time !== n.time) { q.alvo = a.id; q.ax = a.x; q.az = a.z; q.miraSolo = 0; q.espera = 0; q.auto = 1; q.pontoFixo = 0; /* fiscal nukefumaca (item 3): ao travar → DIRETO ao alvo (sem órbita) */ } /* toque SÓ trava; soltar só trocando de alvo (ignora alvo:-1) */ sim.evento({ t: 'nkTravado', idx: q.idx, id: n.id, alvo: q.alvo }); }
@@ -231,7 +233,9 @@ function passoBomba(sim, q, dt) { const b = q.b; b.px = b.x; b.py = b.y; b.pz = 
     if (d < 1200 && n.ciws) for (const c of n.ciws) if (c.mun > 0) h += NUK.ciwsQueda * Math.max(0, 1.6 - d / 1200); if (n.lasers && n.lasers.length && d < LASER.alc) h += NUK.laserQueda * n.lasers.length; }
   if (h > 0 && sim.rng.next() < 1 - Math.exp(-h * dt)) { b.ativo = 0; sim.evento({ t: 'nkBombaAbatida', idx: q.idx, x: b.x, y: b.y, z: b.z, dono: b.dono }); } }
 
-function interceptaBombardeiro(sim, q, dt) { if (q.fase === 1 || !q.ativo) return; let h = 0; const S = q.sams;
+/** v1.2.69 (Valter: "iscas térmicas não funcionam"): autoproteção — com míssil chegando (≤ 2 s), solta FLARES sozinho (jogador e alas), como o sistema de contramedidas real. O botão FLARE continua manual. */
+export function autoFlareNk(sim, q) { if (q.hidro || !q.ativo) return; if (q.fl == null) q.fl = 6; if (q.fl <= 0 || (q.tFlareCd || 0) > sim.t || q.tFlareAte > sim.t) return; q.fl--; q.tFlareAte = sim.t + 3.5; q.tFlareCd = sim.t + 6; q.tFlare = 3.5; sim.evento({ t: 'nkFlare', idx: q.idx, id: q.dono, x: q.x, y: q.y, z: q.z, vx: q.vx || 0, vz: q.vz || 0, auto: 1 }); }
+function interceptaBombardeiro(sim, q, dt) { if (q.fase === 1 || !q.ativo) return; let h = 0; const S = q.sams; for (const s of S) if (s.t - sim.t < 2) { autoFlareNk(sim, q); break; }
   const altMul = q.y > 2000 ? 0.15 : q.y > 1200 ? 0.4 : 1; /* v1.2.27: CIWS inútil em altitude; laser/caça degradados */
   for (const n of sim.navios) { if (n.morto || n.time === q.time) continue; const d = Math.hypot(q.x - n.x, q.y - n.C.F, q.z - n.z);
     if (q.y < 1400 && d < 1200 && n.ciws) for (const c of n.ciws) if (c.mun > 0) h += NUK.ciwsBomb * Math.max(0, 1.6 - d / 1200) * (n.C.antiAereo ? 1.5 : 1);
@@ -243,6 +247,14 @@ function interceptaBombardeiro(sim, q, dt) { if (q.fase === 1 || !q.ativo) retur
   const ecm = esc > 0 ? Math.max(0.18, 1 - 0.28 * Math.min(4, esc)) : 1;
   for (let i = S.length - 1; i >= 0; i--) if (sim.t >= S[i].t) { const s = S[i]; S.splice(i, 1); if (q.tFlareAte > sim.t && sim.rng.next() < 0.8) { sim.evento({ t: 'nkSamFalha', idx: q.idx, x: q.x, y: q.y, z: q.z, flare: 1 }); continue; } /* v1.2.59: flare enganou o míssil */ if (sim.rng.next() < NUK.samPk * ecm) return abate(sim, q, sim.navios[s.por], 'sam'); sim.evento({ t: 'nkSamFalha', idx: q.idx, x: q.x, y: q.y, z: q.z }); }
   if (h > 0 && sim.rng.next() < 1 - Math.exp(-h * ecm * dt)) abate(sim, q, null, 'defesa'); }
+/** v1.2.69 (Valter): mísseis da arma escolhida no hangar (antinavio, bomba guiada, cruzeiro) — par a par, só dentro do alcance real (q.misAlc), contra o alvo travado. */
+export function disparaMissilNk(sim, q, n) { if (q.fase !== 2 || !(q.misseis > 0) || q.tMis > 0 || !n) return 0; const a = q.alvo >= 0 ? sim.navios[q.alvo] : null; if (!a || a.morto) { sim.evento({ t: 'nkMisNeg', idx: q.idx, id: n.id, motivo: 'semAlvo' }); return 0; }
+  const d = Math.hypot(a.x - q.x, a.z - q.z); if (d > q.misAlc) { sim.evento({ t: 'nkMisNeg', idx: q.idx, id: n.id, motivo: 'alcance', d, alc: q.misAlc }); return 0; }
+  let k = 0; for (let i = 0; i < 2 && q.misseis > 0; i++) { const m = sim.misseis.find((x) => !x.ativo); if (!m) break; const lado = i ? 1 : -1, c = Math.cos(q.rumo), s = Math.sin(q.rumo), ox = q.x + c * lado * 4 - s * 2, oz = q.z + s * lado * 4 + c * 2;
+    const pf = Object.assign({}, MISSEIS.curto, { nome: q.misNome || 'Míssil ar-superfície', v: 270, vt: 310, alc: q.misAlc, dano: q.misDano }); const v0 = Math.max(150, q.v + 10);
+    Object.assign(m, { ouro: 0, heli: 1, ativo: 1, x: ox, y: q.y - 1.5, z: oz, vx: Math.sin(q.rumo) * v0, vy: (q.vy || 0) - 5, vz: -Math.cos(q.rumo) * v0, dono: n.id, time: n.time, alvo: a.id, isca: -1, fase: 3, t: 0, v: v0, perfil: pf, cel: 0, iscasVistas: 0, tf: 0, d0: d, samAlvo: 0, dano: q.misDano, pkMul: 1, velMul: 1 });
+    q.misseis--; k++; n.stats.misLanc = (n.stats.misLanc || 0) + 1; sim.evento({ t: 'hdMissil', idx: q.idx, id: n.id, m: m.idx, x: m.x, y: m.y, z: m.z }); }
+  q.tMis = 4; return k; }
 /** v1.2.69 (Valter): o bombardeiro tem VIDA própria (barra no painel e sobre o avião) — cada interceptação tira uma parte; a onda nuclear derruba direto. */
 const DANO_NK = { sam: 0.35, defesa: 0.2, arar: 0.4 };
 function abate(sim, q, por, arma) { if (!q.hidro && q.vidaMax > 0 && DANO_NK[arma]) { q.vida -= q.vidaMax * DANO_NK[arma]; sim.evento({ t: 'nkAtingido', idx: q.idx, id: q.dono, x: q.x, y: q.y, z: q.z, f: Math.max(0, q.vida / q.vidaMax) }); if (q.vida > 0) return; }

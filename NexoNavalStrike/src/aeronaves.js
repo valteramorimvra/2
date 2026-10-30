@@ -66,6 +66,10 @@ export const armaAero = (eco, id) => { const a = AERO[id], i = est(eco)[id] && e
 export function escolheArmaAero(eco, id, i) { const a = AERO[id]; if (!a || !(i >= 0 && i < a.armas.length)) return { ok: false, msg: 'Arma inválida' }; if (/sem armas/i.test(a.armas[i])) return { ok: false, msg: 'Aeronave de radar — sem armas' }; const S = est(eco); S[id] = Object.assign(S[id] || {}, { arma: i }); return { ok: true, msg: `${a.armas[i]} — arma principal` }; }
 /** Perfis das armas escolhidas (só as diferentes da 1ª), por id do modelo de batalha — vai para a sessão do jogador. */
 export const armasDoJogador = (eco) => Object.fromEntries(AERONAVES.filter((a) => !armaFixaNoVoo(a.id) && armaAero(eco, a.id) > 0).map((a) => [a.modelo.heli || a.modelo.hidro, a.armas[armaAero(eco, a.id)]]));
+/* v1.2.69 (Valter): mísseis do caça/bombardeiro no sistema do Urubu-rei — a arma escolhida no hangar (ou o 1º míssil da lista), com o ALCANCE e o dano reais do perfil. */
+export function misNk(eco, id) { const a = AERO[id]; if (!a || !a.modelo.heli) return null; const H = HELIS[a.modelo.heli]; let nome = a.armas[armaAero(eco, id)], P = /atômica/i.test(nome) ? null : perfilArma(nome, H); /* a bomba atômica já é o LANÇAR */
+  if (!P || P.tipo !== 'missil') for (const w of a.armas) { if (/atômica/i.test(w)) continue; const p2 = perfilArma(w, H); if (p2 && p2.tipo === 'missil') { P = p2; nome = w; break; } }
+  return P && P.tipo === 'missil' ? { n: Math.max(2, Math.min(8, (P.mun || 2) * 2)), alc: P.alc, dano: P.dano, nome } : null; }
 /* v1.2.69 (Valter): CAMUFLAGEM por aeronave, escolhida na aba PINTURA do hangar — só visual (sem bônus). 'padrao' = pintura original de cada uma. */
 export const camoAero = (eco, id) => (est(eco)[id] && est(eco)[id].camo) || 'padrao';
 export function escolheCamoAero(eco, id, c) { if (!AERO[id]) return { ok: false, msg: 'Aeronave inválida' }; const S = est(eco); S[id] = Object.assign(S[id] || {}, { camo: c }); return { ok: true, msg: 'Pintura aplicada' }; }

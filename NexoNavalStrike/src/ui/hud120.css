@@ -384,3 +384,4 @@
 .hud:not(.modo-aero) .ae-rep { display: none !important; }
 .hud .hl-bts .cb.ae-rep { right: 214px; bottom: 222px; } .hud .nk-bts .cb.ae-rep i { color: #86efac; }
 .hud .tag.tag-ae { font-size: 10px; } .hud .tag.tag-ae.eu b { color: #fde68a; } /* v1.2.69: etiqueta das aeronaves */
+.hud.modo-nkm .nk-bts .cb.hdb[data-a="hdMissil"] { display: flex !important; } /* v1.2.69: MÍSSIL nos caças do sistema do bombardeiro */

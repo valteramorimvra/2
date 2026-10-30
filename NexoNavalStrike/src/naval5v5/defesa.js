@@ -141,6 +141,7 @@ export function passoSams(sim, dt) {
       ux += (px - ux) * f; uy += (py - uy) * f; uz += (pz - uz) * f; const l = Math.hypot(ux, uy, uz); ux /= l; uy /= l; uz /= l; }
     const ox = s.x - m.x, oy = s.y - m.y, oz = s.z - m.z; // posição relativa antes do passo (o míssil já andou neste passo)
     s.vx = ux * v; s.vy = uy * v; s.vz = uz * v; s.x += s.vx * dt; s.y += s.vy * dt; s.z += s.vz * dt;
+    if (s.tipoAlvo === 'q' && !m.hidro && sim.autoFlareNk && Math.hypot(s.x - m.x, s.y - m.y, s.z - m.z) < v * 2) sim.autoFlareNk(m); /* v1.2.69: contramedida automática do avião-alvo (≤ 2 s do impacto) */
     if (s.fase === 2) { // espoleta de proximidade: menor distância no segmento do passo
       const nx = s.x - m.x, ny = s.y - m.y, nz = s.z - m.z; const dxs = nx - ox, dys = ny - oy, dzs = nz - oz; const L2 = dxs * dxs + dys * dys + dzs * dzs;
       const u = L2 > 0 ? clamp(-(ox * dxs + oy * dys + oz * dzs) / L2, 0, 1) : 1; const dmin = Math.hypot(ox + dxs * u, oy + dys * u, oz + dzs * u);
