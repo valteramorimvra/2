@@ -48,7 +48,7 @@ export const NUK = Object.freeze({
   // v1.2.26 item K: PILOTAGEM MANUAL — v1.2.29: menos tremor (taxas menores)
   manBank: 1, manTaxaRol: 0.9, manPitch: 0.5, manTaxaPitch: 0.6, manFatorCurva: 6, manCurvaMax: 0.36, /* v1.2.32: manche mais responsivo */ manAltMin: 160, manAltMax: 3500, manTempo: 320, assume: 4,
   // v1.2.28/29: acelerador + mira solo + preparo bombas (1ª = 10 s; seguintes mais longas)
-  thrNiveis: [165, 195, 225, 255, 285], thrMin: 165, thrMax: 285, bombasSurtida: 10, tRecargaPouso: 25, relancaAbatido: 25, /* v1.2.29 Valter 15:07: era 3 / 18 s; relançamento 25 s após abatido */
+  thrNiveis: [165, 195, 225, 255, 285], thrMin: 165, thrMax: 285, bombasSurtida: 10, vidaBomb: 600 /* v1.2.69 */, tRecargaPouso: 25, relancaAbatido: 25, /* v1.2.29 Valter 15:07: era 3 / 18 s; relançamento 25 s após abatido */
   tPrep1: 10, tPrepN: [10, 10, 10], // s: 1ª bomba pronta em 10 s após decolar; v1.2.33: seguintes 10 s após a ÚLTIMA bomba da salva (ver FILA.rearme)
   // ESPERA — órbita sem atacar
   espRaio: 2800, espAlt: 2200, espV: 200, espFolga: 2800, autonomia: 720,
@@ -90,13 +90,13 @@ export function lancaNuclear(sim, n, cmd) { const k = prepara(n); const mot = mo
   if (Math.hypot(ax - n.x, az - n.z) > NUK.alcanceMax) { sim.evento({ t: 'nkNegado', id: n.id, motivo: 'alcance' }); return 0; }
   const q = sim.nukes.find((x) => !x.ativo && !x.b.ativo && !(x.espDec > 0)); if (!q) { sim.evento({ t: 'nkNegado', id: n.id, motivo: 'pool' }); return 0; }
   const nCarga = k.ilimitado ? NUK.bombasSurtida : Math.min(NUK.bombasSurtida, k.bombas); if (!k.ilimitado) k.bombas -= nCarga; k.usadas += nCarga; k.noAr = q.idx; const L = n.C.L, P = n.P || {}, dY = P.convoo && P.convoo.y != null ? P.convoo.y + 0.6 /* fiscal nukefumaca: convés de voo REAL (= aeronaves comuns, aereo.js pad/decolaPista); antes C.F+1.6 = 4–6 m DENTRO do casco/hangar */ : (P.deckY != null ? P.deckY : n.C.F) + 1.6;
-  q.ativo = 1; q.aa = 4; q.tAA = 0; q.fl = 6; q.tFlareCd = 0; q.tFlareAte = 0; q.fase = 1; q.dono = n.id; q.time = n.time; q.t = 0; q.alvo = a ? a.id : -1; q.ax = ax; q.az = az; q.tSam = 0; q.sams.length = 0; q.deck = dY; q.v = 0; q.manual = 0; q.manualPend = 0; q.tMan = 0; q.espera = 0; q.devolve = 0; q.cargas = nCarga; q.thr = 2; q.miraSolo = 0; q.jx = q.jy = q.sx = q.sy = q.w = q.bank = q.gam = q.tAssume = 0; q.nSoltas = 0; q.tPrep = NUK.tPrep1 || 10; q.auto = a ? 1 : 0; /* v1.2.29: AUTO se alvo travado; prep 1ª bomba 10 s */
+  q.ativo = 1; q.vidaMax = q.vida = NUK.vidaBomb; /* v1.2.69: vida própria */ q.aa = 4; q.tAA = 0; q.fl = 6; q.tFlareCd = 0; q.tFlareAte = 0; q.fase = 1; q.dono = n.id; q.time = n.time; q.t = 0; q.alvo = a ? a.id : -1; q.ax = ax; q.az = az; q.tSam = 0; q.sams.length = 0; q.deck = dY; q.v = 0; q.manual = 0; q.manualPend = 0; q.tMan = 0; q.espera = 0; q.devolve = 0; q.cargas = nCarga; q.thr = 2; q.miraSolo = 0; q.jx = q.jy = q.sx = q.sy = q.w = q.bank = q.gam = q.tAssume = 0; q.nSoltas = 0; q.tPrep = NUK.tPrep1 || 10; q.auto = a ? 1 : 0; /* v1.2.29: AUTO se alvo travado; prep 1ª bomba 10 s */
   sim.mundo(n, 0, dY, L * 0.38, _o); q.x = q.px = _o.x; q.y = q.py = _o.y; q.z = q.pz = _o.z; q.rumo = q.prumo = n.rumo; q.vx = q.vy = q.vz = 0; q.pitch = q.ppitch = 0; q.roll = q.proll = 0; // começa no terço de ré do convés, aproado
   sim.evento({ t: 'nkDecola', id: n.id, idx: q.idx, x: q.x, y: q.y, z: q.z, alvo: q.alvo, ax, az }); escoltaNuclear(sim, n, q); criaAlas(sim, q); return 1; }
 /** v1.2.32: reserva as 2 alas no pool; decolam do mesmo convés 2,6 s e 5,2 s depois do líder. */
 function criaAlas(sim, c) { c.pontoFixo = c.alvo < 0 ? 1 : 0; c.lider = -1; let k = 0;
   for (const w of sim.nukes) { if (k >= FILA.nAlas) break; if (w === c || w.ativo || w.b.ativo || w.espDec > 0) continue; k++;
-    w.ativo = 0; w.fase = 0; w.dono = c.dono; w.time = c.time; w.t = 0; w.alvo = c.alvo; w.ax = c.ax; w.az = c.az; w.tSam = 0; w.sams.length = 0; w.deck = c.deck; w.v = 0; w.manual = 0; w.manualPend = 0; w.tMan = 0; w.espera = 0; w.devolve = 0; w.cargas = c.cargas; w.thr = 2; w.miraSolo = 0;
+    w.ativo = 0; w.vidaMax = w.vida = NUK.vidaBomb; w.fase = 0; w.dono = c.dono; w.time = c.time; w.t = 0; w.alvo = c.alvo; w.ax = c.ax; w.az = c.az; w.tSam = 0; w.sams.length = 0; w.deck = c.deck; w.v = 0; w.manual = 0; w.manualPend = 0; w.tMan = 0; w.espera = 0; w.devolve = 0; w.cargas = c.cargas; w.thr = 2; w.miraSolo = 0;
     w.jx = w.jy = w.sx = w.sy = w.w = w.bank = w.gam = w.tAssume = 0; w.nSoltas = 0; w.tPrep = 1e9; w.auto = 0; w.pontoFixo = c.pontoFixo; w.lider = c.idx; w.ala = k; w.espDec = FILA.decAla * k; w.soltaEm = 0; } }
 /** v1.2.33: líder soltou → alas soltam 4 s e 8 s depois; líder só tem a próxima bomba 10 s após a última da salva. */
 function agendaAlas(sim, L) { for (const w of sim.nukes) if (w.lider === L.idx && (w.ativo || w.espDec > 0) && (w.cargas | 0) > 0) { w.soltaEm = sim.t + FILA.intervalo * w.ala; L.tPrep = Math.max(L.tPrep || 0, FILA.intervalo * w.ala + FILA.rearme); } }
@@ -243,7 +243,10 @@ function interceptaBombardeiro(sim, q, dt) { if (q.fase === 1 || !q.ativo) retur
   const ecm = esc > 0 ? Math.max(0.18, 1 - 0.28 * Math.min(4, esc)) : 1;
   for (let i = S.length - 1; i >= 0; i--) if (sim.t >= S[i].t) { const s = S[i]; S.splice(i, 1); if (q.tFlareAte > sim.t && sim.rng.next() < 0.8) { sim.evento({ t: 'nkSamFalha', idx: q.idx, x: q.x, y: q.y, z: q.z, flare: 1 }); continue; } /* v1.2.59: flare enganou o míssil */ if (sim.rng.next() < NUK.samPk * ecm) return abate(sim, q, sim.navios[s.por], 'sam'); sim.evento({ t: 'nkSamFalha', idx: q.idx, x: q.x, y: q.y, z: q.z }); }
   if (h > 0 && sim.rng.next() < 1 - Math.exp(-h * ecm * dt)) abate(sim, q, null, 'defesa'); }
-function abate(sim, q, por, arma) { q.ativo = 0; q.sams.length = 0; const n = sim.navios[q.dono], k = n && n.nk; if (k && k.noAr === q.idx) { if (q.fase === 2) k.perdidas++; quedaBombardeiro(sim, q); }
+/** v1.2.69 (Valter): o bombardeiro tem VIDA própria (barra no painel e sobre o avião) — cada interceptação tira uma parte; a onda nuclear derruba direto. */
+const DANO_NK = { sam: 0.35, defesa: 0.2, arar: 0.4 };
+function abate(sim, q, por, arma) { if (!q.hidro && q.vidaMax > 0 && DANO_NK[arma]) { q.vida -= q.vidaMax * DANO_NK[arma]; sim.evento({ t: 'nkAtingido', idx: q.idx, id: q.dono, x: q.x, y: q.y, z: q.z, f: Math.max(0, q.vida / q.vidaMax) }); if (q.vida > 0) return; }
+  q.ativo = 0; q.sams.length = 0; const n = sim.navios[q.dono], k = n && n.nk; if (k && k.noAr === q.idx) { if (q.fase === 2) k.perdidas++; quedaBombardeiro(sim, q); }
   if (por) { por.stats.menores = (por.stats.menores || 0) + 1; por.stats.helisAbatidos = (por.stats.helisAbatidos || 0) + 1; }
   sim.evento({ t: 'nkAbatido', idx: q.idx, x: q.x, y: q.y, z: q.z, vx: q.vx, vy: q.vy, vz: q.vz, comBomba: q.fase === 2 ? 1 : 0, por: por ? por.id : -1, arma }); }
 

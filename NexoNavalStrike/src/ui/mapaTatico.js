@@ -33,7 +33,7 @@ export class MapaTatico {
     el.addEventListener('pointerdown', (e) => { e.stopPropagation(); const b = e.target.closest('[data-mt]'); if (b) { e.preventDefault(); this.botao(b.dataset.mt); return; } if (e.target === this.cv) this.toque(e); });
     requestAnimationFrame(() => { el.classList.add('on'); }); this.dim(); this.desenha(); g.audio && g.audio.bip && g.audio.bip(1200, 0.04, 0.05); }
   fecha() { if (!this.el) return; const el = this.el; this.el = null; el.classList.remove('on'); setTimeout(() => el.remove(), 220); }
-  dim() { const r = this.el.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1); this.W = r.width; this.Hh = r.height; this.cv.width = r.width * dpr; this.cv.height = r.height * dpr; this.dpr = dpr;
+  dim() { const r = { width: this.el.offsetWidth, height: this.el.offsetHeight }, dpr = Math.min(2, devicePixelRatio || 1); /* v1.2.69: tamanho de LAYOUT — o getBoundingClientRect pegava a janela ainda encolhida pela animação de entrada (scale .35) → mapa de 60 px, tela escura */ this.W = r.width; this.Hh = r.height; this.cv.width = r.width * dpr; this.cv.height = r.height * dpr; this.dpr = dpr;
     const lado = Math.min(r.height - 54, r.width - 290), x0 = 12 + Math.max(0, (r.width - 290 - lado) / 2); this.box = { x: x0, y: 44, s: lado }; }
   w2s(x, z) { const T = this.g.S.T || this.g.S.sim.T, b = this.box; return [b.x + (x / T.tam + 0.5) * b.s, b.y + (z / T.tam + 0.5) * b.s]; }
   s2w(px, py) { const T = this.g.S.T || this.g.S.sim.T, b = this.box; return [((px - b.x) / b.s - 0.5) * T.tam, ((py - b.y) / b.s - 0.5) * T.tam]; }
@@ -56,7 +56,7 @@ export class MapaTatico {
       else if (this.sel >= 0) { const hd = g.eu.hd && g.eu.hd.noAr >= 0 && g.eu.hd.pil; if (hd) { g.hud.msg('No hidroavião use TRAVAR e AUTO do próprio avião.', 2.4, '#f59e0b'); return; } g.S.comando({ t: 'engajar', v: 1, alvo: this.sel }); g.hud.msg('PILOTO AUTOMÁTICO OFENSIVO — engajando o alvo; mexa no leme/telégrafo ou toque em DESATIVAR para retomar.', 3, '#f59e0b'); this.fecha(); }
       this.desenha(); } else if (k === 'solta') { this.sel = -1; this.desenha(); } }
   passo(dt) { if (!this.el) return; this.t += dt; if (this.rumoMarca) { this.rumoMarca.t -= dt; if (this.rumoMarca.t <= 0) this.rumoMarca = null; } if (this.t > 0.08) { this.t = 0; this.desenha(); } }
-  desenha() { if (!this.el) return; const g = this.g, sim = g.S.sim, T = g.S.T || sim.T, c = this.cv.getContext('2d'), dpr = this.dpr, b = this.box; c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, this.W, this.Hh);
+  desenha() { if (!this.el) return; if (this.el.offsetWidth !== this.W || this.el.offsetHeight !== this.Hh) this.dim(); /* v1.2.69: girou a tela/mudou o tamanho → mede de novo */ const g = this.g, sim = g.S.sim, T = g.S.T || sim.T, c = this.cv.getContext('2d'), dpr = this.dpr, b = this.box; c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, this.W, this.Hh);
     c.save(); c.shadowColor = 'rgba(0,0,0,.6)'; c.shadowBlur = 14; c.drawImage(relevo(T), b.x, b.y, b.s, b.s); c.restore(); c.strokeStyle = 'rgba(212,175,55,.6)'; c.lineWidth = 1.5; c.strokeRect(b.x, b.y, b.s, b.s);
     const z = sim.match && sim.match.centro; if (z) { const [zx, zy] = this.w2s(z.x, z.z); c.strokeStyle = 'rgba(250,204,21,.7)'; c.setLineDash([5, 4]); c.beginPath(); c.arc(zx, zy, (z.r || 1500) / T.tam * b.s, 0, 7); c.stroke(); c.setLineDash([]); }
     const R = this.ref(), [rx, ry] = this.w2s(R.x, R.z), sel = this.sel, eng = this.engajado();
