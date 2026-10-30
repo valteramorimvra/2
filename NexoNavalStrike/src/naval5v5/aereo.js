@@ -47,12 +47,21 @@ export function instalaAereo(sim) {
   regAereoInstala(sim); /* v1.2.30 item 15: registro de dano das aeronaves (só conta) */
 }
 /** Instala os helicópteros escolhidos no hangar do navio (até C.heli). */
+/** v1.2.66 (Valter): o jogador ENTRA na batalha pilotando a aeronave do slot 0 da megabase.
+ *  'pista' / 'heliponto': já no convés com pedido de decolagem (convés ágil) e controle manual — caças pela catapulta, helicópteros direto do ponto;
+ *  'ar' (Air Start): já em voo tático 1,6 km à frente da base, na proa, a 70% da velocidade máxima e altitude de cruzeiro do tipo. */
+function inicioAeroPrin(sim, n, h, ini) { if (!h) return; n.controle = 0; n.controleIA = 1; n.libVel = 2; h.ctrl = 'jog'; h.auto = 1;
+  if (ini !== 'ar') { h.lancar = 1; return; }
+  const d = 1600, alt = h.H.aviao ? 420 : 140; soltaPonto(n, h); if (n.dk && h.dkC >= 0 && n.dk.cats) { if (n.dk.cats[h.dkC] === h.idx) n.dk.cats[h.dkC] = -1; h.dkC = -1; }
+  h.x = n.x + Math.sin(n.rumo) * d; h.z = n.z - Math.cos(n.rumo) * d; h.y = alt; h.rumo = n.rumo; h.v = h.H.vmax * 0.7; h.vx = Math.sin(h.rumo) * h.v; h.vz = -Math.cos(h.rumo) * h.v; h.vy = 0;
+  h.estado = EST.VOO; h.tEst = 0; h.ativo = 1; h.oculto = 0; h.lancar = 0; h.alt = alt; h.pitch = 0; h.roll = 0; }
 export function instalaHelisNavio(sim, n, modelos) {
   n.helis = []; n.tUav = 0; n.uav = -1; n.controle = -1; /* −1 = navio; k = helicóptero k */ n.controleIA = 0; const nh = n.Cb.heli || 0; if (!nh || !n.P.convoo) return;
-  const lista = (n.forcaHelis && modelos && modelos.length ? modelos : n.C.helisPadrao ? n.C.helisPadrao : modelos && modelos.length ? modelos : ['multi', 'asw']).slice(0, nh); /* v1.2.11: porta-aviões usam a ala aérea própria (caças VTOL) */
+  const lista = (n.aeroPrin && n.aeroPrin.heli ? [n.aeroPrin.heli, ...(n.C.helisPadrao || []).slice(1)] : n.forcaHelis && modelos && modelos.length ? modelos : n.C.helisPadrao ? n.C.helisPadrao : modelos && modelos.length ? modelos : ['multi', 'asw']).slice(0, nh); /* v1.2.11: porta-aviões usam a ala aérea própria (caças VTOL) */
   lista.forEach((mod, k) => { const h = sim.helis.find((q) => !q.usado); if (!h) return; let H = HELIS[mod] || HELIS.leve; const nvA = n.aeroNv && n.aeroNv[H.id]; if (nvA > 1) { const b = bonusNivel(nvA); H = Object.assign({}, H, { vmax: H.vmax * b.vel, vida: Math.round(H.vida * b.vida), recarga: H.recarga ? H.recarga * b.recarga : H.recarga }); } /* v1.2.61: evolução do hangar */ const nmA = n.aeroArma && n.aeroArma[H.id], PA = nmA ? perfilArma(nmA, H) : null; if (PA) H = Object.assign({}, H, PA.arma ? { arma: PA.arma, mun: PA.mun, alc: PA.alc, dano: PA.dano } : {}, { a2a: PA.a2a || 1, a2aAlc: PA.a2aAlc || 1, armaNome: nmA }); /* v1.2.65: arma principal escolhida no hangar */ const fu = n.mods.heliFuel || 1;
     Object.assign(h, { usado: 1, ativo: 0, estado: k === 0 ? EST.CONVOO : EST.HANGAR, slot: k, dono: n.id, time: n.time, modelo: H.id, camo: n.camoAereo || 'padrao' /* v1.2.17 13i */, H, comb: H.comb * fu, combMax: H.comb * fu, mun: Math.round(H.mun * (n.mods.heliMun || 1)), munMax: Math.round(H.mun * (n.mods.heliMun || 1)), vida: H.vida, ctrl: 'ia', alt: ALT_IA, alvo: -1, tArma: 0, tEst: 0, auto: n.papel !== 'jogador' ? 1 : 0, rumo: n.rumo, v: 0 });
     h.lancar = 0; h.oculto = 1; h.dkE = -1; h.dkC = -1; h.esp = 0; h.tEspera = 0; n.helis.push(h.idx); iniConves(sim, n, h, k); });
+  if (n.aeroPrin && n.aeroPrin.heli && n.helis.length) inicioAeroPrin(sim, n, sim.helis[n.helis[0]], n.aeroPrin.ini);
   n.reservaAr = n.C.alaTotal ? Math.max(0, n.C.alaTotal - n.helis.length) : 0; /* v1.2.26: aeronaves de reserva no hangar dos gigantes (repõem abatidas) */
 }
 export function pad(sim, n, h) { const c = n.P.convoo; sim.mundo(n, c.x || 0, c.y + 0.6, c.z, _o); h.x = h.px = _o.x; h.y = h.py = _o.y; h.z = h.pz = _o.z; h.vx = Math.sin(n.rumo) * n.v; h.vz = -Math.cos(n.rumo) * n.v; h.vy = 0; h.rumo = n.rumo; }

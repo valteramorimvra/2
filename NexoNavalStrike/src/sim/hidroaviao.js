@@ -36,7 +36,7 @@ const _o = { x: 0, y: 0, z: 0 }, _imp = {};
 export const temHidro = (n) => !!(n && n.papel === 'jogador');
 export function estadoHidro(n) { return n.hd || (n.hd = { tipo: n.hidroTipo || 'albatroz', noAr: -1, tRec: 0, pil: 0, perdidos: 0, voos: 0 }); }
 /** Por que não pode decolar agora? ('' = pode) */
-export function motivoHidro(sim, n) { if (!temHidro(n) && !(sim && sim.nkBotAtomica)) return 'sem'; if (n.morto) return 'morto'; const k = estadoHidro(n); if (k.noAr >= 0) return 'noAr'; if (k.tRec && sim.t < k.tRec) return 'recarga'; if (sim.t < HD.liberaApos) return 'cedo'; return ''; }
+export function motivoHidro(sim, n) { if (!temHidro(n) && !(sim && sim.nkBotAtomica)) return 'sem'; if (n.morto) return 'morto'; const k = estadoHidro(n); if (k.noAr >= 0) return 'noAr'; if (k.tRec && sim.t < k.tRec) return 'recarga'; if (sim.t < HD.liberaApos && !(n.aeroPrin && n.aeroPrin.hidro)) return 'cedo'; /* v1.2.66: hidroavião como veículo principal sai já no início */ return ''; }
 export function hidroDe(sim, n) { const k = n && n.hd; if (!k || k.noAr < 0 || !sim.nukes) return null; const q = sim.nukes[k.noAr]; return q && q.ativo && q.hidro && q.dono === n.id ? q : null; }
 
 /** Comando { t:'hidro' } — decola (corrida na água ao lado do navio). */
