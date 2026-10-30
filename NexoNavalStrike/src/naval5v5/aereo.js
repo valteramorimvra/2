@@ -98,6 +98,10 @@ export function comandoAereo(sim, n, cmd) {
     case 'heliCtrl': if (h) { h.jx = clamp(+cmd.jx || 0, -1, 1); h.jy = clamp(+cmd.jy || 0, -1, 1); h.alt = clamp(+cmd.alt || ALT_IA, PARAM.heli.altMin, Math.max(PARAM.heli.altMax, 15)); } break;
     case 'heliFlare': if (h && h.estado >= EST.DECOLA && h.estado <= EST.POUSO && (h.flares ?? PARAM.heli.flares) > 0 && !(h.tFlare > 0)) { h.flares = (h.flares ?? PARAM.heli.flares) - 1; h.tFlare = PARAM.heli.flareDur; sim.evento({ t: 'heliFlare', idx: h.idx, id: n.id, x: h.x, y: h.y, z: h.z }); } break;
     case 'heliFogo': if (h) h.fogo = 0.4; break;
+    case 'engajar': { const k = n.controle; const q = k >= 0 && n.helis ? sim.helis[n.helis[k]] : null; const alvo = cmd.v && cmd.alvo >= 0 && sim.navios[cmd.alvo] && !sim.navios[cmd.alvo].morto ? cmd.alvo | 0 : -1; /* v1.2.67: PILOTO AUTOMÁTICO OFENSIVO */
+      if (q && q.estado >= EST.DECOLA && q.estado <= EST.RETORNO) { q.apAlvo = alvo; q.apEng = alvo >= 0 ? 1 : 0; q.ctrl = alvo >= 0 ? 'ia' : 'jog'; if (alvo >= 0) { q.missao = 'ataque'; if (q.estado === EST.RETORNO && q.comb > q.combMax * 0.15) q.estado = EST.VOO; } }
+      else if (k < 0) { n.apAlvo = alvo; n.controleIA = alvo >= 0 ? 1 : 0; if (alvo >= 0) { n.alvoId = alvo; } }
+      sim.evento({ t: alvo >= 0 ? 'apIni' : 'apFim', id: n.id, alvo, motivo: 'jogador' }); break; }
     case 'heliVolta': if (h && (h.estado === EST.VOO)) { h.estado = EST.RETORNO; } break;
     case 'controle': { const k = cmd.k == null || cmd.k < 0 ? -1 : cmd.k | 0; for (const i of n.helis || []) { const q = sim.helis[i]; if (q.ctrl === 'jog') q.ctrl = 'ia'; }
       if (k >= 0 && n.helis && n.helis[k] != null) { const q = sim.helis[n.helis[k]]; if (q.estado === EST.CONVOO && cabeLado(sim, n)) { q.lancar = 1; q.auto = 1; }
@@ -175,6 +179,7 @@ export function arrancaDoConves(sim, h, vx, vy, vz, por) { const n = sim.navios[
   if (por && por.time !== h.time) { por.stats.menores = (por.stats.menores || 0) + 1; por.stats.helisAbatidos = (por.stats.helisAbatidos || 0) + 1; } /* crédito só por aeronave INIMIGA */ }
 
 function alvoHeli(sim, h, n) { // alvo: o travado pelo navio (se jogador) ou o contato mais próximo do helicóptero
+  if (h.apAlvo >= 0) { const f = sim.navios[h.apAlvo]; if (f && !f.morto) return f; h.apAlvo = -1; if (h.apEng) { h.apEng = 0; h.ctrl = 'jog'; sim.evento({ t: 'apFim', id: n.id, idx: h.idx, motivo: 'alvo' }); } } /* v1.2.67: alvo do piloto automático ofensivo */
   if (h.ctrl === 'jog' || n.papel === 'jogador') { const a = sim.navios[n.alvoId]; if (a && !a.morto) return a; }
   const ref = n.papel === 'jogador' ? n : h; /* v1.2.25 item 6: apoio de combate — a aeronave do jogador ataca a ameaça mais próxima do NAVIO-MÃE */ let b = null, bd = 1e12; for (const [id, c] of sim.contatos[h.time]) { const e = sim.navios[id]; if (!e || e.morto) continue; const d = (c.x - ref.x) ** 2 + (c.z - ref.z) ** 2; if (d < bd) { bd = d; b = e; } } return b; }
 /** Dinâmica do helicóptero (PARAM.heli): vetor velocidade com INÉRCIA (deriva ~1,5–2 s ao soltar), aceleração limitada,
