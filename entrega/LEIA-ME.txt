@@ -1,4 +1,4 @@
-NEXO NAVAL STRIKE 3D — v1.2.72 (versionCode 75)
+NEXO NAVAL STRIKE 3D — v1.2.73 (versionCode 76)
 
-Assinado com a chave ORIGINAL do projeto (androiddebugkey, SHA-256 ...A5:99): instala POR CIMA da 1.2.64 a 1.2.71, sem perder o progresso.
+Assinado com a chave ORIGINAL do projeto (androiddebugkey, SHA-256 ...A5:99): instala POR CIMA da 1.2.64 a 1.2.72, sem perder o progresso.
 Novidades: veja no jogo em Manual > Novidades.

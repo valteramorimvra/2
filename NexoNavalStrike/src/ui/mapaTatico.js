@@ -29,7 +29,7 @@ export class MapaTatico {
   abre() { if (this.el) return; const g = this.g; const el = document.createElement('div'); el.className = 'mapa-tat';
     el.innerHTML = `<canvas class="mt-cv"></canvas><aside class="mt-ficha"></aside><div class="mt-topo"><b>MAPA TÁTICO</b><span>toque no mar: rumo · toque num contato: ficha e ENGAJAR</span><button class="mt-fecha" data-mt="fecha" aria-label="Fechar">✕</button></div>
       <div class="mt-leg"><i class="lg-am"></i>amigo <i class="lg-hs"></i>hostil (contato) <i class="lg-ar"></i>aeronave</div>`;
-    ((g.raizHud && g.raizHud.querySelector('.hud')) || g.raizHud || document.body).appendChild(el); this.el = el; this.cv = el.querySelector('.mt-cv'); this.ficha = el.querySelector('.mt-ficha');
+    ((g.raizHud && g.raizHud.querySelector('.hud')) || g.raizHud || document.body).appendChild(el); this.el = el; this.cv = el.querySelector('.mt-cv'); this.ficha = el.querySelector('.mt-ficha'); this.fInfo = this.fAc = null; this.sel = -1; /* v1.2.73 (Valter: 'só ativa uma vez'): a ficha/ENGAJAR é recriada a cada abertura — antes escrevia nos nós da janela ANTERIOR (já removida) e o painel ficava vazio, sem botão */
     el.addEventListener('pointerdown', (e) => { e.stopPropagation(); const b = e.target.closest('[data-mt]'); if (b) { e.preventDefault(); this.botao(b.dataset.mt); return; } if (e.target === this.cv) this.toque(e); });
     requestAnimationFrame(() => { el.classList.add('on'); }); this.dim(); this.desenha(); g.audio && g.audio.bip && g.audio.bip(1200, 0.04, 0.05); }
   fecha() { if (!this.el) return; const el = this.el; this.el = null; el.classList.remove('on'); setTimeout(() => el.remove(), 220); }

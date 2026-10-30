@@ -7,8 +7,8 @@ android {
         applicationId "br.com.valteramorim.nexonavan" // ID publicado de 1.2.64 a 1.2.68 (com "n"): NÃO mudar, senão instala outro app ao lado
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 75
-        versionName "1.2.72"
+        versionCode 76
+        versionName "1.2.73"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
