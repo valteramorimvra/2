@@ -107,7 +107,7 @@ export function comandoAereo(sim, n, cmd) {
     case 'heliVolta': if (h && (h.estado === EST.VOO)) { h.estado = EST.RETORNO; } break;
     case 'controle': { const k = cmd.k == null || cmd.k < 0 ? -1 : cmd.k | 0; for (const i of n.helis || []) { const q = sim.helis[i]; if (q.ctrl === 'jog') q.ctrl = 'ia'; }
       if (k >= 0 && n.helis && n.helis[k] != null) { const q = sim.helis[n.helis[k]]; if (q.estado === EST.CONVOO && cabeLado(sim, n)) { q.lancar = 1; q.auto = 1; }
-        if (q.estado !== EST.ABATIDO && q.estado !== EST.HANGAR && q.estado !== EST.REARMA) { q.ctrl = 'jog'; q.alt = Math.max(40, q.y); q.bank = -(q.roll || 0); q.gam = q.pitch || 0; q.sx = q.jx = 0; q.sy = q.jy = 0; if (q.thr == null) q.thr = q.H.aviao ? 2 : 2; n.controle = k; n.controleIA = 1; break; } }
+        if (q.estado !== EST.ABATIDO && q.estado !== EST.HANGAR && q.estado !== EST.REARMA) { q.ctrl = 'jog'; q.alt = Math.max(40, q.y); q.bank = q.roll || 0; /* v1.2.69: mesma convenção do voaUnificado */ q.gam = q.pitch || 0; q.sx = q.jx = 0; q.sy = q.jy = 0; if (q.thr == null) q.thr = q.H.aviao ? 2 : 2; n.controle = k; n.controleIA = 1; break; } }
       n.controle = -1; n.controleIA = 0; break; }
     case 'esquadrilha': if (n.helis && n.helis.length) { n.esq = 1; if (cmd.m === 1) { n.libMax = Math.ceil(n.helis.length / 2); n.libVel = 1.5; } else if (cmd.m === 2) { n.libMax = n.helis.length; n.libVel = 2; } /* v1.2.32: metade / todas, convés mais rápido */ for (const i of n.helis) { const q = sim.helis[i]; if (q.estado !== EST.ABATIDO) q.auto = 1; } sim.evento({ t: 'esquadrilha', id: n.id, n: n.helis.length }); } break; /* v1.2.16 item 13b: LANÇAR ESQUADRILHA — todos decolam em sequência (intervalo de convoo) e atacam */
     case 'uav': lancaUav(sim, n); break;

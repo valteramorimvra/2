@@ -26,7 +26,7 @@ export function perfilVoo(H) { let P = PERFIS.get(H); if (P) return P; const v =
 
 /** Um passo de voo manual. Entrada: h.jx/h.jy (manche, −1…1) e h.thr (0…4). Atualiza x/y/z, vx/vy/vz, v, rumo, pitch, roll. */
 export function voaUnificado(h, dt, sim) { const P = perfilVoo(h.H); if (h.thr == null) h.thr = 2;
-  if (h._ultJog !== sim.tick - 1) { h.bank = -(h.roll || 0); h.gam = h.pitch || 0; h.w = 0; h.v = Math.max(P.asa ? P.thrMin : 0, Math.hypot(h.vx || 0, h.vz || 0)); } h._ultJog = sim.tick; /* assumiu agora (da IA, decolagem ou automático): continua da atitude/velocidade atuais, sem tranco */
+  if (h._ultJog !== sim.tick - 1) { h.bank = h.roll || 0; /* v1.2.69: roll das aeronaves de navio = +bank (asa direita baixa na curva à direita) */ h.gam = h.pitch || 0; h.w = 0; h.v = Math.max(P.asa ? P.thrMin : 0, Math.hypot(h.vx || 0, h.vz || 0)); } h._ultJog = sim.tick; /* assumiu agora (da IA, decolagem ou automático): continua da atitude/velocidade atuais, sem tranco */
   h.sx = (h.sx || 0) + ((h.jx || 0) - (h.sx || 0)) * Math.min(1, 2.6 * dt); h.sy = (h.sy || 0) + ((h.jy || 0) - (h.sy || 0)) * Math.min(1, 3 * dt); /* manche suavizado exatamente como no bombardeiro */
   if (P.asa) voaAsa(h, P, dt, sim); else voaRotor(h, P, dt, sim);
   const lim = sim.T.tam * 0.47; if (Math.abs(h.x) > lim || Math.abs(h.z) > lim) { h.x = clamp(h.x, -lim, lim); h.z = clamp(h.z, -lim, lim); } }
@@ -36,7 +36,7 @@ function voaAsa(h, P, dt, sim) {
   h.bank += clamp((h.sx * P.manBank - h.bank) * 2.6 * dt, -P.manTaxaRol * dt, P.manTaxaRol * dt); let gA = h.sy * P.manPitch;
   const chao = Math.max(alturaMar(h.x, h.z, sim.t), alturaTerreno(sim.T, h.x, h.z)); if (h.y < chao + P.altMin + P.faixaPiso) gA = Math.max(gA, (chao + P.altMin + P.faixaPiso - h.y) / 160); if (h.y > P.altMax - 200) gA = Math.min(gA, -(h.y - P.altMax + 200) / 800);
   h.gam += clamp((gA - h.gam) * 4 * dt, -P.manTaxaPitch * dt, P.manTaxaPitch * dt); const v = Math.max(1, h.v);
-  h.w = (h.w || 0) + (clamp(G * Math.tan(h.bank) / v * P.manFatorCurva, -P.manCurvaMax, P.manCurvaMax) - (h.w || 0)) * Math.min(1, 3 * dt); h.rumo = ang(h.rumo + h.w * dt); h.roll = -h.bank;
+  h.w = (h.w || 0) + (clamp(G * Math.tan(h.bank) / v * P.manFatorCurva, -P.manCurvaMax, P.manCurvaMax) - (h.w || 0)) * Math.min(1, 3 * dt); h.rumo = ang(h.rumo + h.w * dt); h.roll = h.bank; /* v1.2.69 (Valter: "ao contrário"): o render das aeronaves de navio usa −roll; o do bombardeiro usa +roll → aqui o sinal é o oposto do nuclear.js */
   const thr = P.thrNiveis[Math.max(0, Math.min(4, h.thr | 0))]; h.v = clamp(h.v - G * Math.sin(h.gam) * 0.6 * dt + clamp(thr - h.v, -6 * dt * (1 + P.thrMax / 400), 7 * dt * (1 + P.thrMax / 400)), P.thrMin, P.thrMax); h.pitch = h.gam;
   h.vy = h.v * Math.sin(h.gam); const vh = h.v * Math.cos(h.gam); h.vx = Math.sin(h.rumo) * vh; h.vz = -Math.cos(h.rumo) * vh; h.x += h.vx * dt; h.y = Math.max(chao + 6, h.y + h.vy * dt); h.z += h.vz * dt; }
 
@@ -49,7 +49,7 @@ function voaRotor(h, P, dt, sim) { const vAlvo = h.sy >= 0 ? h.sy * P.vFrente : 
   const chao = Math.max(alturaMar(h.x, h.z, sim.t), alturaTerreno(sim.T, h.x, h.z)); h.x += Math.sin(h.rumo) * h.v * dt; h.z -= Math.cos(h.rumo) * h.v * dt; h.vx = Math.sin(h.rumo) * h.v; h.vz = -Math.cos(h.rumo) * h.v;
   h.y = clamp(h.y + h.vy * dt, chao + P.altMin, P.altMax); if (h.y <= chao + P.altMin + 0.01 && h.vy < 0) h.vy = 0;
   const pAlvo = clamp(-dv / Math.max(dt, 1e-3) / 9, -0.5, 0.25) - h.v / P.vFrente * 0.12; h.pitch = (h.pitch || 0) + (pAlvo - (h.pitch || 0)) * Math.min(1, 3.2 * dt);
-  h.roll = (h.roll || 0) + (clamp(-h.w * Math.max(4, Math.abs(h.v)) / G, -0.66, 0.66) - (h.roll || 0)) * Math.min(1, 3.2 * dt); }
+  h.roll = (h.roll || 0) + (clamp(h.w * Math.max(4, Math.abs(h.v)) / G, -0.66, 0.66) - (h.roll || 0)) * Math.min(1, 3.2 * dt); } /* v1.2.69: inclina PARA DENTRO da curva */
 
 /** Colisão com o relevo após o passo manual (mesma regra do bombardeiro manual). */
 export const bateuRelevo = (h, dt, sim) => colideAereoTerreno(sim, h, dt, { manual: 1, margem: 3 });
