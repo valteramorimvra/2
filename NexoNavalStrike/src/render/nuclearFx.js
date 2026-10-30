@@ -275,7 +275,7 @@ export class NuclearFx {
     let dr = q.rumo - pr; while (dr > Math.PI) dr -= Math.PI * 2; while (dr < -Math.PI) dr += Math.PI * 2;
     o.rumo = pr + dr * A; o.pitch = pp + ((q.pitch || 0) - pp) * A; o.roll = pl + ((q.roll || 0) - pl) * A; return o; }
   passoAvioes(dt, sim, alpha = 0) { const fx = this.fx, Q = sim.nukes; if (!Q) return; if (this._trl) this._trl.passo(dt, this.vento ? this.vento.x : 0, this.vento ? this.vento.z : 0); this.st.avioes = 0; const a = alpha, P = this._pAv || (this._pAv = { x: 0, y: 0, z: 0, rumo: 0, pitch: 0, roll: 0 }), Pb = this._pBo || (this._pBo = { x: 0, y: 0, z: 0 });
-    for (let i = 0; i < 12; i++) { const q = Q[i], b = this.bomb[i]; if (!q) continue;
+    for (let i = 0; i < 12; i++) { const q = Q[i], b = this.bomb[i]; if (!q) continue; if (q.ativo && !q.hidro && !b.queda && (b.aero || null) !== (q.aero || null)) this.trocaModelo(b, q.aero); /* v1.2.69: caça/bombardeiro escolhido voando pelo sistema do bombardeiro */
       if (b.queda) { const av = b.av; b.vy -= 9.81 * dt; b.vx *= 0.995; b.vz *= 0.995; av.position.x += b.vx * dt; av.position.y += b.vy * dt; av.position.z += b.vz * dt; av.rotation.x -= 0.6 * dt; av.rotation.z += 1.4 * dt; b.tR += dt;
         if (b.tR > 0.03) { b.tR = 0; fx.fumaca.emite(av.position.x, av.position.y, av.position.z, 0, 2, 0, '#2a2622', 0.7, 14, 6, 6); fx.brilho.emite(av.position.x, av.position.y, av.position.z, 0, 0, 0, '#ff9a3a', 0.9, 7, 0.35, 4); }
         if (av.position.y < 0) { b.queda = 0; av.visible = false; fx.explosao(av.position.x, 2, av.position.z, 1.2); fx.impactoAeronave(av.position.x, av.position.z, Math.min(160, Math.hypot(b.vx || 0, b.vy || 0, b.vz || 0) || 90), b.vx || 0, b.vz || 0); } } /* v1.2.50: queda do bombardeiro no mar = cortina em V + combustível em chamas na superfície */
@@ -303,6 +303,10 @@ export class NuclearFx {
       const pL = h.point.clone().applyMatrix4(inv), nL = h.face ? h.face.normal.clone().transformDirection(h.object.matrixWorld).transformDirection(inv).normalize() : new THREE.Vector3(0, 1, 0); if (nL.y < 0) nL.negate();
       for (let k = 0; k < 3; k++) { const d = new THREE.Mesh(new THREE.PlaneGeometry(tam, tam), ML[k]); d.position.copy(pL).addScaledVector(nL, 0.04); d.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), nL); d.visible = false; d.userData.nk = 1; d.renderOrder = 2; av.add(d); out[k].push(d); } }
     return out; }
+  /** v1.2.69 (Valter): o pool do bombardeiro leva QUALQUER avião (mesma decolagem, voo, câmera, esquadrilha e fumaça) — troca só o modelo desenhado. */
+  trocaModelo(b, aero) { if (!b.av0) { b.av0 = b.av; b.letras0 = b.letras; b.avA = {}; } const ant = b.av; let m = !aero || aero === 'bombardeiroNuclear' ? b.av0 : b.avA[aero];
+    if (!m) { m = modeloHeli(aero); if (!m) m = b.av0; else { m.rotation.order = 'YXZ'; m.visible = false; m.traverse((o) => { o.userData.nk = 1; if (o.name === 'disco') o.visible = false; }); this.cena.add(m); b.avA[aero] = m; } }
+    if (m !== ant) { m.position.copy(ant.position); m.rotation.copy(ant.rotation); m.visible = ant.visible; ant.visible = false; } b.av = m; b.aero = aero || null; b.letras = m === b.av0 ? b.letras0 : null; b._pinta = null; }
   livery() { return (this.cb.pintura && this.cb.pintura()) || 'fab'; }
   pinta(q, b) { const p = papelFila(q), liv = this.livery(), chave = p + '|' + liv; if (b._pinta === chave) return; b._pinta = chave; const C = NK_METAL[p], M = this._nkMat || (this._nkMat = new Map());
     b.av.traverse((o) => { if (!o.isMesh || !o.material || Array.isArray(o.material)) return; const m0 = o.userData._m0 || (o.userData._m0 = o.material);
