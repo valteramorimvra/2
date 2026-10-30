@@ -113,7 +113,7 @@ export class Sim {
       case 'reparo': this.usaReparo(n); break;
       case 'cons': usaCons(this, n, String(cmd.k)); break;
       case 'rbu': if (cmd.canal === 1 && n.fgC) { this.trocaCanal(n); this.lancaRbu(n, cmd.alvo != null ? cmd.alvo : n.alvoId); this.trocaCanal(n); } else this.lancaRbu(n, cmd.alvo != null ? cmd.alvo : n.alvoId); break; /* v1.2.14: canal 1 = FOGUETES ASW independente do lança-granadas */
-      case 'uav': case 'esquadrilha': case 'heliLanca': case 'heliCtrl': case 'heliFlare': case 'iaNavio': case 'heliFogo': case 'heliThr': case 'heliVolta': case 'controle': case 'engajar': comandoAereo(this, n, cmd); break; /* v1.2.67: engajar */
+      case 'uav': case 'esquadrilha': case 'heliLanca': case 'heliCtrl': case 'heliFlare': case 'aeroReparo': case 'iaNavio': case 'heliFogo': case 'heliThr': case 'heliVolta': case 'controle': case 'engajar': comandoAereo(this, n, cmd); break; /* v1.2.67: engajar */
       case 'nuclear': (n.C.missilNuclear ? lancaMissilNuclear1231 : lancaNuclear)(this, n, cmd); break; /* v1.2.31: míssil nuclear de navio */ /* v1.2.26 */
       case 'hidro': case 'hdPil': case 'hdMissil': case 'hdTorp': case 'hdFlare': case 'hdVolta': comandoHidro(this, n, cmd); break; /* v1.2.39 */
       case 'nkPiloto': case 'nkEspera': case 'nkArAr': case 'nkFlare': case 'nkCtl': case 'nkThr': case 'nkMiraSolo': case 'nkTrava': case 'nkSolta': if (cmd.t === 'nkSolta' && n.hd && n.hd.pil && n.hd.noAr >= 0) { comandoHidro(this, n, cmd); break; } comandoNuclear(this, n, cmd); break; /* v1.2.26/28: pilotagem + acel + mira solo */

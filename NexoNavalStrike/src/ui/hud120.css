@@ -379,3 +379,7 @@
 .hud .h-heli .hl-acel { right: auto; left: calc(var(--sl, 0px) + 14px); bottom: 136px; } /* acima do manche, à esquerda: não cobre ARMA/FLARE/POUSAR/NAVIO/HELI 2 */
 @media (max-width: 840px) { .hud.modo-heli .nk-joy { left: calc(var(--sl, 0px) + 10px); bottom: 10px; width: 96px; height: 96px; } .hud .h-heli .hl-acel { left: calc(var(--sl, 0px) + 10px); bottom: 118px; } }
 @media (orientation: portrait) { .hud.modo-heli .nk-joy { left: calc(var(--sl, 0px) + 8px); bottom: 12px; width: 100px; height: 100px; } }
+
+/* v1.2.69: REPARO da aeronave — só no painel de voo das aeronaves de navio */
+.hud:not(.modo-aero) .ae-rep { display: none !important; }
+.hud .hl-bts .cb.ae-rep { right: 214px; bottom: 222px; } .hud .nk-bts .cb.ae-rep i { color: #86efac; }
