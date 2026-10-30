@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { modeloHeli } from './aereo3d.js';
-import { montaHidro3D } from './hidro3d.js';
+import { montaHidro3D, camoHidro3D } from './hidro3d.js';
 import { HIDROS } from '../sim/hidroaviao.js';
 
 const W0 = 150, D0 = 110, H0 = 30; /* galpão: largura (x), profundidade (z), altura */
@@ -78,8 +78,8 @@ export class Hangar3D {
     this.rotas = []; for (let i = 0; i < NG; i++) { const anda = i < 8; this.rotas.push({ anda, cx: (i % 4 - 1.5) * 22 + (anda ? 0 : 6), cz: (Math.floor(i / 4) - 1.5) * 18, r: anda ? 8 + (i % 3) * 5 : 0, v: (anda ? 0.11 + 0.03 * (i % 3) : 0) * (i % 2 ? 1 : -1), fase: i * 1.7, ry: i * 0.9 }); }
     this._m = new THREE.Matrix4(); this._q = new THREE.Quaternion(); this._p = new THREE.Vector3(); this._s = new THREE.Vector3(1, 1, 1); this._e = new THREE.Euler(); }
   /** Coloca a aeronave escolhida no centro (escala real), apoiada no piso, com sombras. */
-  mostra(item) { if (this.modelo) { this.cena.remove(this.modelo); this.modelo = null; } if (!item) return; let m;
-    try { m = item.modelo.hidro ? montaHidro3D(HIDROS[item.modelo.hidro]) : modeloHeli(item.modelo.heli); } catch (e) { return; }
+  mostra(item, camo) { if (this.modelo) { this.cena.remove(this.modelo); this.modelo = null; } if (!item) return; let m;
+    try { m = item.modelo.hidro ? camoHidro3D(montaHidro3D(HIDROS[item.modelo.hidro]), camo) : modeloHeli(item.modelo.heli, camo); } catch (e) { return; } /* v1.2.69: com a camuflagem escolhida */
     m.traverse((o) => { if (o.name === 'disco') o.visible = false; if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } }); m.updateMatrixWorld(true); const bx = new THREE.Box3(); m.traverse((o) => { if (o.isMesh && o.visible && o.name !== 'disco' && o.geometry) { let vis = true; for (let p = o; p; p = p.parent) if (!p.visible) { vis = false; break; } if (vis) { o.geometry.computeBoundingBox(); bx.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld)); } } }); if (bx.isEmpty()) bx.setFromObject(m); /* só malhas visíveis (peças ocultas não inflam o enquadramento) */ const sz = bx.getSize(new THREE.Vector3()), ct = bx.getCenter(new THREE.Vector3());
     m.position.set(-ct.x, -bx.min.y + 0.02, -ct.z); const g = new THREE.Group(); g.add(m); { /* sombra de contato (oclusão sob a fuselagem) — vale também com sombras dinâmicas desligadas na qualidade baixa */ const so = new THREE.Mesh(new THREE.PlaneGeometry(sz.x * 1.25, sz.z * 1.25).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: texSombra(), transparent: true, depthWrite: false, opacity: 0.62, color: '#000' })); so.position.y = 0.03; so.renderOrder = 1; g.add(so); } g.rotation.y = Math.PI * 0.85; this.cena.add(g); this.modelo = g; const tam = Math.max(sz.x, sz.z, sz.y * 2);
     this.alvoDist = Math.min(46, tam * 1.25 + 6); this.alvoY = Math.min(4, sz.y * 0.45); this.tam = tam; this.id = item.id; }

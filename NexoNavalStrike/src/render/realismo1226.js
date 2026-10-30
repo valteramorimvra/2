@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { bordaPA, PLANO_PA, eixoAngPA, ilhasPA } from '../sim/classes1225.js';
+import { aplicaPele, matCupula } from './peleAero1269.js'; /* v1.2.69 */
 
 const rnd0 = (s) => () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
 const aniso = () => globalThis.__nnsAniso || 8;
@@ -25,11 +26,11 @@ function texAeronave() { if (TAER) return TAER; const W = 512, c = cv(W, W), x =
   const t = new THREE.CanvasTexture(c), tr = new THREE.CanvasTexture(r); for (const q of [t, tr]) { q.wrapS = q.wrapT = THREE.RepeatWrapping; q.anisotropy = aniso(); } t.colorSpace = THREE.SRGBColorSpace; return (TAER = { t, tr }); }
 const CACHE = new Map();
 /** Converte os materiais simples da aeronave em PBR (mantém a cor/camuflagem base). furtivo → revestimento absorvente mais fosco e escuro. */
-export function matsAeronave1226(M, furtivo = 0) { const key = (M.c && M.c.uuid) + ':' + furtivo; if (CACHE.has(key)) return CACHE.get(key); const T = texAeronave();
+export function matsAeronave1226(M, furtivo = 0) { const key = (M.c && M.c.uuid) + ':' + furtivo + ':' + (M.camo || 'padrao'); if (CACHE.has(key)) return CACHE.get(key); const T = texAeronave();
   const base = M.c && M.c.color ? M.c.color.clone() : new THREE.Color('#858c93'); if (furtivo) base.multiplyScalar(0.78);
   const c = new THREE.MeshStandardMaterial({ color: base, map: T.t, roughnessMap: T.tr, roughness: furtivo ? 0.95 : 0.72, metalness: furtivo ? 0.12 : 0.32, envMapIntensity: 0.85 });
   const esc = new THREE.MeshStandardMaterial({ color: '#2b2f33', map: T.t, roughnessMap: T.tr, roughness: 0.8, metalness: 0.25, envMapIntensity: 0.6 }); /* bocais, radomes, trem, compósito */
-  const vid = new THREE.MeshPhysicalMaterial({ color: '#5a4a26', roughness: 0.05, metalness: 0.85, envMapIntensity: 1.7, clearcoat: 1, clearcoatRoughness: 0.04 }); /* cúpula com película metalizada (ouro/índio) */
+  aplicaPele(c, M.camo, 1); const vid = matCupula(furtivo); /* v1.2.69: camuflagem com padrão + painéis/rebites no espaço do modelo; cúpula de vidro transparente */
   const out = Object.assign({}, M, { c, c2: c, claro: c, esc, vid }); CACHE.set(key, out); return out; }
 export const FURTIVO_1226 = { tesourao: 1, marimbondo: 1, bombardeiroNuclear: 1 };
 

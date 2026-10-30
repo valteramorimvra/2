@@ -6,6 +6,7 @@
 //  • pintura em textura (canvas): duas cores, faixa na linha d'água, janelas, portas, linhas de painel, matrícula e logotipo.
 // Nariz em −z, metros (L, envergadura e altura das fichas reais em sim/hidroaviao.js).
 import * as THREE from 'three';
+import { aplicaPele, peleAero, marcaPosModelo } from './peleAero1269.js'; /* v1.2.69 */
 
 const sst = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const CACHE = new Map();
@@ -52,6 +53,7 @@ function mats(S) { if (CACHE.has(S.id)) return CACHE.get(S.id);
     escuro: new THREE.MeshStandardMaterial({ color: '#2c3238', roughness: 0.5, metalness: 0.7 }), vidro: new THREE.MeshStandardMaterial({ color: '#0b1724', roughness: 0.05, metalness: 0.95, envMapIntensity: 1.8 }),
     helice: new THREE.MeshStandardMaterial({ color: '#16191c', roughness: 0.55, metalness: 0.4 }), ponta: new THREE.MeshStandardMaterial({ color: '#e9eef2', roughness: 0.4, metalness: 0.2 }),
     luzV: new THREE.MeshBasicMaterial({ color: '#ff3b30' }), luzG: new THREE.MeshBasicMaterial({ color: '#34c759' }), luzB: new THREE.MeshBasicMaterial({ color: '#ffffff' }) };
+  aplicaPele(m.casco, null); aplicaPele(m.corpo, null); /* v1.2.69: juntas, rebites e sujeira em relevo sobre a plumagem */
   CACHE.set(S.id, m); return m; }
 
 /** Malha a partir de anéis (cada anel = lista de [x,y,z] com o mesmo nº de pontos); fecha as pontas com leque. */
@@ -127,5 +129,7 @@ export function montaHidro3D(S) { const g = new THREE.Group(); g.name = 'hidro:'
     const lT = Math.min(5.2, L * 0.15), rT = 0.27; for (let i = 0; i < Math.min(10, S.torps || 4); i++) { const tg = new THREE.Group(); const c = new THREE.Mesh(new THREE.CylinderGeometry(rT, rT, lT * 0.86, 14).rotateX(Math.PI / 2), M.armaE); tg.add(c); const nz = new THREE.Mesh(new THREE.SphereGeometry(rT, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2).rotateX(-Math.PI / 2), M.armaE); nz.position.z = -lT * 0.43; tg.add(nz);
       const pq = new THREE.Mesh(new THREE.CylinderGeometry(rT * 0.95, rT * 0.6, lT * 0.14, 12).rotateX(Math.PI / 2), M.arma); pq.position.z = lT * 0.48; tg.add(pq); /* cone do paraquedas */
       const s = i % 2 ? 1 : -1, k = (i >> 1) % 2, f = i >> 2; tg.position.set(s * (W * 1.3 + k * 0.75), yA - 0.75 - k * 0.1, zA + cR * 0.2 + k * 0.4 + f * lT * 1.05); /* v1.2.43: até 10 torpedos em fileiras */ g.add(tg); tps.push(tg); } }
-  pintaAve(g, S);
+  pintaAve(g, S); marcaPosModelo(g); g.userData.camo = 'padrao';
   g.rotation.order = 'YXZ'; return g; }
+/** v1.2.69: troca a pintura do hidroavião (plumagem original ↔ camuflagem de aeronave escolhida no hangar). */
+export function camoHidro3D(g, camo) { const ca = camo && camo !== 'padrao' ? camo : 'padrao'; g.traverse((o) => { if (!o.isMesh || !o.material || Array.isArray(o.material)) return; const m0 = o.userData._m0h || o.material; if (!m0.userData || !m0.userData.pele) return; o.userData._m0h = m0; o.material = ca === 'padrao' ? m0 : peleAero(m0, ca); }); g.userData.camo = ca; return g; }

@@ -60,3 +60,6 @@
 .tela-hangar .hg-arma:not(.on) em { color: #8b98a5; }
 .tela-hangar .hg-insp { opacity: .8; }
 .tela-hangar .hg-teste { border-color: rgba(224,181,74,.55); } .tela-hangar .hg-teste b { color: #f0cf7a; } .tela-hangar .hg-teste small { color: #9fb0bf; }
+
+/* v1.2.69: aba PINTURA — amostras das camuflagens */
+.hg-camo .hg-sw{display:flex;gap:3px;margin:4px 0 2px}.hg-camo .hg-sw i{display:block;width:16px;height:16px;border-radius:3px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35)}

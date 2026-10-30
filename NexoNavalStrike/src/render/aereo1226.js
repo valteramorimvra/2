@@ -7,7 +7,7 @@
 import { loft, geoSuperficie, geoNacele } from './hidro3d.js'; /* v1.2.49 */
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { matsAeronave1226, FURTIVO_1226 } from './realismo1226.js'; /* v1.2.26: materiais PBR das aeronaves */
+import { matsAeronave1226, FURTIVO_1226 } from './realismo1226.js'; import { detalhaRotor, escapesHeli } from './peleAero1269.js'; /* v1.2.26: materiais PBR das aeronaves */
 function chapa(pts, e) { const sh = new THREE.Shape(); pts.forEach(([x, z], i) => (i ? sh.lineTo(x, z) : sh.moveTo(x, z))); return new THREE.ExtrudeGeometry(sh, { depth: e, bevelEnabled: false, curveSegments: 1 }).rotateX(Math.PI / 2); }
 const espelha = (m) => m.concat(m.slice().reverse().map(([x, z]) => [-x, z]));
 const deriva = (pts, e = 0.14) => chapa(pts, e).rotateZ(Math.PI / 2).translate(e / 2, 0, 0);
@@ -29,7 +29,7 @@ const TIPOS = {
     asa(g, ms, M.c2, [[0, -9.3], [0.9, -7.4], [1.7, -3.6], [6.7, 2.7], [6.7, 3.6], [4.9, 4.4], [3.4, 3.3], [2.2, 5.6], [1.1, 5.0], [0, 6.0]], 0.34, y + 0.1, 4.0, voo);
     const sp = ms(chapa(espelha([[0, -8.6], [0.75, -6.8], [1.25, -2.0], [1.3, 3.2], [0.8, 5.2]]), 0.55), M.c2); sp.position.y = y + 0.55; g.add(sp);
     const cp = ms(new THREE.SphereGeometry(0.58, 10, 6).scale(1, 0.62, 3.0), M.vid); cp.position.set(0, y + 0.9, -4.6); g.add(cp);
-    for (const sx of [-1, 1]) { const ea = ms(new THREE.BoxGeometry(0.9, 0.42, 2.6).translate(0, 0, 0), M.esc); ea.position.set(sx * 1.05, y + 0.7, -1.4); ea.rotation.y = sx * 0.08; g.add(ea); const bc = ms(new THREE.BoxGeometry(1.0, 0.32, 0.8), M.esc); bc.position.set(sx * 0.75, y + 0.38, 5.1); g.add(bc); }
+    for (const sx of [-1, 1]) { const ea = ms(new THREE.BoxGeometry(0.9, 0.42, 2.6).translate(0, 0, 0), M.esc); ea.position.set(sx * 1.05, y + 0.7, -1.4); ea.rotation.y = sx * 0.08; g.add(ea); const bc = ms(new THREE.BoxGeometry(1.0, 0.32, 0.8), M.tit || M.esc); bc.position.set(sx * 0.75, y + 0.38, 5.1); /* v1.2.69: bocais achatados em titânio */ g.add(bc); }
     if (!voo) trem(g, ms, M, [[0, -6], [-1.9, 1.5], [1.9, 1.5]]); g.userData.luzes = [6.6, y + 0.2, 3.1, y + 0.9, 4.2]; return g; },
   /** Tuiuiú: caça pesado bimotor — fuselagem larga em corpo misturado, canards, asa em delta cortada, 2 derivas inclinadas. 21,5 × 14 m */
   tuiuiu(M, ms, voo) { const g = new THREE.Group(), y = voo ? 0.3 : 1.45;
@@ -39,7 +39,7 @@ const TIPOS = {
     const nz = ms(new THREE.ConeGeometry(0.85, 3.4, 8).scale(1, 0.75, 1).rotateX(-Math.PI / 2), M.c); nz.position.set(0, y + 0.55, -11.6); g.add(nz);
     const cp = ms(new THREE.SphereGeometry(0.62, 10, 6).scale(1, 0.72, 3.2), M.vid); cp.position.set(0, y + 1.25, -6.6); g.add(cp);
     for (const sx of [-1, 1]) { const dv = ms(deriva([[0, 5.0], [0, 8.6], [3.4, 9.6], [3.4, 7.6]]), M.c2); dv.rotation.z = -sx * 0.34; dv.position.set(sx * 1.6, y + 0.9, 0); g.add(dv);
-      const bc = ms(cilZ(0.62, 0.55, 1.4, 10), M.esc); bc.position.set(sx * 0.95, y + 0.45, 10.0); g.add(bc); const ea = ms(new THREE.BoxGeometry(1.0, 0.9, 2.2), M.esc); ea.position.set(sx * 1.85, y + 0.25, -3.2); g.add(ea); }
+      const bc = ms(cilZ(0.62, 0.55, 1.4, 16), M.tit || M.esc); bc.position.set(sx * 0.95, y + 0.45, 10.0); g.add(bc); const ea = ms(new THREE.BoxGeometry(1.0, 0.9, 2.2), M.esc); ea.position.set(sx * 1.85, y + 0.25, -3.2); g.add(ea); }
     if (!voo) trem(g, ms, M, [[0, -7.6], [-2.2, 2.4], [2.2, 2.4]], 1.4); g.userData.luzes = [7.0, y + 0.4, 5.6, y + 1.8, 9.4]; return g; },
   /** Coruja: alerta aéreo bijato — asa alta reta, motores sob a asa, PRANCHA DORSAL de radar de painéis planos (sem radome giratório), cauda em H. 20 × 25 m */
   coruja(M, ms, voo) { const g = new THREE.Group(), y = voo ? 0.6 : 1.7;
@@ -63,7 +63,7 @@ const TIPOS = {
     for (const sx of [-1, 1]) { const sp = ms(new THREE.BoxGeometry(0.8, 0.6, 2.4), M.c2); sp.position.set(sx * 1.6, y + 0.9, 0.4); g.add(sp); for (const dz of [-0.4, 0.4]) { const mi = ms(cilZ(0.13, 0.13, 2.0, 6), M.claro); mi.position.set(sx * 2.15, y + 0.75 + dz * 0.3, 0.2 + dz); g.add(mi); } }
     const hb = ms(new THREE.CylinderGeometry(0.32, 0.42, 0.7, 8), M.esc); hb.position.set(0, y + 3.75, 0); g.add(hb);
     const rot = new THREE.Group(); rot.name = 'rotor'; rot.position.set(0, y + 4.1, 0); g.add(rot); for (let i = 0; i < 5; i++) { const p = ms(new THREE.BoxGeometry(0.46, 0.06, 7.4).translate(0, 0, 3.7), M.rotor || M.esc); p.rotation.y = voo ? i * Math.PI * 2 / 5 + 0.3 : Math.PI + (i - 2) * 0.07 /* parque: pás rebatidas para a cauda */; if (!voo) p.position.y = -0.04 * i; rot.add(p); }
-    const rc = new THREE.Group(); rc.name = 'rotorCauda'; rc.position.set(0, y + 2.8, 9.6); g.add(rc); for (let i = 0; i < 4; i++) { const p = ms(new THREE.BoxGeometry(0.05, 1.6, 0.18), M.rotor || M.esc); p.rotation.x = i * Math.PI / 4; rc.add(p); }
+    if (voo && M.tit) { detalhaRotor(g, rot, 5, 7.4, M, ms); escapesHeli(g, y + 3.1, 1.6, 0.95, M, ms); } /* v1.2.69 */ const rc = new THREE.Group(); rc.name = 'rotorCauda'; rc.position.set(0, y + 2.8, 9.6); g.add(rc); for (let i = 0; i < 4; i++) { const p = ms(new THREE.BoxGeometry(0.05, 1.6, 0.18), M.rotor || M.esc); p.rotation.x = i * Math.PI / 4; rc.add(p); }
     if (voo && M.disco) { const d = new THREE.Mesh(new THREE.CircleGeometry(7.4, 28).rotateX(-Math.PI / 2), M.disco); d.name = 'disco'; d.position.y = y + 4.12; g.add(d); }
     if (!voo) for (const [x, z] of [[-1.5, -2.6], [1.5, -2.6], [0, 4.0]]) { const r = ms(new THREE.CylinderGeometry(0.3, 0.3, 0.24, 8).rotateZ(Math.PI / 2), M.esc); r.position.set(x, 0.3, z); g.add(r); }
     g.userData.luzes = [2.2, y + 1.0, 0.4, y + 3.6, 1.8]; g.userData.heli = 1; return g; },
@@ -83,7 +83,7 @@ const TIPOS = {
     { const cab = new THREE.SphereGeometry(1.15, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.45); cab.scale(0.95, 0.62, 2.5); const cp = ms(cab, M.vid); cp.position.set(0, y + 2.55, -9.4); g.add(cp); }
     for (const s of [-1, 1]) { const ag = geoSuperficie({ span: 10.2, cR: 7.6, cP: 1.9, enf: 0.62, died: -0.035, tR: 0.13, tP: 0.09, n: 10 }); const a = ms(s < 0 ? ag.clone() : ag, M.c2); a.position.set(s * 1.3, y + 2.5, -3.2); a.scale.x = s; g.add(a);
       const nc = ms(geoNacele(7.6, 1.05, true), M.c2); nc.position.set(s * 2.05, y + 3.15, 3.2); g.add(nc); const ent = ms(new THREE.CircleGeometry(0.88, 18).rotateY(Math.PI), M.esc); ent.position.set(s * 2.05, y + 3.15, -0.62); g.add(ent);
-      const bo = ms(new THREE.CylinderGeometry(0.62, 0.78, 0.6, 16).rotateX(Math.PI / 2), M.esc); bo.position.set(s * 2.05, y + 3.15, 7.15); g.add(bo);
+      const bo = ms(new THREE.CylinderGeometry(0.62, 0.78, 0.6, 16).rotateX(Math.PI / 2), M.tit || M.esc); bo.position.set(s * 2.05, y + 3.15, 7.15); g.add(bo);
       const pl = ms(geoSuperficie({ span: 0.9, cR: 4.2, cP: 3.8, tR: 0.14, tP: 0.14, vertical: true, n: 2 }), M.c2); pl.position.set(s * 2.05, y + 2.3, 1.2); g.add(pl);
       const dv = ms(geoSuperficie({ span: 4.2, cR: 3.6, cP: 1.5, enf: 0.62, tR: 0.11, tP: 0.09, vertical: true, n: 6 }), M.c2); dv.rotation.z = -s * 0.62; dv.position.set(s * 0.55, y + 2.4, 8.1); g.add(dv); }
     const bb = ms(new THREE.BoxGeometry(1.9, 0.06, 6.0), M.esc); bb.position.set(0, y + 0.26, -1.0); g.add(bb); /* portas da baia interna */
@@ -100,7 +100,7 @@ const _GEO = {};
 export function geoParque1226(tipo) { if (_GEO[tipo]) return _GEO[tipo]; const K = { c: 'c', c2: 'c', claro: 'c', esc: 'esc', rotor: 'esc', vid: 'vid' }; const g = TIPOS[tipo](K, (geo, k) => { const m = new THREE.Mesh(geo); m.userData.k = k; return m; }, 0);
   g.updateMatrixWorld(true); const por = {}; g.traverse((o) => { if (!o.isMesh) return; let gg = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone(); gg.applyMatrix4(o.matrixWorld); for (const a of Object.keys(gg.attributes)) if (a !== 'position' && a !== 'normal' && a !== 'uv') gg.deleteAttribute(a);
     if (!gg.attributes.uv) gg.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(gg.attributes.position.count * 2), 2)); (por[o.userData.k] = por[o.userData.k] || []).push(gg); });
-  const out = {}; for (const k in por) out[k] = mergeGeometries(por[k], false); return (_GEO[tipo] = out); }
+  const out = {}; for (const k in por) { out[k] = mergeGeometries(por[k], false); if (out[k]) out[k].setAttribute('posM', out[k].attributes.position.clone()); /* v1.2.69: painéis da pele no parque */ } return (_GEO[tipo] = out); }
 /** Silhuetas laterais (HUD/hangar), formato de ui/silhuetas.js (viewBox 64×26). Mesclar: Object.assign(SILH, SILH_1226). */
 const S = (corpo) => `<svg class="silh" viewBox="0 0 64 26" aria-hidden="true"><g fill="currentColor" stroke="currentColor" stroke-linejoin="round">${corpo}</g></svg>`;
 export const SILH_1226 = {

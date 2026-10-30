@@ -16,7 +16,7 @@ function modeloRaio(M, ms) { const g = new THREE.Group();
   const cp = ms(new THREE.SphereGeometry(0.55, 10, 6).scale(1, 0.7, 2.8), M.vid); cp.position.set(0, 2.25, -3.9); g.add(cp);
   const ht = ms(chapa(espelha([[0.9, 5.2], [3.7, 6.3], [3.7, 7.8], [1.0, 7.7]]), 0.16), M.c2); ht.position.y = 1.3; g.add(ht);
   for (const sx of [-1, 1]) { const dv = ms(deriva([[0, 3.6], [0, 6.6], [2.7, 7.4], [2.7, 5.7]]), M.c2); dv.rotation.z = -sx * 0.5; dv.position.set(sx * 1.15, 1.75, 0); g.add(dv); }
-  const bc = ms(new THREE.CylinderGeometry(0.62, 0.58, 1.0, 10).rotateX(Math.PI / 2), M.esc); bc.position.set(0, 1.4, 7.2); g.add(bc);
+  const bc = ms(new THREE.CylinderGeometry(0.62, 0.58, 1.0, 16).rotateX(Math.PI / 2), M.tit || M.esc); /* v1.2.69: titânio */ bc.position.set(0, 1.4, 7.2); g.add(bc);
   const gc = ms(new THREE.BoxGeometry(0.1, 0.1, 2.0), M.esc); gc.position.set(0, 0.7, 6.2); gc.rotation.x = 0.35; g.add(gc); /* gancho de parada */
   g.scale.setScalar(1.12); return fim(g, M, ms, 5.4, 1.3, 3.2, 2.9, 6.6); }
 /** Vigia: bimotor turboélice de alerta aéreo antecipado — asa alta reta, radome giratório sobre a fuselagem, empenagem com 4 derivas. */
