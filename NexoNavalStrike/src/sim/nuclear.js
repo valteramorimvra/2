@@ -48,7 +48,7 @@ export const NUK = Object.freeze({
   // v1.2.26 item K: PILOTAGEM MANUAL — v1.2.29: menos tremor (taxas menores)
   manBank: 1, manTaxaRol: 0.9, manPitch: 0.5, manTaxaPitch: 0.6, manFatorCurva: 6, manCurvaMax: 0.36, /* v1.2.32: manche mais responsivo */ manAltMin: 160, manAltMax: 3500, manTempo: 320, assume: 4,
   // v1.2.28/29: acelerador + mira solo + preparo bombas (1ª = 10 s; seguintes mais longas)
-  thrNiveis: [165, 195, 225, 255, 285], thrMin: 165, thrMax: 285, bombasSurtida: 10, vidaBomb: 600 /* v1.2.69 */, tRecargaPouso: 25, relancaAbatido: 25, /* v1.2.29 Valter 15:07: era 3 / 18 s; relançamento 25 s após abatido */
+  thrNiveis: [165, 195, 225, 255, 285], thrMin: 165, thrMax: 285, bombasSurtida: 10, vidaBomb: 1500 /* v1.2.69 (Valter): vida e resistência maiores */, tRecargaPouso: 25, relancaAbatido: 25, /* v1.2.29 Valter 15:07: era 3 / 18 s; relançamento 25 s após abatido */
   tPrep1: 10, tPrepN: [10, 10, 10], // s: 1ª bomba pronta em 10 s após decolar; v1.2.33: seguintes 10 s após a ÚLTIMA bomba da salva (ver FILA.rearme)
   // ESPERA — órbita sem atacar
   espRaio: 2800, espAlt: 2200, espV: 200, espFolga: 2800, autonomia: 720,
@@ -256,7 +256,7 @@ export function disparaMissilNk(sim, q, n) { if (q.fase !== 2 || !(q.misseis > 0
     q.misseis--; k++; n.stats.misLanc = (n.stats.misLanc || 0) + 1; sim.evento({ t: 'hdMissil', idx: q.idx, id: n.id, m: m.idx, x: m.x, y: m.y, z: m.z }); }
   q.tMis = 4; return k; }
 /** v1.2.69 (Valter): o bombardeiro tem VIDA própria (barra no painel e sobre o avião) — cada interceptação tira uma parte; a onda nuclear derruba direto. */
-const DANO_NK = { sam: 0.35, defesa: 0.2, arar: 0.4 };
+const DANO_NK = { sam: 0.2, defesa: 0.1, arar: 0.25 }; /* fração da vida por acerto: SAM 5 acertos, defesa de perto 10, ar-ar 4 */
 function abate(sim, q, por, arma) { if (!q.hidro && q.vidaMax > 0 && DANO_NK[arma]) { q.vida -= q.vidaMax * DANO_NK[arma]; sim.evento({ t: 'nkAtingido', idx: q.idx, id: q.dono, x: q.x, y: q.y, z: q.z, f: Math.max(0, q.vida / q.vidaMax) }); if (q.vida > 0) return; }
   q.ativo = 0; q.sams.length = 0; const n = sim.navios[q.dono], k = n && n.nk; if (k && k.noAr === q.idx) { if (q.fase === 2) k.perdidas++; quedaBombardeiro(sim, q); }
   if (por) { por.stats.menores = (por.stats.menores || 0) + 1; por.stats.helisAbatidos = (por.stats.helisAbatidos || 0) + 1; }

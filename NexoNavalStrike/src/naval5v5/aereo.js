@@ -92,7 +92,7 @@ export function contagemAr(sim, timeJog) {
 }
 
 /** v1.2.69 (Valter): a aeronave do jogador é independente — vida própria considerável e consumível de REPARO (cura 45%, apaga o fogo). */
-export const VIDA_JOG = 3; export const REP_AERO = Object.freeze({ usos: 2, cura: 0.45, recarga: 30 });
+export const VIDA_JOG = 5; /* v1.2.69 (Valter): ×5 */ export const REP_AERO = Object.freeze({ usos: 2, cura: 0.45, recarga: 30 });
 /** Comandos de helicóptero/VANT (aplicados pelo Sim). */
 export function comandoAereo(sim, n, cmd) {
   const h = cmd.k != null && n.helis ? sim.helis[n.helis[cmd.k | 0]] : null;
