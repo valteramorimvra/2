@@ -34,10 +34,8 @@ function texSpray() { /* v1.2.50: textura de ÁGUA pulverizada — lençol trans
   const vn = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf); return (h(xi, yi) * (1 - u) + h(xi + 1, yi) * u) * (1 - v) + (h(xi, yi + 1) * (1 - u) + h(xi + 1, yi + 1) * u) * v; };
   for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) { const x = i / N * 2 - 1, y = j / N * 2 - 1; let f = 0, a = 0.5, sc = 3; for (let o = 0; o < 4; o++) { f += a * vn(i / N * sc + o * 5.3, j / N * sc * 0.55 + o * 2.9); a *= 0.5; sc *= 2.2; }
     const nucleo = Math.exp(-(x * x / 0.16 + y * y / 0.34) * 1.6), fil = Math.pow(vn(i / N * 22, j / N * 2.4), 3) * 1.4; /* filetes verticais */
-    const m = nucleo * (0.55 + 0.6 * f) + fil * nucleo * 0.8 - 0.18; const al = Math.max(0, Math.min(1, m * 1.9)); A[j * N + i] = al * 0.92; B[j * N + i] = 0.86 + 0.14 * f; }
-  let sd = 7; const rnd = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
-  for (let g = 0; g < 150; g++) { const ang = rnd() * 6.283, rr = 0.25 + Math.pow(rnd(), 0.6) * 0.68, cx = (0.5 + Math.cos(ang) * rr * 0.42) * N, cy = (0.5 + Math.sin(ang) * rr * 0.5) * N, rad = 0.7 + rnd() * 1.9, al = 0.55 + rnd() * 0.45; /* gotas: mais na borda (o lençol se rasga em gotas) */
-    for (let j = Math.floor(cy - rad - 1); j <= cy + rad + 1; j++) for (let i = Math.floor(cx - rad - 1); i <= cx + rad + 1; i++) { if (i < 0 || j < 0 || i >= N || j >= N) continue; const q = 1 - Math.hypot(i - cx, j - cy) / rad; if (q <= 0) continue; const k = j * N + i; A[k] = Math.max(A[k], Math.min(1, q * 1.8) * al); B[k] = Math.max(B[k], 0.95); } }
+    const nv = Math.exp(-(x * x / 0.3 + y * y / 0.55) * 1.4) * (0.35 + 0.65 * f); /* véu de névoa ao redor (esgarça a borda sem pontos) */ const m = nucleo * (0.5 + 0.6 * f) + fil * nucleo * 0.7 - 0.16; const al = Math.max(0, Math.min(1, m * 1.7)), alN = Math.max(0, Math.min(1, nv * 0.55 - 0.05)); A[j * N + i] = Math.max(al * 0.88, alN); B[j * N + i] = 0.86 + 0.14 * f; }
+  /* v1.2.68 (Valter: 'flocos' nas colunas): SEM gotas redondas desenhadas na textura — sobrepostas em centenas de partículas viravam pontinhos brancos tipo neve/bolhas. A água pulverizada agora é lençol + filetes + névoa contínua (borda esgarçada por ruído), como spray real visto de longe. */
   for (let k = 0; k < N * N; k++) { const r = Math.round(255 * B[k]); d[k * 4] = r; d[k * 4 + 1] = r; d[k * 4 + 2] = r; d[k * 4 + 3] = Math.round(255 * A[k]); }
   const t = new THREE.DataTexture(d, N, N); t.needsUpdate = true; t.magFilter = THREE.LinearFilter; t.minFilter = THREE.LinearMipmapLinearFilter; t.generateMipmaps = true; return t; }
 
@@ -346,7 +344,7 @@ export class Efeitos {
     /* 2) COROA / spray que ABRE no topo (componente radial ↑ no ápice ≈ vy/g) */
     for (let i = 0; i < nCoroa; i++) {
       const a = R() * 6.28, vRad = (2.5 + f * 8) * T.wMul * (0.7 + R() * 0.6), vy = vy0 * (0.22 + R() * 0.28);
-      W.emite(x + Math.cos(a) * (1.2 + f * 2), 0.5, z + Math.sin(a) * (1.2 + f * 2), Math.cos(a) * vRad, vy, Math.sin(a) * vRad, '#e8eff3', 0.55, 0.8 + f * 1.6, Math.min(4.2, 2 * vy / g + 0.8), 1.1, g, 0.18);
+      W.emite(x + Math.cos(a) * (1.2 + f * 2), 0.5, z + Math.sin(a) * (1.2 + f * 2), Math.cos(a) * vRad, vy, Math.sin(a) * vRad, '#e8eff3', 0.34, 1.6 + f * 2.8, /* v1.2.68: coroa em véu (sem pontinhos) */ Math.min(4.2, 2 * vy / g + 0.8), 1.1, g, 0.18);
     }
     /* 3) NÉVOA baixa + anel imediato na superfície */
     for (let i = 0; i < nBase; i++) W.emite(x + (R() - 0.5) * 3 * T.wMul, 0.35, z + (R() - 0.5) * 3 * T.wMul, (R() - 0.5) * 1.5, 0.4, (R() - 0.5) * 1.5, '#dde6ea', 0.22, (3 + f * 6) * T.wMul, tVoo * 1.4, 2.5 + f * 3, 0, 0.55);
@@ -356,11 +354,11 @@ export class Efeitos {
       this.stColuna.quedas++;
       for (let i = 0; i < Math.round((7 + f * 14) * T.nMul); i++) {
         const a = R() * 6.28, r = R() * (2 + f * 7) * T.wMul, y0 = h * (0.4 + R() * 0.55);
-        W.emite(x + Math.cos(a) * r, y0, z + Math.sin(a) * r, Math.cos(a) * (0.5 + f), -1.5 - R() * 4, Math.sin(a) * (0.5 + f), i % 2 ? '#e9f0f3' : '#d5e0e6', 0.48, 0.55 + f + R() * 0.5, Math.min(5, Math.sqrt(2 * y0 / g) + 0.7), 0.85, g, 0.02);
+        W.emite(x + Math.cos(a) * r, y0, z + Math.sin(a) * r, Math.cos(a) * (0.5 + f), -1.5 - R() * 4, Math.sin(a) * (0.5 + f), i % 2 ? '#e9f0f3' : '#d5e0e6', 0.3, 1.4 + f * 2 + R() * 0.8, /* v1.2.68: chuva da coluna em cortina, não flocos */ Math.min(5, Math.sqrt(2 * y0 / g) + 0.7), 0.85, g, 0.02);
       }
       for (let i = 0; i < Math.round((5 + f * 8) * T.wMul); i++) {
         const a = R() * 6.28, r = (2 + R() * (4 + f * 8)) * T.wMul, v = 1.8 + R() * 3.5;
-        W.emite(x + Math.cos(a) * r, 0.35, z + Math.sin(a) * r, Math.cos(a) * v, 2.5 + R() * 4, Math.sin(a) * v, '#eef4f6', 0.5, 1.3 + f * 2, 1.1 + R() * 0.5, 1.5, g, 0.22);
+        W.emite(x + Math.cos(a) * r, 0.35, z + Math.sin(a) * r, Math.cos(a) * v, 2.5 + R() * 4, Math.sin(a) * v, '#eef4f6', 0.36, 2 + f * 2.6, 1.1 + R() * 0.5, 1.5, g, 0.22);
       }
       /* v1.2.52: sem 'gotas' paradas no mar depois da coluna — a espuma fica só no anel da superfície */
       this.anel(x, z, (6 + f * 16) * T.wMul);

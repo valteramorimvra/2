@@ -3,6 +3,7 @@
 // e voltar ao navio (a IA assume o helicóptero: patrulha, ataca, volta para pousar e rearmar). Podem ser abatidos por
 // CIWS, 30 mm e SAM inimigos. Sensores elevados enxergam por cima das ilhas e plotam no radar da frota (data-link).
 import { bonusNivel, perfilArma } from '../aeronaves.js';
+import { voaUnificado, bateuRelevo } from '../sim/vooUnificado.js'; /* v1.2.68: controle único (motor do bombardeiro) */
 import { clamp, ang, marcacao, G } from '../sim/util.js';
 import { HELIS, UAV, MISSEIS, TORPEDO } from '../sim/classes.js';
 import { alturaMar } from '../sim/ocean.js';
@@ -50,7 +51,7 @@ export function instalaAereo(sim) {
 /** v1.2.66 (Valter): o jogador ENTRA na batalha pilotando a aeronave do slot 0 da megabase.
  *  'pista' / 'heliponto': já no convés com pedido de decolagem (convés ágil) e controle manual — caças pela catapulta, helicópteros direto do ponto;
  *  'ar' (Air Start): já em voo tático 1,6 km à frente da base, na proa, a 70% da velocidade máxima e altitude de cruzeiro do tipo. */
-function inicioAeroPrin(sim, n, h, ini) { if (!h) return; n.controle = 0; n.controleIA = 1; n.libVel = 2; h.ctrl = 'jog'; h.auto = 1;
+function inicioAeroPrin(sim, n, h, ini) { if (!h) return; n.controle = 0; n.controleIA = 1; n.libVel = 2; h.ctrl = 'jog'; h.auto = 1; h.thr = ini === 'ar' ? 3 : 2;
   if (ini !== 'ar') { h.lancar = 1; return; }
   const d = 1600, alt = h.H.aviao ? 420 : 140; soltaPonto(n, h); if (n.dk && h.dkC >= 0 && n.dk.cats) { if (n.dk.cats[h.dkC] === h.idx) n.dk.cats[h.dkC] = -1; h.dkC = -1; }
   h.x = n.x + Math.sin(n.rumo) * d; h.z = n.z - Math.cos(n.rumo) * d; h.y = alt; h.rumo = n.rumo; h.v = h.H.vmax * 0.7; h.vx = Math.sin(h.rumo) * h.v; h.vz = -Math.cos(h.rumo) * h.v; h.vy = 0;
@@ -98,6 +99,7 @@ export function comandoAereo(sim, n, cmd) {
     case 'heliCtrl': if (h) { h.jx = clamp(+cmd.jx || 0, -1, 1); h.jy = clamp(+cmd.jy || 0, -1, 1); h.alt = clamp(+cmd.alt || ALT_IA, PARAM.heli.altMin, Math.max(PARAM.heli.altMax, 15)); } break;
     case 'heliFlare': if (h && h.estado >= EST.DECOLA && h.estado <= EST.POUSO && (h.flares ?? PARAM.heli.flares) > 0 && !(h.tFlare > 0)) { h.flares = (h.flares ?? PARAM.heli.flares) - 1; h.tFlare = PARAM.heli.flareDur; sim.evento({ t: 'heliFlare', idx: h.idx, id: n.id, x: h.x, y: h.y, z: h.z }); } break;
     case 'heliFogo': if (h) h.fogo = 0.4; break;
+    case 'heliThr': if (h) h.thr = Math.max(0, Math.min(4, cmd.v | 0)); break; /* v1.2.68: acelerador (asa) / coletivo (rotor) — 5 posições como no bombardeiro */
     case 'engajar': { const k = n.controle; const q = k >= 0 && n.helis ? sim.helis[n.helis[k]] : null; const alvo = cmd.v && cmd.alvo >= 0 && sim.navios[cmd.alvo] && !sim.navios[cmd.alvo].morto ? cmd.alvo | 0 : -1; /* v1.2.67: PILOTO AUTOMÁTICO OFENSIVO */
       if (q && q.estado >= EST.DECOLA && q.estado <= EST.RETORNO) { q.apAlvo = alvo; q.apEng = alvo >= 0 ? 1 : 0; q.ctrl = alvo >= 0 ? 'ia' : 'jog'; if (alvo >= 0) { q.missao = 'ataque'; if (q.estado === EST.RETORNO && q.comb > q.combMax * 0.15) q.estado = EST.VOO; } }
       else if (k < 0) { n.apAlvo = alvo; n.controleIA = alvo >= 0 ? 1 : 0; if (alvo >= 0) { n.alvoId = alvo; } }
@@ -105,7 +107,7 @@ export function comandoAereo(sim, n, cmd) {
     case 'heliVolta': if (h && (h.estado === EST.VOO)) { h.estado = EST.RETORNO; } break;
     case 'controle': { const k = cmd.k == null || cmd.k < 0 ? -1 : cmd.k | 0; for (const i of n.helis || []) { const q = sim.helis[i]; if (q.ctrl === 'jog') q.ctrl = 'ia'; }
       if (k >= 0 && n.helis && n.helis[k] != null) { const q = sim.helis[n.helis[k]]; if (q.estado === EST.CONVOO && cabeLado(sim, n)) { q.lancar = 1; q.auto = 1; }
-        if (q.estado !== EST.ABATIDO && q.estado !== EST.HANGAR && q.estado !== EST.REARMA) { q.ctrl = 'jog'; q.alt = Math.max(40, q.y); n.controle = k; n.controleIA = 1; break; } }
+        if (q.estado !== EST.ABATIDO && q.estado !== EST.HANGAR && q.estado !== EST.REARMA) { q.ctrl = 'jog'; q.alt = Math.max(40, q.y); q.bank = -(q.roll || 0); q.gam = q.pitch || 0; q.sx = q.jx = 0; q.sy = q.jy = 0; if (q.thr == null) q.thr = q.H.aviao ? 2 : 2; n.controle = k; n.controleIA = 1; break; } }
       n.controle = -1; n.controleIA = 0; break; }
     case 'esquadrilha': if (n.helis && n.helis.length) { n.esq = 1; if (cmd.m === 1) { n.libMax = Math.ceil(n.helis.length / 2); n.libVel = 1.5; } else if (cmd.m === 2) { n.libMax = n.helis.length; n.libVel = 2; } /* v1.2.32: metade / todas, convés mais rápido */ for (const i of n.helis) { const q = sim.helis[i]; if (q.estado !== EST.ABATIDO) q.auto = 1; } sim.evento({ t: 'esquadrilha', id: n.id, n: n.helis.length }); } break; /* v1.2.16 item 13b: LANÇAR ESQUADRILHA — todos decolam em sequência (intervalo de convoo) e atacam */
     case 'uav': lancaUav(sim, n); break;
@@ -327,7 +329,7 @@ export function passoAereo(sim, dt) { POOL_REF.s = sim; if (!sim.stConves) sim.s
     if ((h.comb <= -30 || n.morto && h.comb <= 0) && h.estado !== EST.POUSO && !(h.ap && n.dk && n.dk.tok === h.idx)) { derrubaAereo(sim, 'h', h, null); continue; } /* v1.2.25: já no convés (cabo/taxi) não cai por combustível */
     if (h.ctrl === 'ia' && !(h.tFlare > 0) && (h.flares ?? PARAM.heli.flares) > 0 && sim.sams.some((s) => s.ativo && s.tipoAlvo === 'h' && s.alvo === h.idx && s.t > 0.8)) { h.flares = (h.flares ?? PARAM.heli.flares) - 1; h.tFlare = PARAM.heli.flareDur; sim.evento({ t: 'heliFlare', idx: h.idx, id: n.id, x: h.x, y: h.y, z: h.z }); }
     if (h.estado === EST.VOO) { const a = alvoHeli(sim, h, n);
-      if (h.ctrl === 'jog') { voa(h, h.rumo + h.jx * 1.2, h.H.vmax * clamp(h.jy, -0.25, 1), h.alt, dt, sim); if (h.fogo > 0 || (h.H.arma === 'mg' && h.fogo > 0)) dispara(sim, h, n, a); }
+      if (h.ctrl === 'jog') { voaUnificado(h, dt, sim); /* v1.2.68: pilotagem antiga (voa com rumo/alt) SUBSTITUÍDA pelo controlador do bombardeiro */ if (bateuRelevo(h, dt, sim)) { derrubaAereo(sim, 'h', h, null); sim.evento({ t: 'heliTerreno', idx: h.idx, x: h.x, y: h.y, z: h.z }); continue; } if (h.fogo > 0 || (h.H.arma === 'mg' && h.fogo > 0)) dispara(sim, h, n, a); }
       else if ((() => { /* v1.2.29 item 13: dogfight — prioridade sobre CAP/ataque se inimigo no envelope; busca stagger 3 ticks (FPS) */
         let ae = h._ae, ad = h._ad != null ? h._ad : 9e6;
         if ((sim.tick + h.idx) % 3 === 0 || !ae || !ae.ativo) { ae = null; ad = 9e6; for (const q of sim.helis) { if (!q.ativo || q.time === h.time || q.estado < EST.DECOLA || q.estado > EST.RETORNO) continue; const d2 = (q.x - h.x) ** 2 + (q.z - h.z) ** 2; if (d2 < ad) { ad = d2; ae = q; } } h._ae = ae; h._ad = ad; }
