@@ -375,3 +375,36 @@
 /* v1.2.67: quadro do veículo compacto (dentro da rolagem) */
 .tela-preparo .pp-veic { padding: 6px 8px; } .tela-preparo .pp-veic-seg button { min-width: 0; flex: 1; padding: 6px 4px; } .tela-preparo .pp-veic-aero p { font-size: 10.5px; line-height: 1.3; margin: 4px 0; }
 .tela-preparo .pp-aeros { max-height: 132px; }
+
+/* v1.3.00 (Valter): PASSE DE BATALHA em DOURADO destacado — moldura do cartão do menu e ícone */
+.tela-inicio .mw-passe-ouro { position: relative; border: 2px solid #d4af37 !important; box-shadow: 0 0 0 1px rgba(255,236,170,.55) inset, 0 0 14px rgba(212,175,55,.55), 0 0 2px #fff3c4 inset; animation: psBrilho 2.6s ease-in-out infinite; }
+.tela-inicio .mw-passe-ouro .mw-ct b { color: #ffd76a !important; text-shadow: 0 1px 2px rgba(0,0,0,.7); }
+.tela-inicio .mw-passe-ouro .mw-ct small { color: #f5e6b8 !important; }
+.mw-ps-ic { position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff3c4 0, #f5cf5a 32%, #b8860b 78%, #7a5a10 100%); box-shadow: 0 0 10px rgba(255,210,90,.7), inset 0 -2px 3px rgba(0,0,0,.35); }
+.mw-ps-ic svg { width: 19px; height: 19px; fill: #fff8dc; stroke: #6b4c0a; stroke-width: 1; stroke-linejoin: round; }
+@keyframes psBrilho { 0%, 100% { box-shadow: 0 0 0 1px rgba(255,236,170,.55) inset, 0 0 10px rgba(212,175,55,.45); } 50% { box-shadow: 0 0 0 1px rgba(255,236,170,.8) inset, 0 0 20px rgba(255,205,80,.75); } }
+@media (prefers-reduced-motion: reduce) { .tela-inicio .mw-passe-ouro { animation: none; } }
+@media (max-height: 420px) { .mw-ps-ic { width: 24px; height: 24px; top: 4px; right: 4px; } .mw-ps-ic svg { width: 15px; height: 15px; } }
+.ps-it small { font-size: 8.5px; color: #f3e3b3; }
+
+/* v1.3.00 (Valter): ÁRVORE em formato HORIZONTAL — cada equipe/classe numa linha, nós lado a lado (rolagem horizontal),
+   linha dourada ligando os níveis e nós brilhantes conforme o estado (na frota · pesquisável · bloqueado) */
+.tela-arvore .ar-wrap { overflow-x: auto; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.tela-arvore .ar-grade { --cw: 104px; }
+.tela-arvore .ar-linha { grid-template-columns: 112px calc(max(1, var(--n1)) * (var(--cw) + 6px) + 12px) calc(var(--n2) * (var(--cw) + 6px) + 12px) calc(var(--n3) * (var(--cw) + 6px) + 12px) calc(var(--n4) * (var(--cw) + 6px) + 12px) calc(var(--n5) * (var(--cw) + 6px) + 12px) calc(var(--n6) * (var(--cw) + 6px) + 12px) !important; }
+.tela-arvore .ar-linha:not(.ar-cab) { overflow: clip !important; } /* clip (não hidden): o rótulo da linha continua FIXO à esquerda na rolagem horizontal */
+.tela-arvore .ar-cel { flex-wrap: wrap !important; min-width: 0; justify-content: flex-start !important; align-content: center !important; }
+.tela-arvore .ar-linha:not(.ar-cab) .ar-cel { background: linear-gradient(180deg, transparent calc(50% - 1px), rgba(246,211,107,.55) calc(50% - 1px), rgba(246,211,107,.55) calc(50% + 1px), transparent calc(50% + 1px)); }
+.tela-arvore .ar-card { flex: 0 0 auto; transition: box-shadow .3s, transform .2s; }
+.tela-arvore .ar-card.st-possui { box-shadow: 0 0 0 1px rgba(74,222,128,.5), 0 0 12px rgba(74,222,128,.55), 0 4px 10px rgba(0,0,0,.45); }
+.tela-arvore .ar-card.st-pesq, .tela-arvore .ar-card.st-pode { box-shadow: 0 0 0 1px rgba(56,189,248,.55), 0 0 12px rgba(56,189,248,.5); animation: arPulso 2.4s ease-in-out infinite; }
+.tela-arvore .ar-card.lend { box-shadow: 0 0 0 1px rgba(167,139,250,.7), 0 0 14px rgba(167,139,250,.55); }
+.tela-arvore .ar-card.slend { box-shadow: 0 0 0 1px rgba(253,230,138,.85), 0 0 16px rgba(253,210,90,.7); animation: arOuro 2.8s ease-in-out infinite; }
+.tela-arvore .ar-card.st-bloq { box-shadow: 0 0 0 1px rgba(100,116,139,.35); }
+.tela-arvore .ar-cab .ar-cel { justify-content: flex-start !important; padding-left: 12px; }
+@media (max-height: 440px) { .tela-arvore .ar-grade { --cw: 96px; } }
+@keyframes arPulso { 0%, 100% { box-shadow: 0 0 0 1px rgba(56,189,248,.45), 0 0 8px rgba(56,189,248,.35); } 50% { box-shadow: 0 0 0 1px rgba(56,189,248,.8), 0 0 16px rgba(56,189,248,.7); } }
+@keyframes arOuro { 0%, 100% { box-shadow: 0 0 0 1px rgba(253,230,138,.7), 0 0 10px rgba(253,210,90,.5); } 50% { box-shadow: 0 0 0 1px rgba(255,240,170,1), 0 0 20px rgba(255,215,90,.85); } }
+@media (prefers-reduced-motion: reduce) { .tela-arvore .ar-card { animation: none !important; } }
+.tela-inicio .mw-passe-ouro .mw-ct { padding-right: 40px; }
+@media (max-height: 420px) { .tela-inicio .mw-passe-ouro .mw-ct { padding-right: 32px; } }

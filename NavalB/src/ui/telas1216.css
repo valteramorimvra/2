@@ -32,3 +32,17 @@
 .tela-visualizar .vz-dica { position: absolute; left: 50%; translate: -50% 0; bottom: calc(10px + env(safe-area-inset-bottom)); font-size: 11px; color: rgba(226,232,240,.7); pointer-events: none; text-shadow: 0 1px 3px #000; }
 @media (max-height: 380px) { .tela-visualizar .vz-info { font-size: 10.5px; padding: 7px 10px; } .tela-visualizar .vz-info dl { row-gap: 1px; } }
 @media (max-width: 800px) { .tela-visualizar .vz-info { width: clamp(228px, 31vw, 270px); font-size: 10.5px; } .tela-visualizar .vz-ficha { max-width: min(330px, 40vw); } }
+
+/* v1.3.00 (Valter): Visualizar — navio no alto + caixas de dados FIXAS embaixo, sem rolagem */
+.tela-visualizar { overflow: hidden; }
+.tela-visualizar .vz-topo { max-width: min(420px, 46vw); }
+.tela-visualizar .vz-caixas { position: absolute; left: calc(10px + env(safe-area-inset-left)); right: calc(10px + env(safe-area-inset-right)); bottom: calc(26px + env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); grid-auto-rows: 34px; gap: 4px; max-height: 42vh; overflow: hidden; }
+.tela-visualizar .vz-cx { min-width: 0; padding: 3px 7px; border-radius: 7px; background: rgba(8,14,22,.74); border: 1px solid rgba(148,163,184,.28); display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(3px); }
+.tela-visualizar .vz-cx small { font-size: 8.5px; letter-spacing: .08em; text-transform: uppercase; color: #94a3b8; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tela-visualizar .vz-cx b { font-size: 10.5px; font-weight: 600; color: #f1f5f9; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tela-visualizar .vz-cx img { width: 14px; vertical-align: -2px; }
+.tela-visualizar .vz-dica { bottom: calc(6px + env(safe-area-inset-bottom)); }
+@media (max-height: 380px) { .tela-visualizar .vz-caixas { grid-auto-rows: 30px; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); } .tela-visualizar .vz-cx b { font-size: 10px; } }
+@media (orientation: portrait) { .tela-visualizar .vz-caixas { grid-template-columns: repeat(2, 1fr); max-height: 48vh; } }
+.tela-visualizar .vz-cx2 { grid-column: span 2; }
+.tela-visualizar .vz-caixas { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); grid-auto-rows: 31px; gap: 3px; }

@@ -7,9 +7,9 @@ import { CLASSES, HELIS } from '../sim/classes.js';
 import './hangar.css';
 
 const MINI = new Map(); /* miniaturas já renderizadas (data URL) — guardadas no aparelho: Comércio e Árvore mostram a foto 3D real */
-const CHAVE_MINI = 'nns-mini-aero-4'; /* v1.2.69: miniaturas refeitas com o acabamento novo */ try { const o = JSON.parse(localStorage.getItem(CHAVE_MINI) || '{}'); for (const k in o) MINI.set(k, o[k]); } catch (e) { /* sem armazenamento: renderiza de novo */ }
+const CHAVE_MINI = 'nns-mini-aero-5'; /* v1.3.00: refeitas (placa do país do Gavião/Harpia) */ /* v1.2.69: miniaturas refeitas com o acabamento novo */ try { const o = JSON.parse(localStorage.getItem(CHAVE_MINI) || '{}'); for (const k in o) MINI.set(k, o[k]); } catch (e) { /* sem armazenamento: renderiza de novo */ }
 const guardaMini = () => { try { localStorage.setItem(CHAVE_MINI, JSON.stringify(Object.fromEntries(MINI))); } catch (e) { /* cota cheia: só memória */ } };
-export const miniAero = (id) => MINI.get(id); /* também usadas no Comércio e na Árvore */
+export const miniAero = (id) => MINI.get(id) || (AERO[id] ? `fotos/aero/${id}.jpg` : undefined); /* v1.3.00: foto fixa de TODAS as aeronaves (renderizada do hangar 3D) até a miniatura do aparelho ficar pronta */ /* também usadas no Comércio e na Árvore */
 const maxVida = (a) => Math.max(...AERONAVES.filter((q) => !q.modelo.hidro === !a.modelo.hidro).map((q) => fichaAero(q.id).vida)); /* blindagem relativa à família (hidro × aeronaves de navio) */
 const n0 = (v) => Math.round(v).toLocaleString('pt-BR');
 const precoTxt = (a) => (a.preco.ouro ? `● ${n0(a.preco.ouro)}` : a.preco.prata ? `◎ ${n0(a.preco.prata)}` : 'GRÁTIS');
@@ -30,7 +30,7 @@ export function telaHangar({ jogo, eco, save, som, eventoCompra, mostra, TELAS, 
   <div class="hg-atalhos"><button class="hg-big" data-ir="loja">${SVG('<path d="M5 8h14l-1.2 12H6.2z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>')}<b>LOJA</b></button><button class="hg-big" data-ir="arvore">${SVG('<circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M6 8.2v3.3h12V8.2M12 11.5v4.3"/>')}<b>ÁRVORE TECNOLÓGICA</b></button></div>`, { transp: true });
   const $ = (s) => el.querySelector(s), lista = () => AERONAVES.filter((a) => cat === 'todas' || a.cat === cat);
   const desenhaLista = () => { $('.hg-lista').innerHTML = lista().map((a) => { const f = fichaAero(a.id), tem = possuiAero(eco, a.id);
-    return `<button class="hg-it${a.id === sel ? ' on' : ''}${tem ? '' : ' bloq'}" data-id="${a.id}"><i class="hg-mini"${MINI.has(a.id) ? ` style="background-image:url(${MINI.get(a.id)})"` : ''}></i><b>${f.nome.split(' ').pop()}</b><small>${tem ? (emUso(a.id) ? 'EM USO' : 'T' + a.tier + ' · nv ' + nivelAero(eco, a.id)) : precoTxt(a)}</small></button>`; }).join('');
+    return `<button class="hg-it${a.id === sel ? ' on' : ''}${tem ? '' : ' bloq'}" data-id="${a.id}"><i class="hg-mini" style="background-image:url(${miniAero(a.id)})"></i><b>${f.nome.split(' ').pop()}</b><small>${tem ? (emUso(a.id) ? 'EM USO' : 'T' + a.tier + ' · nv ' + nivelAero(eco, a.id)) : precoTxt(a)}</small></button>`; }).join('');
     const on = $('.hg-it.on'); if (on) on.scrollIntoView({ block: 'nearest' }); };
   const desenhaFicha = () => { const a = AERO[sel], f = fichaAero(sel), tem = possuiAero(eco, sel), nv = nivelAero(eco, sel); const barra = (r, v, max) => `<div class="hg-b"><span>${r}</span><i style="--v:${Math.min(1, v / max)}"></i><em>${v}</em></div>`;
     const acao = !tem ? `<button class="hg-comprar" data-a="compra">COMPRAR · ${precoTxt(a)}</button>` : a.modelo.hidro || ehHeliNavio(sel) ? (emUso(sel) ? '<button class="hg-usar on" disabled>EM USO ✓</button>' : '<button class="hg-usar" data-a="usa">USAR NA BATALHA</button>') : '<p class="hg-ala">Voa na ala dos porta-aviões e gigantes — o nível vale na batalha.</p>';

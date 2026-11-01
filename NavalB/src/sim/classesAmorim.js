@@ -48,7 +48,7 @@ export function layoutAmorim(C) {
   grade(35.34, 5.84, 5, 10, 1.2, 1.1, P.vls);   // slot de RÉ (dourado, z 29,8 a 41,0): 50 mísseis — também lança o NUCLEAR
   P.celulas = P.vls.slice();
   P.ciws.push({ x: -1.68, y: 10.6, z: 44.57, lug: 0, tipo: 'ciws', piv: 1.0 }, { x: 1.68, y: 10.6, z: 44.57, lug: 1, tipo: 'ciws', piv: 1.0 });
-  for (const [x, y, z] of [[-6.1, 7.5, -10.0], [6.1, 7.5, -10.0], [-7.5, 6.7, 70.5], [7.5, 6.7, 70.5], [-1.24, 33.54, -5.30], [1.29, 33.54, -5.30], [-0.01, 33.54, -4.07]]) P.laser.push({ x, y, z });
+  for (const [x, y, z] of [[-6.1, 7.5, -10.0], [6.1, 7.5, -10.0], [-7.5, 6.7, 70.5], [7.5, 6.7, 70.5], [-1.24, 33.54 - 0.95, -5.30], [1.29, 33.54 - 0.95, -5.30], [-0.01, 33.54 - 0.95, -4.07]]) P.laser.push({ x, y, z }); /* esferas: o feixe do jogo nasce 0,95 m acima do ponto → aqui fica no CENTRO de cada esfera (y 33,54) */
   for (const z of [55.5, 60.6, 65.8]) for (const sx of [-1, 1]) P.tubos.push({ x: sx * 9.1, y: 6.6, z, lado: sx, canos: 4, sub: 0 });
   P.granadas.push({ x: 0, y: 14.36, z: -46.5, lado: 0, r: 1.3, centro: 0, meio: 2.6, torre: 1 }, { x: 7.6, y: 8.6, z: -42.7, lado: 1, r: 1.3, centro: 0.6, meio: 2.2 }, { x: -7.6, y: 8.6, z: -42.7, lado: -1, r: 1.3, centro: -0.6, meio: 2.2 });
   P.convoo = null; P.heliponto = { z: 64.3, y: 5.6 };
