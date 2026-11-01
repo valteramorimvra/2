@@ -27,7 +27,7 @@ import { instalaDefesa, instalaNavio, passoCiws5, passoLaser, passoSam, passoSam
 
 import { instalaNuclear, passoNuclear, lancaNuclear, comandoNuclear } from './nuclear.js'; import { criaTrafego, passoTrafego, acertaCivil, danoCivil } from './trafego.js'; /* v1.2.46 */
 import { passoHidros, comandoHidro } from './hidroaviao.js'; /* v1.2.39: hidroaviões */
-import { passoMissil1231, lancaMissilNuclear1231 } from './missilNuclear1231.js'; /* v1.2.31 */ /* v1.2.26: bombardeiro + bomba atômica */
+import { passoMissil1231, lancaMissilNuclear1231 } from './missilNuclear1231.js'; import { instalaAmorim, lancaMissilAmorim, passoLateral, passoAutosAmorim } from './amorim.js'; /* v1.3.00 */ /* v1.2.31 */ /* v1.2.26: bombardeiro + bomba atômica */
 export const DT = 1 / 60;
 export const PISCA_BOT = 0.2;
 /** v1.2.7 lança-granadas: velocidade de boca fixa (alcance máx. a 45°) e elevação de tiro baixo para a distância */
@@ -77,7 +77,7 @@ export class Sim {
     this.visual = hora === 'noite' ? 2600 : hora === 'entardecer' ? 6000 : 8500; if (tempo === 'chuva') this.visual *= 0.5; else if (tempo === 'nublado') this.visual *= 0.8;
     this.match = null; this._tmp = {}; this._o = { x: 0, y: 0, z: 0 }; this._s = { az: 0, el: 0, tv: 0, d: 0, px: 0, pz: 0 }; instalaDefesa(this); instalaAereo(this); instalaNuclear(this);
   }
-  adicionaNavio(time, tipo, x, z, rumo, papel = 'jogador', opc) { const n = novoNavio(this.navios.length, time, tipo, x, z, rumo, papel, opc); instalaNavio(n); instalaSec(n); instalaAvarias(n); if (n.C.canhao && n.C.canhao.V0) { const k0 = arrastoCal(n.C.canhao.cal); alcanceMax(n.C.canhao.V0, k0); alcanceMax(n.C.canhao.V0, k0 * 0.9); } /* v1.2.1: tabelas balísticas (HE e AP) no carregamento — antes eram geradas no 1º tiro (pico de dezenas de ms) */ instalaCons(n, (opc && opc.cons) || (opc && opc.mods && opc.mods.cons) || {}); n.aeroNv = (opc && opc.aeroNv) || null; n.aeroArma = (opc && opc.aeroArma) || null; n.forcaHelis = !!(opc && opc.forcaHelis); n.aeroPrin = (opc && opc.aeroPrin) || null; /* v1.2.66 */ /* v1.2.65: teste drive do hangar usa a aeronave escolhida mesmo nos gigantes (ala própria) */ /* v1.2.65: arma principal do hangar */ /* v1.2.61: níveis do hangar (só o jogador) */ instalaHelisNavio(this, n, opc && opc.helis); this.navios.push(n); return n; }
+  adicionaNavio(time, tipo, x, z, rumo, papel = 'jogador', opc) { const n = novoNavio(this.navios.length, time, tipo, x, z, rumo, papel, opc); instalaNavio(n); instalaSec(n); instalaAvarias(n); instalaAmorim(n); /* v1.3.00 */ if (n.C.canhao && n.C.canhao.V0) { const k0 = arrastoCal(n.C.canhao.cal); alcanceMax(n.C.canhao.V0, k0); alcanceMax(n.C.canhao.V0, k0 * 0.9); } /* v1.2.1: tabelas balísticas (HE e AP) no carregamento — antes eram geradas no 1º tiro (pico de dezenas de ms) */ instalaCons(n, (opc && opc.cons) || (opc && opc.mods && opc.mods.cons) || {}); n.aeroNv = (opc && opc.aeroNv) || null; n.aeroArma = (opc && opc.aeroArma) || null; n.forcaHelis = !!(opc && opc.forcaHelis); n.aeroPrin = (opc && opc.aeroPrin) || null; /* v1.2.66 */ /* v1.2.65: teste drive do hangar usa a aeronave escolhida mesmo nos gigantes (ala própria) */ /* v1.2.65: arma principal do hangar */ /* v1.2.61: níveis do hangar (só o jogador) */ instalaHelisNavio(this, n, opc && opc.helis); this.navios.push(n); return n; }
   solucao(gx, gz, h0, V0, tx, tz, tvx, tvz, k) { return k ? solucaoArrasto(gx, gz, h0, V0, k, tx, tz, tvx, tvz, this._s) : solucaoTiro(gx, gz, h0, V0, tx, tz, tvx, tvz, this._s); }
   evento(e) { if (this.eventos.length < 800) this.eventos.push(e); }
   navio(id) { return this.navios[id]; }
@@ -147,7 +147,7 @@ export class Sim {
     colideTodos(this, n, dt); /* v1.2.16 (item 15): cápsulas sólidas + impulso com massa + guinada + deriva + abalroamento (só inimigos) */
     // incêndio, alagamento, módulos avariados, reparo e recarga das iscas (naval5v5/avarias.js)
     if (Math.abs(n.w || 0) < PARAM.dispersao.wEstavel && Math.abs((n.v || 0) - (n._vEst || 0)) < 0.5 * dt * 60) n.tEstavel = (n.tEstavel || 0) + dt; else n.tEstavel = 0; n._vEst = n.v; /* v1.2.2: navio estável (sem guinada) há quanto tempo */
-    if ((this.tick + n.id) % 6 === 0) this.fatorDisp(n);
+    if ((this.tick + n.id) % 6 === 0) this.fatorDisp(n); if (n.am) passoAutosAmorim(this, n, dt); /* v1.3.00: canhões automáticos antinavio do Amorim */
     passoAvarias(this, n, dt); passoCons(this, n, dt); if (n.C.rbu) { this.passoRbu(n, dt); if (n.fgC && (n.fgC.rbuFila > 0 || n.fgC.tRbu > 0)) { this.trocaCanal(n); n._canal1 = 1; this.passoRbu(n, dt); n._canal1 = 0; this.trocaCanal(n); } } /* v1.2.14: granadas e foguetes com filas/recargas próprias */
     if (n.tChaff > 0) n.tChaff -= dt; if (n.tVls > 0) n.tVls -= dt; if (n.tTorp > 0) n.tTorp -= dt;
     // trava de alvo: precisa de contato atual; radar ativo trava mais rápido
@@ -314,7 +314,7 @@ export class Sim {
    *  vira o alvo; a trava completa em ~0,5–1 s (PARAM.trava); sair da mira por ≤ tFora s mantém a trava; parar sobre OUTRO navio por tTroca s troca. */
   /** v1.2.5 PRONTIDÃO de VLS/TORP (jogador e bots, mesmas faixas de alcance): alvo travado, DETECTADO, dentro de [mín, máx] da arma;
    *  para o jogador a mira também precisa estar sobre o alvo. Devolve { ok, motivo: 'vazio'|'sem'|'mira'|'travando'|'fora'|'perto', d, falta }. */
-  prontidao(n, arma) { const ehM = arma === 'vls'; const tem = ehM ? n.C.vls && n.C.missil && n.vls > 0 && (!n.avaria || n.avaria.vls >= 0.08) : n.C.torp && n.torp > 0; /* v1.2.56: VLS avariado ainda dispara (degradado); só bloqueia destruído */ if (!tem) return { ok: 0, motivo: 'vazio', d: 0, falta: 0 };
+  prontidao(n, arma) { const ehM = arma === 'vls'; const tem = ehM ? n.C.vls && n.C.missil && (n.vls > 0 || !!n.am) && (!n.avaria || n.avaria.vls >= 0.08) : n.C.torp && n.torp > 0; /* v1.2.56: VLS avariado ainda dispara (degradado); só bloqueia destruído */ if (!tem) return { ok: 0, motivo: 'vazio', d: 0, falta: 0 };
     const a = n.alvoId >= 0 ? this.navios[n.alvoId] : null; if (!a || a.morto || a.time === n.time || !this.detectado(n.time, a.id)) return { ok: 0, motivo: 'sem', d: 0, falta: 0 }; if (this.oculto(n, a) && !(ehM && this.vlsContorna(n))) return { ok: 0, motivo: 'oculto', d: Math.hypot(a.x - n.x, a.z - n.z), falta: 0 }; /* v1.2.15 — fiscal nukefumaca: VLS do jogador dispensa a visada (míssil contorna o relevo) */
     const d = Math.hypot(a.x - n.x, a.z - n.z), max = ehM ? MISSEIS[n.C.missil].alc : TORPEDO.alc, min = ehM ? ALC_MIN.vls : ALC_MIN.torp;
     if (d > max) return { ok: 0, motivo: 'fora', d, falta: d - max }; if (d < min) return { ok: 0, motivo: 'perto', d, falta: min - d };
@@ -361,9 +361,9 @@ export class Sim {
   // ======================= MÍSSEIS VLS (4 fases) =======================
   lancaMissil(n, alvoId, qtd = 1, azLivre) {
     const livre = !(alvoId >= 0) && azLivre != null && Number.isFinite(+azLivre); /* v1.2.1: lançamento SEM alvo, na direção da mira (buscador com cone estreito) */
-    const alvo = livre ? null : this.navios[alvoId]; if ((!livre && (!alvo || alvo.morto || alvo.time === n.time)) || n.vls <= 0 || n.tVls > 0 || n.avaria.vls < 0.08) return 0; if (n.avaria.vls < 0.3) qtd = 1; /* v1.2.56: avariado = 1 por vez */
+    const alvo = livre ? null : this.navios[alvoId]; if ((!livre && (!alvo || alvo.morto || alvo.time === n.time)) || (!n.am && (n.vls <= 0 || n.tVls > 0)) || n.avaria.vls < 0.08) return 0; /* v1.3.00: o Amorim controla os próprios lançadores (laterais + 2 VLS) */ if (n.avaria.vls < 0.3) qtd = 1; /* v1.2.56: avariado = 1 por vez */
     if (livre && !n.heliLanc) return 0; /* v1.2.5: sem alvo válido o tiro não sai */ if (!livre) { if (n.alvoId !== alvoId) return 0; const pr = this.prontidao(n, 'vls'); if (!pr.ok) { this.evento({ t: 'naoPronto', id: n.id, arma: 'vls', motivo: pr.motivo, falta: Math.round(pr.falta) }); return 0; } }
-    const pf = MISSEIS[n.C.missil]; const d = livre ? pf.alc : Math.hypot(alvo.x - n.x, alvo.z - n.z); if (d > pf.alc) return 0; if (livre) alvoId = -1;
+    const pf = MISSEIS[n.C.missil]; const d = livre ? pf.alc : Math.hypot(alvo.x - n.x, alvo.z - n.z); if (d > pf.alc) return 0; if (livre) alvoId = -1; if (n.am) return lancaMissilAmorim(this, n, alvoId, livre, azLivre, d); /* v1.3.00 */
     let saiu = 0;
     for (let k = 0; k < qtd && n.vls > 0; k++) {
       const m = this.misseis.find((q) => !q.ativo); if (!m) break;
@@ -375,7 +375,7 @@ export class Sim {
     if (saiu) n.tVls = recargaVlsSeg(n.tipo) * (n.avaria.vls < 0.3 ? 2 : 1); /* fiscal nukefumaca (item 7): tabela por tipo */ return saiu;
   }
   passoMisseis(dt) {
-    for (const m of this.misseis) { if (!m.ativo) continue; m.t += dt; if (m.heli && m.t < PARAM.heli.missilReto) { const vv = Math.hypot(m.vx, m.vy, m.vz) || 1, nv = Math.min(m.perfil.v, vv + 160 * dt); m.vx *= nv / vv; m.vy = Math.min(0, m.vy * nv / vv); m.vz *= nv / vv; m.x += m.vx * dt; m.y += m.vy * dt; m.z += m.vz * dt; continue; } /* míssil de asa do heli: sai RETO e depois guia */ if (m.t < 0) { const d = this.navios[m.dono]; const pc = d.P.vls[m.cel], o = this.mundo(d, pc.x, pc.y, pc.z, {}); m.x = o.x; m.y = o.y; m.z = o.z; continue; }
+    for (const m of this.misseis) { if (!m.ativo) continue; m.t += dt; if (m.lat && passoLateral(this, m, dt)) continue; /* v1.3.00: lançador lateral inclinado do Amorim */ if (m.heli && m.t < PARAM.heli.missilReto) { const vv = Math.hypot(m.vx, m.vy, m.vz) || 1, nv = Math.min(m.perfil.v, vv + 160 * dt); m.vx *= nv / vv; m.vy = Math.min(0, m.vy * nv / vv); m.vz *= nv / vv; m.x += m.vx * dt; m.y += m.vy * dt; m.z += m.vz * dt; continue; } /* míssil de asa do heli: sai RETO e depois guia */ if (m.t < 0) { const d = this.navios[m.dono]; const pc = d.P.vls[m.cel], o = this.mundo(d, pc.x, pc.y, pc.z, {}); m.x = o.x; m.y = o.y; m.z = o.z; continue; }
       const pf = m.perfil; let tx, ty, tz, tvx = 0, tvz = 0;
       if (m.isca >= 0) { const s = this.iscas[m.isca]; tx = s.x; ty = s.y; tz = s.z; if (!s.ativo) { m.isca = -1; m.alvo = -1; } }
       else { if (m.livre && m.alvo < 0) { /* buscador do míssil livre: só adquire navio inimigo num cone de ±PARAM.trava.coneMissil da direção da mira, até 6 km à frente */ let md = 6000; for (const e of this.navios) { if (e.morto || e.time === m.time) continue; const de = Math.hypot(e.x - m.x, e.z - m.z); if (de < md && Math.abs(ang(marcacao(m.x, m.z, e.x, e.z) - m.azL)) < PARAM.trava.coneMissil) { md = de; m.alvo = e.id; } } }
@@ -438,9 +438,9 @@ export class Sim {
     else { rumo = n.mira.az; alvoId = -1; }
     const t = this.torpedos.find((q) => !q.ativo); if (!t) return 0;
     // tubo do bordo voltado para o alvo
-    const rel = ang(rumo - n.rumo); const tubo = n.P.tubos.find((q) => q.lado === (rel >= 0 ? 1 : -1)) || n.P.tubos[0]; const o = this.mundo(n, tubo.x, 0, tubo.z, {});
+    const rel = ang(rumo - n.rumo); let tubo = n.P.tubos.find((q) => q.lado === (rel >= 0 ? 1 : -1)) || n.P.tubos[0]; if (n.am) { const lb = rel >= 0 ? 1 : -1, k = n._amTk || 0; let c = 0; for (const q of n.P.tubos) if (q.lado === lb && c++ === k % 3) { tubo = q; break; } rumo += (k - 1.5) * 0.035; /* v1.3.00: Amorim — salva de 4 em leque, um tubo de cada lançador do bordo */ } const o = this.mundo(n, tubo.x, 0, tubo.z + (n.am ? Math.floor((n._amTk || 0) / 3) * 0.6 : 0), {});
     Object.assign(t, { y: tubo.y, vy: tubo.sub ? 0 : 1.5, sub: tubo.sub ? 1 : 0, /* v1.2.7: sai do tubo de convés (cai na água) ou da porta submersa */ danoMul: n.mods.torpDano || 1, alcMax: 0, leve: 0, lancha: 0, ativo: 1, x: o.x, z: o.z, rumo: n.rumo + (rel >= 0 ? 1.1 : -1.1), rumoAlvo: rumo, v: 8, dono: n.id, time: n.time, alvo: alvoId, corrida: 0, modo: n.torpModo, t: 0, buscando: 0 });
-    n.torp--; n.tTorp = PARAM.recarga.torpTubo; /* v1.2.21 item 11c: 2,5 → 4,0 s entre tubos */ n.tuboAtivo = (n.tuboAtivo + 1) % 3; n.stats.torpLanc++; this.evento({ t: 'torpLanc', id: n.id, x: o.x, z: o.z, idx: t.idx }); return 1;
+    n.torp--; n.tTorp = PARAM.recarga.torpTubo; /* v1.2.21 item 11c: 2,5 → 4,0 s entre tubos */ n.tuboAtivo = (n.tuboAtivo + 1) % 3; n.stats.torpLanc++; this.evento({ t: 'torpLanc', id: n.id, x: o.x, z: o.z, idx: t.idx }); if (n.am && !this._amT) { this._amT = 1; let k = 1; for (; k < 4 && n.torp > 0; k++) { n.tTorp = 0; n._amTk = k; if (!this.lancaTorpedo(n, alvoId >= 0 ? alvoId : n.alvoId)) break; } this._amT = 0; n._amTk = 0; n.tTorp = PARAM.recarga.torpTubo; return k; } return 1;
   }
   passoTorpedos(dt) {
     for (const tp of this.torpedos) { if (!tp.ativo) continue; tp.t += dt; if (tp.y > -2.5) { const a0 = tp.y; tp.vy -= G * dt; tp.y = Math.max(-2.5, tp.y + tp.vy * dt); if (a0 > 0 && tp.y <= 0) this.evento({ t: 'torpAgua', x: tp.x, z: tp.z }); } tp.v = Math.min(TORPEDO.v, tp.v + Math.max(8, TORPEDO.v * 0.2) * dt); const kv = Math.max(1, tp.v / 42); /* v1.2.9: acelera até a corrida em ~5 s; giro escala com a velocidade (raio de curva ~constante) */ tp.corrida += tp.v * dt;

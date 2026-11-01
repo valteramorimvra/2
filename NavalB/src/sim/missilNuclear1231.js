@@ -26,7 +26,7 @@ export function lancaMissilNuclear1231(sim, n, cmd) {
   let a = sim.navios[cmd && cmd.alvo != null ? cmd.alvo : n.alvoId], ax, az; if (a && !a.morto && a.time !== n.time) { ax = a.x; az = a.z; } else { a = null; if (cmd && Number.isFinite(cmd.px) && Number.isFinite(cmd.pz)) { ax = +cmd.px; az = +cmd.pz; } else { sim.evento({ t: 'nkNegado', id: n.id, motivo: 'semAlvo' }); return 0; } }
   if (Math.hypot(ax - n.x, az - n.z) > NUK.alcanceMax) { sim.evento({ t: 'nkNegado', id: n.id, motivo: 'alcance' }); return 0; }
   if (!sim.nukes || !sim.nukes.some((x) => !x.ativo && !x.b.ativo && !(x.espDec > 0))) { sim.evento({ t: 'nkNegado', id: n.id, motivo: 'pool' }); return 0; }
-  const P = layout1231(n.C), nk = P.nuke; sim.mundo(n, nk.x, nk.y + 0.3, nk.z, _o);
+  const P = n.C.amorim ? n.P : layout1231(n.C), nk = P.nuke; /* v1.3.00: Amorim lança do slot dourado de ré */ sim.mundo(n, nk.x, nk.y + 0.3, nk.z, _o);
   const m = { fase: 0, t: 0, x: _o.x, y: _o.y, z: _o.z, px: _o.x, py: _o.y, pz: _o.z, x0: _o.x, y0: _o.y, z0: _o.z, vx: 0, vy: 0, vz: 0, v: 0, u: 0, dono: n.id, time: n.time, alvo: a ? a.id : -1, esc: 0, rumo: n.rumo, pitch: Math.PI / 2, espera: 0 };
   montaCurva(m, ax, az); if (k.voando && k.m) (k.ms || (k.ms = [])).push(k.m); m.k = k.kSeq = (k.kSeq || 0) + 1; if (n.papel === 'jogador') k.tRec = sim.t + MISS.intervaloJogador; k.m = m; k.voando = 1; k.usadas++; sim.evento({ t: 'nkMissilEscotilha', id: n.id, x: m.x, y: m.y, z: m.z }); return 1; }
 const _d = { x: 0, y: 0, z: 0 }, _b = { x: 0, y: 0, z: 0 };
