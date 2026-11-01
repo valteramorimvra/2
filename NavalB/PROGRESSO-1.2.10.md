@@ -1,0 +1,13 @@
+# PROGRESSO 1.2.10
+- 15:20 início; backup /tmp/src129bak
+- 15:25 item 1 míssil em ARCO (parábola sin², pico ≈7,5% da distância, 40–380 m; 5 km → ápice ≈410 m; só ≥3,8 km), aproximação final baixa nos últimos ~2,6 km; chama/rastro um pouco mais fortes; som de lançamento/voo mais forte. CIWS taxaMissil 0,08→0,2 (defesa ainda reage)
+- 15:27 item 4 torpedo 300 m/s; rastro menor/fraco que some; bolhas 60→35%; som de lançamento e corrida mais altos (alcance 2,5→3,5 km)
+- 15:28 item 3 câmera de míssil presa a 1 míssil; ao terminar volta à câmera anterior
+- 15:28 item 2 câmera CANHÃO atrás da torre ALINHADA ao eixo do cano (az+elevação reais), olhar paralelo ao tubo
+- 15:29 item 7 ícones de torre (vista de cima) giram com o ângulo real de cada torre (borda do CANHÃO)
+- 15:29 item 8 binóculo zoom inicial ×8→×13, máximo ×22→×44; ÓPTICA alcance visual +35%
+- 15:30 itens 5/6/9/10 água (cristas menos realçadas, reflexo de céu mais natural, cintilação contida); sons míssil/lança-granadas em camadas; adorno com mola criticamente amortecida, caimento +37%, balanço menos amortecido; pintura metálica rough 0,62→0,52 metal 0,36→0,46 env 0,8→0,95
+- 15:34 bancada: mísseis 88,5% (200), torpedos 300 m/s 96% (100), 0 erros
+- 15:50 testes: unit 74/74; boca do cano MAX 0,84 m (30 classes); HUD overlap 0 (20:9 e 16:9); programas WebGL novos em partida = 0 com qualidade fixa (o ajuste AUTO de qualidade recompila ao trocar sombras — já era assim na 1.2.9); pré-aquecimento passa a cobrir vistas de perto/binóculo
+- 15:52 capturas em nexo-naval-shots/1210
+- 15:55 APK 1.2.10 (sha256 3b58a5c0…445e, 7.155.307 B) + relatório

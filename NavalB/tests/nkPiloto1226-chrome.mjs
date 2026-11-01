@@ -1,0 +1,64 @@
+// v1.2.26 item K — PILOTAGEM DO BOMBARDEIRO NUCLEAR no navegador, pelo caminho dos BOTÕES e do MANCHE (toques reais via CDP Input):
+// NUCLEAR (2 toques) → PILOTAR → IA desliga (manual) → manche (arrasto) → TRAVAR → solução → LANÇAR → detonação → IA religa → pousa → câmera volta ao navio.
+// Mede quadros (sem travadas), suavidade (taxa de rolagem), HUD sem sobreposição em 4 telas. Defesas inimigas desligadas no teste.
+import { abre } from './cdp.mjs'; import fs from 'node:fs';
+const URL = process.env.URL || 'http://127.0.0.1:4173/?auto', CAP = '/workspace/capturas1226/nkpiloto'; fs.mkdirSync(CAP, { recursive: true });
+const TELAS = (process.env.TELAS || '915x412,780x360,640x360,412x915').split(',').map((s) => s.split('x').map(Number)); const R = { telas: [] }, falhas = [];
+const SOBRE = `(()=>{ const P=document.querySelector('.h-nkp'); if (!P || P.hidden) return JSON.stringify({ painel:0 }); const vis=e=>{ const s=getComputedStyle(e); if (s.display==='none'||s.visibility==='hidden'||e.closest('[hidden]')) return null; const q=e.getBoundingClientRect(); return q.width>1&&q.height>1?q:null; };
+  const meus=[...P.querySelectorAll('.nk-joy,.nk-info,.cb')].map(e=>[e,vis(e)]).filter(x=>x[1]); const outros=[...document.querySelectorAll('.hud button,.hud [data-a],.hud .cb,.h-radar,.h-placar,.h-painel,.h-vida,.h-feed')].filter(e=>!P.contains(e)).map(e=>[e,vis(e)]).filter(x=>x[1]);
+  const W=innerWidth,H=innerHeight, sob=[], fora=[]; const nm=e=>e.dataset.a||e.className.toString().split(' ')[0]; const cx=(a,b)=>Math.min(a.right,b.right)-Math.max(a.left,b.left)>1&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1;
+  for (let i=0;i<meus.length;i++){ const [e,a]=meus[i]; if (a.left<-1||a.top<-1||a.right>W+1||a.bottom>H+1) fora.push(nm(e)); for (let j=i+1;j<meus.length;j++) if (cx(a,meus[j][1])) sob.push(nm(e)+'×'+nm(meus[j][0])); for (const [o,b] of outros) if (cx(a,b)) sob.push(nm(e)+'×'+nm(o)); }
+  const c=document.querySelector('.h-nkp .nk-info').getBoundingClientRect(); const centro = c.left < W*0.6 && c.right > W*0.4 && c.top < H*0.6 && c.bottom > H*0.4;
+  return JSON.stringify({ painel:1, n: meus.length, sob, fora, infoNoCentro: centro }) })()`;
+const toque = async (b, sel) => { const r = JSON.parse(await b.ev(`(()=>{ const e=document.querySelector('${sel}'); if(!e) return 'null'; const q=e.getBoundingClientRect(); return JSON.stringify([q.left+q.width/2,q.top+q.height/2]) })()`)); if (!r) return 0;
+  for (const type of ['mousePressed', 'mouseReleased']) await b.send('Input.dispatchMouseEvent', { type, x: r[0], y: r[1], button: 'left', clickCount: 1, pointerType: 'mouse' }); return 1; };
+for (const [w, h] of TELAS) { const prim = w === TELAS[0][0] && h === TELAS[0][1]; const b = await abre(URL, { w, h }); const ev = b.ev, esp = b.espera; const T = { tela: `${w}x${h}` };
+  for (let i = 0; i < 300; i++) { if (await ev(`!document.querySelector('#boot') && !!window.__nnsUI`)) break; await esp(500); }
+  await ev(`(async()=>{ await __nnsUI.zarpar({ mapa: 'atois', modo: 'frota', classe: 'chapada', seed: 11 }); return 1 })()`, 240000);
+    for (let i = 0; i < 300; i++) { if (await ev(`!!(window.__nns && __nns.S && __nns.eu && __nns.S.sim.tick > 30)`)) break; await esp(500); }
+  await ev(`(()=>{ clearInterval(window.__desarma); window.__desarma=setInterval(()=>{ const sim=__nns.S.sim; for (const e of sim.navios) { if (e.time===__nns.eu.time) continue; e.sam=0; e.ciws=[]; e.lasers=[]; e.sams=[]; if (e.canhao30) e.canhao30=[]; } },200); return 1 })()`);
+  await ev(`(()=>{ const j=__nns, sim=j.S.sim, n=j.eu; j.tutorial=false; j.hud.dica&&j.hud.dica(null); n.controleIA=0; sim.t=Math.max(sim.t,121);
+    for (const e of sim.navios) if (e.time!==n.time) { e.sam=0; e.ciws=[]; e.lasers=[]; e.sams=[]; }
+    window.__semHeli=setInterval(()=>{ for (const e of sim.navios) if (e.time!==n.time) { e.sam=0; e.ciws=[]; e.lasers=[]; e.sams=[]; } for (const h of sim.helis) { const dn=sim.navios[h.dono]; if (dn && dn.time!==n.time && h.ativo) { h.ativo=0; h.estado=7; } } },300);
+    let best=null, bd=1e9; for (const e of sim.navios) if (!e.morto && e.time!==n.time) { const d=Math.hypot(e.x-n.x,e.z-n.z); if (d<bd) { bd=d; best=e; } } if (bd>9000) { const a=Math.atan2(best.x-n.x, -(best.z-n.z)); best.x=n.x+Math.sin(a)*7500; best.z=n.z-Math.cos(a)*7500; } j.S.comando({ t:'travar', alvo: best.id }); window.__alvo=best.id;
+    window.__F=[]; let u=performance.now(); const L=()=>{ const t=performance.now(); window.__F.push(t-u); u=t; window.__fr=requestAnimationFrame(L); }; L(); return 1 })()`);
+  await esp(800); await toque(b, '[data-a=nuke]'); await esp(400); await toque(b, '[data-a=nuke]'); await esp(1500);
+  T.decolou = await ev(`__nns.S.sim.nukes.some(q=>q.ativo)?1:0`); T.rotulo = await ev(`document.querySelector('[data-r=q_nuke]').textContent`);
+  await toque(b, '[data-a=nuke]'); await esp(600); T.pilotando = await ev(`__nns.nkPil?1:0`); T.painel = await ev(`document.querySelector('.h-nkp').hidden?0:1`);
+  for (let i = 0; i < 40; i++) { if (await ev(`(()=>{ const q=__nns.nkQ(); return !!q && q.fase===2 })()`)) break; await esp(300); }
+  T.hud = JSON.parse(await ev(SOBRE)); await b.foto(`${CAP}/piloto-ia-${w}x${h}.png`);
+  if (prim) { // fluxo completo só na 1ª tela (as demais: layout)
+    await toque(b, '[data-a=nkIa]'); for (let i = 0; i < 40; i++) { if (await ev(`__nns.nkQ().manual`)) break; await esp(250); } T.manual = await ev(`__nns.nkQ().manual`);
+    const J = JSON.parse(await ev(`(()=>{ const q=document.querySelector('.nk-joy').getBoundingClientRect(); return JSON.stringify([q.left+q.width/2,q.top+q.height/2,q.width/2]) })()`));
+    await ev(`(()=>{ const q=__nns.nkQ(); window.__R=[]; window.__rI=setInterval(()=>{ const z=__nns.nkQ(); if(z) window.__R.push([__nns.S.sim.t, z.roll, z.rumo, z.y, z.manual]); },50); return 1 })()`);
+    // manche: arrasto real (pointer) para a direita e para cima por 4 s — e um "tranco" (salto brusco do dedo) para provar a suavização
+    await b.send('Input.dispatchMouseEvent', { type: 'mousePressed', x: J[0], y: J[1], button: 'left', clickCount: 1 });
+    for (let i = 1; i <= 20; i++) { await b.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: J[0] + J[2] * 0.9 * (i / 20), y: J[1] - J[2] * 0.3 * (i / 20), button: 'left', buttons: 1 }); await esp(100); }
+    await b.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: J[0] - J[2], y: J[1], button: 'left', buttons: 1 }); await esp(1500);
+    await b.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: J[0] - J[2], y: J[1], button: 'left', clickCount: 1 }); await esp(1500);
+    await b.foto(`${CAP}/piloto-manual-curva.png`);
+    // pilotagem para o alvo (piloto de teste no navegador: aponta o manche via mesmo canal do HUD), TRAVAR pelo botão, LANÇAR pelo botão quando a solução fica OK
+    T.rotIaManual = await ev(`document.querySelector('[data-r=q_nkIa]').textContent`);
+    // ESPERA / voltar ao navio → órbita sem atacar; HUD do navio volta; PILOTAR reassume
+    await toque(b, '[data-a=nkSair]'); await esp(800); T.espera = JSON.parse(await ev(`(()=>{ const q=__nns.S.sim.nukes.find(x=>x.ativo&&x.dono===__nns.eu.id); return JSON.stringify({ pil: __nns.nkPil?1:0, espera: q?q.espera:-1, painelNk: document.querySelector('.h-nkp').hidden?0:1, hudNavio: getComputedStyle(document.querySelector('.h-armas')).display!=='none'?1:0, rotulo: document.querySelector('[data-r=q_nuke]').textContent }) })()`));
+    await esp(6000); T.espera.atacou = await ev(`(()=>{ const q=__nns.S.sim.nukes.find(x=>x.dono===__nns.eu.id); return q && (q.b.ativo || q.fase===3) ? 1 : 0 })()`); await b.foto(`${CAP}/espera-hud-navio.png`);
+    await toque(b, '[data-a=nuke]'); await esp(2000); T.reassumiu = JSON.parse(await ev(`(()=>{ const q=__nns.nkQ(); return JSON.stringify({ pil: __nns.nkPil?1:0, espera: q?q.espera:-1, rot: document.querySelector('[data-r=q_nkIa]').textContent }) })()`));
+    await toque(b, '[data-a=nkIa]'); await esp(500); T.manualDeNovo = await ev(`__nns.nkQ().manual`);
+    T.travaInicial = await ev(`__nns.nkQ().alvo`); if (T.travaInicial >= 0) { await toque(b, '[data-a=nkTrava]'); await esp(500); T.destravou = await ev(`__nns.nkQ().alvo`) < 0 ? 1 : 0; } await toque(b, '[data-a=nkTrava]'); await esp(500); T.travado = await ev(`__nns.nkQ().alvo`);
+    await ev(`(()=>{ const j=__nns; window.__pil=setInterval(()=>{ const q=j.nkQ(); if(!q||q.fase!==2) return; const a=q.alvo>=0?j.S.sim.navios[q.alvo]:j.S.sim.navios[window.__alvo]; if(!a||a.morto) return; const f={x:Math.sin(q.rumo),z:-Math.cos(q.rumo)}; const tQueda=Math.max(5,q.y/80); const ix=q.x+f.x*q.v*tQueda, iz=q.z+f.z*q.v*tQueda; const lat=(a.x-ix)*f.z-(a.z-iz)*f.x; const br=Math.atan2(a.x-q.x,-(a.z-q.z)); let e=br-q.rumo; e=Math.atan2(Math.sin(e),Math.cos(e))+Math.max(-0.7,Math.min(0.7,lat/2800)); j.hud.nkJ.x=Math.max(-1,Math.min(1,e*2.2)); j.hud.nkJ.y=Math.max(-1,Math.min(1,(1000-q.y)/400)); },80); return 1 })()`);
+    let sol = 0; for (let i = 0; i < 400; i++) { const c = await ev(`document.querySelector('[data-a=nkSolta]').classList.contains('nk-cue')?1:0`); if (c) { sol = 1; break; } if (!(await ev(`(()=>{ const q=__nns.nkQ(); return !!q && q.fase===2 })()`))) break; await esp(250); }
+    T.solucaoOk = sol; await b.foto(`${CAP}/piloto-solucao.png`); T.info = await ev(`document.querySelector('.nk-info').textContent`);
+    await toque(b, '[data-a=nkSolta]'); await esp(800); T.soltou = await ev(`(()=>{ const q=__nns.S.sim.nukes.find(x=>x.dono===__nns.eu.id); return q && q.b.ativo ? 1 : (__nns.S.sim.nukeDet.length?1:0) })()`); await ev('clearInterval(window.__pil),1');
+    T.bombEvt = await ev(`(()=>{ const E=__nns.S.sim.eventos||[]; const u=[]; for (const e of E) if (e && (e.t||'').startsWith('nk')) u.push(e.t); return u.slice(-12).join(','); })()`);
+    for (let i = 0; i < 900; i++) { const st = await ev(`(()=>{ const q=__nns.S.sim.nukes.find(x=>x.dono===__nns.eu.id); const d=__nns.S.sim.nukeDet.length; const ab=((__nns.S.sim.eventos)||[]).some(e=>e&&e.t==='nkBombaAbatida'); return d>0?2:(ab?3:(q&&q.b&&q.b.ativo?1:0)); })()`); if (st===2||st===3||st===0) { T._bombSt=st; break; } await esp(400); }
+    T.detonou = await ev(`__nns.S.sim.nukeDet.length`); T.bombAbatida = await ev(`((__nns.S.sim.eventos)||[]).some(e=>e&&e.t==='nkBombaAbatida')?1:0`); await esp(3000); await b.foto(`${CAP}/piloto-detonacao-vista-bombardeiro.png`);
+    T.alvoMorto = await ev(`__nns.S.sim.navios[window.__alvo].morto?1:0`); T.dmgNuclear = await ev(`Math.round(__nns.eu.stats.dano_nuclear||0)`);
+    await toque(b, '[data-a=nkIa]'); await esp(400); T.iaReligada = await ev(`(()=>{ const q=__nns.nkQ(); return q ? (q.manual?0:1) : -1 })()`);
+    for (let i = 0; i < 480; i++) { if (!(await ev(`__nns.nkPil?1:0`))) break; await esp(500); } /* v1.2.26: pouso sob SwiftShader é lento; 4 min basta */ T.saiuAoPousar = await ev(`__nns.nkPil?0:1`); T.painelOculto = await ev(`document.querySelector('.h-nkp').hidden?1:0`); await esp(1000); await b.foto(`${CAP}/piloto-volta-navio.png`);
+    const RR = JSON.parse(await ev(`(clearInterval(window.__rI), JSON.stringify(window.__R))`)); let mr = 0; for (let i = 1; i < RR.length; i++) { const dt = RR[i][0] - RR[i - 1][0]; if (dt > 0.02) mr = Math.max(mr, Math.abs(RR[i][1] - RR[i - 1][1]) / dt); } T.maxTaxaRolagem = +mr.toFixed(3);
+  } else { await toque(b, '[data-a=nkSair]'); await esp(600); T.saiu = await ev(`__nns.nkPil?0:1`); }
+  const F = JSON.parse(await ev(`(cancelAnimationFrame(window.__fr), JSON.stringify(window.__F.slice(30)))`)).sort((a, b) => a - b); T.quadros = { n: F.length, med: +F[F.length >> 1].toFixed(1), p99: +F[Math.floor(F.length * 0.99)].toFixed(1), max: +F.at(-1).toFixed(1), acima100: F.filter((x) => x > 100).length };
+  T.erros = b.erros.slice(0, 3); R.telas.push(T); console.log(JSON.stringify(T)); b.fecha();
+  if (!T.decolou || !T.pilotando || !T.painel) falhas.push(T.tela + ': não entrou na pilotagem'); if (T.hud.sob && T.hud.sob.length) falhas.push(T.tela + ': sobreposição ' + T.hud.sob.join(',')); if (T.hud.fora && T.hud.fora.length) falhas.push(T.tela + ': fora da tela ' + T.hud.fora.join(',')); if (T.hud.infoNoCentro) falhas.push(T.tela + ': info no centro');
+  if (prim && !(T.espera && T.espera.pil === 0 && T.espera.espera === 1 && T.espera.hudNavio && !T.espera.atacou && T.reassumiu.pil === 1 && T.manualDeNovo === 1)) falhas.push('estados espera/troca falharam'); if (prim && !(T.manual && T.travado >= 0 && T.solucaoOk && T.soltou && T.detonou && T.iaReligada === 1 && T.saiuAoPousar)) falhas.push('fluxo completo incompleto'); if (prim && T.maxTaxaRolagem > 0.65) falhas.push('rolagem brusca ' + T.maxTaxaRolagem); if (T.erros.length) falhas.push(T.tela + ': erros JS'); }
+R.falhas = falhas; fs.writeFileSync(CAP + '/nkpiloto.json', JSON.stringify(R, null, 1)); console.log('falhas', JSON.stringify(falhas)); process.exit(falhas.length ? 1 : 0);

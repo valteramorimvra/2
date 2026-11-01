@@ -1,0 +1,9 @@
+míssil idx 1
+estado antes CIWS: {"eu":0,"vida":364,"e":0,"d":5156,"torp":6,"alvoId":8,"esp":0}
+CIWS em ação capturado: true
+torp estado {"livres":13,"torp":6,"morto":0,"esp":0}
+torpedo idx 3
+fim: Frota aliada destruída
+áudio: {"canhao_grande":"gravação real","canhao_medio":"gravação real","canhao_rapido":"gravação real","canhao_longe":"gravação real","ciws":"gravação real","vls_lancamento":"gravação real","explosao_perto":"gravação real","explosao_media":"gravação real","explosao_grande":"gravação real","explosao_longe":"gravação real","respingo_grande":"gravação real","respingo":"gravação real","impacto_metal":"gravação real","torpedo_corrida":"gravação real","alarme_trava":"gravação real","motor_diesel_loop":"gravação real","turbina_loop":"gravação real"}
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

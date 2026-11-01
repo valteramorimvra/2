@@ -1,0 +1,31 @@
+créditos (texto): ‹ Voltar / Créditos / Nexo Naval Strike 3D / Desenvolvedor: Valter Amorim / Simulador tático de combate naval moderno em 3D, desenvolvido para levar a potência de uma frota de guerra à palma da sua mão. Cada navio, oceano, efeito visual e trilha foi construído com dedicação e atenção aos detalhes, com hidrodinâmica, balística e sistemas de defesa pensados para uma experiência autêntica e envolvente. / Obrigado por jogar. Bons ventos e boa caçada, comandante. / Versão 1.1.0 · © 2026 Valter Amorim. Todos os direitos reservados. / LICENÇAS / Efeitos sonoros e música: gravações de domínio público (CC0 1.0); camadas complementares sintetizadas no aparelho. / Dados cartográficos (Baía de Guanabara e Santos) © colaboradores do OpenStreetMap (ODbL 1.0). / Relevo e batimetria: Tilezen/Mapzen (SRTM/USGS e ETOPO1/NOAA, domínio público). / Gráficos 3D: three.js (licença MIT). Plataforma Android: Capacitor (licença MIT), Apache Cordova e bibliotecas AndroidX (licença Apache 2.0).
+menus ok
+shaders nível 1: {"programas":25,"ruins":[],"glErro":0,"nivel":1}
+shaders nível 0: {"programas":37,"ruins":[],"glErro":0,"nivel":0}
+shaders nível 2: {"programas":39,"ruins":[],"glErro":0,"nivel":2}
+shaders nível 1: {"programas":39,"ruins":[],"glErro":0,"nivel":1}
+HUD 915x412: 28 elementos, problemas: nenhum
+HUD 800x360: 28 elementos, problemas: nenhum
+HUD 1280x720: 28 elementos, problemas: nenhum
+HUD 960x432: 28 elementos, problemas: nenhum
+HUD 740x360: 28 elementos, problemas: nenhum
+HUD 1600x720: 28 elementos, problemas: nenhum
+HUD canhoto 915x412: nenhum
+HUD binóculo: nenhum
+torres (az, bloqueada): [[1.58,0],[1.58,0],[1.58,0]]
+Fortaleza: torres que dispararam juntas = 3
+auto: {"auto":1,"tiros":12,"chips":"tc:T1 Proa3,2s tc:T23,2s tc:T3 Popa3,2s"}
+CIWS: sem engajamento na tentativa 0
+CIWS x míssil capturado a 644 m
+SAM: nenhum lançamento na tentativa 0
+SAM capturado a 80 m do míssil
+estatística SAM: {"tiros":0,"acertos":0,"misLanc":0,"misAcertos":0,"torpLanc":0,"torpAcertos":0,"abates":0,"dano":0,"intercept":1,"ricochetes":0}
+30 mm x lancha capturado a 1335 m
+lanchas: [0]
+drone: fogo a 1496 m · {"ativo":1,"d":1496,"y":110,"pausado":true,"ciws":["1550:","1550:"],"a30":["d",""]}
+drone final: {"ativo":0,"menores":1}
+HUD defesa: 
+noite: {"q":1,"fps":60,"expo":1.25}
+áudio: {"canhao_grande":"gravação real","canhao_medio":"gravação real","canhao_rapido":"gravação real","canhao_longe":"gravação real","ciws":"gravação real","vls_lancamento":"gravação real","explosao_perto":"gravação real","explosao_media":"gravação real","explosao_grande":"gravação real","explosao_longe":"gravação real","respingo_grande":"gravação real","respingo":"gravação real","impacto_metal":"gravação real","torpedo_corrida":"gravação real","alarme_trava":"gravação real","motor_diesel_loop":"gravação real","turbina_loop":"gravação real"}
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

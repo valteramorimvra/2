@@ -1,0 +1,16 @@
+HUD partida: 20 elementos; sem sobreposição
+FPS headless (SwiftShader, CPU): 1.5
+NaN: ok
+auto: {"tiros":0,"autoMira":true,"auto":1}
+HUD binóculo: 17 elementos; sem sobreposição
+HUD drone: 20 elementos; PROBLEMAS: tag × .h-feed
+cams: {"cam":"longe","uav":0}
+HUD alerta: 19 elementos; sem sobreposição
+iscas: {"chaff":2,"res":5,"iscas":1}
+helis do navio: [1,0]
+HUD helicóptero: 10 elementos; PROBLEMAS: .h-painel × .h-placar[placar]; cortado: pn-navio "Cruzador de Mísseis "
+heli: {"ctrl":0,"est":[[3,43],[1,8]]}
+após voltar: {"ctrl":-1,"est":[3,1]}
+NaN: ok
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

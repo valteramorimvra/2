@@ -1,0 +1,33 @@
+estaleiro abas: navio,modulos,pintura,bandeira,comandante,helis
+pinturas: bra,cinza_naval,artica,dazzle,digital,noturno,costeiro,tropical,nac_bra,nac_deu,nac_rus,areia_verm,nac_eua,nac_uk,nac_chn,mercurio,eclipse,aurora_ouro,neon_tech,couraca_ouro
+premium na lista: Patrulha Rápida Premium | Fragata de Escolta Premium | Fragata Premium de Ataque | Cruzador de Ataque Premium | Destróier Premium de Escolta
+comparação premium: ★ PREMIUM × FRAGATA PESADA DE ATAQUE F 22 (MESMO TIER)
+Casco (HP efetivo)
++17%
+Fogo de canhão/min
++50%
+Salva de mísseis
+0%
+Defesa aérea
+-6%
+Velocidade
++3%
+PODER DE COMBATE
++20%
+enfeite: {"fragata":{"bandeira":"BR-SP","gala":true,"faixa":false}}
+créditos: ‹ Voltar / Créditos / Nexo Naval Strike 3D / Desenvolvedor: Valter Amorim / Simulador tático de combate naval moderno em 3D, desenvolvido para levar a potência de uma frota de guerra à palma da sua mão. Cada navio, oceano, efeito visual e trilha foi construído com dedicação e atenção aos detalhes, com hidrodinâmica, balística e sistemas de defesa pensados para uma experiência autêntica e envolvente. / Obrigado por jogar. Bons ventos e boa caçada, comandante. / Versão 1.2.0 · © 2026 Valter Amorim. Todos os direitos reservados. / LICENÇAS / Efeitos sonoros e música: gravações reais de domínio público (CC0 1.0) — inclusive rotor e turbina de helicóptero, flares, incêndio, alagamento, rangidos metálicos, bolhas, rádio e interface (Freesound, CC0); camadas complementares sintetizadas no aparelho. / Retratos: arte original criada para o jogo. / Bandeiras nacionais: símbolos oficiais de domínio público, desenhados de forma simplificada. / Dados cartográficos (Baía de Guanabara e Santos) © colaboradores do OpenStreetMap (ODbL 1.0). / Relevo e batimetria: Tilezen/Mapzen (SRTM/USGS e ETOPO1/NOAA, domínio público). / Gráficos 3D: three.js (licença MIT). Plataforma Android: Capacitor (licença MIT), Apache Cordova e bibliotecas AndroidX (licença Apache 2.0).
+v10_partida_entardecer: skylines 2, hora entardecer
+v11_partida_noite: skylines 2, hora noite
+HUD partida: 20 elementos; sem sobreposição
+FPS headless (SwiftShader, CPU): 4
+NaN: ok
+auto: {"tiros":9,"autoMira":true,"auto":1}
+HUD binóculo: 18 elementos; sem sobreposição
+HUD drone: 20 elementos; sem sobreposição
+cams: {"cam":"drone","uav":0}
+HUD alerta: 20 elementos; sem sobreposição
+iscas: {"chaff":2,"res":5,"iscas":1}
+crítico: {"vida":124,"max":768,"fogo":10.7,"alag":10.7}
+economia antes/depois: {"p":99952000,"o":1000000} → {"p":101358800,"o":1000040}
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

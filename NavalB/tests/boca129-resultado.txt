@@ -1,0 +1,32 @@
+corveta t0c0:0.46
+corsario t0c0:0.47
+kestrel t0c0:0.39
+haiyan t0c0:0.47
+strizh t0c0:0.45
+puffin t0c0:0.03
+fragata t0c0:0.69
+destroier t0c0:0.59
+furtivo t0c0:0.66
+tempestade t0c0:0.72 t0c1:0.76
+sentinela t0c0:0.71
+tridente t0c0:0.72 t1c0:0.65
+redwood t0c0:0.58
+jinpeng t0c0:0.60
+tianlong t0c0:0.74
+sokol t0c0:0.67 t0c1:0.71
+thornwood t0c0:0.72
+leviata t0c0:0.59 t1c0:0.38
+sapsan t0c0:0.64 t0c1:0.67
+cruzador t0c0:0.78 t1c0:0.51
+dragao t0c0:0.84
+capitania t0c0:0.45 t0c1:0.46 t1c0:0.42 t1c1:0.43 t2c0:0.29 t2c1:0.31
+trovao t0c0:0.14 t0c1:0.14 t0c2:0.14 t1c0:0.14 t1c1:0.14 t1c2:0.14
+monolito t0c0:0.52 t1c0:0.34
+xuanwu t0c0:0.48 t0c1:0.50 t1c0:0.32 t1c1:0.34
+medved t0c0:0.44 t0c1:0.46
+warden t0c0:0.69 t1c0:0.43
+aurora t0c0:0.60 t0c1:0.63
+fenghuang t0c0:0.77
+zarev t0c0:0.30 t0c1:0.31 t1c0:0.33 t1c1:0.33
+MAX 0.84 OK
+FIM

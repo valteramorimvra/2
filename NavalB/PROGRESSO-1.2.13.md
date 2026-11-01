@@ -1,0 +1,12 @@
+# PROGRESSO 1.2.13
+- 05:24 backup em /tmp/bak1212, vc16/1.2.13 aplicados
+- 05:32 world.js: granada marca causa de morte (g.fim). Teste novo tests/disparo1213.mjs (artefatos do teste corrigidos: telAlvo/vida). 1º resultado fenghuang/colosso/corveta: som==projétil 1502/1502, mas 562 morrem <0,1 s (terra 338: boca dentro do terreno na costa; agua 224: investigar)
+- 05:34 achado: tiro de corveta nasce com velocidade absurda (vy -721, para trás) → morre na água em 1 passo. Suspeita: campos velhos do pool (arcR) de granada reciclada. Steering: item extra música abafada (pendente)
+- 05:35 CAUSA 1 corrigida: disparaCanhao/heliFoguete agora zeram g.arcR (slot reciclado do LF-12 seguia arco velho). Corveta mar: precoces 92→0. CAUSA 2: boca dentro da costa → bocaObstruida() bloqueia o disparo (sem som). Escopo extra: música abafada, brilho do lançamento de míssil
+- 05:36 música: bus Web Audio (EQ, duck leve, LP só submersa, limiter knee3/rel .25). Teste disparo 3 classes: 1185/1185, precoces 0
+- 05:37 água no casco: discard no shader do mar dentro da planta do casco (navio vivo). Lançamento míssil: clarão +25%, chama +15–25% nos 1,5 s iniciais, mais fumaça
+- 05:44 cap1213: máscara confirmada (foto antes/depois), projétil visível, míssil lançado, 0 programas novos (101→101); música +2,3–3,1 dB, rolloff 85% ~950→~1690 Hz
+- 05:47 disparo1213 TODAS as classes (36×3 cenários×8 marcações×3 dist.): 15302/15302 som==projétil, 0 precoces. Smoke 8×8 NaN 0. HUD 20:9 OK. Unit rodando
+- 06:02 box reiniciou: /tmp limpo (backup /tmp/bak1212 perdido; a 1.2.12 assinada continua em /workspace/NexoNavalStrike-1.2.12.apk). APK 1.2.13 já gerado. Unit reiniciado → /workspace/unit1213.txt
+- 06:19 unit 76/76; assinatura d0c31791 OK, vc16, só VIBRATE; APK copiado p/ attachments; ENTREGUE
+- 06:19 FINAL: unit 76/76; APK 05:58 confere com o código final (sem rebuild); apksigner cert d0c31791…a599, vc16/1.2.13, só VIBRATE; cópia em attachments; relatório pronto
