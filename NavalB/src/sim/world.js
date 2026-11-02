@@ -27,7 +27,7 @@ import { instalaDefesa, instalaNavio, passoCiws5, passoLaser, passoSam, passoSam
 
 import { instalaNuclear, passoNuclear, lancaNuclear, comandoNuclear } from './nuclear.js'; import { criaTrafego, passoTrafego, acertaCivil, danoCivil } from './trafego.js'; /* v1.2.46 */
 import { passoHidros, comandoHidro } from './hidroaviao.js'; /* v1.2.39: hidroaviões */
-import { passoMissil1231, lancaMissilNuclear1231 } from './missilNuclear1231.js'; import { instalaAmorim, lancaMissilAmorim, passoLateral, passoAutosAmorim } from './amorim.js'; /* v1.3.00 */ import { passoVtolAmorim, comandoVtol } from './vtolAmorim.js'; /* v1.3.04 */ /* v1.2.31 */ /* v1.2.26: bombardeiro + bomba atômica */
+import { passoMissil1231, lancaMissilNuclear1231 } from './missilNuclear1231.js'; import { instalaAmorim, lancaMissilAmorim, passoLateral, passoAutosAmorim } from './amorim.js'; /* v1.3.00 */ import { passoVtolAmorim, comandoVtol, lancaVtol } from './vtolAmorim.js'; /* v1.3.04 */ /* v1.2.31 */ /* v1.2.26: bombardeiro + bomba atômica */
 export const DT = 1 / 60;
 export const PISCA_BOT = 0.2;
 /** v1.2.7 lança-granadas: velocidade de boca fixa (alcance máx. a 45°) e elevação de tiro baixo para a distância */
@@ -115,7 +115,7 @@ export class Sim {
       case 'cons': usaCons(this, n, String(cmd.k)); break;
       case 'rbu': if (cmd.canal === 1 && n.fgC) { this.trocaCanal(n); this.lancaRbu(n, cmd.alvo != null ? cmd.alvo : n.alvoId); this.trocaCanal(n); } else this.lancaRbu(n, cmd.alvo != null ? cmd.alvo : n.alvoId); break; /* v1.2.14: canal 1 = FOGUETES ASW independente do lança-granadas */
       case 'uav': case 'esquadrilha': case 'heliLanca': case 'heliCtrl': case 'heliFlare': case 'aeroReparo': case 'iaNavio': case 'heliFogo': case 'heliThr': case 'heliVolta': case 'controle': case 'engajar': comandoAereo(this, n, cmd); break; /* v1.2.67: engajar */
-      case 'nuclear': (n.C.missilNuclear ? lancaMissilNuclear1231 : lancaNuclear)(this, n, cmd); break; /* v1.2.31: míssil nuclear de navio */ /* v1.2.26 */
+      case 'nuclear': (n.C.destAmorim ? lancaVtol : n.C.missilNuclear ? lancaMissilNuclear1231 : lancaNuclear)(this, n, cmd); break; /* v1.3.06: no Destróier Amorim o botão nuclear é a DECOLAGEM dos caças */ /* v1.2.31: míssil nuclear de navio */ /* v1.2.26 */
       case 'hidro': case 'hdPil': case 'hdMissil': case 'hdTorp': case 'hdFlare': case 'hdVolta': comandoHidro(this, n, cmd); break; /* v1.2.39 */
       case 'vtArma': comandoVtol(this, n, cmd); break; /* v1.3.04: botões AAM/ASM/TORP/NUKE dos caças do Destróier Amorim */
       case 'nkArIni': case 'nkPiloto': case 'nkEspera': case 'nkArAr': case 'nkFlare': case 'nkMissil': case 'nkVolta': case 'nkCtl': case 'nkThr': case 'nkMiraSolo': case 'nkTrava': case 'nkSolta': case 'nkEjeta': case 'nkPorta': case 'nkReparo': if (cmd.t === 'nkSolta' && n.hd && n.hd.pil && n.hd.noAr >= 0) { comandoHidro(this, n, cmd); break; } comandoNuclear(this, n, cmd); break; /* v1.2.79: BASE */

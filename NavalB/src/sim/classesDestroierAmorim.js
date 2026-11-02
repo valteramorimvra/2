@@ -33,7 +33,7 @@ export function adicionaDestroierAmorim(CLASSES, { D, CAN, VIDA }) {
     vls: 160, missil: 'hiper', salva: 6, misRec: 6, misAuto: MIS_DA, latCfg: LAT_DA, tubosLat: TUBOS_LAT_DA, autoCfg: AUTO_DA, autos: AUTOS_DA, caixasAuto: CAIXAS_DA,
     sam: 0, ciws: 4, ciwsLug: [0, 1, 2, 3], a30: 0, laser: 6, chaff: 12,
     torp: 18, tubos: [6, 3], torpSalva: 9, torpRec: 10,
-    heli: 2, helisPadrao: ['acaua', 'uiracu'],
+    heli: 0, vtolAmorim: ['acaua', 'uiracu'], /* v1.3.06: os 2 caças saem pelo botão DECOLAR (sistema do Urubu-rei), não pelo HELI */
     rbu: { nome: 'LG-12', salvas: 10, foguetes: 12, alc: 5500, min: 300, dano: 30, cad: 14, el: 0.62 },
     bandeiraProa: 1, casco: 'convencional', cascoN: 'bra', estilo: 'destroier', pf: 'escolta', antiAereo: 1 });
 }

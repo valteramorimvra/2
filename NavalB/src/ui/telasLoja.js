@@ -2,7 +2,7 @@
 // MERCADO (ofertas do dia, caixas e câmbio, no estilo Modern Warships) e LOJA de pacotes (offline, compras de teste).
 import { CLASSES, ORDEM_CLASSES } from '../sim/classes.js';
 import { HIDROS, ORDEM_HIDROS } from '../sim/hidroaviao.js';
-import { AERONAVES, fichaAero, possuiAero } from '../aeronaves.js'; import { miniAero } from './telaHangar.js'; import { silh } from './silhuetas.js'; /* v1.2.61 */
+import { AERONAVES, fichaAero, possuiAero, CAT_AERO } from '../aeronaves.js'; import { miniAero } from './telaHangar.js'; import { silh } from './silhuetas.js'; /* v1.2.61 */
 const fotoAero = (a) => { const m = miniAero(a.id); return m ? `<i class="cm-foto" style="background-image:url(${m})"></i>` : a.modelo.hidro ? `<i class="cm-foto" style="background-image:url(fotos/navios/${a.modelo.hidro}.webp)"></i>` : `<i class="cm-foto cm-silh">${silh(a.modelo.heli)}</i>`; };
 const ROM5 = ['', 'I', 'II', 'III', 'IV', 'V'];
 import { PRECO, PINTURAS, TIPO_NAVIO } from '../navalTechTreeEconomy.js';
@@ -31,9 +31,16 @@ export function telaArvore(D) { const { mostra, voltar, eco, carteira, statusNav
 
     const lista = [1, 2, 3, 4, 5, 6].flatMap((nv) => grade[t][nv] || []);
     return `<div class="ar-linha ar-t-${t}"><div class="ar-tipo"><i class="ar-des">${DESIG[t] || ''}</i><span>${nome}</span><small>${lista.length} ${lista.length === 1 ? 'navio' : 'navios'}</small></div><div class="ar-fila">${lista.map(cartao).join('')}</div></div>`; }).join('');
+  /* v1.3.06 (Valter): TODAS as aeronaves embaixo dos navios — uma linha por categoria (caças, helicópteros, hidroaviões, bombardeiros,
+     alerta aéreo e drones), em sequência por nível; mesmo quadro militar; o toque abre a aeronave no hangar 3D (comprar, evoluir, teste drive). */
+  const DES_AE = { caca: 'VF', heli: 'HS', hidro: 'HV', bomb: 'VB', apoio: 'VAW' };
+  const imgAero = (a) => { const m = miniAero(a.id); return m ? `background-image:url(${m})` : a.modelo.hidro ? `background-image:url(fotos/navios/${a.modelo.hidro}.webp)` : ''; };
+  const cartaoAero = (a) => { const tem = possuiAero(eco, a.id), nv = Math.min(5, a.tier | 0), im = imgAero(a); return `<button class="ar-no ar-ae ${tem ? 'st-tem' : 'st-pode'}${nv >= 5 ? ' lend' : ''}" data-aero="${a.id}"><span class="ar-no-img"${im ? ` style="${im}"` : ''}>${im ? '' : `<i class="ar-silh">${silh(a.modelo.heli)}</i>`}<em class="ar-no-nv">${nv >= 5 ? '◆ LENDÁRIO' : 'NÍVEL ' + ROMANO[nv]}</em>${a.preco.ouro ? '<em class="ar-no-pr">PREMIUM</em>' : ''}</span><span class="ar-no-txt"><b>${fichaAero(a.id).nome}</b><small>${tem ? 'NO HANGAR ✓' : a.papel}</small></span></button>`; };
+  const linhasAero = CAT_AERO.map(([c, nome]) => { const lista = AERONAVES.filter((a) => a.cat === c).sort((x, y) => (x.tier - y.tier) || (x.preco.ouro ? 1 : 0) - (y.preco.ouro ? 1 : 0)); if (!lista.length) return '';
+    return `<div class="ar-linha ar-t-ae-${c}"><div class="ar-tipo"><i class="ar-des">${DES_AE[c] || ''}</i><span>${nome}</span><small>${lista.length} ${lista.length === 1 ? 'aeronave' : 'aeronaves'}</small></div><div class="ar-fila">${lista.map(cartaoAero).join('')}</div></div>`; }).join('');
 
-  const el = mostra('arvore', `${voltar()}${carteira()}<h2>Árvore tecnológica <small>classes de casco · toque no navio para ver os dados, girar e fazer o teste drive</small></h2>
-    <div class="ar-wrap ar-mil"><div class="ar-grade">${linhas}</div></div>`, D.save && CLASSES[D.save.ultimo.classe] ? { vitrine: D.save.ultimo.classe, transp: true, cine: true } : {});
+  const el = mostra('arvore', `${voltar()}${carteira()}<h2>Árvore tecnológica <small>classes de casco e aeronaves · toque no navio para ver os dados, girar e fazer o teste drive; na aeronave, abre o hangar</small></h2>
+    <div class="ar-wrap ar-mil"><div class="ar-grade">${linhas}<div class="ar-sep-ae"><span>AERONAVES</span></div>${linhasAero}</div></div>`, D.save && CLASSES[D.save.ultimo.classe] ? { vitrine: D.save.ultimo.classe, transp: true, cine: true } : {});
   el.addEventListener('click', (e) => { const b = e.target.closest('.ar-card, .ar-no'); if (!b) return; som(); if (b.dataset.aero) D.irHangar(b.dataset.aero); else if (b.dataset.h) irHidro(b.dataset.h); else if (D.fichaNavio) { const w = el.querySelector('.ar-wrap'); D._arvScroll = w ? [w.scrollLeft, w.scrollTop] : null; D.fichaNavio(b.dataset.k, () => { telaArvore(D); }, 'Árvore'); } else irEstaleiro(b.dataset.k); }); /* v1.3.00 (Valter): clicar no navio abre o painel com TODOS os dados, o navio 3D para girar e o TESTE DRIVE */
   { const w = el.querySelector('.ar-wrap'); if (w && telaArvore._sc) { const [x, y] = telaArvore._sc; requestAnimationFrame(() => { w.scrollLeft = x; w.scrollTop = y; }); } if (w) w.addEventListener('scroll', () => { telaArvore._sc = [w.scrollLeft, w.scrollTop]; }, { passive: true }); }
   void eco; void PRECO; }

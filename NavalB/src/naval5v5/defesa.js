@@ -185,7 +185,7 @@ function afundaLancha(sim, l, por) { l.ativo = 0; if (por) por.stats.menores = (
 function maeDoTime(sim, time) { let m = null; for (const n of sim.navios) { if (n.time !== time || n.morto) continue; if (!m || (n.tipo === 'capitania') || (n.tipo === 'cruzador' && m.tipo !== 'capitania')) m = n; } return m; }
 function maisProximo(sim, time, x, z) { let b = null, bd = 1e12; for (const n of sim.navios) { if (n.morto || n.time === time) continue; const d = (n.x - x) ** 2 + (n.z - z) ** 2; if (d < bd) { bd = d; b = n; } } return b; }
 export function passoAmeacas(sim, dt) {
-  const A = sim.ameacas; if (!A) return; const frota = sim.navios.length > 4; const limD = frota ? 2 : 1, limL = frota ? 2 : 1;
+  const A = sim.ameacas; if (!A) return; const frota = sim.navios.length > 4; const limD = frota ? 2 : 1, limL = 0; /* v1.3.06 (Valter): as lanchas de ataque rápido (botes minúsculos que ficavam atirando) foram retiradas do jogo — nenhuma é lançada */
   if (A.ligadas && !sim.fim) for (const time of ['azul', 'vermelho']) { const st = A[time]; st.tDrone -= dt; st.tLancha -= dt; const mae = maeDoTime(sim, time); if (!mae) continue;
     if (st.tDrone <= 0) { st.tDrone = DEF.droneInt + sim.rng.next() * 10; let vivos = 0; for (const q of sim.drones) if (q.ativo && q.time === time) vivos++;
       const alvo = maisProximo(sim, time, mae.x, mae.z); if (vivos < limD && alvo && Math.hypot(alvo.x - mae.x, alvo.z - mae.z) < 9000) { const q = livre(sim.drones); if (q) {

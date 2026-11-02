@@ -174,6 +174,7 @@ function passoBombardeiro(sim, q, dt) { guardaPose(q); q.t += dt; if (q.tMis > 0
     if (q.alvo < 0 && q.fase === 2 && !q.miraSolo) { const don = sim.navios[q.dono]; /* v1.2.58: ponto marcado no mapa tem prioridade sobre o alvo do navio */ if (don && don.alvoId >= 0) { const a0 = sim.navios[don.alvoId]; if (a0 && !a0.morto && a0.time !== don.time) { q.alvo = a0.id; q.ax = a0.x; q.az = a0.z; q.miraSolo = 0; q.auto = 1; q.espera = 0; } } }
     if (q.auto && q.alvo >= 0 && q.fase === 2) { const a = sim.navios[q.alvo]; if (a && !a.morto) { q.ax = a.x; q.az = a.z; } }
   }
+  if (q.vtol && sim.ganchoVtol && sim.ganchoVtol(q, n, dt)) return; /* v1.3.06: caças VTOL do Destróier Amorim — decolagem/pouso verticais no heliponto (sim/vtolAmorim.js); espelho do q.rotor, o Urubu-rei não passa aqui */
   if (q.fase === 1 && q.rotor && n && !n.morto && q.t < 5) { const u = q.t / 5; sim.mundo(n, 0, q.deck + 0.5 + u * u * 30, n.C.L * 0.38, _o); q.x = _o.x; q.y = _o.y; q.z = _o.z; q.rumo = n.rumo; q.v = n.v || 0; q.pitch = 0; return; } /* decolagem vertical: 5 s */
   if (q.fase === 1) { // corrida no convés (catapulta) acompanhando o navio, depois sai pela proa subindo
     if (n && !n.morto && q.t < NUK.tDecola) { const u = q.t / NUK.tDecola, L = n.C.L; sim.mundo(n, 0, q.deck, L * 0.38 - u * u * L * 0.8, _o); q.x = _o.x; q.y = _o.y; q.z = _o.z; q.rumo = n.rumo; q.v = NUK.vDecola * u + (n.v || 0); q.pitch = 0; return; }

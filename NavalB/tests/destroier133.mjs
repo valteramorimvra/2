@@ -6,10 +6,10 @@ let falhas = 0; const ok = (c, m) => { if (!c) { falhas++; console.log('FALHA', 
 const C = CLASSES.destroier_amorim;
 ok(C && C.num === 'D-01' && LENDARIOS.includes('destroier_amorim'), 'classe registrada (D-01)');
 ok(C.L === 176 && C.canhao.cal === 155 && C.canhao.canos === 2 && C.canhao.torres === 3 && C.canhao.cad === 5 && C.vls === 160 && C.torp === 18 && C.ciws === 4 && C.laser === 6, 'ficha: 176 m, 3×2 155 mm cad 5, 160 VLS, 18 torpedos, 4 CIWS, 6 lasers');
-ok(HELIS.acaua && HELIS.uiracu && C.helisPadrao.join() === 'acaua,uiracu', 'caças Acauã e Uiraçu travados na classe');
+ok(HELIS.acaua && HELIS.uiracu && C.vtolAmorim.join() === 'acaua,uiracu' && !C.heli, 'caças Acauã e Uiraçu fixos na classe (saem pelo DECOLAR, v1.3.06)');
 const S = criaSessao({ mapa: 'atois', modo: 'duelo', classe: 'destroier_amorim', classeRival: 'destroier', seed: 5 }); const sim = S.sim, eu = sim.navios[S.match.jogadorId], ini = sim.navios.find((q) => q.time !== eu.time); sim.revelaTudo = 1;
 ok(eu.am && eu.P.vls.length === 160 && eu.P.tubos.length === 18 && eu.am.autos.length === 4 && eu.torres.length === 3, 'estado: 160 VLS, 18 tubos, 4 autos, 3 torres');
-ok(eu.helis.length === 2 && sim.helis[eu.helis[0]].modelo === 'acaua' && sim.helis[eu.helis[1]].modelo === 'uiracu', 'helis do navio = Acauã + Uiraçu');
+ok(!(eu.helis && eu.helis.length), 'sem helicópteros: os caças estão no sistema do Urubu-rei (tests/vtol136.mjs)');
 const poe = (rel, dist) => { eu.x = 0; eu.z = 0; eu.rumo = 0; eu.v = 0; for (let i = 0; i < 40; i++) { ini.x = Math.sin(rel) * dist; ini.z = -Math.cos(rel) * dist; ini.v = 0; sim.passo([]); } eu.alvoId = ini.id; eu.trava = 1; eu.controleIA = 1; };
 poe(Math.PI / 2, 6000); eu.tVls = 0; eu.am.ult = -1; let k = sim.lancaMissil(eu, ini.id, 6); ok(k === 6 && eu.am.ult === 1, `alvo a BORESTE → salva de 6 do lateral BE (${k})`); ok(Math.abs(eu.tVls - 6) < 0.05, 'recarga 6 s');
 poe(0, 8000); eu.tVls = 0; eu.am.ult = -1; k = sim.lancaMissil(eu, ini.id, 6); ok(k === 6 && eu.am.ult === 2, `alvo pela PROA → salva de 6 do VLS (${k})`);
@@ -21,9 +21,5 @@ const ev3 = []; const o3 = s3.evento.bind(s3); s3.evento = (e) => { ev3.push(e);
 try { for (let i = 0; i < 60 * 120; i++) { S3.avanca(1 / 60); for (const hi of e3.helis) { const h = s3.helis[hi]; if (h.estado >= EST.DECOLA && h.estado <= EST.POUSO) voou = 1; } } } catch (e) { erro = e.stack; }
 const c3 = {}; for (const e of ev3) if (e.id === e3.id) { const kk = e.t + (e.t === 'tiro' ? (e.auto ? ':auto' : ':torre' + e.torre) : ''); c3[kk] = (c3[kk] || 0) + 1; } console.log(JSON.stringify(c3));
 ok(!erro, 'batalha de 120 s sem erro ' + (erro || '')); ok([0, 1, 2].every((t) => (c3['tiro:torre' + t] || 0) > 0), '3 torres de 155 mm atiram'); ok((c3.vls || 0) > 0, 'mísseis lançados'); ok(true, 'ok');
-const S4 = criaSessao({ mapa: 'atois', modo: 'duelo', classe: 'destroier_amorim', classeRival: 'corveta', seed: 9 }); const s4 = S4.sim, e4 = s4.navios[S4.match.jogadorId]; let est = [];
-for (let i = 0; i < 60 * 15; i++) S4.avanca(1 / 60); S4.comando({ t: 'heliLanca', k: 0 });
-for (let i = 0; i < 60 * 40; i++) { S4.avanca(1 / 60); const h = s4.helis[e4.helis[0]]; est.push(h.estado); }
-const h0 = s4.helis[e4.helis[0]]; console.log('estados do Acauã', [...new Set(est)].join(','), 'y', h0.y.toFixed(0)); ok(est.some((e) => e >= EST.DECOLA && e <= EST.POUSO), 'Acauã decola do heliponto pelo botão (LIBERAR)');
 ok(!CLASSES.amorim.torpSalva && CLASSES.fragata_amorim.torpSalva === 3 && CLASSES.amorim.vls === 100, 'Amorim e Fragata inalterados');
 console.log(falhas ? `FALHAS: ${falhas}` : 'RESULTADO: TUDO OK'); process.exit(falhas ? 1 : 0);
