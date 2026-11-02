@@ -1,4 +1,4 @@
-# Naval B v1.3.03 — gera src/render/vtolDados.js com os caças VTOL do Valter (Acauã e Uiraçu, LOD de JOGO ≤ 8000 tris).
+# Naval B v1.3.03 (v1.3.10: trem de pouso e portas como peças móveis) — gera src/render/vtolDados.js com os caças VTOL do Valter (Acauã e Uiraçu, LOD de JOGO ≤ 8000 tris).
 # Uso: python3 tools/vtol/gera.py
 # Forma/cores/peças do OBJ, sem mudança. Cada ESTAÇÃO de arma (míssil/torpedo/nuke + aletas) vira um grupo próprio 'estNN' (o pilone
 # fica no casco): o jogo esconde a estação disparada (pilone vazio) e mostra de novo ao rearmar. Posição Int16 (1/256 m), normal Int8.
@@ -41,16 +41,20 @@ S = {'esc': ESC}
 for nome, idv in (('Acaua-jogo', 'acaua'), ('Uiracu-jogo', 'uiracu')):
     V, N, F = le(nome); M = json.load(open(os.path.join(AQUI, idv + '-meta-jogo.json')))
     est = {e['id'].split('_')[0]: e for e in M['estacoes']}
+    TR = {t['nome']: t['grupo'] for t in M['trem']}; PT = {q['nome']: q for q in M['portas'] if q.get('tipo') == 'trem'}
+    TG = {t['grupo']: t for t in M['trem']}
     G = collections.defaultdict(lambda: collections.defaultdict(list))
     for (o, m), fs in F.items():
         g = 'base'; p = o.split('_')[0]
         if p in est and not o.endswith('pilone'): g = p
+        elif o in TR: g = 'mov:' + TR[o]  # v1.3.10: trem de pouso (perna inteira por grupo) e portas do trem = peças móveis
+        elif o in PT: g = 'mov:' + o
         mc = mclasse(m)
         if o.startswith('luz_estrobo'): mc = ('pisca_estrobo', mc[1])
         elif o.startswith('luz_anticolisao'): mc = ('pisca_anti', mc[1])
         G[g][mc] += fs
     ordem = sorted([e for e in M['estacoes'] if e['tipo'] in ('aam', 'asm')], key=lambda e: (0 if e['tipo'] == 'aam' else 1, e['ordem_disparo']))
-    S[idv] = {'base': pack(V, N, G['base']), 'est': {k: pack(V, N, G[k]) for k in G if k != 'base'}, 'ordem': [e['id'].split('_')[0] for e in ordem], 'ordemTipo': {t: [e['id'].split('_')[0] for e in sorted([x for x in M['estacoes'] if x['tipo'] == t], key=lambda x: x['ordem_disparo'])] for t in ('aam', 'asm', 'torp', 'nuke')}, 'estP': {e['id'].split('_')[0]: e['p'] for e in M['estacoes']}, 'lasers': [l['p'] for l in M['lasers']], 'tipos': {k: est[k]['tipo'] for k in est},
+    S[idv] = {'base': pack(V, N, G['base']), 'est': {k: pack(V, N, G[k]) for k in G if k != 'base' and not k.startswith('mov:')}, 'mov': {k[4:]: pack(V, N, G[k]) for k in G if k.startswith('mov:')}, 'trem': [{'g': g, 'p': TG[g]['pivo'], 'e': TG[g]['eixo'], 'a': TG[g]['ang_rec']} for g in sorted(TG)], 'portas': [{'g': k, 'p': q['pivo'], 'e': q['eixo'], 'a': q['ang_aberto']} for k, q in sorted(PT.items())], 'tTrem': M['trem_info']['tempo_s'], 'ordem': [e['id'].split('_')[0] for e in ordem], 'ordemTipo': {t: [e['id'].split('_')[0] for e in sorted([x for x in M['estacoes'] if x['tipo'] == t], key=lambda x: x['ordem_disparo'])] for t in ('aam', 'asm', 'torp', 'nuke')}, 'estP': {e['id'].split('_')[0]: e['p'] for e in M['estacoes']}, 'lasers': [l['p'] for l in M['lasers']], 'tipos': {k: est[k]['tipo'] for k in est},
               'fumaca': [{'p': e['p'], 'cor': e['cor']} for e in M['fumaca']['emissores']], 'dim': M['dim'], 'tri': M['triangulos']}
 js = '// GERADO por tools/vtol/gera.py a partir dos caças do Valter (Acauã e Uiraçu, LOD de jogo). Não editar à mão.\nexport const VTOL_GEO = ' + json.dumps(S, separators=(',', ':')) + ';\n'
 open(os.path.join(AQUI, '..', '..', 'src', 'render', 'vtolDados.js'), 'w').write(js)

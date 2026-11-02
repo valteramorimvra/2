@@ -2,7 +2,7 @@
 // queda são os ORIGINAIS do Urubu-rei (sem adaptação). Aqui só os BOTÕES: DECOLAR (botão nuclear) → pilotagem do Urubu-rei; na tela,
 // LANÇAR = NUKE · AR-AR = AAM · MÍSSIL = ASM · TORP, com a munição somada dos 2 caças (0 = esmaecido); o pilone disparado some; luzes do
 // modelo piscando (estrobo/anticolisão); textos de caça no lugar de "bombardeiro". Zero alocação por quadro.
-import { matsPisca, estacoesVtPorTipo } from './modeloVtol.js';
+import { matsPisca, estacoesVtPorTipo, tremVtol } from './modeloVtol.js';
 import { somaVt } from '../sim/vtolAmorim.js';
 
 const ROT = { aam: 'AAM', asm: 'ASM', torp: 'TORP', nuke: 'NUKE' };
@@ -19,14 +19,17 @@ export class VtolAmorimFx {
     const set = (k, t) => { const b = r['b_' + k] && r['b_' + k].querySelector('b'); if (b) b.textContent = t; };
     if (on) { for (const k in BT) set(k, ROT[BT[k]]); for (const t in this._ult) this._ult[t] = -1; } else { set('nkSolta', 'LANÇAR'); set('nkArAr', 'AR-AR'); set('hdMissil', 'MÍSSIL'); set('hdTorp', 'TORP'); for (const k in BT) H._cls(k, 'vt-zero', false); } }
   /** botão da tela do Urubu-rei; true = tratado aqui (caça pilotado) */
-  acaoNk(a) { const q = this.pilotado(); if (!q) return false; const tipo = BT[a]; if (!tipo) return false; const j = this.j;
+  acaoNk(a) { const q = this.pilotado(); if (!q) return false; const j = this.j;
+    if (a === 'nkIa') { const v = q.manual || q.manualPend ? 0 : 1; j.S.comando({ t: 'nkPiloto', v }); if (!v && q.alvo >= 0) j.S.comando({ t: 'nkTrava', alvo: q.alvo }); return true; } /* v1.3.10: IA com alvo travado = IA do Urubu-rei seguindo o alvo (o TRAVAR feito no manual não deixava a IA perseguir) */
+    const tipo = BT[a]; if (!tipo) return false;
     if (this._s[tipo] <= 0) j.hud.msg(`${ROT[tipo]}: sem munição — BASE para voltar ao navio e rearmar`, 1.6, '#f59e0b'); else if (q.fase !== 2) j.hud.msg('Aguarde a decolagem', 1.2); else j.S.comando({ t: 'vtArma', tipo }); return true; }
   /** números dos botões (soma dos 2 caças) — só quando mudam */
   painel() { const H = this.j.hud; somaVt(this.j.eu, this._s); for (const k in BT) { const b = H.r['b_' + k] && H.r['b_' + k].querySelector('b'), t = ROT[BT[k]]; if (b && b.textContent !== t) b.textContent = t; } /* rótulos (o nkPasso põe LANÇAR ao entrar) — só escreve se mudou */ for (const k in BT) { const t = BT[k], v = this._s[t]; if (this._ult[t] === v) continue; this._ult[t] = v; if (t === 'nuke' || t === 'torp') H._q(k, String(v)); /* AR-AR e MÍSSIL: o próprio nkPasso escreve (q.aa / q.misseis = soma) */ H._cls(k, 'vt-zero', v <= 0); } }
   /** quadro: luzes, pilones, feixes, entrada na pilotagem e tela */
   quadro(dt, t) { const j = this.j, sim = j.S && j.S.sim; if (!sim) return; const P = matsPisca(); { const ta = t % 1, ts = t % 1.4; P.anti.emissiveIntensity = ta < 0.15 ? 2.2 : 0; P.estrobo.emissiveIntensity = ts < 0.07 || (ts > 0.17 && ts < 0.24) ? 3 : 0; }
     const NB = j.nuke && j.nuke.bomb; /* pilones: a estação disparada some (botões) */
-    if (NB) for (let i = 0; i < sim.nukes.length; i++) { const q = sim.nukes[i]; if (!q.ativo || !q.vtol) continue; const n = sim.navios[q.dono], E = n && n.vtA && n.vtA[q.vtId], m = NB[i] && NB[i].av; if (E && m) estacoesVtPorTipo(m, E); }
+    if (NB) for (let i = 0; i < sim.nukes.length; i++) { const q = sim.nukes[i]; if (!q.ativo || !q.vtol) continue; const n = sim.navios[q.dono], E = n && n.vtA && n.vtA[q.vtId], m = NB[i] && NB[i].av; if (E && m) estacoesVtPorTipo(m, E);
+      if (m && m.userData.trem) { const U = m.userData, perto = q.fase === 3 && n && !n.morto && Math.hypot(n.x - q.x, n.z - q.z) < 2500, alvo = q.fase === 1 || perto ? 0 : 1; if (q.fase === 1) U._kT = 0; U._kT = U._kT == null ? alvo : U._kT + Math.max(-dt / U.tTrem, Math.min(dt / U.tTrem, alvo - U._kT)); tremVtol(m, Math.round(U._kT * 200) / 200); } } /* v1.3.10: trem baixado no convés/decolagem, recolhe em 4 s no voo, baixa na aproximação do navio */
     if (this.nukes[0] > 0) this.nukes[0] -= dt; if (this.nukes[1] > 0) this.nukes[1] -= dt;
     if (!this.ativo || !j.hud) return;
     if (j._apNk === 1 && !(j.cfg && j.cfg.aeroPrin) && j.nkQ && j.nkQ() && j.nkQ().vtol) { j._apNk = 2; j.nkEntra(); j.S.comando({ t: 'nkPiloto', v: 1 }); j.hud.msg('Decolagem vertical do heliponto — você pilota (sistema do Urubu-rei). Toque no manche após sair do navio.', 3, '#38bdf8'); } /* DECOLAR → pilotagem, como no Lençóis Maranhenses */

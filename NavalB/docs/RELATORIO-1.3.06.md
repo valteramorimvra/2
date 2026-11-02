@@ -87,3 +87,12 @@ Linhas alteradas:
 
 Estado:
 - VERIFICADO na simulação: 20 m acima; a câmera segue o último; velocidade 255/252 m/s.
+
+## 1.3.10
+
+| Item | Onde | Estado |
+|---|---|---|
+| TRAVAR e IA na tela dos caças. O toque já mandava os mesmos comandos do Urubu-rei, mas o TRAVAR feito no manual desligava o "seguir alvo". Agora o botão IA com alvo travado segue o alvo, e a IA ataca o alvo travado (ASM e NUKE, como o Urubu-rei com a bomba). Depois volta ao navio. | `src/render/vtolAmorimFx.js` (`acaoNk`), `src/sim/vtolAmorim.js` (`ia`) | VERIFICADO (toques no navegador; simulação) |
+| Trem de pouso: estava fundido na peça fixa, sempre baixado. Agora pernas e portas são peças móveis, com os pivôs e ângulos do META do Valter. Baixado no convés e na corrida; recolhe para trás em 4 s depois de sair, e as portas fecham; baixa na aproximação do navio. | `tools/vtol/gera.py`, `src/render/vtolDados.js`, `src/render/modeloVtol.js` (`tremVtol`), `vtolAmorimFx.js` | VERIFICADO (fotos do trem baixado e recolhido; em voo: 0 → −90° em 4 s) |
+| Todo o armamento disponível: NUKE, AAM, ASM e TORP disparam pelos botões. | | VERIFICADO |
+| Armamento dos caças 5× mais resistente à defesa aérea (CIWS, SAM e laser): `resistMissil` do jogo nos ASM e NUKE (fator 0,2). | `vtolAmorim.js` | VERIFICADO (chance de abate pelo CIWS × 0,20) |

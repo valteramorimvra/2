@@ -9,7 +9,7 @@
 // Zero alocação por quadro: estados criados uma vez por navio.
 import { VTOL_SIM } from './vtolDadosSim.js';
 import { MISSEIS, TORPEDO } from './classes.js';
-import { lancaArAr } from '../naval5v5/defesa.js';
+import { lancaArAr } from '../naval5v5/defesa.js'; import { resistMissil } from '../naval5v5/resistAereo.js';
 import { lancaNuclear } from './nuclear.js';
 import { marcacao } from './util.js';
 
@@ -48,6 +48,7 @@ function inimigoNavio(sim, q, n, alc) { const a0 = q.alvo >= 0 ? sim.navios[q.al
 function disparaMissil(sim, n, q, E, a, tipo) { const m = sim.misseis.find((x) => !x.ativo); if (!m) return 0; const nuke = tipo === 'nuke'; ponto(q, estacao(E, tipo), _o); const d = Math.hypot(a.x - q.x, a.z - q.z), v0 = Math.max(130, (q.v || 0) + 15);
   const pf = Object.assign({}, MISSEIS.curto, { nome: nuke ? 'Nuclear tático' : 'Antinavio', v: nuke ? 240 : 270, vt: nuke ? 260 : 300, alc: nuke ? VT.alcNuke : VT.alcAsm, dano: nuke ? VT.danoNuke : VT.danoAsm });
   Object.assign(m, { ouro: 0, heli: 1, ativo: 1, x: _o.x, y: _o.y, z: _o.z, vx: Math.sin(q.rumo) * v0, vy: (q.vy || 0) - 4, vz: -Math.cos(q.rumo) * v0, dono: n.id, time: n.time, alvo: a.id, isca: -1, fase: 3, t: 0, v: v0, perfil: pf, cel: 0, iscasVistas: 0, tf: 0, d0: d, samAlvo: 0, dano: pf.dano, pkMul: nuke ? 0.6 : 1, velMul: 1, livre: 0, curto: d < 1500 ? 1 : 0, lat: null, vtNk: nuke ? 1 : 0 });
+  resistMissil(m); /* v1.3.10 (Valter): armamento dos caças 5× mais resistente à defesa aérea (CIWS, SAM, laser) — o mesmo fator das armas de aeronave do jogo */
   if (nuke) for (let k = 0; k < 3; k++) if (E.nk[k] < 0) { E.nk[k] = m.idx; E.nkT[k] = -1; break; }
   n.stats.misLanc++; sim.evento({ t: 'heliMissil', idx: q.idx, m: m.idx, x: m.x, y: m.y, z: m.z, vt: tipo }); return 1; }
 function disparaTorp(sim, n, q, E, a) { const tp = sim.torpedos.find((x) => !x.ativo); if (!tp) return 0; ponto(q, estacao(E, 'torp'), _o); const b = marcacao(q.x, q.z, a.x, a.z);
@@ -74,7 +75,10 @@ function rastreiaNukes(sim, n, E) { for (let k = 0; k < 3; k++) { const mi = E.n
   E.nk[k] = -1; if (pertoInimigo(sim, n, E.nkP[k * 3], E.nkP[k * 3 + 2])) detonaNuke(sim, n, E.nkP[k * 3], E.nkP[k * 3 + 1], E.nkP[k * 3 + 2]); } } /* abatido no caminho (longe do alvo) não detona */
 /** IA (fora da pilotagem): no lugar do míssil do sistema, usa as armas dos botões — o líder ataca, o ala se defende (AAM) */
 function ia(sim, n, q, E, lider) { if (q.manual) return; if (E.aam > 0 && disparaVt(sim, n, q, 'aam')) return; if (!lider) return;
-  if (n.papel !== 'jogador' && sim.nkBotAtomica && E.nuke > 0 && disparaVt(sim, n, q, 'nuke')) return; if (E.asm > 0) disparaVt(sim, n, q, 'asm'); }
+  if (E.asm > 0 && disparaVt(sim, n, q, 'asm')) return;
+  const trav = q.alvo >= 0 && sim.navios[q.alvo] && !sim.navios[q.alvo].morto; /* v1.3.10: como o Urubu-rei lança a bomba no alvo travado, a IA lança o NUKE no alvo travado (computador só com a bomba ligada) */
+  if (trav && E.nuke > 0 && (n.papel === 'jogador' || sim.nkBotAtomica) && disparaVt(sim, n, q, 'nuke')) return;
+  if (q.fase === 2 && !q.espera && E.asm <= 0 && (E.nuke <= 0 || !trav) && trav) { q.fase = 3; q.tEsc = 0; sim.evento({ t: 'nkIa', idx: q.idx, id: q.dono, v: 1, motivo: 'base' }); } } /* atacou: volta ao navio, como o Urubu-rei depois da bomba */
 /** HUD: soma da munição dos caças no ar (abatido sai da soma). Escreve em out (sem alocar). */
 export function somaVt(n, out) { out.aam = out.asm = out.torp = out.nuke = 0; if (!n || !n.vtA) return out; for (const id of IDS_VT) { const E = n.vtA[id]; if (E.abat) continue; out.aam += E.aam; out.asm += E.asm; out.torp += E.torp; out.nuke += E.nuke; } return out; }
 const _S = { aam: 0, asm: 0, torp: 0, nuke: 0 };

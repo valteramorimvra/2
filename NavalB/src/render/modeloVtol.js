@@ -36,6 +36,9 @@ export function montaVtol(id) {
   const D = VTOL_GEO[id], g = new THREE.Group(); g.name = 'vtol_' + id; poe(g, D.base);
   const est = {}; for (const [k, L] of Object.entries(D.est)) { const e = new THREE.Group(); e.name = k; poe(e, L); g.add(e); est[k] = e; }
   g.userData.vtol = id; g.userData.estOrd = D.ordem.map((k) => est[k]).filter(Boolean); g.userData.fumacaVtol = D.fumaca; g.userData._munV = -1;
+  /* v1.3.10: TREM DE POUSO e portas do trem como peças móveis (pivô e ângulo do META do Valter): recolhe para trás em 4 s; portas fecham */
+  const piv = (L, p) => { const pv = new THREE.Group(); pv.position.set(p[0], p[1], p[2]); const e = new THREE.Group(); e.position.set(-p[0], -p[1], -p[2]); poe(e, L); pv.add(e); g.add(pv); return pv; };
+  const MOV = D.mov || {}; g.userData.trem = (D.trem || []).filter((t) => MOV[t.g]).map((t) => ({ o: piv(MOV[t.g], t.p), e: t.e, a: t.a })); g.userData.portasTrem = (D.portas || []).filter((t) => MOV[t.g]).map((t) => ({ o: piv(MOV[t.g], t.p), e: t.e, a: t.a })); g.userData.tTrem = D.tTrem || 4; g.userData._kTrem = 0;
   g.userData.estTipo = {}; for (const t of ['aam', 'asm', 'torp', 'nuke']) g.userData.estTipo[t] = (D.ordemTipo[t] || []).map((k) => est[k]).filter(Boolean); g.userData._vtV = [-1, -1, -1, -1]; g.userData.lasersP = D.lasers; /* v1.3.04 */
   return g;
 }
@@ -43,4 +46,6 @@ export function montaVtol(id) {
 /** v1.3.04: estações por TIPO (AAM/ASM/TORP/NUKE) conforme a munição que resta em h.vt — a disparada some (pilone vazio), ao rearmar volta. */
 const TIPOS = ['aam', 'asm', 'torp', 'nuke'];
 export function estacoesVtPorTipo(g, vt) { const U = g.userData; if (!U.estTipo || !vt) return; for (let t = 0; t < 4; t++) { const k = TIPOS[t], resta = vt[k] | 0; if (U._vtV[t] === resta) continue; U._vtV[t] = resta; const L = U.estTipo[k], usadas = Math.max(0, L.length - resta); for (let i = 0; i < L.length; i++) L[i].visible = i >= usadas; } }
+/** v1.3.10: trem de pouso — k = 0 baixado (portas abertas, como no modelo) · 1 recolhido (pernas para trás, portas fechadas). Só mexe quando k muda. */
+export function tremVtol(g, k) { const U = g.userData; if (!U.trem || U._kTrem === k) return; U._kTrem = k; for (const t of U.trem) t.o.rotation.set(t.e[0] * t.a * k, t.e[1] * t.a * k, t.e[2] * t.a * k); for (const t of U.portasTrem) t.o.rotation.set(-t.e[0] * t.a * k, -t.e[1] * t.a * k, -t.e[2] * t.a * k); }
 export function estacoesVtol(g, mun, total) { const U = g.userData; if (!U.estOrd || U._munV === mun) return; U._munV = mun; const usadas = Math.max(0, Math.min(U.estOrd.length, (total | 0) - (mun | 0))); for (let i = 0; i < U.estOrd.length; i++) U.estOrd[i].visible = i >= usadas; }
