@@ -89,7 +89,7 @@ function ilhasExtras(base, ex, id) { const n = base.n, tam = base.tam, cel = tam
         const perfil = Math.pow(clamp(1 - borda, 0, 1), 1.35), rug = fbm(px / 260, pz / 260, sd + 9) * 0.35, v = perfil * H * (0.75 + rug) + 18 - borda * 70; if (v > base.h[j * n + i]) base.h[j * n + i] = v; }
       k++; } return k; }
 export function criaArena(id, ex = null) {
-  const M = MAPAS[id] || MAPAS.arquipelago; const base0 = M.tipo === 'real' ? decodeReal(ARENAS_REAIS[id]) : M.tipo === 'novo' ? geraNovo(id, M) : geraProcedural(id, M); /* v1.2.25 item 10 */ const base = ex && ex.ilhas > 0 ? { ...base0, h: Float32Array.from(base0.h) } : base0; const nIlhasExtra = ex && ex.ilhas > 0 ? ilhasExtras(base, ex, id) : 0;
+  const M = MAPAS[id] || MAPAS.arquipelago; const base0 = M.tipo === 'real' ? decodeReal(ARENAS_REAIS[id]) : M.tipo === 'novo' ? geraNovo(id, M) : geraProcedural(id, M); /* v1.2.25 item 10 */ const base = ex && (ex.ilhas > 0 || ex.marAberto) ? { ...base0, h: Float32Array.from(base0.h) } : base0; if (ex && ex.marAberto) base.h.fill(-420); /* v1.3.03: TESTE DE COMBATE — só mar aberto (sem ilha nem costa) */ const nIlhasExtra = ex && ex.ilhas > 0 ? ilhasExtras(base, ex, id) : 0;
   const T = Object.assign({ id, nome: M.nome, def: M }, base); const n = T.n;
   // distância (em células) até terra/raso (h > −6 m), por BFS
   T.dist = new Float32Array(n * n).fill(1e9); const fila = new Int32Array(n * n); let fim = 0;

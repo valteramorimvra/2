@@ -246,6 +246,11 @@ export function impactoNuclear(q, out = {}) { let x = q.x, y = q.y - 2, z = q.z,
 /** v1.2.26 item K: comandos do jogador para o SEU bombardeiro no ar. */
 export function nkBombardeiroDe(sim, n) { const h = n && n.hd; if (h && h.pil && h.noAr >= 0 && sim.nukes) { const q = sim.nukes[h.noAr]; if (q && q.ativo && q.hidro) return q; } /* v1.2.39: pilotando o hidroavião */ const k = n && n.nk; return k && k.noAr >= 0 && sim.nukes ? sim.nukes[k.noAr] : null; }
 export function comandoNuclear(sim, n, cmd) { const q = nkBombardeiroDe(sim, n); if (!q || !q.ativo || q.dono !== n.id) return;
+  if (cmd.t === 'nkArIni') { /* v1.3.03 TESTE DE COMBATE: a esquadrilha já começa NO AR, formada, à altitude pedida (~750 m) e em velocidade de cruzeiro (o fluxo normal do Urubu-rei não muda) */
+    const alt = +cmd.alt || 750, dir = n.rumo, vc = q.hidro ? Math.max(60, (q.vMax || 70) * 0.75) : q.H && q.H.vmax > 0 ? q.H.vmax * (q.rotor ? 0.6 : 0.75) : NUK.vVoo, sn = Math.sin(dir), cs = Math.cos(dir);
+    const poe = (w, lado, atras) => { const fx = 1800 - atras, ox = lado; w.x = w.px = n.x + sn * fx + cs * ox; w.z = w.pz = n.z - cs * fx + sn * ox; w.y = w.py = alt; w.rumo = w.prumo = dir; w.v = vc; w.vx = sn * vc; w.vz = -cs * vc; w.vy = 0; w.gam = 0; w.pitch = w.ppitch = 0; w.bank = 0; w.roll = w.proll = 0; w.fase = 2; w.t = Math.max(w.t || 0, NUK.tDecola + 0.1); w.espDec = 0; w.alt = alt; };
+    poe(q, 0, 0); let k = 0; for (const w of sim.nukes) { if (!w.ativo || w === q || w.lider !== q.idx) continue; k++; poe(w, (k % 2 ? 1 : -1) * 55 * Math.ceil(k / 2), 45 * Math.ceil(k / 2)); }
+    sim.evento({ t: q.hidro ? 'hdNoAr' : 'nkNoAr', idx: q.idx, id: n.id }); return; }
   if (cmd.t === 'nkPiloto') { const m = cmd.v ? 1 : 0; if (q.fase === 1 && m) { q.manualPend = 1; return; } if (m === q.manual && !q.espera) return; q.espera = 0; q.manual = m; if (m) { q.bank = clamp(-q.roll, -NUK.manBank, NUK.manBank); q.gam = Math.atan2(q.vy || 0, Math.max(1, q.v)); q.sx = q.bank / NUK.manBank; q.sy = 0; q.jx = q.jy = 0; } else { q.tAssume = NUK.assume; if (q.fase === 3) { q.tEsc = Math.min(q.tEsc || 0, 6); q.rumoEsc = marcacao(q.ax, q.az, q.x, q.z); } } sim.evento({ t: 'nkIa', idx: q.idx, id: n.id, v: m ? 0 : 1 }); }
   else if (cmd.t === 'nkVolta') { q.manual = 0; q.manualPend = 0; q.espera = 0; q.jx = q.jy = 0; q.tAssume = NUK.assume; if (q.fase <= 1) q.volta = 1; else { q.fase = 3; q.tEsc = 0; q.volta = 0; } sim.evento({ t: 'nkIa', idx: q.idx, id: n.id, v: 1, motivo: 'base' }); }
   else if (cmd.t === 'nkEspera') { const v = cmd.v ? 1 : 0; if (v) { if (q.manual) { q.manual = 0; q.tAssume = NUK.assume; } q.espera = q.fase <= 2 ? 1 : 0; q.manualPend = 0; q.espC = null; } else q.espera = 0; sim.evento({ t: 'nkEspera', idx: q.idx, id: n.id, v: q.espera }); }
@@ -483,10 +488,10 @@ function passoChoque(sim, dt) {
 
 /** IA de bot: usa a bomba COM CRITÉRIO — só depois de liberada +30 s, com ≥ 2 navios inimigos (ou 1 navio capital) dentro do raio total
  *  em torno de um contato detectado, nenhum aliado a < 900 m do ponto e alvo ao alcance. Avalia a cada 2 s (barato). */
-export function iaNuclear(sim, n, dt) { const k = n.nk; k.tIa -= dt; if (k.tIa > 0) return; k.tIa = NUK.iaIntervalo; if (motivoNuclear(sim, n) || sim.t < NUK.liberaApos + 30) return;
+export function iaNuclear(sim, n, dt) { const k = n.nk; k.tIa -= dt; if (k.tIa > 0) return; k.tIa = NUK.iaIntervalo; if (motivoNuclear(sim, n) || sim.t < NUK.liberaApos + 30) return; if (sim.nkLimiteBot != null && (sim.nkBotUsadas | 0) >= sim.nkLimiteBot) return; /* v1.3.03: TESTE DE COMBATE — no máximo N bombas do computador (o Urubu-rei em si não muda) */
   let best = null, bs = 0; const cont = sim.contatos[n.time]; if (!cont) return;
   for (const [id] of cont) { const e = sim.navios[id]; if (!e || e.morto || e.time === n.time || !sim.detectado(n.time, id)) continue; if (Math.hypot(e.x - n.x, e.z - n.z) > NUK.alcanceMax * 0.9) continue;
     let sc = 0; for (const o of sim.navios) { if (o.morto) continue; const d = Math.hypot(o.x - e.x, o.z - e.z); if (o.time === n.time) { if (d < NUK.raioTotal * 0.7) { sc = -1; break; } continue; } if (d < NUK.raioTotal * 0.85) sc += o.C.superPA || (o.helis && o.helis.length >= 6) || o.C.vida >= 7000 ? 1.6 : 1; }
     if (sc > bs) { bs = sc; best = e; } }
-  const tardio = sim.t > 420; if (best && (bs >= NUK.iaMinSc || (tardio && bs >= 1))) lancaNuclear(sim, n, { alvo: best.id }); }
+  const tardio = sim.t > 420; if (best && (bs >= NUK.iaMinSc || ((tardio || sim.testeCombate) && bs >= 1))) { const ok = lancaNuclear(sim, n, { alvo: best.id }); if (ok && sim.nkLimiteBot != null) { sim.nkBotUsadas = (sim.nkBotUsadas | 0) + 1; if (sim.nkBotUsadas >= sim.nkLimiteBot) for (const o of sim.navios) if (o.time === n.time && o.papel !== 'jogador') o.agrIA = 0.62; /* depois da bomba: ataque EQUILIBRADO */ } } }
 export { detona as detonaTeste }; /* v1.2.53: testes headless da frente de choque */

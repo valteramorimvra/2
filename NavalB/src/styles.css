@@ -179,3 +179,7 @@ h1, h2, h3 { margin: 0; letter-spacing: .04em; } h2 { font-size: 22px; margin: 2
 
 /* v1.3.01: camuflagem bloqueada (navio de pintura fixa) */
 button.trava { position: relative; opacity: .5; filter: grayscale(.7); cursor: not-allowed; } button.trava .trava-ic { position: absolute; top: 3px; right: 4px; text-decoration: none; font-size: 13px; filter: none; opacity: 1; }
+/* v1.3.03: botão do TESTE DE COMBATE (ficha do navio: canto inferior esquerdo) */
+.btn-teste-comb { position: absolute; left: max(14px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom)); z-index: 5; display: grid; gap: 2px; text-align: left; padding: 10px 16px; min-height: 52px; border-radius: 10px; border: 1px solid #d4af37; background: linear-gradient(180deg, rgba(40,30,8,.92), rgba(18,14,6,.94)); color: #fde68a; box-shadow: 0 0 14px rgba(212,175,55,.35); }
+.btn-teste-comb b { font-size: 14px; letter-spacing: .08em; } .btn-teste-comb small { font-size: 10.5px; color: #e5d3a1; }
+.btn-teste-comb:active { transform: translateY(1px); }

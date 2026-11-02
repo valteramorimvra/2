@@ -29,7 +29,7 @@ const _o = { x: 0, y: 0, z: 0 }, _d = { x: 0, y: 0, z: 0 };
 export function lancaMissilAmorim(sim, n, alvoId, livre, azLivre, d) {
   const A = n.am; if (!A) return 0; if (A.cfg.mis) return lancaMissilAuto(sim, n, alvoId, livre, azLivre, d, A.cfg.mis); /* v1.3.02: Fragata Amorim escolhe o slot */
   for (let tent = 0; tent < AM.slots; tent++) { const s = (A.prox + tent) % AM.slots;
-    if (s < 2) { if (A.recLat[s] > sim.t) continue; const pf = MISSEIS[AM.perfilLat]; if (!livre && d > pf.alc) continue; const k = salvaLateral(sim, n, s, alvoId, livre, azLivre, d); if (k) { A.recLat[s] = sim.t + AM.recLat; A.prox = (s + 1) % AM.slots; return k; } }
+    if (s < 2) { if (A.recLat[s] > sim.t || n.tVls > 0) continue; const pf = MISSEIS[AM.perfilLat]; if (!livre && d > pf.alc) continue; const k = salvaLateral(sim, n, s, alvoId, livre, azLivre, d); if (k) { A.recLat[s] = sim.t + AM.recLat; A.prox = (s + 1) % AM.slots; n.tVls = Math.max(n.tVls || 0, k * AM.dtSalva + 1.6); /* v1.3.03 (Valter): UMA salva de UM slot por disparo — o próximo slot só depois que esta salva saiu toda */ return k; } }
     else { if (n.tVls > 0 || n.vls <= 0) continue; const frente = s === 2; if ((frente ? A.vlsF : A.vlsR) <= 0) continue; const k = salvaVls(sim, n, frente, alvoId, livre, azLivre, d); if (k) { A.prox = (s + 1) % AM.slots; return k; } } }
   return 0;
 }

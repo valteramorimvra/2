@@ -117,7 +117,7 @@ export class Sim {
       case 'uav': case 'esquadrilha': case 'heliLanca': case 'heliCtrl': case 'heliFlare': case 'aeroReparo': case 'iaNavio': case 'heliFogo': case 'heliThr': case 'heliVolta': case 'controle': case 'engajar': comandoAereo(this, n, cmd); break; /* v1.2.67: engajar */
       case 'nuclear': (n.C.missilNuclear ? lancaMissilNuclear1231 : lancaNuclear)(this, n, cmd); break; /* v1.2.31: míssil nuclear de navio */ /* v1.2.26 */
       case 'hidro': case 'hdPil': case 'hdMissil': case 'hdTorp': case 'hdFlare': case 'hdVolta': comandoHidro(this, n, cmd); break; /* v1.2.39 */
-      case 'nkPiloto': case 'nkEspera': case 'nkArAr': case 'nkFlare': case 'nkMissil': case 'nkVolta': case 'nkCtl': case 'nkThr': case 'nkMiraSolo': case 'nkTrava': case 'nkSolta': case 'nkEjeta': case 'nkPorta': case 'nkReparo': if (cmd.t === 'nkSolta' && n.hd && n.hd.pil && n.hd.noAr >= 0) { comandoHidro(this, n, cmd); break; } comandoNuclear(this, n, cmd); break; /* v1.2.79: BASE */
+      case 'nkArIni': case 'nkPiloto': case 'nkEspera': case 'nkArAr': case 'nkFlare': case 'nkMissil': case 'nkVolta': case 'nkCtl': case 'nkThr': case 'nkMiraSolo': case 'nkTrava': case 'nkSolta': case 'nkEjeta': case 'nkPorta': case 'nkReparo': if (cmd.t === 'nkSolta' && n.hd && n.hd.pil && n.hd.noAr >= 0) { comandoHidro(this, n, cmd); break; } comandoNuclear(this, n, cmd); break; /* v1.2.79: BASE */
     }
   }
 
