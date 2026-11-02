@@ -1,0 +1,25 @@
+// Teste node (v1.3.08): Acauã/Uiraçu = SISTEMA ORIGINAL DO URUBU-REI (sem adaptação), só os botões são deles.
+import { criaSessao } from '../src/sim/session.js';
+import { NUK } from '../src/sim/nuclear.js';
+let falhas = 0; const ok = (c, m) => { if (!c) { falhas++; console.log('FALHA', m); } else console.log('OK', m); };
+const S = criaSessao({ mapa: 'atois', modo: 'duelo', classe: 'destroier_amorim', classeRival: 'destroier', seed: 7 }); const sim = S.sim, eu = sim.navios[S.match.jogadorId], ini = sim.navios.find((q) => q.time !== eu.time); sim.revelaTudo = 1;
+const ev = []; const o = sim.evento.bind(sim); sim.evento = (e) => { ev.push(e); return o(e); };
+const passo = (s) => { for (let i = 0; i < Math.round(s * 60); i++) S.avanca(1 / 60); };
+ini.x = eu.x + 7000; ini.z = eu.z; ini.v = 0; ini.vida = 1e5; eu.vida = 1e6; passo(1);
+ok(eu.C.vida === 5000 && !(eu.helis && eu.helis.length) && eu.nkAero === 'acaua', 'destróier 5000 de vida; caças pelo DECOLAR');
+S.comando({ t: 'nuclear', px: eu.x + Math.sin(eu.rumo) * 9000, pz: eu.z - Math.cos(eu.rumo) * 9000 }); passo(0.2);
+const L = sim.nukes[eu.nk.noAr]; ok(L && L.vtol && L.aero === 'acaua' && L.vidaMax === 2500 && !L.H, 'Acauã líder (2500 de vida), sem perfil próprio');
+const ala = sim.nukes.find((w) => w.lider === L.idx && w.aero === 'uiracu'); ok(!!ala && ala.vidaMax === 2500 && sim.nukes.filter((w) => w.lider === L.idx && (w.ativo || w.espDec > 0)).length === 1, 'Uiraçu é o único ala');
+const z0 = L.z, x0 = L.x; passo(2.5); ok(L.fase === 1 && Math.hypot(L.x - x0, L.z - z0) > 5 && L.v > 10, 'decolagem ORIGINAL: corrida no convés (catapulta) como o Urubu-rei');
+passo(4); ok(L.fase === 2, 'no ar'); S.comando({ t: 'nkPiloto', v: 1 }); passo(0.3); S.comando({ t: 'nkThr', v: 4 }); passo(25); ok(Math.abs(L.v - NUK.thrNiveis[4]) < 3, `MÁX = ${NUK.thrNiveis[4]} m/s do Urubu-rei (${L.v.toFixed(0)})`);
+S.comando({ t: 'nkThr', v: 0 }); passo(25); ok(Math.abs(L.v - NUK.thrNiveis[0]) < 3, `MIN = ${NUK.thrNiveis[0]} m/s do Urubu-rei (${L.v.toFixed(0)})`);
+S.comando({ t: 'nkCtl', jx: 1, jy: 0 }); let wM = 0; for (let i = 0; i < 600; i++) { S.avanca(1 / 60); wM = Math.max(wM, Math.abs(L.w || 0)); } ok(wM <= NUK.manCurvaMax + 1e-6 && wM > NUK.manCurvaMax * 0.9, `curva do Urubu-rei (ω ${wM.toFixed(3)})`); S.comando({ t: 'nkCtl', jx: 0, jy: 0 });
+const mira = (dd) => { L.rumo = Math.atan2(ini.x - L.x, -(ini.z - L.z)); L.x = ini.x - Math.sin(L.rumo) * dd; L.z = ini.z + Math.cos(L.rumo) * dd; L.y = 300; };
+const A = eu.vtA.acaua; mira(4000); A.tMis = 0; const a0 = A.asm; S.comando({ t: 'vtArma', tipo: 'asm' }); passo(0.3); ok(A.asm === a0 - 1, `botão MÍSSIL = ASM (${a0}→${A.asm})`); ok(L.misseis === A.asm + eu.vtA.uiracu.asm, 'MÍSSIL mostra a soma dos 2');
+mira(2500); A.tMis = 0; const t0 = A.torp; S.comando({ t: 'vtArma', tipo: 'torp' }); passo(0.3); ok(A.torp === t0 - 1, 'botão TORP'); mira(4000); A.tNuke = 0; const n0 = A.nuke; S.comando({ t: 'vtArma', tipo: 'nuke' }); passo(0.3); ok(A.nuke === n0 - 1 && A.tNuke > 11, 'botão LANÇAR = NUKE (12 s)');
+S.comando({ t: 'nkVolta' }); let fim = -1; for (let i = 0; i < 60 * 300 && fim < 0; i++) { S.avanca(1 / 60); if (!L.ativo) fim = sim.t; } ok(fim > 0 && ev.some((e) => e.t === 'nkPousa' || e.t === 'vtPousa') && eu.nk.noAr < 0, 'BASE: regresso e pouso ORIGINAIS do Urubu-rei');
+ok(eu.nk.tRec > sim.t + 15, `recarga ORIGINAL do Urubu-rei antes da nova decolagem (${(eu.nk.tRec - sim.t).toFixed(0)} s)`); passo(eu.nk.tRec - sim.t + 0.5);
+S.comando({ t: 'nuclear', px: eu.x + 9000, pz: eu.z }); passo(0.3); ok(eu.nk.noAr >= 0 && A.asm === 4 && A.nuke === 3, 'nova decolagem com munição cheia');
+{ const S3 = criaSessao({ mapa: 'atois', modo: 'duelo', classe: 'lencois', classeRival: 'destroier', seed: 2 }); const s3 = S3.sim, j3 = s3.navios[S3.match.jogadorId], i3 = s3.navios.find((q) => q.time !== j3.time); for (let i = 0; i < 60 * 16; i++) S3.avanca(1 / 60); S3.comando({ t: 'nuclear', alvo: i3.id }); for (let i = 0; i < 60 * 3; i++) S3.avanca(1 / 60); const q = s3.nukes.find((w) => w.ativo && w.dono === j3.id); ok(!!q && !q.vtol && !q.aero && q.cargas > 0, 'Urubu-rei do Lençóis igual'); }
+{ const S2 = criaSessao({ mapa: 'atois', modo: 'duelo', classe: 'destroier', classeRival: 'destroier_amorim', seed: 3 }); const s2 = S2.sim, j2 = s2.navios[S2.match.jogadorId], b2 = s2.navios.find((q) => q.time !== j2.time); b2.x = j2.x + 8000; b2.z = j2.z; j2.vida = 1e6; b2.vida = 1e6; let voou = 0; for (let i = 0; i < 60 * 60; i++) { S2.avanca(1 / 60); if (s2.nukes.some((q) => q.ativo && q.vtol && q.dono === b2.id && q.fase >= 2)) voou = 1; } ok(voou && !s2.nukes.some((q) => q.dono === b2.id && q.b && q.b.ativo), 'computador decola os caças, sem bomba'); }
+console.log(falhas ? `FALHAS: ${falhas}` : 'RESULTADO: TUDO OK'); process.exit(falhas ? 1 : 0);

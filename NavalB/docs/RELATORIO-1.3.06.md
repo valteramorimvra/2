@@ -46,3 +46,30 @@
 
 - Vida do Destróier Amorim: 5.000. Vida de cada caça (Acauã e Uiraçu): 2.500. Arquivos: `src/sim/classesDestroierAmorim.js` e `src/sim/vtolAmorim.js` (`VIDA_VT`).
 - VERIFICADO em `tests/vtol136.mjs`.
+
+## 1.3.08 — sistema ORIGINAL do Urubu-rei nos caças
+
+Pedido do Valter: "sistema original do Urubu-rei em todos os aspectos, sem adaptação em nada, exceto os botões; até a neblina nas asas".
+
+Retirado tudo o que era adaptação:
+- Decolagem e pouso verticais.
+- Fumaça por bocal.
+- Faixa de velocidade própria do caça.
+- Lasers e canhão.
+- Tempos próprios de rearme (15 s) e de volta do abatido (20 s).
+
+Resultado:
+- `src/sim/nuclear.js` não tem nenhuma linha dos caças.
+- `src/render/nuclearFx.js`, `src/sim/vooUnificado.js`, `src/render/vorticeAsa.js` e `src/render/fx.js` estão idênticos aos da 1.2.99.
+
+| Item | Estado |
+|---|---|
+| Decolagem: corrida no convés (catapulta), igual ao Urubu-rei | VERIFICADO (`tests/vtol138.mjs`) |
+| Velocidades do Urubu-rei: 165 a 285 m/s | VERIFICADO |
+| Curva igual à do Urubu-rei (ω 0,36) | VERIFICADO |
+| Regresso e pouso originais (a 400 m do navio) e recarga original de 25 s | VERIFICADO |
+| Câmera e fumaça colorida originais (uma cor por posição na esquadrilha) | VERIFICADO (navegador) |
+| Neblina nas asas: os vórtices originais da 1.2.98 | LIDO (mesmo código, sem mudança) |
+| Botões dos caças: LANÇAR = NUKE · AR-AR = AAM · MÍSSIL = ASM · TORP; munição somada, cheia a cada decolagem; 7 s e 12 s | VERIFICADO |
+| Vida: destróier 5.000, cada caça 2.500 | VERIFICADO |
+| O Urubu-rei do Lençóis continua igual | VERIFICADO |
