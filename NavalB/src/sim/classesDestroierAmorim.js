@@ -28,7 +28,7 @@ export function adicionaDestroierAmorim(CLASSES, { D, CAN, VIDA }) {
   CLASSES.destroier_amorim = D('destroier', 'destroier_amorim', { premium: 1, lendario: 1, destAmorim: 1, pinturaFixa: 1,
     nome: 'Destróier Amorim', classe: 'Classe Amorim', nomeOriginal: 'Destróier Amorim (projeto do Valter)', num: 'D-01',
     papel: 'Escolta oceânica multimissão: 3 torres de 2×155 mm (recarga 5 s), 160 células VLS e 2 lançadores laterais de 6 mísseis com escolha automática do melhor slot (salva de 6, recarga 6 s), 18 tubos de torpedo (salva de 9, recarga 10 s), 4 lança-granadas, 6 lasers, 4 CIWS, 4 canhões automáticos de 30 mm e 2 caças VTOL de classe fixa (Acauã e Uiraçu) no heliponto',
-    L: 176, B: 21.6, T: 6.4, F: 8.2, vmax: 17.0, acel: 0.7, giro: 0.82, vida: VIDA(320), blind: 1.4, rcs: 0.8, radar: 18000, desl: 9800,
+    L: 176, B: 21.6, T: 6.4, F: 8.2, vmax: 17.0, acel: 0.7, giro: 0.82, vida: 5000 /* v1.3.07 (Valter): vida 5 mil */, blind: 1.4, rcs: 0.8, radar: 18000, desl: 9800,
     canhao: CAN({ cal: 155, V0: 920, cad: 5.0, dano: 30, alc: 17000, disp: 0.55, torres: 3, canos: 2, som: 'grande' }),
     vls: 160, missil: 'hiper', salva: 6, misRec: 6, misAuto: MIS_DA, latCfg: LAT_DA, tubosLat: TUBOS_LAT_DA, autoCfg: AUTO_DA, autos: AUTOS_DA, caixasAuto: CAIXAS_DA,
     sam: 0, ciws: 4, ciwsLug: [0, 1, 2, 3], a30: 0, laser: 6, chaff: 12,

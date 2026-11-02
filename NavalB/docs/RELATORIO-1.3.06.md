@@ -41,3 +41,8 @@
 
 - Fps, som e toque no aparelho.
 - A câmera segue o último caça da esquadrilha (o ala), que é a regra original do Urubu-rei.
+
+## 1.3.07
+
+- Vida do Destróier Amorim: 5.000. Vida de cada caça (Acauã e Uiraçu): 2.500. Arquivos: `src/sim/classesDestroierAmorim.js` e `src/sim/vtolAmorim.js` (`VIDA_VT`).
+- VERIFICADO em `tests/vtol136.mjs`.

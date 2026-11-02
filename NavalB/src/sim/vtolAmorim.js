@@ -64,7 +64,8 @@ export function lancaVtol(sim, n, cmd) { const A = instalaVtol(n); const ids = I
   n.nkAero = ids[0]; if (n.nk) n.nk.tRec = 0; const bk = sim.nkBotAtomica; if (n.papel !== 'jogador') sim.nkBotAtomica = 1; /* os caças NÃO levam bomba; só libera a decolagem do computador */ const ok = lancaNuclear(sim, n, cmd); sim.nkBotAtomica = bk; if (!ok) return 0; const q = sim.nukes[n.nk.noAr]; arma(n, q, ids[0]);
   let ala = 0; for (const w of sim.nukes) { if (w.lider !== q.idx || w.ativo || !(w.espDec > 0)) continue; if (!ala && ids[1]) { ala = 1; w.aero = ids[1]; w.H = HELIS[ids[1]]; arma(n, w, ids[1]); w.espDec = 2.6; w.ala = 1; } else { w.espDec = 0; w.lider = -1; } } /* só 1 ala (o outro caça) — as outras 3 vagas da esquadrilha independente ficam no pool */
   return 1; }
-function arma(n, q, id) { const E = n.vtA[id]; q.vtol = 1; q.vtId = id; q.vtPouso = 0; q.semBomba = 1; q.cargas = 0; q.misseis = E.asm; q.misAlc = VT.alcAsm; q.misNome = 'ASM'; q.tMis = 1e6; q.aa = E.aam; q.tAA = 0; q.altV = 0;
+export const VIDA_VT = 2500; /* v1.3.07 (Valter): vida de cada caça */
+function arma(n, q, id) { const E = n.vtA[id]; q.vidaMax = q.vida = VIDA_VT; q.vtol = 1; q.vtId = id; q.vtPouso = 0; q.semBomba = 1; q.cargas = 0; q.misseis = E.asm; q.misAlc = VT.alcAsm; q.misNome = 'ASM'; q.tMis = 1e6; q.aa = E.aam; q.tAA = 0; q.altV = 0;
   E.q = q.idx; E.noAr = 1; E.pousou = 0; E.abat = 0; E.voou = 0; }
 
 // ---------------- ARMAS ----------------
