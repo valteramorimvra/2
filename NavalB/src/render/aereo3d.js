@@ -7,7 +7,7 @@ import { mesclaEstatico } from './props.js';
 import { mesclaFilhos, mesclaLuzes } from './mescla1230.js'; /* v1.2.30 FPS */
 const PULA_AE = new Set(['rotor', 'rotor2', 'rotorCauda', 'disco']);
 import { EST } from '../naval5v5/aereo.js';
-import { montaVtol, ehVtolAmorim, estacoesVtol } from './modeloVtol.js'; /* v1.3.03 */
+import { montaVtol, ehVtolAmorim, estacoesVtPorTipo } from './modeloVtol.js'; /* v1.3.03 */
 import { alturaMar } from '../sim/ocean.js';
 import { PARAM } from '../armasParametros.js';
 import { modeloAereo1225 } from './aereo1225.js'; /* v1.2.25 item 12 */
@@ -116,7 +116,7 @@ export class Aereo3D {
     // helicópteros
     sim.helis.forEach((h, i) => { const vis = h.usado && (h.estado >= EST.CONVOO && h.estado <= EST.REARMA && !h.oculto && !(h.dk && (h.dk.f === 'desce' || h.dk.f === 'sobe') && (h.dk.y || 0) < -0.3) /* v1.3.01: abaixo do convés no elevador = invisível (o convés não tem abertura: antes parecia atravessar o piso) */ /* v1.2.26 item C: no hangar/rearmando embaixo = invisível */ || (h.estado === EST.ABATIDO && h.y > -4)); if (!vis) { if (this.helis[i]) this.helis[i].visible = false; return; }
       const n = sim.navios[h.dono]; if (n && n.submerso) { if (this.helis[i]) this.helis[i].visible = false; return; } const m = this.heli(i); m.visible = true; { const a = Math.min(1, Math.max(0, (j.S.acc || 0) * 60)); const px = h.px != null ? h.px : h.x, py = h.py != null ? h.py : h.y, pz = h.pz != null ? h.pz : h.z; m.position.set(px + (h.x - px) * a, py + (h.y - py) * a, pz + (h.z - pz) * a); } /* v1.2.29 bombcam lerp */
-      if (m.userData.vtol) estacoesVtol(m, h.mun | 0, (h.H && h.H.mun) || 0); /* v1.3.03: estação disparada = pilone vazio; rearmou = cheia */
+      if (m.userData.vtol) estacoesVtPorTipo(m, h.vt); /* v1.3.04: estações por tipo */ /* v1.3.03: estação disparada = pilone vazio; rearmou = cheia */
       const voando = h.estado >= EST.DECOLA && h.estado <= EST.POUSO; const giro = h.vr = (h.vr || 0) + ((h.rumo - (h.rumoAnt ?? h.rumo)) / Math.max(dt, 1e-3) - (h.vr || 0)) * Math.min(1, dt * 4); h.rumoAnt = h.rumo;
       const PH = PARAM.heli, bal = voando && h.estado === EST.VOO && Math.abs(h.v) < 9 ? PH.balancoGraus * Math.PI / 180 : 0; const fase = t * PH.balancoHz * Math.PI * 2 + i; /* balanço leve no pairado (±1°, 0,5 Hz) */
       { let pq = voando ? (h.pitch || 0) + bal * Math.sin(fase) : 0, rq = voando ? -(h.roll || 0) + bal * Math.cos(fase * 0.8) : 0; if (h.ctrl === 'jog') { const ks = 1 - Math.exp(-dt * 7); if (h._rP == null || Math.abs(h._rP - pq) > 1.5) { h._rP = pq; h._rR = rq; } h._rP += (pq - h._rP) * ks; h._rR += (rq - h._rR) * ks; pq = h._rP; rq = h._rR; } else h._rP = null; m.rotation.set(pq, -h.rumo, rq); } /* v1.2.69: pilotada = atitude suavizada como o bombardeiro (~0,15 s) */ if (h.estado === EST.VOO && Math.abs(h.v) < 9) m.position.y += Math.sin(fase * 0.5) * 0.25; void giro; if (h.estado === EST.ABATIDO) { if (h.caiu && !h.terra) { const ta = h.tAgua || 0; m.rotation.x = -0.18 - Math.min(0.7, ta * 0.06); m.rotation.z = 0.32 + Math.sin(ta * 0.9) * 0.05; } else { m.rotation.y += t * 4; m.rotation.z = 0.6; } } /* v1.2.50: no mar para de girar, aderna e afunda de bico */

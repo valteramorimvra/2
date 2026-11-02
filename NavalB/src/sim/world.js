@@ -27,7 +27,7 @@ import { instalaDefesa, instalaNavio, passoCiws5, passoLaser, passoSam, passoSam
 
 import { instalaNuclear, passoNuclear, lancaNuclear, comandoNuclear } from './nuclear.js'; import { criaTrafego, passoTrafego, acertaCivil, danoCivil } from './trafego.js'; /* v1.2.46 */
 import { passoHidros, comandoHidro } from './hidroaviao.js'; /* v1.2.39: hidroaviões */
-import { passoMissil1231, lancaMissilNuclear1231 } from './missilNuclear1231.js'; import { instalaAmorim, lancaMissilAmorim, passoLateral, passoAutosAmorim } from './amorim.js'; /* v1.3.00 */ /* v1.2.31 */ /* v1.2.26: bombardeiro + bomba atômica */
+import { passoMissil1231, lancaMissilNuclear1231 } from './missilNuclear1231.js'; import { instalaAmorim, lancaMissilAmorim, passoLateral, passoAutosAmorim } from './amorim.js'; /* v1.3.00 */ import { passoVtolAmorim, comandoVtol } from './vtolAmorim.js'; /* v1.3.04 */ /* v1.2.31 */ /* v1.2.26: bombardeiro + bomba atômica */
 export const DT = 1 / 60;
 export const PISCA_BOT = 0.2;
 /** v1.2.7 lança-granadas: velocidade de boca fixa (alcance máx. a 45°) e elevação de tiro baixo para a distância */
@@ -117,6 +117,7 @@ export class Sim {
       case 'uav': case 'esquadrilha': case 'heliLanca': case 'heliCtrl': case 'heliFlare': case 'aeroReparo': case 'iaNavio': case 'heliFogo': case 'heliThr': case 'heliVolta': case 'controle': case 'engajar': comandoAereo(this, n, cmd); break; /* v1.2.67: engajar */
       case 'nuclear': (n.C.missilNuclear ? lancaMissilNuclear1231 : lancaNuclear)(this, n, cmd); break; /* v1.2.31: míssil nuclear de navio */ /* v1.2.26 */
       case 'hidro': case 'hdPil': case 'hdMissil': case 'hdTorp': case 'hdFlare': case 'hdVolta': comandoHidro(this, n, cmd); break; /* v1.2.39 */
+      case 'vtArma': comandoVtol(this, n, cmd); break; /* v1.3.04: botões AAM/ASM/TORP/NUKE dos caças do Destróier Amorim */
       case 'nkArIni': case 'nkPiloto': case 'nkEspera': case 'nkArAr': case 'nkFlare': case 'nkMissil': case 'nkVolta': case 'nkCtl': case 'nkThr': case 'nkMiraSolo': case 'nkTrava': case 'nkSolta': case 'nkEjeta': case 'nkPorta': case 'nkReparo': if (cmd.t === 'nkSolta' && n.hd && n.hd.pil && n.hd.noAr >= 0) { comandoHidro(this, n, cmd); break; } comandoNuclear(this, n, cmd); break; /* v1.2.79: BASE */
     }
   }
@@ -127,7 +128,7 @@ export class Sim {
     const dt = DT; this.tick++; this.t += dt;
     const L = this.ordemTick(); /* v1.2.20: ORDEM NEUTRA — a cada tick a ordem de processamento dos navios se inverte (antes o azul sempre ia primeiro e o vermelho, por último, reagia ao estado mais novo: vantagem sistemática do vermelho em bot × bot) */
     for (const n of L) this.passoNavio(n, dt);
-    this.passoGranadas(dt); this.passoMisseis(dt); passoSams(this, dt); this.passoTorpedos(dt); passoAereo(this, dt); passoTurbulencia(this, dt); /* v1.2.53 */ passoMissil1231(this, dt); passoNuclear(this, dt); passoHidros(this, dt); if (!this.trafego && this.trafegoOn !== false && this.tick === 1) this.trafego = criaTrafego(this, this._seedTr || 1); passoTrafego(this, dt); /* v1.2.46: tráfego civil */ this.passoIscas(dt); passoAmeacas(this, dt);
+    this.passoGranadas(dt); this.passoMisseis(dt); passoSams(this, dt); this.passoTorpedos(dt); passoAereo(this, dt); passoVtolAmorim(this, dt); /* v1.3.04: caças Acauã/Uiraçu (código próprio) */ passoTurbulencia(this, dt); /* v1.2.53 */ passoMissil1231(this, dt); passoNuclear(this, dt); passoHidros(this, dt); if (!this.trafego && this.trafegoOn !== false && this.tick === 1) this.trafego = criaTrafego(this, this._seedTr || 1); passoTrafego(this, dt); /* v1.2.46: tráfego civil */ this.passoIscas(dt); passoAmeacas(this, dt);
     for (const n of L) { passoCiws5(this, n, dt); passoLaser(this, n, dt); passoSam(this, n, dt); passoA30(this, n, dt); }
     if (this.tick % 15 === 0) this.sensores();
     for (const n of L) passoArmas5(this, n, dt);

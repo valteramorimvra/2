@@ -9,7 +9,8 @@ import { VTOL_GEO } from './vtolDados.js';
 let _M = null;
 function mats() {
   if (_M) return _M; const S = (o) => new THREE.MeshStandardMaterial(Object.assign({ side: THREE.DoubleSide, vertexColors: true }, o));
-  _M = { metal: S({ roughness: 0.24, metalness: 0.85, envMapIntensity: 1.4 }), fosco: S({ roughness: 0.8, metalness: 0.1, envMapIntensity: 0.4 }),
+  _M = { pisca_estrobo: new THREE.MeshStandardMaterial({ color: '#ffffff', emissive: '#ffffff', emissiveIntensity: 0, roughness: 0.2, metalness: 0.3 }), pisca_anti: new THREE.MeshStandardMaterial({ color: '#ff1a1a', emissive: '#ff1a1a', emissiveIntensity: 0, roughness: 0.2, metalness: 0.3 }), /* v1.3.04: luzes que PISCAM (o render muda só a intensidade) */
+    metal: S({ roughness: 0.24, metalness: 0.85, envMapIntensity: 1.4 }), fosco: S({ roughness: 0.8, metalness: 0.1, envMapIntensity: 0.4 }),
     vidro: S({ roughness: 0.08, metalness: 0.4, envMapIntensity: 1.3 }), vidroFume: S({ roughness: 0.05, metalness: 0.3, envMapIntensity: 1.5, transparent: true, opacity: 0.4, depthWrite: false }),
     ouro: S({ roughness: 0.06, metalness: 1, envMapIntensity: 1.8 }), laser: S({ roughness: 0.2, metalness: 0.3, emissive: '#40f0ff', emissiveIntensity: 0.6 }) };
   return _M;
@@ -29,12 +30,17 @@ function geometrias(lista) {
 function poe(grupo, lista) { const M = mats(); for (const [m, g] of geometrias(lista)) { const x = new THREE.Mesh(g, m.startsWith('luz_') ? matLuz(m.slice(4)) : M[m] || M.metal); x.castShadow = true; x.receiveShadow = true; if (m === 'vidroFume') x.renderOrder = 2; grupo.add(x); } return grupo; }
 
 export const ehVtolAmorim = (id) => id === 'acaua' || id === 'uiracu';
+export const matsPisca = () => { const M = mats(); return { estrobo: M.pisca_estrobo, anti: M.pisca_anti }; };
 /** Monta o caça (id 'acaua' | 'uiracu'). userData.estOrd = estações de míssil na ordem de disparo (o render esconde as já usadas). */
 export function montaVtol(id) {
   const D = VTOL_GEO[id], g = new THREE.Group(); g.name = 'vtol_' + id; poe(g, D.base);
   const est = {}; for (const [k, L] of Object.entries(D.est)) { const e = new THREE.Group(); e.name = k; poe(e, L); g.add(e); est[k] = e; }
   g.userData.vtol = id; g.userData.estOrd = D.ordem.map((k) => est[k]).filter(Boolean); g.userData.fumacaVtol = D.fumaca; g.userData._munV = -1;
+  g.userData.estTipo = {}; for (const t of ['aam', 'asm', 'torp', 'nuke']) g.userData.estTipo[t] = (D.ordemTipo[t] || []).map((k) => est[k]).filter(Boolean); g.userData._vtV = [-1, -1, -1, -1]; g.userData.lasersP = D.lasers; /* v1.3.04 */
   return g;
 }
 /** Esconde as estações já disparadas (mun = munição que resta; total = munição cheia). Só mexe quando o número muda (zero GC). */
+/** v1.3.04: estações por TIPO (AAM/ASM/TORP/NUKE) conforme a munição que resta em h.vt — a disparada some (pilone vazio), ao rearmar volta. */
+const TIPOS = ['aam', 'asm', 'torp', 'nuke'];
+export function estacoesVtPorTipo(g, vt) { const U = g.userData; if (!U.estTipo || !vt) return; for (let t = 0; t < 4; t++) { const k = TIPOS[t], resta = vt[k] | 0; if (U._vtV[t] === resta) continue; U._vtV[t] = resta; const L = U.estTipo[k], usadas = Math.max(0, L.length - resta); for (let i = 0; i < L.length; i++) L[i].visible = i >= usadas; } }
 export function estacoesVtol(g, mun, total) { const U = g.userData; if (!U.estOrd || U._munV === mun) return; U._munV = mun; const usadas = Math.max(0, Math.min(U.estOrd.length, (total | 0) - (mun | 0))); for (let i = 0; i < U.estOrd.length; i++) U.estOrd[i].visible = i >= usadas; }
