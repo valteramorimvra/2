@@ -99,7 +99,7 @@ function aplicaCmd1273(q, cmd) {
 function slotFila(L, ala, aero, o) {
   const fx = Math.sin(L.rumo), fz = -Math.cos(L.rumo), rx = Math.cos(L.rumo), rz = Math.sin(L.rumo);
   let back, lat, dy;
-  if (aero) { const pair = (ala + 1) >> 1, side = (ala & 1) ? 1 : -1; back = FILA.passo * pair; lat = 26 * pair * side; dy = FILA.degrau * pair * 0.4; }
+  if (aero && !L.vtol) { const pair = (ala + 1) >> 1, /* v1.3.09: caças do Destróier Amorim usam a FILA do Urubu-rei (else) */ side = (ala & 1) ? 1 : -1; back = FILA.passo * pair; lat = 26 * pair * side; dy = FILA.degrau * pair * 0.4; }
   else { back = FILA.passo * ala; lat = 0; dy = FILA.degrau * ala; }
   o.x = L.x - fx * back + rx * lat; o.z = L.z - fz * back + rz * lat; o.y = Math.max(150, L.y + dy); return o;
 }

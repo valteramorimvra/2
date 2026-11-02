@@ -73,3 +73,17 @@ Resultado:
 | Botões dos caças: LANÇAR = NUKE · AR-AR = AAM · MÍSSIL = ASM · TORP; munição somada, cheia a cada decolagem; 7 s e 12 s | VERIFICADO |
 | Vida: destróier 5.000, cada caça 2.500 | VERIFICADO |
 | O Urubu-rei do Lençóis continua igual | VERIFICADO |
+
+## 1.3.09 — formação
+
+Única mudança pedida:
+- Depois da formação feita, o Acauã (da frente, abaixo) fica na posição do 1º da fila do Urubu-rei. O Uiraçu fica na posição do ÚLTIMO (74 m atrás e 20 m acima). O meio fica vazio.
+- A câmera é a mesma do Urubu-rei: atrás do último, sem a escala de tamanho usada nas outras aeronaves. A velocidade também é a do Urubu-rei.
+
+Linhas alteradas:
+- `src/sim/nuclear.js` (`slotFila`: `aero && !L.vtol`).
+- `src/modernNavalCombat3D.js` (`nkCam`: `&& !q.vtol`).
+- `src/sim/vtolAmorim.js` (`w.ala = 2`).
+
+Estado:
+- VERIFICADO na simulação: 20 m acima; a câmera segue o último; velocidade 255/252 m/s.

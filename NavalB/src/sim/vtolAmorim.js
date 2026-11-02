@@ -32,7 +32,7 @@ function estacao(E, tipo) { const D = VTOL_SIM[E.id], tot = D.muni[tipo], k = to
 /** comando 'nuclear' do Destróier Amorim = DECOLAR (fluxo original da aeronave independente): Acauã líder + Uiraçu ala, munição cheia. */
 export function lancaVtol(sim, n, cmd) { const A = instalaVtol(n); n.nkAero = 'acaua'; const bk = sim.nkBotAtomica; if (n.papel !== 'jogador') sim.nkBotAtomica = 1; /* os caças NÃO levam bomba; só libera a decolagem do computador */
   const ok = lancaNuclear(sim, n, cmd); sim.nkBotAtomica = bk; if (!ok) return 0; const q = sim.nukes[n.nk.noAr]; arma(q, A.acaua);
-  let ala = 0; for (const w of sim.nukes) { if (w.lider !== q.idx || w.ativo || !(w.espDec > 0)) continue; if (!ala) { ala = 1; w.aero = 'uiracu'; arma(w, A.uiracu); } else { w.espDec = 0; w.lider = -1; } } /* o navio tem 2 caças: o Uiraçu é o único ala */
+  let ala = 0; for (const w of sim.nukes) { if (w.lider !== q.idx || w.ativo || !(w.espDec > 0)) continue; if (!ala) { ala = 1; w.aero = 'uiracu'; w.ala = 2; arma(w, A.uiracu); } /* v1.3.09: Uiraçu na vaga do ÚLTIMO da fila do Urubu-rei (o meio fica vazio) */ else { w.espDec = 0; w.lider = -1; } } /* o navio tem 2 caças: o Uiraçu é o único ala */
   return 1; }
 function arma(q, E) { enche(E); q.vidaMax = q.vida = VIDA_VT; q.H = null; /* sem perfil próprio: números de voo do Urubu-rei */ q.vtol = 1; q.vtId = E.id; q.semBomba = 1; q.cargas = 0; q.misseis = E.asm; q.misAlc = VT.alcAsm; q.misDano = VT.danoAsm; q.misNome = 'ASM'; q.tMis = 1e6; q.aa = E.aam; q.tAA = 0;
   E.q = q.idx; E.noAr = 1; E.abat = 0; }
