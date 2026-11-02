@@ -176,3 +176,6 @@ h1, h2, h3 { margin: 0; letter-spacing: .04em; } h2 { font-size: 22px; margin: 2
 .mapa.mini.foto { background: linear-gradient(90deg, rgba(7,11,19,.86) 0 34%, rgba(7,11,19,.38) 64%, rgba(7,11,19,.08)), var(--foto) center / cover no-repeat, #0a2c4e; }
 .mapa.mini.foto::after { content: ''; position: absolute; right: 6px; bottom: 6px; width: 44px; height: 44px; border-radius: 6px; background: var(--mini) center / cover no-repeat; border: 1px solid rgba(255,255,255,.35); box-shadow: 0 2px 6px rgba(0,0,0,.5); opacity: .92; pointer-events: none; }
 @media (max-height: 400px) { .mapa.mini.foto::after { width: 34px; height: 34px; } }
+
+/* v1.3.01: camuflagem bloqueada (navio de pintura fixa) */
+button.trava { position: relative; opacity: .5; filter: grayscale(.7); cursor: not-allowed; } button.trava .trava-ic { position: absolute; top: 3px; right: 4px; text-decoration: none; font-size: 13px; filter: none; opacity: 1; }

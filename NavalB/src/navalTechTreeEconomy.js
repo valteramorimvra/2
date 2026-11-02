@@ -223,7 +223,7 @@ export class Economia {
   enfeiteDe(k) { const f = (this.e.enfeite || {})[k] || {}; return { bandeira: f.bandeira || CLASSES[k].nacao || 'BRA', gala: !!f.gala, faixa: !!f.faixa, nome: f.nome || NOMES_PADRAO[k] || null }; } /* v1.2.16 item 34: nome fictício padrão */
   escolherEnfeite(k, o) { this.e.enfeite = this.e.enfeite || {}; this.e.enfeite[k] = Object.assign(this.enfeiteDe(k), o); this.save.salva(); return this.enfeiteDe(k); }
   pinturaDe(k) { const p = this.e.pintura[k]; return p && this.possuiPintura(p) ? p : CLASSES[k].pintura || 'cinza_naval'; }
-  escolherPintura(k, p) { if (p !== CLASSES[k].pintura && !this.possuiPintura(p)) return false; this.e.pintura[k] = p; this.save.salva(); return true; }
+  escolherPintura(k, p) { if (CLASSES[k].pinturaFixa && p !== CLASSES[k].pintura) return false; /* v1.3.01 */ if (p !== CLASSES[k].pintura && !this.possuiPintura(p)) return false; this.e.pintura[k] = p; this.save.salva(); return true; }
   /** Lotes de munição/míssil/isca especiais (consumidos ao zarpar). */
   comprarLote(tipo, n = 1) { const c = custoLote(tipo); if (!c) return false; const moeda = c.prata ? 'prata' : 'ouro'; const custo = (c.prata || c.ouro) * n; if (this.e[moeda] < custo) return false; this.e[moeda] -= custo; this.e.lotes[tipo] = (this.e.lotes[tipo] || 0) + n; this.save.salva(); return true; }
   /** Loadout efetivo para uma partida: gasta lotes; se faltar lote, volta ao padrão. Retorna os modificadores para a simulação. */

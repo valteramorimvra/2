@@ -408,3 +408,46 @@
 @media (prefers-reduced-motion: reduce) { .tela-arvore .ar-card { animation: none !important; } }
 .tela-inicio .mw-passe-ouro .mw-ct { padding-right: 40px; }
 @media (max-height: 420px) { .tela-inicio .mw-passe-ouro .mw-ct { padding-right: 32px; } }
+
+/* v1.3.01 (Valter): abertura das caixas — a caixa treme, abre com clarão e revela o prêmio (já resgatado) */
+.mk-premio .mk-bau { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.mk-premio .mk-bau-img { width: min(46vw, 260px); aspect-ratio: 1; background: center / contain no-repeat; filter: drop-shadow(0 10px 24px rgba(0,0,0,.6)); }
+.mk-premio .mk-bau-luz { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle, #fff 0, var(--cx) 40%, transparent 70%); opacity: 0; }
+.mk-premio.abrindo .mk-pcx { opacity: 0; transform: scale(.6); }
+.mk-premio.abrindo .mk-bau-img { animation: bauTreme 1.1s ease-in both; }
+.mk-premio.aberta .mk-bau-img { animation: bauSome .45s ease-out forwards; }
+.mk-premio.aberta .mk-bau-luz { animation: bauLuz .7s ease-out forwards; }
+.mk-premio.aberta .mk-pcx { animation: bauRevela .45s cubic-bezier(.2,1.4,.4,1) both; }
+.mk-premio .mk-pcx { transition: opacity .2s; }
+.mk-resg { font-style: normal; font-size: 11px; font-weight: 800; letter-spacing: .14em; color: #4ade80; }
+@keyframes bauTreme { 0% { transform: scale(.7); } 20% { transform: scale(1) rotate(0); } 35% { transform: rotate(-4deg); } 45% { transform: rotate(4deg); } 55% { transform: rotate(-6deg) scale(1.03); } 65% { transform: rotate(6deg) scale(1.05); } 75% { transform: rotate(-8deg) scale(1.07); } 85% { transform: rotate(8deg) scale(1.1); } 100% { transform: rotate(0) scale(1.14); } }
+@keyframes bauSome { to { transform: scale(1.5); opacity: 0; } }
+@keyframes bauLuz { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(80); } }
+@keyframes bauRevela { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .mk-premio.abrindo .mk-bau-img, .mk-premio.aberta .mk-bau-img, .mk-premio.aberta .mk-pcx, .mk-premio.aberta .mk-bau-luz { animation-duration: .01s; } }
+
+/* v1.3.01 (Valter): CÂMBIO — moedas desenhadas (ouro, prata, Nexos), saldo de cada lado, taxa e botões com as moedas */
+.mk-cambio.cbx { display: grid; grid-template-columns: minmax(0, 1fr); max-width: 620px; width: 100%; gap: 12px; align-content: start; }
+.cb-card { display: grid; gap: 12px; padding: 14px; border-radius: 10px; background: linear-gradient(180deg, rgba(16,24,34,.92), rgba(8,13,20,.94)); border: 1px solid rgba(212,175,55,.35); box-shadow: 0 8px 24px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.05); }
+.cb-par { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+.cb-lado { display: grid; justify-items: center; gap: 3px; text-align: center; } .cb-lado b { font-size: 13px; color: #f1f5f9; letter-spacing: .04em; } .cb-lado small { font-size: 10.5px; color: #94a3b8; font-variant-numeric: tabular-nums; }
+.cb-seta { display: grid; justify-items: center; gap: 1px; color: #f3d77a; } .cb-seta b { font-size: 13px; font-variant-numeric: tabular-nums; } .cb-seta i { font-style: normal; font-size: 22px; line-height: 1; } .cb-seta small { font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: #94a3b8; }
+.cb-q { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.cb-bt { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 44px; padding: 6px 8px; border-radius: 8px; border: 1px solid rgba(148,197,230,.3); background: rgba(14,26,40,.9); color: #f1f5f9; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cb-bt span { display: inline-flex; align-items: center; gap: 4px; } .cb-bt > i { font-style: normal; color: #f3d77a; }
+.cb-bt:not(:disabled):active { transform: scale(.97); } .cb-bt:disabled { opacity: .4; }
+.cb-moeda { display: inline-block; width: 16px; height: 16px; border-radius: 50%; flex: 0 0 auto; box-shadow: inset 0 -2px 2px rgba(0,0,0,.35), inset 0 1px 1px rgba(255,255,255,.6), 0 1px 2px rgba(0,0,0,.5); position: relative; }
+.cb-moeda.g { width: 46px; height: 46px; box-shadow: inset 0 -4px 6px rgba(0,0,0,.35), inset 0 3px 4px rgba(255,255,255,.55), 0 4px 10px rgba(0,0,0,.5); }
+.cb-moeda::after { content: ''; position: absolute; inset: 18%; border-radius: 50%; border: 1px solid rgba(255,255,255,.45); }
+.cb-ouro { background: radial-gradient(circle at 35% 30%, #fff4c2 0, #f5cf5a 30%, #c8961e 70%, #7a5a10 100%); }
+.cb-prata { background: radial-gradient(circle at 35% 30%, #ffffff 0, #dfe5ea 30%, #9aa5ae 72%, #59636c 100%); }
+.cb-nexos { border-radius: 4px; transform: rotate(45deg) scale(.86); background: linear-gradient(135deg, #b8fff4 0, #2dd4bf 40%, #0f766e 100%); } .cb-nexos::after { inset: 22%; border-radius: 2px; }
+
+/* v1.3.01 (Valter): árvore em PADRÃO MILITAR — linhas por classe de casco, designação naval em estêncil, nós em sequência (sem espaços) e nível no quadro */
+.tela-arvore .ar-mil .ar-linha { grid-template-columns: 112px max-content !important; }
+.tela-arvore .ar-mil .ar-fila { display: flex; flex-wrap: nowrap; gap: 6px; align-items: center; padding: 7px 10px; position: relative; background: linear-gradient(180deg, transparent calc(50% - 1px), rgba(246,211,107,.5) calc(50% - 1px), rgba(246,211,107,.5) calc(50% + 1px), transparent calc(50% + 1px)); }
+.tela-arvore .ar-mil .ar-des { font-style: normal; font-family: 'Saira Stencil One', 'Arial Black', Impact, sans-serif; font-size: 17px; font-weight: 900; letter-spacing: .12em; color: #f3d77a; text-shadow: 0 1px 0 #000, 0 0 8px rgba(243,215,122,.35); line-height: 1; }
+.tela-arvore .ar-mil .ar-card .ar-nv { position: absolute; top: 3px; left: 3px; z-index: 2; font-style: normal; font-size: 7.5px; font-weight: 900; letter-spacing: .1em; padding: 1px 4px; border-radius: 2px; background: rgba(6,10,16,.82); color: #e8eef3; border: 1px solid rgba(243,215,122,.55); }
+.tela-arvore .ar-mil .ar-card .ar-nv.ld { color: #ddd6fe; border-color: rgba(167,139,250,.8); } .tela-arvore .ar-mil .ar-card .ar-nv.sl { color: #fde68a; border-color: rgba(253,230,138,.9); }
+.tela-arvore .ar-mil .ar-cel { display: none; }
+.cbx .cb-card { min-width: 0; overflow: hidden; } .cbx .cb-q > * { min-width: 0; }

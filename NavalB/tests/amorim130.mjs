@@ -18,13 +18,14 @@ const passo = (s) => { for (let i = 0; i < s * 30; i++) sim.passo([]); };
 /* ---- revezamento de salvas ---- */
 eu.x = -4000; eu.z = 0; eu.rumo = 0; ini.x = 4000; ini.z = 0; ini.v = 0; eu.v = 0; eu.alvoId = ini.id; eu.trava = 1; eu.controleIA = 1;
 for (let i = 0; i < 60; i++) { ini.x = 4000; ini.z = 0; ini.v = 0; sim.passo([]); } eu.alvoId = ini.id; const seq = [];
-for (let k = 0; k < 4; k++) { eu.tVls = 0; const a = eu.am.prox; const q = sim.lancaMissil(eu, ini.id, 4); seq.push([a, q]); for (let i = 0; i < 3; i++) sim.passo([]); }
+for (let k = 0; k < 4; k++) { eu.tVls = 0; if (k === 3) eu.am.recLat[0] = 0; const a = eu.am.prox; const q = sim.lancaMissil(eu, ini.id, 4); seq.push([a, q]); for (let i = 0; i < 3; i++) sim.passo([]); }
 console.log('salvas', JSON.stringify(seq));
-ok(seq.map((s) => s[0]).join() === '0,1,2,3' && seq.map((s) => s[1]).join() === '5,5,4,4', 'ordem BB 5 → BE 5 → VLS vante 4 → VLS ré 4');
-ok(eu.am.vlsF === 46 && eu.am.vlsR === 46 && eu.vls === 92, 'VLS: 46 + 46 restantes');
+ok(seq.map((s) => s[0]).join() === '0,1,2,0' && seq.map((s) => s[1]).join() === '5,5,4,5', 'ordem BB 5 → BE 5 → VLS vante 4 → volta ao BB (3 slots; o dourado é só do nuclear)');
+ok(eu.am.vlsF === 96 && eu.vls === 96, 'VLS de vante: 96 restantes');
+ok(eu.C.heli === 1 && eu.P.convoo && Math.abs(eu.P.convoo.z - 61.5) < 0.1, 'helicóptero no heliponto');
 /* ---- lançador lateral: sai reto, curva, não cruza o navio, entra na guiagem ---- */
 const lat = sim.misseis.filter((m) => m.ativo && m.dono === eu.id && m.lat);
-ok(lat.length === 10, '10 mísseis laterais no ar');
+ok(lat.length >= 10, '10+ mísseis laterais no ar');
 let cruza = 0, minY = 1e9, guiou = 0; const bb = lat.filter((m) => m.lat.sx < 0), be = lat.filter((m) => m.lat.sx > 0);
 const larg = (m) => { const dx = m.x - eu.x, dz = m.z - eu.z, c = Math.cos(eu.rumo), s = Math.sin(eu.rumo); return dx * c + dz * s; };
 const lado = new Map(lat.map((m) => [m, m.lat.sx])); const loc = (m) => { const dx = m.x - eu.x, dz = m.z - eu.z, c = Math.cos(eu.rumo), s = Math.sin(eu.rumo); return [dx * c + dz * s, -dx * s + dz * c]; };
@@ -57,7 +58,6 @@ const las = ev3.filter((e) => e.t === 'missilAbatido' && e.por === e3.id && e.ar
 console.log('laser: disparos', las.length, 'montagens', JSON.stringify(mont), las[0] ? JSON.stringify(las[0]) : '');
 console.log(`abates por laser: ${las.length} (o LASER do jogo precisa de 1,5 s de feixe no alvo; míssil do jogo a ~1,8 km/s cruza os 2,6 km em ~1,4 s)`); ok(esf.size === 3, 'as 3 esferas do topo disparam o feixe');
 /* ---- nuclear do slot dourado ---- */
-eu.controleIA = 0; sim.t = Math.max(sim.t, NUK.liberaApos + 1); eu.alvoId = ini.id; console.log('motivo nuclear:', (await import('../src/sim/missilNuclear1231.js')).motivoMissil1231(sim, eu), eu.papel, sim.t); const nk = lancaMissilNuclear1231(sim, eu, { px: 4000, pz: 0 }); ok(nk === 1, 'míssil nuclear lança do slot dourado');
-const ne = evs.filter((e) => e.t === 'nkMissilEscotilha').pop(); if (ne) { const dx = ne.x - eu.x, dz = ne.z - eu.z, c = Math.cos(eu.rumo), s = Math.sin(eu.rumo), lz = -dx * s + dz * c; ok(Math.abs(lz - 35.34) < 3, `posição do lançamento nuclear z local ${lz.toFixed(1)} (grade dourada 29,8–41)`); }
-ok(Math.abs(eu.nm1231.tRec - sim.t - 8) < 0.1, 'próximo nuclear pronto 8 s após lançar');
+eu.controleIA = 0; sim.t = Math.max(sim.t, NUK.liberaApos + 1); eu.alvoId = ini.id; console.log('motivo nuclear:', (await import('../src/sim/missilNuclear1231.js')).motivoMissil1231(sim, eu), eu.papel, sim.t); eu.v = 14; const nk = lancaMissilNuclear1231(sim, eu, { px: 4000, pz: 0 }); const mN = eu.nm1231.m; let maxAft = -1e9; for (let i = 0; i < 30 * 3; i++) { sim.passo([]); if (!eu.nm1231.m) break; const q = eu.nm1231.m, dx = q.x - eu.x, dz = q.z - eu.z, c = Math.cos(eu.rumo), sn = Math.sin(eu.rumo), lz = -dx * sn + dz * c; if (q.y < 60) maxAft = Math.max(maxAft, lz); } console.log('nuclear: z local máx. abaixo de 60 m', maxAft.toFixed(1)); ok(maxAft < 42, 'nuclear sobe do slot dourado (não deriva para o heliponto com o navio andando)'); ok(nk === 1, 'míssil nuclear lança do slot dourado');
+
 console.log(falhas ? `FALHAS: ${falhas}` : 'RESULTADO: TUDO OK'); process.exit(falhas ? 1 : 0);

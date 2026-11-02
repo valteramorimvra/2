@@ -31,7 +31,7 @@ function achaPorto(T, R) { const lim = T.tam * 0.42; let melhor = null;
 function pontoBorda(T, R) { const lim = T.tam * 0.47; for (let k = 0; k < 200; k++) { const a = R.next() * Math.PI * 2, x = Math.cos(a) * lim, z = Math.sin(a) * lim; if (agua(T, x, z, 15)) return { x: clamp(x, -lim, lim), z: clamp(z, -lim, lim) }; } return { x: lim * 0.9, z: 0 }; }
 
 export function criaTrafego(sim, seed = 1) { const T = sim.T, R = new Rng((seed * 7919 + 101) >>> 0); const tr = { R, civis: [], porto: achaPorto(T, R), t: 0, eventos: 0 };
-  const nM = T.tam > 13000 ? 7 : 6; let id = 0;
+  const nM = T.tam > 13000 ? 3 : 2; let id = 0; /* v1.3.01 (Valter): menos mercantes civis (eram 6–7) */
   const novo = (tipo, x, z, rumo, extra = {}) => { const F = TIPOS_CIVIS[tipo]; const lb = LIBRES[Math.floor(R.next() * LIBRES.length)]; const c = Object.assign({ id: id++, tipo, F, libre: tipo === 'rebocador' ? (R.next() < 0.5 ? LIBRES[2] : LIBRES[1]) : lb, nome: NOMES[Math.floor(R.next() * NOMES.length)], x, z, rumo, v: F.v * 0.6, vida: F.vida, fogo: 0, afunda: 0, adorno: 0, adV: 0, morto: 0, tMorto: 0, rota: null, i: 0, espera: 0, empurrao: { x: 0, z: 0 }, escolta: -1 }, extra); tr.civis.push(c); return c; };
   for (let k = 0; k < nM; k++) { const tipo = ['conteineiro', 'petroleiro', 'graneleiro', 'conteineiro'][k % 4]; const a = pontoBorda(T, R), b = pontoBorda(T, R); const vaiPorto = tr.porto && k % 2 === 0;
     const rota = vaiPorto ? [a, tr.porto, a] : [a, b]; const f = 0.15 + R.next() * 0.6; const x = a.x + ((vaiPorto ? tr.porto.x : b.x) - a.x) * f, z = a.z + ((vaiPorto ? tr.porto.z : b.z) - a.z) * f;

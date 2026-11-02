@@ -133,7 +133,9 @@ function matPlaca(nome) { let m = _PLACA.get(nome); if (m || typeof document ===
   const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
   m = new THREE.MeshStandardMaterial({ map: tex, color: '#ffffff', roughness: 0.42, metalness: 0.35, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
   _PLACA.set(nome, m); return m; }
+const PLACAS_NOME = false;
 export function poePlacaPais(g, camo) { if (!g || typeof document === 'undefined') return g; const velhas = []; g.traverse((o) => { if (o.userData && o.userData.placa) velhas.push(o); }); for (const o of velhas) if (o.parent) o.parent.remove(o);
+  if (!PLACAS_NOME) return g; /* v1.3.01 (Valter): sem os quadros com o nome da camuflagem nas aeronaves */
   const K = CAMO_AEREO[camo] || CAMO_AEREO.padrao; const nome = String((K && (K.pais || K.nome)) || 'BRASIL').toUpperCase(); const mat = matPlaca(nome); if (!mat) return g;
   g.updateMatrixWorld(true); const invG = new THREE.Matrix4().copy(g.matrixWorld).invert(); const box = new THREE.Box3(), tmp = new THREE.Box3(), mw = new THREE.Matrix4(); let ok = false;
   g.traverse((o) => { if (!o.isMesh || !o.geometry || (o.userData && o.userData.placa)) return; if (/rotor|disco|helice|pas|luz/i.test(o.name || '')) return; for (let q = o; q && q !== g; q = q.parent) if (!q.visible) return; /* v1.3.00: peça OCULTA não entra na medida (no Gavião e no Harpia a placa do país ia parar a 55 m do avião) */ if (!o.geometry.boundingBox) o.geometry.computeBoundingBox(); mw.multiplyMatrices(invG, o.matrixWorld); tmp.copy(o.geometry.boundingBox).applyMatrix4(mw); if (!ok) { box.copy(tmp); ok = true; } else box.union(tmp); });

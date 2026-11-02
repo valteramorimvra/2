@@ -32,9 +32,11 @@ export function lancaMissilNuclear1231(sim, n, cmd) {
 const _d = { x: 0, y: 0, z: 0 }, _b = { x: 0, y: 0, z: 0 };
 function termina(sim, n, k, m, det) { k.voando = 0; k.m = null; if (n.papel !== 'jogador') k.tRec = sim.t + NUK.tRecargaPouso; /* v1.2.33: jogador conta 8 s do lançamento */ /* recarga 25 s a contar da detonação (ou da perda) */ if (!det) k.perdidas++; }
 function passoUm(sim, n, k, dt) { const m = k.m; m.px = m.x; m.py = m.y; m.pz = m.z; m.t += dt;
-  if (m.fase === 0) { m.esc = Math.min(1, m.t / MISS.tAbre); /* abre a escotilha */ if (n.morto) { termina(sim, n, k, m, 0); return; } if (m.t >= MISS.tAbre) { m.fase = 1; m.t = 0; m.v = MISS.v0; sim.evento({ t: 'nkMissilLanca', id: n.id, x: m.x, y: m.y, z: m.z }); } return; }
+  if (m.fase === 0) { m.esc = Math.min(1, m.t / MISS.tAbre); /* abre a escotilha */ if (n.morto) { termina(sim, n, k, m, 0); return; }
+    if (n.C.amorim) { const nk = n.P.nuke; sim.mundo(n, nk.x, nk.y + 0.3, nk.z, _o); m.x = m.px = m.x0 = _o.x; m.y = m.py = m.y0 = _o.y; m.z = m.pz = m.z0 = _o.z; montaCurva(m, m.ax, m.az); m.vnx = Math.sin(n.rumo) * (n.v || 0); m.vnz = -Math.cos(n.rumo) * (n.v || 0); } /* v1.3.00: Amorim — o míssil fica NO slot dourado enquanto a escotilha abre (o navio anda) */ if (m.t >= MISS.tAbre) { m.fase = 1; m.t = 0; m.v = MISS.v0; sim.evento({ t: 'nkMissilLanca', id: n.id, x: m.x, y: m.y, z: m.z }); } return; }
   if (m.fase === 1) { m.esc = Math.max(0, 1 - Math.max(0, m.t - 0.8) / MISS.tFecha); /* fecha atrás de si */ /* o ponto de saída acompanha o navio só durante a abertura; depois o míssil já está livre */
     if (m.u < MISS.travaU) { const a = sim.navios[m.alvo]; if (a && !a.morto) { montaCurva(m, a.x, a.z); } }
+    if (m.vnx != null && m.t < 3) { const f = 1 - m.t / 3, ex = m.vnx * f * dt, ez = m.vnz * f * dt; for (const q of [m.p0, m.p1]) { q.x += ex; q.z += ez; } } /* v1.3.00: Amorim — sai com a velocidade do navio (inércia), não fica para trás sobre o heliponto */
     m.v = Math.min(MISS.vCruz, m.v + MISS.aceleracao * dt); dBez(m.p0, m.p1, m.p2, m.p3, m.u, _d); const sp = Math.hypot(_d.x, _d.y, _d.z) || 1; m.u = Math.min(1, m.u + m.v * dt / sp);
     lig(m.p0, m.p1, m.p2, m.p3, m.u, _b); m.x = _b.x; m.y = _b.y; m.z = _b.z; dBez(m.p0, m.p1, m.p2, m.p3, m.u, _d); const h = Math.hypot(_d.x, _d.z); m.pitch = Math.atan2(_d.y, h); m.rumo = Math.atan2(_d.z, _d.x); m.vx = _d.x / sp * m.v; m.vy = _d.y / sp * m.v; m.vz = _d.z / sp * m.v;
     if (m.u >= 1) m.fase = 2; return; }

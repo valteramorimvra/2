@@ -5,6 +5,7 @@
 // Desempenho: casco fixo = 1 malha por material (8 materiais); geometria decodificada UMA vez e compartilhada entre clones.
 import * as THREE from 'three';
 import { AMORIM_GEO } from './amorimDados.js';
+import { texBandeira } from './camuflagem.js';
 
 let _MAT = null;
 function mats() {
@@ -78,6 +79,9 @@ export function montaModeloAmorim() {
   /* nome no casco */
   { const t = texNome(); if (t) { const m = new THREE.MeshStandardMaterial({ map: t, transparent: true, alphaTest: 0.4, roughness: 0.35, metalness: 0.35, polygonOffset: true, polygonOffsetFactor: -2, depthWrite: false });
       for (const sx of [-1, 1]) { const pl = new THREE.Mesh(new THREE.PlaneGeometry(9, 1.7), m); pl.position.set(sx * 9.47, 5.55, -44); pl.rotation.y = sx * Math.PI / 2; pl.name = 'nomeAmorim'; g.add(pl); } } }
+  /* v1.3.01: pau da bandeira na popa + bandeira 'flamula' (a bandeira escolhida pelo jogador troca o material dela, como nos outros navios) */
+  { const pau = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 5.2, 8), new THREE.MeshStandardMaterial({ color: '#c9ced3', roughness: 0.25, metalness: 0.9, envMapIntensity: 1.3 })); pau.position.set(0, 5.6 + 2.6, 70.9); pau.castShadow = true; g.add(pau);
+    const fl = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.6), new THREE.MeshStandardMaterial({ map: texBandeira('BRA'), side: THREE.DoubleSide, roughness: 0.8, alphaTest: 0.5 })); fl.position.set(0, 5.6 + 4.3, 70.9 + 1.25); fl.rotation.y = Math.PI / 2; fl.userData.det = 1; fl.name = 'flamula'; g.add(fl); }
   /* pontos usados pelo jogo: chaminé (fumaça), holofote, topo do mastro */
   g.userData.chamine = new THREE.Vector3(AMORIM_POS.chamines[0].x, AMORIM_POS.chamines[0].y, AMORIM_POS.chamines[0].z);
   g.userData.chamines = AMORIM_POS.chamines.map((c) => new THREE.Vector3(c.x, c.y, c.z));

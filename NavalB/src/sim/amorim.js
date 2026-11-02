@@ -20,16 +20,16 @@ export { AM, AUTOS, TUBOS_LAT, adicionaAmorim, META_AMORIM, layoutAmorim } from 
 
 /* ---------- estado ---------- */
 export function instalaAmorim(n) { if (!n.C.amorim) return;
-  n.am = { prox: 0, recLat: [0, 0], vlsF: 50, vlsR: 50, autos: AUTOS.map((a) => ({ az: 0, el: 0, alvo: -1, tBusca: 0, rec: 0, bala: AM.auto.carregador, recarga: 0, fogo: 0, k: arrastoCal(AM.auto.cal), sol: { az: 0, el: 0, tv: 0, d: 0, px: 0, pz: 0 } })) }; }
+  n.am = { prox: 0, recLat: [0, 0], vlsF: n.C.vls || 100, vlsR: 0, /* v1.3.01: todo o VLS no slot de vante */ autos: AUTOS.map((a) => ({ az: 0, el: 0, alvo: -1, tBusca: 0, rec: 0, bala: AM.auto.carregador, recarga: 0, fogo: 0, k: arrastoCal(AM.auto.cal), sol: { az: 0, el: 0, tv: 0, d: 0, px: 0, pz: 0 } })) }; }
 
 /* ---------- 1+2) mísseis: revezamento e lançadores laterais ---------- */
 const _o = { x: 0, y: 0, z: 0 }, _d = { x: 0, y: 0, z: 0 };
 /** Substitui lancaMissil do mundo SÓ para o Amorim (mesmas regras de alvo/alcance/prontidão do jogo; muda só de onde e como os mísseis saem). */
 export function lancaMissilAmorim(sim, n, alvoId, livre, azLivre, d) {
   const A = n.am; if (!A) return 0;
-  for (let tent = 0; tent < 4; tent++) { const s = (A.prox + tent) % 4;
-    if (s < 2) { if (A.recLat[s] > sim.t) continue; const pf = MISSEIS[AM.perfilLat]; if (!livre && d > pf.alc) continue; const k = salvaLateral(sim, n, s, alvoId, livre, azLivre, d); if (k) { A.recLat[s] = sim.t + AM.recLat; A.prox = (s + 1) % 4; return k; } }
-    else { if (n.tVls > 0 || n.vls <= 0) continue; const frente = s === 2; if ((frente ? A.vlsF : A.vlsR) <= 0) continue; const k = salvaVls(sim, n, frente, alvoId, livre, azLivre, d); if (k) { A.prox = (s + 1) % 4; return k; } } }
+  for (let tent = 0; tent < AM.slots; tent++) { const s = (A.prox + tent) % AM.slots;
+    if (s < 2) { if (A.recLat[s] > sim.t) continue; const pf = MISSEIS[AM.perfilLat]; if (!livre && d > pf.alc) continue; const k = salvaLateral(sim, n, s, alvoId, livre, azLivre, d); if (k) { A.recLat[s] = sim.t + AM.recLat; A.prox = (s + 1) % AM.slots; return k; } }
+    else { if (n.tVls > 0 || n.vls <= 0) continue; const frente = s === 2; if ((frente ? A.vlsF : A.vlsR) <= 0) continue; const k = salvaVls(sim, n, frente, alvoId, livre, azLivre, d); if (k) { A.prox = (s + 1) % AM.slots; return k; } } }
   return 0;
 }
 function novoMissil(sim, n, pf, alvoId, livre, azLivre, d, k, campos) {

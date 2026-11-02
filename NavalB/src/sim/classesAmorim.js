@@ -1,7 +1,7 @@
 // Naval B v1.3.00 — AMORIM (SL 06): ficha, constantes e layout (SEM importações — classes.js/layout.js importam daqui sem ciclo).
 // A parte que roda na batalha (revezamento de salvas, lançador lateral, canhões automáticos) está em amorim.js.
 export const AM = Object.freeze({
-  salvaLat: 5, recLat: 7, salvaVls: 4, dtSalva: 0.15, perfilLat: 'medio',
+  salvaLat: 5, recLat: 7, salvaVls: 4, slots: 3, /* v1.3.01: mísseis normais em 3 slots (lateral BB, lateral BE, VLS de vante); o dourado é só do nuclear */ dtSalva: 0.15, perfilLat: 'medio',
   lat: { t1: 0.7, t2: 2.0, v0: 35, acel: 25, giro: 30 * Math.PI / 180, elev: 24.1 * Math.PI / 180, fora: 8 * Math.PI / 180 },
   auto: { alc: 3000, cad: 0.1, carregador: 20, recarga: 6, dano: 0.6, cal: 30, V0: 1000, giro: 2.6, disp: 0.6 },
 });
@@ -28,10 +28,10 @@ export const CAIXAS = [
 export function adicionaAmorim(CLASSES, { D, CAN, VIDA }) {
   CLASSES.amorim = D('cruzador', 'amorim', { premium: 1, lendario: 1, superLend: 1, amorim: 1, missilNuclear: 1,
     nome: 'Amorim', classe: 'Classe Amorim', nomeOriginal: 'Amorim (projeto do Valter)', num: 'SL 06',
-    papel: 'Super lendário: 2 torres grandes de 3 canos, 100 mísseis em 2 slots (salvas de 4), lançadores laterais inclinados (salvas de 5, recarga 7 s), VLS nuclear dourado (efeito do Nakhimov), 30 torpedos em salvas de 4, 3 lança-granadas, antiaérea laser (3 esferas do topo) e convencional, 2 canhões automáticos de ré, canhões automáticos novos e CIWS',
+    papel: 'Super lendário: 2 torres grandes de 3 canos, 100 mísseis no VLS de vante (salvas de 4), lançadores laterais inclinados nos 2 bordos (salvas de 5, recarga 7 s), slot dourado só para o míssil nuclear (efeito do Nakhimov), 1 helicóptero no heliponto, 30 torpedos em salvas de 4, 3 lança-granadas, antiaérea laser (3 esferas do topo) e convencional, 2 canhões automáticos de ré, canhões automáticos novos e CIWS',
     L: 163, B: 21, T: 5.6, F: 7.0, vmax: 16.0, acel: 0.6, giro: 0.72, vida: VIDA(1150), blind: 2.4, rcs: 1.1, radar: 22000, desl: 12500,
     canhao: CAN({ cal: 152, V0: 900, cad: 2.2, dano: 30, alc: 16000, disp: 0.6, torres: 2, canos: 3, som: 'grande' }),
-    vls: 100, missil: 'hiper', salva: 4, sam: 0, ciws: 2, ciwsLug: [0, 1], a30: 0, laser: 7, chaff: 14, torp: 30, tubos: [3, 4], heli: 0,
+    vls: 100, missil: 'hiper', salva: 4, sam: 0, ciws: 2, ciwsLug: [0, 1], a30: 0, laser: 7, chaff: 14, torp: 30, tubos: [3, 4], heli: 1, pinturaFixa: 1, /* v1.3.01: 1 helicóptero no heliponto; pintura de fábrica travada */
     rbu: { nome: 'LG-12', salvas: 10, foguetes: 12, alc: 5500, min: 300, dano: 30, cad: 14, el: 0.62 },
     casco: 'convencional', cascoN: 'bra', estilo: 'cruzador', pf: 'ataque', antiAereo: 1 });
 }
@@ -51,7 +51,7 @@ export function layoutAmorim(C) {
   for (const [x, y, z] of [[-6.1, 7.5, -10.0], [6.1, 7.5, -10.0], [-7.5, 6.7, 70.5], [7.5, 6.7, 70.5], [-1.24, 33.54 - 0.95, -5.30], [1.29, 33.54 - 0.95, -5.30], [-0.01, 33.54 - 0.95, -4.07]]) P.laser.push({ x, y, z }); /* esferas: o feixe do jogo nasce 0,95 m acima do ponto → aqui fica no CENTRO de cada esfera (y 33,54) */
   for (const z of [55.5, 60.6, 65.8]) for (const sx of [-1, 1]) P.tubos.push({ x: sx * 9.1, y: 6.6, z, lado: sx, canos: 4, sub: 0 });
   P.granadas.push({ x: 0, y: 14.36, z: -46.5, lado: 0, r: 1.3, centro: 0, meio: 2.6, torre: 1 }, { x: 7.6, y: 8.6, z: -42.7, lado: 1, r: 1.3, centro: 0.6, meio: 2.2 }, { x: -7.6, y: 8.6, z: -42.7, lado: -1, r: 1.3, centro: -0.6, meio: 2.2 });
-  P.convoo = null; P.heliponto = { z: 64.3, y: 5.6 };
+  P.convoo = { z: 61.5, y: 5.62, x: 0 }; P.heliponto = { z: 64.3, y: 5.6 }; /* v1.3.01: heliponto de popa (o ponto do hangar cai em z ≈ 50, na porta do hangar) */
   P.nuke = { x: 0, y: 5.84, z: 35.34, w: 6, l: 11 };
   P.autos = AUTOS; P.tubosLat = TUBOS_LAT;
   return P;
