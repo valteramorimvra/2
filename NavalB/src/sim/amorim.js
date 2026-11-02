@@ -19,8 +19,8 @@ import { AM, AUTOS, TUBOS_LAT, CAIXAS } from './classesAmorim.js';
 export { AM, AUTOS, TUBOS_LAT, adicionaAmorim, META_AMORIM, layoutAmorim } from './classesAmorim.js';
 
 /* ---------- estado ---------- */
-export function instalaAmorim(n) { if (!n.C.amorim && !n.C.fragAmorim) return;
-  /* v1.3.02: configuração POR CLASSE (Amorim = constantes de sempre; Fragata Amorim = as dela) */ const C = n.C, cfg = { autos: C.autos || AUTOS, auto: C.autoCfg || AM.auto, caixas: C.caixasAuto || CAIXAS, tubos: C.tubosLat || TUBOS_LAT, lat: C.latCfg || AM.lat, mis: C.misAuto || null, nCel: C.fragAmorim ? (n.P.vls.length || 32) : 50 };
+export function instalaAmorim(n) { if (!n.C.amorim && !n.C.fragAmorim && !n.C.destAmorim) return;
+  /* v1.3.02: configuração POR CLASSE (Amorim = constantes de sempre; Fragata Amorim = as dela) */ const C = n.C, cfg = { autos: C.autos || AUTOS, auto: C.autoCfg || AM.auto, caixas: C.caixasAuto || CAIXAS, tubos: C.tubosLat || TUBOS_LAT, lat: C.latCfg || AM.lat, mis: C.misAuto || null, nCel: C.fragAmorim || C.destAmorim ? (n.P.vls.length || 32) : 50 }; /* v1.3.03: Destróier Amorim usa as 160 células */
   n.am = { cfg, prox: 0, ult: -1, recLat: [0, 0], vlsF: n.C.vls || 100, vlsR: 0, /* v1.3.01: todo o VLS no slot de vante */ autos: cfg.autos.map((a) => ({ az: 0, el: 0, alvo: -1, tBusca: 0, rec: 0, bala: cfg.auto.carregador, recarga: 0, fogo: 0, k: arrastoCal(cfg.auto.cal), sol: { az: 0, el: 0, tv: 0, d: 0, px: 0, pz: 0 } })) }; }
 
 /* ---------- 1+2) mísseis: revezamento e lançadores laterais ---------- */

@@ -58,14 +58,15 @@ def bbox(g):
             for vi, _ in f: x, y, z = V[vi]; xs.append(x); ys.append(y); zs.append(z)
     return min(xs), max(xs), min(ys), max(ys), min(zs), max(zs)
 
-def malhas(g, o):
-    out = []
+import math
+def malhas(g, o, yaw=0.0):  # v1.3.03: yaw = giro com que a peça vem no OBJ; é desfeito no pivô (o jogo gira o grupo pelo azimute da simulação)
+    th = -math.radians(yaw); c0, s0 = math.cos(th), math.sin(th); out = []
     for (m, c), fs in sorted(G[g].items()):
         P, Q = [], []
         for f in fs:
             for vi, ni in f:
-                x, y, z = V[vi]; P += [max(-32768, min(32767, int(round((x - o[0]) * ESC)))), max(-32768, min(32767, int(round((y - o[1]) * ESC)))), max(-32768, min(32767, int(round((z - o[2]) * ESC))))]
-                nx, ny, nz = N[ni] if ni >= 0 else (0, 1, 0); Q += [int(round(nx * 127)), int(round(ny * 127)), int(round(nz * 127))]
+                x, y, z = V[vi]; x, z = x - o[0], z - o[2]; x, z = x * c0 + z * s0, -x * s0 + z * c0; P += [max(-32768, min(32767, int(round(x * ESC)))), max(-32768, min(32767, int(round((y - o[1]) * ESC)))), max(-32768, min(32767, int(round(z * ESC))))]
+                nx, ny, nz = N[ni] if ni >= 0 else (0, 1, 0); nx, nz = nx * c0 + nz * s0, -nx * s0 + nz * c0; Q += [int(round(nx * 127)), int(round(ny * 127)), int(round(nz * 127))]
         out.append({'m': m, 'c': '#' + c, 'p': base64.b64encode(struct.pack('<%dh' % len(P), *P)).decode(), 'n': base64.b64encode(struct.pack('<%db' % len(Q), *Q)).decode()})
     return out
 
@@ -76,7 +77,7 @@ for i, t in enumerate((t1, t2)):
 for nm, pos in (('ciws0', T['ciws_proa']['pos']), ('ciws1', T['ciws_popa']['pos'])):
     b = bbox(nm); o = [pos[0], b[2], pos[2]]; S['giram'][nm] = {'pos': o, 'malhas': malhas(nm, o)}
 for nm, k in (('auto0', 'canhao_automatico_30mm_bombordo'), ('auto1', 'canhao_automatico_30mm_boreste')):
-    o = T[k]['cab_pivo']; S['giram'][nm] = {'pos': o, 'malhas': malhas(nm, o), 'yaw': T[k]['yaw_graus']}
+    o = T[k]['cab_pivo']; S['giram'][nm] = {'pos': o, 'malhas': malhas(nm, o, T[k]['yaw_graus'])}
 for r in META['radares']:
     g = 'radar:' + r['nome']; b = bbox(g); o = [r['x'], b[2], r['z']]; S['radares'][r['nome']] = {'pos': o, 'w': r['w'], 'malhas': malhas(g, o)}
 for g in ('flamula', 'flamulaProa'):

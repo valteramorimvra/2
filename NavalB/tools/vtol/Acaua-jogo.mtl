@@ -1,0 +1,597 @@
+# Acauã — materiais
+
+newmtl mat_0_tinta_metalica_acaua_009c3b
+Kd 0.0000 0.3325 0.0437
+Ka 0 0 0
+Ks 0.77 0.77 0.77
+Ke 0.0000 0.0000 0.0000
+Ns 177
+d 1.00
+illum 2
+
+newmtl mat_1_radome_ceramica_3b4047
+Kd 0.0437 0.0513 0.0630
+Ka 0 0 0
+Ks 0.26 0.26 0.26
+Ke 0.0000 0.0000 0.0000
+Ns 133
+d 1.00
+illum 2
+
+newmtl mat_2_preto_fosco_0c0d0f
+Kd 0.0037 0.0040 0.0048
+Ka 0 0 0
+Ks 0.32 0.32 0.32
+Ke 0.0000 0.0000 0.0000
+Ns 95
+d 1.00
+illum 2
+
+newmtl mat_3_vidro_fume_dourado_76765f
+Kd 0.1812 0.1812 0.1144
+Ka 0 0 0
+Ks 0.26 0.26 0.26
+Ke 0.0000 0.0000 0.0000
+Ns 194
+d 0.40
+illum 2
+
+newmtl mat_4_moldura_escura_15191d
+Kd 0.0075 0.0097 0.0123
+Ka 0 0 0
+Ks 0.50 0.50 0.50
+Ke 0.0000 0.0000 0.0000
+Ns 124
+d 1.00
+illum 2
+
+newmtl mat_5_grafite_acaua_0a3d1c
+Kd 0.0030 0.0467 0.0116
+Ka 0 0 0
+Ks 0.62 0.62 0.62
+Ke 0.0000 0.0000 0.0000
+Ns 133
+d 1.00
+illum 2
+
+newmtl mat_6_tela_cabine_1b6e8c
+Kd 0.0110 0.1559 0.2623
+Ka 0 0 0
+Ks 0.26 0.26 0.26
+Ke 0.1659 0.7341 0.9000
+Ns 162
+d 1.00
+illum 2
+
+newmtl mat_7_almofada_assento_4a4f55
+Kd 0.0685 0.0782 0.0908
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 38
+d 1.00
+illum 2
+
+newmtl mat_8_cinto_tecido_3b4248
+Kd 0.0437 0.0545 0.0648
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 47
+d 1.00
+illum 2
+
+newmtl mat_9_alca_amarela_f2c20a
+Kd 0.8879 0.5395 0.0030
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 105
+d 1.00
+illum 2
+
+newmtl mat_10_macacao_oliva_5b6b4a
+Kd 0.1046 0.1470 0.0685
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 47
+d 1.00
+illum 2
+
+newmtl mat_11_luva_botas_pretas_16181b
+Kd 0.0080 0.0091 0.0110
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 67
+d 1.00
+illum 2
+
+newmtl mat_12_pele_b5805e
+Kd 0.4621 0.2159 0.1119
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 67
+d 1.00
+illum 2
+
+newmtl mat_13_capacete_branco_e9ecef
+Kd 0.8148 0.8388 0.8632
+Ka 0 0 0
+Ks 0.32 0.32 0.32
+Ke 0.0000 0.0000 0.0000
+Ns 158
+d 1.00
+illum 2
+
+newmtl mat_14_viseira_dourada_d9a826
+Kd 0.6939 0.3916 0.0194
+Ka 0 0 0
+Ks 0.80 0.80 0.80
+Ke 0.0000 0.0000 0.0000
+Ns 192
+d 1.00
+illum 2
+
+newmtl mat_15_mascara_oxigenio_23272b
+Kd 0.0168 0.0203 0.0242
+Ka 0 0 0
+Ks 0.26 0.26 0.26
+Ke 0.0000 0.0000 0.0000
+Ns 67
+d 1.00
+illum 2
+
+newmtl mat_16_tinta_metalica_acaua_007a2e
+Kd 0.0000 0.1946 0.0273
+Ka 0 0 0
+Ks 0.77 0.77 0.77
+Ke 0.0000 0.0000 0.0000
+Ns 177
+d 1.00
+illum 2
+
+newmtl mat_17_linha_painel_12161a
+Kd 0.0060 0.0080 0.0103
+Ka 0 0 0
+Ks 0.26 0.26 0.26
+Ke 0.0000 0.0000 0.0000
+Ns 86
+d 1.00
+illum 2
+
+newmtl mat_18_esmalte_faixa_verde_006b28
+Kd 0.0000 0.1470 0.0212
+Ka 0 0 0
+Ks 0.47 0.47 0.47
+Ke 0.0000 0.0000 0.0000
+Ns 158
+d 1.00
+illum 2
+
+newmtl mat_19_esmalte_faixa_amarela_ffe600
+Kd 1.0000 0.7913 0.0000
+Ka 0 0 0
+Ks 0.47 0.47 0.47
+Ke 0.0000 0.0000 0.0000
+Ns 158
+d 1.00
+illum 2
+
+newmtl mat_20_luz_vermelha_ff1a1a
+Kd 1.0000 0.0103 0.0103
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 1.8000 0.1835 0.1835
+Ns 143
+d 1.00
+illum 2
+
+newmtl mat_21_luz_verde_16ff52
+Kd 0.0080 1.0000 0.0844
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.1553 1.8000 0.5788
+Ns 143
+d 1.00
+illum 2
+
+newmtl mat_22_tinta_metalica_acaua_14b34f
+Kd 0.0070 0.4508 0.0782
+Ka 0 0 0
+Ks 0.77 0.77 0.77
+Ke 0.0000 0.0000 0.0000
+Ns 177
+d 1.00
+illum 2
+
+newmtl mat_23_esmalte_faixa_contorno_marinho_06142e
+Kd 0.0018 0.0070 0.0273
+Ka 0 0 0
+Ks 0.53 0.53 0.53
+Ke 0.0000 0.0000 0.0000
+Ns 165
+d 1.00
+illum 2
+
+newmtl mat_24_esmalte_faixa_branco_perolado_f4f6f8
+Kd 0.9047 0.9216 0.9387
+Ka 0 0 0
+Ks 0.53 0.53 0.53
+Ke 0.0000 0.0000 0.0000
+Ns 165
+d 1.00
+illum 2
+
+newmtl mat_25_esmalte_faixa_azul_bandeira_002776
+Kd 0.0000 0.0203 0.1812
+Ka 0 0 0
+Ks 0.53 0.53 0.53
+Ke 0.0000 0.0000 0.0000
+Ns 165
+d 1.00
+illum 2
+
+newmtl mat_26_bandeira_moldura_06142e
+Kd 0.0018 0.0070 0.0273
+Ka 0 0 0
+Ks 0.41 0.41 0.41
+Ke 0.0000 0.0000 0.0000
+Ns 139
+d 1.00
+illum 2
+
+newmtl mat_27_bandeira_verde_009739
+Kd 0.0000 0.3095 0.0409
+Ka 0 0 0
+Ks 0.41 0.41 0.41
+Ke 0.0000 0.0000 0.0000
+Ns 139
+d 1.00
+illum 2
+
+newmtl mat_28_bandeira_amarelo_fedd00
+Kd 0.9911 0.7231 0.0000
+Ka 0 0 0
+Ks 0.41 0.41 0.41
+Ke 0.0000 0.0000 0.0000
+Ns 139
+d 1.00
+illum 2
+
+newmtl mat_29_bandeira_azul_002776
+Kd 0.0000 0.0203 0.1812
+Ka 0 0 0
+Ks 0.41 0.41 0.41
+Ke 0.0000 0.0000 0.0000
+Ns 139
+d 1.00
+illum 2
+
+newmtl mat_30_bandeira_faixa_branca_ffffff
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ks 0.41 0.41 0.41
+Ke 0.0000 0.0000 0.0000
+Ns 139
+d 1.00
+illum 2
+
+newmtl mat_31_luz_branca_ffffff
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 2.0000 2.0000 2.0000
+Ns 143
+d 1.00
+illum 2
+
+newmtl mat_32_interior_escuro_07080a
+Kd 0.0021 0.0024 0.0030
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 28
+d 1.00
+illum 2
+
+newmtl mat_33_labio_cromado_c9ced3
+Kd 0.5841 0.6172 0.6514
+Ka 0 0 0
+Ks 0.77 0.77 0.77
+Ke 0.0000 0.0000 0.0000
+Ns 177
+d 1.00
+illum 2
+
+newmtl mat_34_titanio_queimado_6b665f
+Kd 0.1470 0.1329 0.1144
+Ka 0 0 0
+Ks 0.77 0.77 0.77
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1.00
+illum 2
+
+newmtl mat_35_interior_escuro_0b0b0c
+Kd 0.0033 0.0033 0.0037
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 28
+d 1.00
+illum 2
+
+newmtl mat_36_cromo_trem_c9ced3
+Kd 0.5841 0.6172 0.6514
+Ka 0 0 0
+Ks 0.77 0.77 0.77
+Ke 0.0000 0.0000 0.0000
+Ns 177
+d 1.00
+illum 2
+
+newmtl mat_37_grafite_acaua_0a3d1c
+Kd 0.0030 0.0467 0.0116
+Ka 0 0 0
+Ks 0.68 0.68 0.68
+Ke 0.0000 0.0000 0.0000
+Ns 124
+d 1.00
+illum 2
+
+newmtl mat_38_pneu_borracha_17181a
+Kd 0.0086 0.0091 0.0103
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 28
+d 1.00
+illum 2
+
+newmtl mat_39_roda_aluminio_aeb4ba
+Kd 0.4233 0.4564 0.4910
+Ka 0 0 0
+Ks 0.77 0.77 0.77
+Ke 0.0000 0.0000 0.0000
+Ns 152
+d 1.00
+illum 2
+
+newmtl mat_40_luz_branca_f6fbff
+Kd 0.9216 0.9647 1.0000
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 1.5000 1.5000 1.5000
+Ns 162
+d 1.00
+illum 2
+
+newmtl mat_41_vidro_sensor_1d2a35
+Kd 0.0123 0.0232 0.0356
+Ka 0 0 0
+Ks 0.50 0.50 0.50
+Ke 0.0000 0.0000 0.0000
+Ns 190
+d 1.00
+illum 2
+
+newmtl mat_42_vidro_sensor_2a2218
+Kd 0.0232 0.0160 0.0091
+Ka 0 0 0
+Ks 0.50 0.50 0.50
+Ke 0.0000 0.0000 0.0000
+Ns 184
+d 1.00
+illum 2
+
+newmtl mat_43_canhao_aco_0b0c0e
+Kd 0.0033 0.0037 0.0044
+Ka 0 0 0
+Ks 0.74 0.74 0.74
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1.00
+illum 2
+
+newmtl mat_44_interior_escuro_020203
+Kd 0.0006 0.0006 0.0009
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 28
+d 1.00
+illum 2
+
+newmtl mat_45_domo_laser_274753
+Kd 0.0203 0.0630 0.0865
+Ka 0 0 0
+Ks 0.62 0.62 0.62
+Ke 0.0000 0.0000 0.0000
+Ns 188
+d 1.00
+illum 2
+
+newmtl mat_46_lente_laser_40f0ff
+Kd 0.0513 0.8714 1.0000
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.4016 1.5059 1.6000
+Ns 181
+d 1.00
+illum 2
+
+newmtl mat_47_corpo_aam_dfe3e6
+Kd 0.7379 0.7682 0.7913
+Ka 0 0 0
+Ks 0.44 0.44 0.44
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1.00
+illum 2
+
+newmtl mat_48_ogiva_escura_3a3f45
+Kd 0.0423 0.0497 0.0595
+Ka 0 0 0
+Ks 0.38 0.38 0.38
+Ke 0.0000 0.0000 0.0000
+Ns 124
+d 1.00
+illum 2
+
+newmtl mat_49_aleta_grafite_55606a
+Kd 0.0908 0.1170 0.1441
+Ka 0 0 0
+Ks 0.62 0.62 0.62
+Ke 0.0000 0.0000 0.0000
+Ns 133
+d 1.00
+illum 2
+
+newmtl mat_50_faixa_amarela_m_ffc40a
+Kd 1.0000 0.5520 0.0030
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 105
+d 1.00
+illum 2
+
+newmtl mat_51_corpo_asm_8a9198
+Kd 0.2542 0.2831 0.3140
+Ka 0 0 0
+Ks 0.50 0.50 0.50
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1.00
+illum 2
+
+newmtl mat_52_ogiva_asm_6c7480
+Kd 0.1500 0.1746 0.2159
+Ka 0 0 0
+Ks 0.38 0.38 0.38
+Ke 0.0000 0.0000 0.0000
+Ns 124
+d 1.00
+illum 2
+
+newmtl mat_53_ogiva_asm_1a1d21
+Kd 0.0103 0.0123 0.0152
+Ka 0 0 0
+Ks 0.38 0.38 0.38
+Ke 0.0000 0.0000 0.0000
+Ns 124
+d 1.00
+illum 2
+
+newmtl mat_54_aleta_grafite_4a535c
+Kd 0.0685 0.0865 0.1070
+Ka 0 0 0
+Ks 0.62 0.62 0.62
+Ke 0.0000 0.0000 0.0000
+Ns 133
+d 1.00
+illum 2
+
+newmtl mat_55_corpo_nuke_16181b
+Kd 0.0080 0.0091 0.0110
+Ka 0 0 0
+Ks 0.53 0.53 0.53
+Ke 0.0000 0.0000 0.0000
+Ns 133
+d 1.00
+illum 2
+
+newmtl mat_56_ogiva_nuke_2c3036
+Kd 0.0252 0.0296 0.0369
+Ka 0 0 0
+Ks 0.44 0.44 0.44
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1.00
+illum 2
+
+newmtl mat_57_aleta_grafite_2e343a
+Kd 0.0273 0.0343 0.0423
+Ka 0 0 0
+Ks 0.62 0.62 0.62
+Ke 0.0000 0.0000 0.0000
+Ns 133
+d 1.00
+illum 2
+
+newmtl mat_58_torpedo_bronze_b07a35
+Kd 0.4342 0.1946 0.0356
+Ka 0 0 0
+Ks 0.74 0.74 0.74
+Ke 0.0000 0.0000 0.0000
+Ns 146
+d 1.00
+illum 2
+
+newmtl mat_59_torpedo_bronze_8c6128
+Kd 0.2623 0.1195 0.0212
+Ka 0 0 0
+Ks 0.74 0.74 0.74
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1.00
+illum 2
+
+newmtl mat_60_faixa_torp_1c1f22
+Kd 0.0116 0.0137 0.0160
+Ka 0 0 0
+Ks 0.32 0.32 0.32
+Ke 0.0000 0.0000 0.0000
+Ns 105
+d 1.00
+illum 2
+
+newmtl mat_61_tinta_metalica_acaua_14b34f
+Kd 0.0070 0.4508 0.0782
+Ka 0 0 0
+Ks 0.78 0.78 0.78
+Ke 0.0000 0.0000 0.0000
+Ns 181
+d 1.00
+illum 2
+
+newmtl mat_62_luz_branca_ffffff
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 3.0000 3.0000 3.0000
+Ns 143
+d 1.00
+illum 2
+
+newmtl mat_63_luz_vermelha_ff1a1a
+Kd 1.0000 0.0103 0.0103
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 2.4000 0.2447 0.2447
+Ns 143
+d 1.00
+illum 2
+
+newmtl mat_64_luz_formacao_b6ff2e
+Kd 0.4678 1.0000 0.0273
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.9992 1.4000 0.2525
+Ns 124
+d 1.00
+illum 2
+
+# decal da bandeira (PNG 1000x700 gerado por código). A bandeira 3D usa os materiais bandeira_* em camadas finas (sem UV); este material é a REFERÊNCIA de textura p/ o jogo.
+newmtl mat_bandeira_decal_ref
+Kd 1 1 1
+Ka 0 0 0
+Ks 0.10 0.10 0.10
+Ke 0 0 0
+Ns 60
+d 1
+illum 2
+map_Kd bandeira_brasil_decal.png

@@ -1,0 +1,1070 @@
+{
+ "trem": [
+  {
+   "nome": "trem_principal_boreste_amortecedor",
+   "pivo": [
+    0.95,
+    1.85,
+    3.2
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_rec": -1.5707963267948966,
+   "grupo": "trem_principal_boreste"
+  },
+  {
+   "nome": "trem_principal_boreste_tesoura",
+   "pivo": [
+    0.95,
+    1.85,
+    3.2
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_rec": -1.5707963267948966,
+   "grupo": "trem_principal_boreste"
+  },
+  {
+   "nome": "trem_principal_boreste_pneu",
+   "pivo": [
+    0.95,
+    1.85,
+    3.2
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_rec": -1.5707963267948966,
+   "grupo": "trem_principal_boreste"
+  },
+  {
+   "nome": "trem_principal_boreste_roda",
+   "pivo": [
+    0.95,
+    1.85,
+    3.2
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_rec": -1.5707963267948966,
+   "grupo": "trem_principal_boreste"
+  },
+  {
+   "nome": "trem_principal_bombordo_amortecedor",
+   "pivo": [
+    -0.95,
+    1.85,
+    3.2
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_rec": -1.5707963267948966,
+   "grupo": "trem_principal_bombordo"
+  },
+  {
+   "nome": "trem_principal_bombordo_tesoura",
+   "pivo": [
+    -0.95,
+    1.85,
+    3.2
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_rec": -1.5707963267948966,
+   "grupo": "trem_principal_bombordo"
+  },
+  {
+   "nome": "trem_principal_bombordo_pneu",
+   "pivo": [
+    -0.95,
+    1.85,
+    3.2
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_rec": -1.5707963267948966,
+   "grupo": "trem_principal_bombordo"
+  },
+  {
+   "nome": "trem_principal_bombordo_roda",
+   "pivo": [
+    -0.95,
+    1.85,
+    3.2
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_rec": -1.5707963267948966,
+   "grupo": "trem_principal_bombordo"
+  },
+  {
+   "nome": "trem_nariz_amortecedor",
+   "pivo": [
+    0.0,
+    1.65,
+    -5.2
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_rec": -1.5707963267948966,
+   "grupo": "trem_nariz"
+  },
+  {
+   "nome": "trem_nariz_tesoura",
+   "pivo": [
+    0.0,
+    1.65,
+    -5.2
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_rec": -1.5707963267948966,
+   "grupo": "trem_nariz"
+  },
+  {
+   "nome": "trem_nariz_pneus",
+   "pivo": [
+    0.0,
+    1.65,
+    -5.2
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_rec": -1.5707963267948966,
+   "grupo": "trem_nariz"
+  },
+  {
+   "nome": "trem_nariz_rodas",
+   "pivo": [
+    0.0,
+    1.65,
+    -5.2
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_rec": -1.5707963267948966,
+   "grupo": "trem_nariz"
+  },
+  {
+   "nome": "trem_nariz_farol",
+   "pivo": [
+    0.0,
+    1.65,
+    -5.2
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_rec": -1.5707963267948966,
+   "grupo": "trem_nariz"
+  }
+ ],
+ "portas": [
+  {
+   "nome": "porta_trem_principal_boreste",
+   "pivo": [
+    1.33,
+    1.5188193923309559,
+    3.9
+   ],
+   "eixo": [
+    0,
+    0,
+    1
+   ],
+   "ang_aberto": 1.361356816555577,
+   "lado": 1,
+   "tipo": "trem"
+  },
+  {
+   "nome": "porta_trem_principal_bombordo",
+   "pivo": [
+    -1.33,
+    1.5188193923309559,
+    3.9
+   ],
+   "eixo": [
+    0,
+    0,
+    1
+   ],
+   "ang_aberto": -1.361356816555577,
+   "lado": -1,
+   "tipo": "trem"
+  },
+  {
+   "nome": "porta_trem_nariz_boreste",
+   "pivo": [
+    0.4,
+    1.3687292708171046,
+    -5.15
+   ],
+   "eixo": [
+    0,
+    0,
+    1
+   ],
+   "ang_aberto": 1.3962634015954636,
+   "lado": 1,
+   "tipo": "trem"
+  },
+  {
+   "nome": "porta_trem_nariz_bombordo",
+   "pivo": [
+    -0.4,
+    1.3687292708171046,
+    -5.15
+   ],
+   "eixo": [
+    0,
+    0,
+    1
+   ],
+   "ang_aberto": 1.3962634015954636,
+   "lado": -1,
+   "tipo": "trem"
+  }
+ ],
+ "bocais": [
+  {
+   "nome": "bocal_vtol_boreste",
+   "furo": "bocal_vtol_boreste_furo",
+   "pivo": [
+    0.62,
+    2.0,
+    7.6499999999999995
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_vtol": 1.6929693744344996
+  },
+  {
+   "nome": "bocal_vtol_bombordo",
+   "furo": "bocal_vtol_bombordo_furo",
+   "pivo": [
+    -0.62,
+    2.0,
+    7.6499999999999995
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_vtol": 1.6929693744344996
+  }
+ ],
+ "tampas": [
+  {
+   "nome": "tampa_ventilador",
+   "pivo": [
+    0,
+    3.027,
+    -0.67
+   ],
+   "eixo": [
+    1,
+    0,
+    0
+   ],
+   "ang_aberto": -1.3089969389957472
+  }
+ ],
+ "armas": [],
+ "luzes": [
+  {
+   "nome": "luz_bb_vermelha",
+   "p": [
+    -5.949999999999999,
+    2.143787675900257,
+    3.75
+   ],
+   "tipo": "nav_vermelha_bombordo"
+  },
+  {
+   "nome": "luz_be_verde",
+   "p": [
+    5.949999999999999,
+    2.143787675900257,
+    3.75
+   ],
+   "tipo": "nav_verde_boreste"
+  },
+  {
+   "nome": "luz_cauda_branca_be",
+   "p": [
+    1.6390933895424977,
+    4.9331542398457975,
+    6.25
+   ],
+   "tipo": "nav_branca_cauda"
+  },
+  {
+   "nome": "luz_cauda_branca_bb",
+   "p": [
+    -1.6390933895424977,
+    4.9331542398457975,
+    6.25
+   ],
+   "tipo": "nav_branca_cauda"
+  },
+  {
+   "nome": "luz_estrobo_ponta_be",
+   "p": [
+    5.93,
+    2.143787675900257,
+    3.2
+   ],
+   "tipo": "strobe_duplo"
+  },
+  {
+   "nome": "luz_estrobo_ponta_bb",
+   "p": [
+    -5.93,
+    2.143787675900257,
+    3.2
+   ],
+   "tipo": "strobe_duplo"
+  },
+  {
+   "nome": "luz_anticolisao_ventral",
+   "p": [
+    0.0,
+    1.2253333333333334,
+    -3.0
+   ],
+   "tipo": "anticolisao_vermelha"
+  },
+  {
+   "nome": "luz_anticolisao_dorsal",
+   "p": [
+    0.0,
+    2.8971666666666667,
+    5.0
+   ],
+   "tipo": "anticolisao_vermelha"
+  },
+  {
+   "nome": "luz_formacao_fus_be",
+   "p": [
+    0.93,
+    2.08,
+    -5.3
+   ],
+   "tipo": "formacao_lima"
+  },
+  {
+   "nome": "luz_formacao_fus_bb",
+   "p": [
+    -0.93,
+    2.08,
+    -5.3
+   ],
+   "tipo": "formacao_lima"
+  },
+  {
+   "nome": "luz_formacao_deriva_be",
+   "p": [
+    0.95,
+    3.3499999999999996,
+    4.5
+   ],
+   "tipo": "formacao_lima"
+  },
+  {
+   "nome": "luz_formacao_deriva_bb",
+   "p": [
+    -0.95,
+    3.3499999999999996,
+    4.5
+   ],
+   "tipo": "formacao_lima"
+  }
+ ],
+ "lasers": [
+  {
+   "nome": "laser_dorsal",
+   "p": [
+    0,
+    3.1776000000000004,
+    1.6
+   ],
+   "centro_giro": [
+    0,
+    3.1376000000000004,
+    1.6
+   ],
+   "raio_giro": 0.2,
+   "lado": "cima"
+  },
+  {
+   "nome": "laser_ventral",
+   "p": [
+    0,
+    1.0462500000000001,
+    5.5
+   ],
+   "centro_giro": [
+    0,
+    1.09625,
+    5.5
+   ],
+   "raio_giro": 0.2,
+   "lado": "baixo"
+  }
+ ],
+ "estacoes": [
+  {
+   "id": "est01_aam",
+   "tipo": "aam",
+   "slot": "aam_ponta_boreste",
+   "p": [
+    5.83,
+    1.7101,
+    3.8228
+   ],
+   "lado": "boreste",
+   "ordem_disparo": 1,
+   "pilone": "est01_pilone",
+   "recarga_s": 7.0,
+   "partes": [
+    "est01_aam_aletas_cauda",
+    "est01_aam_aletas_proa",
+    "est01_aam_bocal",
+    "est01_aam_corpo",
+    "est01_aam_faixa",
+    "est01_aam_ogiva"
+   ]
+  },
+  {
+   "id": "est02_aam",
+   "tipo": "aam",
+   "slot": "aam_ponta_bombordo",
+   "p": [
+    -5.83,
+    1.7101,
+    3.8228
+   ],
+   "lado": "bombordo",
+   "ordem_disparo": 2,
+   "pilone": "est02_pilone",
+   "recarga_s": 7.0,
+   "partes": [
+    "est02_aam_aletas_cauda",
+    "est02_aam_aletas_proa",
+    "est02_aam_bocal",
+    "est02_aam_corpo",
+    "est02_aam_faixa",
+    "est02_aam_ogiva"
+   ]
+  },
+  {
+   "id": "est03_aam",
+   "tipo": "aam",
+   "slot": "aam_int_boreste_1",
+   "p": [
+    3.3,
+    1.5573,
+    3.197
+   ],
+   "lado": "boreste",
+   "ordem_disparo": 3,
+   "pilone": "est03_pilone",
+   "recarga_s": 7.0,
+   "partes": [
+    "est03_aam_aletas_cauda",
+    "est03_aam_aletas_proa",
+    "est03_aam_bocal",
+    "est03_aam_corpo",
+    "est03_aam_faixa",
+    "est03_aam_ogiva"
+   ]
+  },
+  {
+   "id": "est04_aam",
+   "tipo": "aam",
+   "slot": "aam_int_bombordo_0",
+   "p": [
+    -3.3,
+    1.5573,
+    3.197
+   ],
+   "lado": "bombordo",
+   "ordem_disparo": 4,
+   "pilone": "est04_pilone",
+   "recarga_s": 7.0,
+   "partes": [
+    "est04_aam_aletas_cauda",
+    "est04_aam_aletas_proa",
+    "est04_aam_bocal",
+    "est04_aam_corpo",
+    "est04_aam_faixa",
+    "est04_aam_ogiva"
+   ]
+  },
+  {
+   "id": "est05_aam",
+   "tipo": "aam",
+   "slot": "aam_int_boreste_0",
+   "p": [
+    2.7,
+    1.5573,
+    3.197
+   ],
+   "lado": "boreste",
+   "ordem_disparo": 5,
+   "pilone": "est05_pilone",
+   "recarga_s": 7.0,
+   "partes": [
+    "est05_aam_aletas_cauda",
+    "est05_aam_aletas_proa",
+    "est05_aam_bocal",
+    "est05_aam_corpo",
+    "est05_aam_faixa",
+    "est05_aam_ogiva"
+   ]
+  },
+  {
+   "id": "est06_aam",
+   "tipo": "aam",
+   "slot": "aam_int_bombordo_1",
+   "p": [
+    -2.7,
+    1.5573,
+    3.197
+   ],
+   "lado": "bombordo",
+   "ordem_disparo": 6,
+   "pilone": "est06_pilone",
+   "recarga_s": 7.0,
+   "partes": [
+    "est06_aam_aletas_cauda",
+    "est06_aam_aletas_proa",
+    "est06_aam_bocal",
+    "est06_aam_corpo",
+    "est06_aam_faixa",
+    "est06_aam_ogiva"
+   ]
+  },
+  {
+   "id": "est07_asm",
+   "tipo": "asm",
+   "slot": "asm_boreste_1",
+   "p": [
+    4.91,
+    1.4599,
+    3.4005
+   ],
+   "lado": "boreste",
+   "ordem_disparo": 1,
+   "pilone": "est07_pilone",
+   "recarga_s": 7.0,
+   "partes": [
+    "est07_asm_aletas_cauda",
+    "est07_asm_asas",
+    "est07_asm_bocal",
+    "est07_asm_buscador",
+    "est07_asm_corpo",
+    "est07_asm_faixa",
+    "est07_asm_ogiva"
+   ]
+  },
+  {
+   "id": "est08_asm",
+   "tipo": "asm",
+   "slot": "asm_bombordo_1",
+   "p": [
+    -4.91,
+    1.4599,
+    3.4005
+   ],
+   "lado": "bombordo",
+   "ordem_disparo": 2,
+   "pilone": "est08_pilone",
+   "recarga_s": 7.0,
+   "partes": [
+    "est08_asm_aletas_cauda",
+    "est08_asm_asas",
+    "est08_asm_bocal",
+    "est08_asm_buscador",
+    "est08_asm_corpo",
+    "est08_asm_faixa",
+    "est08_asm_ogiva"
+   ]
+  },
+  {
+   "id": "est09_asm",
+   "tipo": "asm",
+   "slot": "asm_boreste_0",
+   "p": [
+    3.91,
+    1.4599,
+    3.4005
+   ],
+   "lado": "boreste",
+   "ordem_disparo": 3,
+   "pilone": "est09_pilone",
+   "recarga_s": 7.0,
+   "partes": [
+    "est09_asm_aletas_cauda",
+    "est09_asm_asas",
+    "est09_asm_bocal",
+    "est09_asm_buscador",
+    "est09_asm_corpo",
+    "est09_asm_faixa",
+    "est09_asm_ogiva"
+   ]
+  },
+  {
+   "id": "est10_asm",
+   "tipo": "asm",
+   "slot": "asm_bombordo_0",
+   "p": [
+    -3.91,
+    1.4599,
+    3.4005
+   ],
+   "lado": "bombordo",
+   "ordem_disparo": 4,
+   "pilone": "est10_pilone",
+   "recarga_s": 7.0,
+   "partes": [
+    "est10_asm_aletas_cauda",
+    "est10_asm_asas",
+    "est10_asm_bocal",
+    "est10_asm_buscador",
+    "est10_asm_corpo",
+    "est10_asm_faixa",
+    "est10_asm_ogiva"
+   ]
+  },
+  {
+   "id": "est11_torp",
+   "tipo": "torp",
+   "slot": "torpedo_boreste",
+   "p": [
+    0.26,
+    0.82,
+    3.2
+   ],
+   "lado": "boreste",
+   "ordem_disparo": 1,
+   "pilone": "est11_pilone",
+   "recarga_s": 7.0,
+   "partes": [
+    "est11_torp_aletas_cauda",
+    "est11_torp_anel_helice",
+    "est11_torp_corpo",
+    "est11_torp_faixa"
+   ]
+  },
+  {
+   "id": "est12_torp",
+   "tipo": "torp",
+   "slot": "torpedo_bombordo",
+   "p": [
+    -0.26,
+    0.82,
+    3.2
+   ],
+   "lado": "bombordo",
+   "ordem_disparo": 2,
+   "pilone": "est12_pilone",
+   "recarga_s": 7.0,
+   "partes": [
+    "est12_torp_aletas_cauda",
+    "est12_torp_anel_helice",
+    "est12_torp_corpo",
+    "est12_torp_faixa"
+   ]
+  },
+  {
+   "id": "est13_nuke",
+   "tipo": "nuke",
+   "slot": "nuke_boreste",
+   "p": [
+    1.95,
+    1.1129,
+    2.908
+   ],
+   "lado": "boreste",
+   "ordem_disparo": 1,
+   "pilone": "est13_pilone",
+   "recarga_s": 12.0,
+   "partes": [
+    "est13_nuke_aletas_cauda",
+    "est13_nuke_asas",
+    "est13_nuke_bocal",
+    "est13_nuke_corpo",
+    "est13_nuke_faixa_1",
+    "est13_nuke_faixa_2",
+    "est13_nuke_ogiva"
+   ]
+  },
+  {
+   "id": "est14_nuke",
+   "tipo": "nuke",
+   "slot": "nuke_bombordo",
+   "p": [
+    -1.95,
+    1.1129,
+    2.908
+   ],
+   "lado": "bombordo",
+   "ordem_disparo": 2,
+   "pilone": "est14_pilone",
+   "recarga_s": 12.0,
+   "partes": [
+    "est14_nuke_aletas_cauda",
+    "est14_nuke_asas",
+    "est14_nuke_bocal",
+    "est14_nuke_corpo",
+    "est14_nuke_faixa_1",
+    "est14_nuke_faixa_2",
+    "est14_nuke_ogiva"
+   ]
+  },
+  {
+   "id": "est15_nuke",
+   "tipo": "nuke",
+   "slot": "nuke_1",
+   "p": [
+    0.0,
+    0.76,
+    -1.1
+   ],
+   "lado": "centro",
+   "ordem_disparo": 3,
+   "pilone": "est15_pilone",
+   "recarga_s": 12.0,
+   "partes": [
+    "est15_nuke_aletas_cauda",
+    "est15_nuke_asas",
+    "est15_nuke_bocal",
+    "est15_nuke_corpo",
+    "est15_nuke_faixa_1",
+    "est15_nuke_faixa_2",
+    "est15_nuke_ogiva"
+   ]
+  }
+ ],
+ "nome": "Acau\u00e3",
+ "id": "acaua",
+ "papel": "Interceptador VTOL",
+ "bandeira": {
+  "proporcao": "10:7",
+  "largura": 2.405,
+  "altura": 1.684,
+  "area_m2": 4.05,
+  "area_deriva_m2": 7.88,
+  "faixa_span": [
+   0.05,
+   0.723
+  ],
+  "face": "externa",
+  "camadas_mm": [
+   4,
+   7,
+   10,
+   13,
+   16
+  ],
+  "textura_png": "bandeira_brasil_decal.png",
+  "nota": "geometria fina em camadas (sem UV); PNG gerado por c\u00f3digo = refer\u00eancia/decal para o jogo",
+  "pct_area_deriva": 51.4,
+  "pct_area_central": 57.1,
+  "area_central_m2": 7.09
+ },
+ "ventilador": {
+  "centro": [
+   0,
+   3.017,
+   -0.15
+  ],
+  "raio": 0.5,
+  "pas": "ventilador_pas"
+ },
+ "pas_pos": [
+  0,
+  3.017,
+  -0.15
+ ],
+ "trem_info": {
+  "altura_solo_m": 0.0,
+  "retrai_para": "tr\u00e1s (\u2212Z\u2192+Z), dentro da fuselagem",
+  "tempo_s": 4.0
+ },
+ "canhao": {
+  "cal_mm": 25,
+  "pos": [
+   0.74,
+   2.0,
+   -6.2
+  ]
+ },
+ "defesas_poder": {
+  "laser_dorsal": 1.0,
+  "laser_ventral": 1.0,
+  "regra": "poder igual nos dois emissores; cada um independente, escolhe a amea\u00e7a mais pr\u00f3xima ao alcance e com linha livre"
+ },
+ "luzes_padrao": {
+  "nav_vermelha": "ponta da asa ESQUERDA (bombordo, \u2212X)",
+  "nav_verde": "ponta da asa DIREITA (boreste, +X)",
+  "branca_cauda": "pontas das duas derivas",
+  "anticolisao": "vermelha, cima e baixo, ~1 Hz (150 ms aceso)",
+  "strobe": "branco duplo nas pontas das asas (2 clar\u00f5es de 70 ms, intervalo 100 ms, ciclo 1,4 s)",
+  "formacao": "faixas verde-lim\u00e3o #b6ff2e, discretas, fuselagem (3 por lado) e deriva (1 por face)",
+  "regra": "emissivo (MTL Ke) + piscar s\u00f3 alterando emissiveIntensity (zero-GC); pe\u00e7as embutidas na superf\u00edcie (\u22642 cm), no verificador 08-conectividade"
+ },
+ "fumaca": {
+  "limiar_velocidade_ms": 75.0,
+  "regra": "emite s\u00f3 com velocidade >= limiar (Urubu-rei: fase>=2, v>=vDecola=75 m/s); passo 1,8 m; m\u00e1x 60 por quadro; n\u00facleo + v\u00e9u p\u00e1lido a cada 2\u00ba; pool \u00fanico; sem GC",
+  "emissores": [
+   {
+    "lado": "bombordo",
+    "ref": "turbina ESQUERDA",
+    "p": [
+     -0.62,
+     2.0,
+     9.399999999999999
+    ],
+    "cor": "#1ee46e",
+    "palida": "#bfe9cf",
+    "nome_cor": "verde"
+   },
+   {
+    "lado": "boreste",
+    "ref": "turbina DIREITA",
+    "p": [
+     0.62,
+     2.0,
+     9.399999999999999
+    ],
+    "cor": "#ffd21a",
+    "palida": "#f1e6b8",
+    "nome_cor": "amarela"
+   }
+  ],
+  "nota": "dois bocais principais nos dois ca\u00e7as \u2192 um emissor por bocal (sem emissor extra nas asas); posi\u00e7\u00e3o = sa\u00edda das p\u00e9talas do bocal"
+ },
+ "municao": {
+  "finita_por_surtida": true,
+  "estacoes_total": 15,
+  "por_tipo": {
+   "aam": 6,
+   "asm": 4,
+   "torp": 2,
+   "nuke": 3
+  },
+  "intervalo_disparo_s": {
+   "aam": 7.0,
+   "asm": 7.0,
+   "torp": 7.0,
+   "nuke": 12.0
+  },
+  "rearme_no_navio_s": 15.0,
+  "recuperacao_abatido_s": 20.0,
+  "regra": "cada esta\u00e7\u00e3o disparada fica VAZIA (partes ocultas, sem criar/destruir objetos); o intervalo entre disparos/salvas usa as esta\u00e7\u00f5es ainda carregadas; sem muni\u00e7\u00e3o \u2192 voltar ao navio, pousar no ponto do heliponto, rearmar (15 s) e as esta\u00e7\u00f5es reaparecem cheias; abatida \u2192 dispon\u00edvel pousada e cheia ap\u00f3s 20 s"
+ },
+ "contagem_armas": {
+  "aam": 6,
+  "asm": 4,
+  "nuke": 3,
+  "torp": 2
+ },
+ "dim": {
+  "comprimento": 18.85,
+  "envergadura": 12.04,
+  "altura": 4.97,
+  "min": [
+   -6.02,
+   0.013,
+   -9.65
+  ],
+  "max": [
+   6.02,
+   4.978,
+   9.2
+  ]
+ },
+ "_fus": [
+  [
+   -8.7,
+   0,
+   2.0,
+   0.02,
+   0.02,
+   0.02,
+   2
+  ],
+  [
+   -8.3,
+   0,
+   2.0,
+   0.16,
+   0.15,
+   0.14,
+   2.2
+  ],
+  [
+   -7.4,
+   0,
+   2.02,
+   0.42,
+   0.38,
+   0.36,
+   2.3
+  ],
+  [
+   -6.4,
+   0,
+   2.06,
+   0.7,
+   0.46,
+   0.55,
+   2.5
+  ],
+  [
+   -5.6,
+   0,
+   2.08,
+   0.9,
+   0.34,
+   0.68,
+   2.7
+  ],
+  [
+   -4.6,
+   0,
+   2.08,
+   1.0,
+   0.3,
+   0.78,
+   2.8
+  ],
+  [
+   -3.2,
+   0,
+   2.08,
+   1.1,
+   0.28,
+   0.86,
+   2.8
+  ],
+  [
+   -2.0,
+   0,
+   2.08,
+   1.25,
+   0.3,
+   0.9,
+   2.8
+  ],
+  [
+   -1.2,
+   0,
+   2.08,
+   1.38,
+   0.62,
+   0.93,
+   2.8
+  ],
+  [
+   -0.5,
+   0,
+   2.1,
+   1.46,
+   0.9,
+   0.95,
+   2.8
+  ],
+  [
+   1.5,
+   0,
+   2.1,
+   1.5,
+   0.94,
+   0.95,
+   2.8
+  ],
+  [
+   4.0,
+   0,
+   2.1,
+   1.48,
+   0.88,
+   0.92,
+   2.8
+  ],
+  [
+   6.4,
+   0,
+   2.05,
+   1.38,
+   0.76,
+   0.86,
+   2.8
+  ],
+  [
+   8.0,
+   0,
+   2.0,
+   1.2,
+   0.64,
+   0.74,
+   2.8
+  ],
+  [
+   8.7,
+   0,
+   2.0,
+   1.08,
+   0.56,
+   0.66,
+   2.8
+  ]
+ ],
+ "triangulos": 7996,
+ "lod": "jogo",
+ "partes": 229
+}

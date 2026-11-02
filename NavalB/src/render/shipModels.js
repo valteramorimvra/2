@@ -14,6 +14,7 @@ import { layoutDe, deckY as deckYC, meiaBoca, bordaLivre } from '../sim/layout.j
 import { montaModelo1231 } from './modelo1231.js'; /* v1.2.31 */
 import { montaModeloAmorim, AMORIM_POS } from './modeloAmorim.js'; /* v1.3.00: super lendário Amorim */
 import { montaModeloFragataAmorim, FRAGATA_POS } from './modeloFragataAmorim.js'; /* v1.3.02: Fragata Lendária Amorim */
+import { montaModeloDestroierAmorim, DESTROIER_POS } from './modeloDestroierAmorim.js'; /* v1.3.03: Destróier Amorim D-01 */
 import { materialPintura, texBandeira, materialConves } from './camuflagem.js';
 import { registraLuz } from './cidade.js';
 import { MASC_PRE } from '../sim/mascarasLT.js';
@@ -205,6 +206,7 @@ const _OURO = new Map(); function matOuro(txt, estilo = 'ouro') { const nav = es
 function montaModelo(tipo, time, mais = 0) {
   if (CLASSES[tipo].amorim) return montaModeloAmorim(); /* v1.3.00 */
   if (CLASSES[tipo].fragAmorim) return montaModeloFragataAmorim(); /* v1.3.02 */
+  if (CLASSES[tipo].destAmorim) return montaModeloDestroierAmorim(); /* v1.3.03 */
   if (CLASSES[tipo].m1231) return montaModelo1231(CLASSES[tipo], time); /* v1.2.31: 3 navios lendários reais (modelo próprio) */
   const C = CLASSES[tipo], P = layoutDe(C, mais), M = materiais(time); const g = new THREE.Group(); const { L, B } = C;
   const dY = (z) => deckYC(C, z), meia = (z) => meiaBoca(C, z) / (C.casco === 'tumblehome' ? 0.86 : 1);
@@ -535,12 +537,12 @@ export function criaNavio3D(tipo, time, pintura, enfeite = null, mais = 0) {
   const ref = { g, pintura, torres: [], ciws: [], a30: [], radar: g.getObjectByName('radar'), radar2: g.getObjectByName('radar2'), radar3: g.getObjectByName('radar3'), flamula: g.getObjectByName('flamula'), tampas: g.getObjectByName('tampas'), armasLOD: g.getObjectByName('armasLOD'), det: [], linhas: g.getObjectByName('linhas'), luzes: [], chamine: MODELOS[k].userData.chamine, holofote: MODELOS[k].userData.holofote, topoMastro: U.topoMastro, luzTopo: U.luzTopo, raioLuz: U.raioLuz, abertas: new Float32Array(P.celulas.length) };
   if (ref.tampas) { ref.tampas = ref.tampas; ref.tampas.instanceMatrix = ref.tampas.instanceMatrix.clone(); }
   ref.lg = (P.granadas || []).map((m, i) => { const q = g.getObjectByName('lg' + i); return q ? { g: q, el: q.getObjectByName('lgEl') } : null; }); /* v1.2.7 */
-  P.torres.forEach((t, i) => { const tr = g.getObjectByName('torre' + i); ref.torres.push({ g: tr, piv: tr.getObjectByName('pivo'), cano: tr.getObjectByName('cano'), cano2: tr.getObjectByName('cano2'), cano3: tr.getObjectByName('cano3'), cano4: tr.getObjectByName('cano4'), lcLocal: C.amorim || C.fragAmorim ? t.lc : t.estilo === 'couracado' ? t.lc : t.estilo === 'embutido' ? t.lc / (t.esc || 1) : (C.canhao.cal > 140 ? 9 : C.canhao.cal > 100 ? 7.5 : 5.2) }); });
+  P.torres.forEach((t, i) => { const tr = g.getObjectByName('torre' + i); ref.torres.push({ g: tr, piv: tr.getObjectByName('pivo'), cano: tr.getObjectByName('cano'), cano2: tr.getObjectByName('cano2'), cano3: tr.getObjectByName('cano3'), cano4: tr.getObjectByName('cano4'), lcLocal: C.amorim || C.fragAmorim || C.destAmorim ? t.lc : t.estilo === 'couracado' ? t.lc : t.estilo === 'embutido' ? t.lc / (t.esc || 1) : (C.canhao.cal > 140 ? 9 : C.canhao.cal > 100 ? 7.5 : 5.2) }); });
   ref.sec = (P.sec || []).map((a) => { const m = g.getObjectByName('sec_' + a.i); return m ? { g: m, el: m.getObjectByName('pivo') || m.getObjectByName('cab') } : null; }); /* v1.2.18 item 14d */
   P.a30.forEach((a, i) => { const m = g.getObjectByName('a30_' + i); ref.a30.push({ g: m, cab: m.getObjectByName('cab') }); });
   P.ciws.forEach((c, i) => { const m = g.getObjectByName('ciws' + i); ref.ciws.push({ g: m, cab: m.getObjectByName('cab'), canos: m.getObjectByName('canos') }); });
   g.traverse((o) => { if (o.name === 'det') ref.det.push(o); if (o.userData.luz) ref.luzes.push(o); });
-  if (C.amorim || C.fragAmorim) { const PO = C.fragAmorim ? FRAGATA_POS : AMORIM_POS, nA = C.fragAmorim ? 2 : 4; ref.amChamines = U.chamines; ref.amRad = PO.radares.map(([nm, w]) => ({ g: g.getObjectByName('am_' + nm), w })); ref.amAutos = []; for (let i = 0; i < nA; i++) { const m = g.getObjectByName('amAuto' + i); if (m) ref.amAutos.push({ g: m, cab: m.getObjectByName('cab'), y0: m.rotation.y }); } } /* v1.3.02: Amorim (4 autos) e Fragata Amorim (2) */ /* v1.3.00: radares (cada um na sua velocidade) e canhões automáticos do Amorim */
+  if (C.amorim || C.fragAmorim || C.destAmorim) { const PO = C.destAmorim ? DESTROIER_POS : C.fragAmorim ? FRAGATA_POS : AMORIM_POS, nA = C.fragAmorim ? 2 : 4; if (C.destAmorim) ref.vtolPouso = [g.getObjectByName('vtolPouso0'), g.getObjectByName('vtolPouso1')]; ref.amChamines = U.chamines; ref.amRad = PO.radares.map(([nm, w]) => ({ g: g.getObjectByName('am_' + nm), w })); ref.amAutos = []; for (let i = 0; i < nA; i++) { const m = g.getObjectByName('amAuto' + i); if (m) ref.amAutos.push({ g: m, cab: m.getObjectByName('cab'), y0: m.rotation.y }); } } /* v1.3.02: Amorim (4 autos) e Fragata Amorim (2) */ /* v1.3.00: radares (cada um na sua velocidade) e canhões automáticos do Amorim */
   if (enfeite) aplicaEnfeite(g, C, P, enfeite);
   return ref;
 }
