@@ -183,11 +183,9 @@ button.trava { position: relative; opacity: .5; filter: grayscale(.7); cursor: n
 .btn-teste-comb { position: absolute; left: max(14px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom)); z-index: 5; display: grid; gap: 2px; text-align: left; padding: 10px 16px; min-height: 52px; border-radius: 10px; border: 1px solid #d4af37; background: linear-gradient(180deg, rgba(40,30,8,.92), rgba(18,14,6,.94)); color: #fde68a; box-shadow: 0 0 14px rgba(212,175,55,.35); }
 .btn-teste-comb b { font-size: 14px; letter-spacing: .08em; } .btn-teste-comb small { font-size: 10.5px; color: #e5d3a1; }
 .btn-teste-comb:active { transform: translateY(1px); }
-/* v1.3.04: botões de arma somados dos caças Acauã/Uiraçu (Destróier Amorim) — coluna à esquerda, alvo de toque ≥ 44 px */
-.vt-armas { left: 50%; transform: translateX(-50%); top: calc(70px + env(safe-area-inset-top, 0px)); display: none; flex-direction: row; gap: 6px; z-index: 6; }
-.vt-armas.on { display: flex; }
-.vt-bt { min-width: 58px; min-height: 44px; padding: 4px 8px; border-radius: 8px; border: 1px solid rgba(160, 200, 230, 0.55); background: linear-gradient(180deg, rgba(18, 32, 44, 0.86), rgba(8, 16, 24, 0.86)); color: #e6f1f8; font: 600 11px/1.1 system-ui, sans-serif; letter-spacing: 0.06em; display: flex; flex-direction: column; align-items: center; justify-content: center; touch-action: none; }
-.vt-bt b { font-size: 12px; } .vt-bt span { font: 600 13px ui-monospace, monospace; color: #9fe3ff; }
-.vt-bt.vt-nuke { border-color: rgba(240, 190, 60, 0.75); } .vt-bt.vt-nuke span { color: #ffd34d; }
-.vt-bt:active { filter: brightness(1.35); }
-.vt-bt.vazio, .vt-bt:disabled { opacity: 0.3; }
+/* v1.3.05: Acauã/Uiraçu pilotados — armas na MESMA tela do Urubu-rei (sem botões novos): mostra MÍSSIL (=ASM), TORP e PORTA (=CANHÃO) nas posições do próprio painel; esconde POUSAR do hidroavião */
+.hud.modo-vt .nk-bts .cb.hdb[data-a="hdMissil"], .hud.modo-vt .nk-bts .cb.hdb[data-a="hdTorp"] { display: flex !important; }
+.hud.modo-vt .hl-bts .cb.hdb[data-a="hdMissil"] { right: 276px; bottom: 100px; left: auto; top: auto; }
+.hud.modo-vt .nk-bts .cb.hdb[data-a="hdVolta"] { display: none !important; }
+.hud.modo-vt .hl-bts .cb.nk-pt { right: 338px; bottom: 100px; left: auto; top: auto; display: flex !important; }
+.hud.modo-vt .nk-bts .cb.vt-zero { opacity: .3; pointer-events: none; }
