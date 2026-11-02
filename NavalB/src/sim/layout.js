@@ -1,5 +1,5 @@
 import { EST_1225, layoutSuperPA } from './classes1225.js'; /* v1.2.25 */
-import { layout1231 } from './layout1231.js'; import { layoutAmorim } from './classesAmorim.js'; /* v1.3.00 */ import { bordaLivre1231, meiaBoca1231 } from './dados1231.js'; /* v1.2.31 */
+import { layout1231 } from './layout1231.js'; import { layoutAmorim } from './classesAmorim.js'; import { layoutFragAmorim } from './classesFragAmorim.js'; /* v1.3.00 */ import { bordaLivre1231, meiaBoca1231 } from './dados1231.js'; /* v1.2.31 */
 import { layoutGigaPA } from './classes1226.js'; /* v1.2.26: porta-aviões gigantes (também registra EST/PLANO_PA dos 8 navios novos) */
 // Arranjo de bordo comum à simulação e ao modelo 3D: onde ficam canhões, células VLS, CIWS e tubos de torpedo.
 // Coordenadas LOCAIS do navio: x = boreste, y = cima (0 = linha d'água), z = popa (proa em −z).
@@ -24,6 +24,7 @@ export const AJUSTE_LT = {"tridente":{"ciws":{"0":{"y":12.05}}},"corsario":{"a30
 export function layoutDe(C, mais = 0) { /* v1.2.21 item 19b: mais = células VLS extras do módulo (posições REAIS, uma fileira a mais no bloco) */
   const ck = mais > 0 ? C.id + ':' + mais : C.id; if (CACHE[ck]) return CACHE[ck];
   if (C.amorim) return CACHE[ck] = layoutAmorim(C); /* v1.3.00 */
+  if (C.fragAmorim) return CACHE[ck] = layoutFragAmorim(C); /* v1.3.02 */
   if (C.m1231) { const q = layout1231(C); if (q) return CACHE[ck] = q; } /* v1.2.31 */
   const L = C.L, P = { torres: [], vls: [], sam: [], celulas: [], ciws: [], a30: [], tubos: [], mastro: 0 };
   const est = { corveta: [-0.14, 0.12], fragata: [-0.16, 0.08], destroier: [-0.15, 0.08], furtivo: [-0.15, 0.1], cruzador: [-0.17, 0.06], capitania: [-0.19, 0.1], tridente: [-0.18, 0.16], dragao: [-0.17, 0.08], tempestade: [-0.17, 0.1], sentinela: [-0.17, 0.1], corsario: [-0.12, 0.1], leviata: [-0.15, 0.08], aurora: [-0.16, 0.08], kestrel: [-0.1, 0.14], haiyan: [-0.13, 0.1], strizh: [-0.11, 0.08], puffin: [-0.16, 0.14], redwood: [-0.17, 0.12], jinpeng: [-0.15, 0.1], tianlong: [-0.18, 0.06], sokol: [-0.14, 0.12], thornwood: [-0.19, 0.1], sapsan: [-0.13, 0.1], monolito: [-0.2, 0.12], xuanwu: [-0.18, 0.04], medved: [-0.15, 0.14], warden: [-0.18, 0.12], fenghuang: [-0.16, 0.1], trovao: [-0.14, 0.12], volkhar: [-0.12, 0.1], baluarte: [-0.12, 0.1], kordao: [-0.24, -0.04], estrelar: [-0.08, 0.16], colosso: [-0.11, 0.09], marcos: [-0.1, 0.07], rodolfo: [-0.12, 0.09], antonia: [-0.11, 0.08], horizonte: [-0.06, 0.1], atlantico: [-0.06, 0.1], kelly: [-0.12, 0.09], laiane: [-0.1, 0.08], klevton: [-0.12, 0.09], ananery: [-0.12, 0.1], trajano: [-0.09, 0.06], leidevaldo: [-0.1, 0.08], ronaldo: [-0.1, 0.08], mercante: [0.3, 0.4], ...EST_1225 }[C.id] || (C.osv ? [-0.38, -0.12] : [-0.16, 0.08]); /* v1.2.42: offshore com superestrutura na proa */

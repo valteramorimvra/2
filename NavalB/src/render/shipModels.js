@@ -13,6 +13,7 @@ export { NOMES_PADRAO };
 import { layoutDe, deckY as deckYC, meiaBoca, bordaLivre } from '../sim/layout.js';
 import { montaModelo1231 } from './modelo1231.js'; /* v1.2.31 */
 import { montaModeloAmorim, AMORIM_POS } from './modeloAmorim.js'; /* v1.3.00: super lendário Amorim */
+import { montaModeloFragataAmorim, FRAGATA_POS } from './modeloFragataAmorim.js'; /* v1.3.02: Fragata Lendária Amorim */
 import { materialPintura, texBandeira, materialConves } from './camuflagem.js';
 import { registraLuz } from './cidade.js';
 import { MASC_PRE } from '../sim/mascarasLT.js';
@@ -203,6 +204,7 @@ const _OURO = new Map(); function matOuro(txt, estilo = 'ouro') { const nav = es
 /** Monta o navio completo (modelo-matriz). */
 function montaModelo(tipo, time, mais = 0) {
   if (CLASSES[tipo].amorim) return montaModeloAmorim(); /* v1.3.00 */
+  if (CLASSES[tipo].fragAmorim) return montaModeloFragataAmorim(); /* v1.3.02 */
   if (CLASSES[tipo].m1231) return montaModelo1231(CLASSES[tipo], time); /* v1.2.31: 3 navios lendários reais (modelo próprio) */
   const C = CLASSES[tipo], P = layoutDe(C, mais), M = materiais(time); const g = new THREE.Group(); const { L, B } = C;
   const dY = (z) => deckYC(C, z), meia = (z) => meiaBoca(C, z) / (C.casco === 'tumblehome' ? 0.86 : 1);
@@ -533,12 +535,12 @@ export function criaNavio3D(tipo, time, pintura, enfeite = null, mais = 0) {
   const ref = { g, pintura, torres: [], ciws: [], a30: [], radar: g.getObjectByName('radar'), radar2: g.getObjectByName('radar2'), radar3: g.getObjectByName('radar3'), flamula: g.getObjectByName('flamula'), tampas: g.getObjectByName('tampas'), armasLOD: g.getObjectByName('armasLOD'), det: [], linhas: g.getObjectByName('linhas'), luzes: [], chamine: MODELOS[k].userData.chamine, holofote: MODELOS[k].userData.holofote, topoMastro: U.topoMastro, luzTopo: U.luzTopo, raioLuz: U.raioLuz, abertas: new Float32Array(P.celulas.length) };
   if (ref.tampas) { ref.tampas = ref.tampas; ref.tampas.instanceMatrix = ref.tampas.instanceMatrix.clone(); }
   ref.lg = (P.granadas || []).map((m, i) => { const q = g.getObjectByName('lg' + i); return q ? { g: q, el: q.getObjectByName('lgEl') } : null; }); /* v1.2.7 */
-  P.torres.forEach((t, i) => { const tr = g.getObjectByName('torre' + i); ref.torres.push({ g: tr, piv: tr.getObjectByName('pivo'), cano: tr.getObjectByName('cano'), cano2: tr.getObjectByName('cano2'), cano3: tr.getObjectByName('cano3'), cano4: tr.getObjectByName('cano4'), lcLocal: C.amorim ? t.lc : t.estilo === 'couracado' ? t.lc : t.estilo === 'embutido' ? t.lc / (t.esc || 1) : (C.canhao.cal > 140 ? 9 : C.canhao.cal > 100 ? 7.5 : 5.2) }); });
+  P.torres.forEach((t, i) => { const tr = g.getObjectByName('torre' + i); ref.torres.push({ g: tr, piv: tr.getObjectByName('pivo'), cano: tr.getObjectByName('cano'), cano2: tr.getObjectByName('cano2'), cano3: tr.getObjectByName('cano3'), cano4: tr.getObjectByName('cano4'), lcLocal: C.amorim || C.fragAmorim ? t.lc : t.estilo === 'couracado' ? t.lc : t.estilo === 'embutido' ? t.lc / (t.esc || 1) : (C.canhao.cal > 140 ? 9 : C.canhao.cal > 100 ? 7.5 : 5.2) }); });
   ref.sec = (P.sec || []).map((a) => { const m = g.getObjectByName('sec_' + a.i); return m ? { g: m, el: m.getObjectByName('pivo') || m.getObjectByName('cab') } : null; }); /* v1.2.18 item 14d */
   P.a30.forEach((a, i) => { const m = g.getObjectByName('a30_' + i); ref.a30.push({ g: m, cab: m.getObjectByName('cab') }); });
   P.ciws.forEach((c, i) => { const m = g.getObjectByName('ciws' + i); ref.ciws.push({ g: m, cab: m.getObjectByName('cab'), canos: m.getObjectByName('canos') }); });
   g.traverse((o) => { if (o.name === 'det') ref.det.push(o); if (o.userData.luz) ref.luzes.push(o); });
-  if (C.amorim) { ref.amChamines = U.chamines; ref.amRad = AMORIM_POS.radares.map(([nm, w]) => ({ g: g.getObjectByName('am_' + nm), w })); ref.amAutos = [0, 1, 2, 3].map((i) => { const m = g.getObjectByName('amAuto' + i); return { g: m, cab: m.getObjectByName('cab'), y0: m.rotation.y }; }); } /* v1.3.00: radares (cada um na sua velocidade) e canhões automáticos do Amorim */
+  if (C.amorim || C.fragAmorim) { const PO = C.fragAmorim ? FRAGATA_POS : AMORIM_POS, nA = C.fragAmorim ? 2 : 4; ref.amChamines = U.chamines; ref.amRad = PO.radares.map(([nm, w]) => ({ g: g.getObjectByName('am_' + nm), w })); ref.amAutos = []; for (let i = 0; i < nA; i++) { const m = g.getObjectByName('amAuto' + i); if (m) ref.amAutos.push({ g: m, cab: m.getObjectByName('cab'), y0: m.rotation.y }); } } /* v1.3.02: Amorim (4 autos) e Fragata Amorim (2) */ /* v1.3.00: radares (cada um na sua velocidade) e canhões automáticos do Amorim */
   if (enfeite) aplicaEnfeite(g, C, P, enfeite);
   return ref;
 }
@@ -554,8 +556,9 @@ function texFaixa() { if (TFAIXA) return TFAIXA; const c = document.createElemen
   x.fillStyle = '#fff'; x.beginPath(); x.arc(296, 128, 66, 0, Math.PI * 2); x.fill(); x.strokeStyle = '#f59e0b'; x.lineWidth = 7; x.stroke(); x.fillStyle = '#0f2a5c'; x.beginPath(); x.arc(296, 128, 52, 0, Math.PI * 2); x.fill();
   x.strokeStyle = '#fff'; x.lineWidth = 7; x.lineCap = 'round'; x.beginPath(); x.moveTo(296, 92); x.lineTo(296, 160); x.moveTo(278, 104); x.lineTo(314, 104); x.stroke(); x.beginPath(); x.arc(296, 138, 26, 0.15 * Math.PI, 0.85 * Math.PI); x.stroke(); x.beginPath(); x.arc(296, 86, 7, 0, Math.PI * 2); x.stroke();
   TFAIXA = new THREE.CanvasTexture(c); TFAIXA.colorSpace = THREE.SRGBColorSpace; TFAIXA.anisotropy = (globalThis.__nnsAniso || 8) /* v1.2.15: anisotropia máx. suportada */; return TFAIXA; }
-function aplicaEnfeite(g, C, P, { bandeira, gala, faixa }) {
+function aplicaEnfeite(g, C, P, { bandeira, gala, faixa, bandeiraProa }) {
   const fl = g.getObjectByName('flamula'); if (fl && bandeira) fl.material = matBand(bandeira);
+  { const fp = g.getObjectByName('flamulaProa'); if (fp) { const bp = bandeiraProa; if (bp === 'nenhuma') fp.visible = false; else if (bp || bandeira) fp.material = matBand(bp || bandeira); } } /* v1.3.02: bandeira da PROA (Fragata Amorim): a escolhida para a proa, ou a mesma da popa */
   if (faixa) { const L = C.L, zz = -L * 0.12; const m = new THREE.MeshBasicMaterial({ map: texFaixa(), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 }); const hF = deckYC(C, zz) * 0.85, wF = hF * 2;
     for (const sx of [-1, 1]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(wF, hF), m); p.position.set(sx * (meiaBoca(C, zz) * 1.0 + 0.2), hF * 0.52, zz); p.rotation.y = sx * Math.PI / 2; if (sx < 0) p.scale.x = -1; p.userData.det = 1; g.add(p); } }
   if (!gala) return; const L = C.L; const topo = g.userData.topoMastro ? new THREE.Vector3().copy(g.userData.topoMastro) : new THREE.Vector3(0, P.sup.h * 3 + 10 + L * 0.1, P.sup.z0 + (P.sup.z1 - P.sup.z0) * 0.35); /* v1.2.17: cabo da gala preso no topo real do mastro */

@@ -19,7 +19,8 @@ import { adiciona1225, HELIS_1225, META_1225, IDS_1225 } from './classes1225.js'
 import { adiciona1226, HELIS_1226, META_1226, IDS_1226, SUPER_LEND_1226 } from './classes1226.js'; /* v1.2.26 */
 import { adiciona1231, META_1231, IDS_1231 } from './classes1231.js'; /* v1.2.31 */
 import { adiciona1275, META_1275, IDS_1275, HELIS_1275 } from './classes1275.js'; /* v1.2.75 */
-import { adicionaAmorim, META_AMORIM } from './classesAmorim.js'; /* v1.3.00: super lendário Amorim (SL 06) */
+import { adicionaAmorim, META_AMORIM } from './classesAmorim.js';
+import { adicionaFragAmorim, META_FRAGAMORIM } from './classesFragAmorim.js'; /* v1.3.02: Fragata Lendária Amorim (L 09) */ /* v1.3.00: super lendário Amorim (SL 06) */
 export const LANCHA = { v: 21, vida: 40, alcCanhao: 1000, danoS: 0.9, alcTorp: 2400 };
 /** v1.2.0 — helicópteros embarcados (modelos genéricos, sem marcas). vmax m/s, comb s de voo, mun = cargas da arma. */
 export const HELIS = {
@@ -205,7 +206,7 @@ CLASSES.atlantico = D('capitania', 'atlantico', { nome: 'Super Porta-Aviões Atl
   L: 336, B: 44, T: 11.5, F: 17, vmax: 15.4, acel: 0.42, giro: 0.42, vida: VIDA(1500), blind: 2.2, rcs: 2.4, desl: 104000, canhao: CAN({ cal: 57, V0: 1000, cad: 0.55, dano: 4.8, alc: 8500, torres: 2, canos: 1, som: 'rapido', frenteDupla: 0, embutido: 1 }),
   vls: 0, missil: 'medio', salva: 0, sam: 16, ciws: 4, ciwsLug: [0, 2, 3, 4], a30: 4, torp: 0, tubos: [0, 0], laser: 2, heli: 24, maxAr: 14, /* v1.2.17 item 7: 2×8 células SAM de autodefesa em patrocínios */
   helisPadrao: ['caca', 'caca', 'caca', 'caca', 'caca', 'caca', 'caca', 'caca', 'jato', 'jato', 'jato', 'jato', 'caca', 'caca', 'tufao', 'tufao', 'tufao', 'asw', 'asw', 'jato', 'caca', 'caca', 'utilitario', 'tufao'], porta: 'pa', couracado: 0, estilo: 'capitania', pf: 'capitania' });
-adiciona1225(CLASSES, { D, CAN, VIDA }); adiciona1226(CLASSES, { D, CAN, VIDA }); adiciona1231(CLASSES, { D, CAN, VIDA }); adiciona1275(CLASSES, { D, CAN, VIDA }); /* v1.2.75 */ adicionaAmorim(CLASSES, { D, CAN, VIDA }); /* v1.3.00 */
+adiciona1225(CLASSES, { D, CAN, VIDA }); adiciona1226(CLASSES, { D, CAN, VIDA }); adiciona1231(CLASSES, { D, CAN, VIDA }); adiciona1275(CLASSES, { D, CAN, VIDA }); /* v1.2.75 */ adicionaAmorim(CLASSES, { D, CAN, VIDA }); /* v1.3.00 */ adicionaFragAmorim(CLASSES, { D, CAN, VIDA }); /* v1.3.02 */
 /* v1.2.18 item 14/14b/14c/14d: SETE CRUZEIROS PESADOS (projetos ORIGINAIS inspirados num cruzeiro multimissão moderno; nomes do Valter).
    Mais fortes que a referência, com torres EXTRAS na proa e na popa, cada um com layout/calibre/mísseis/defesa/pintura próprios.
    Antiaérea como na referência: SAM de longo alcance em VLS vertical + defesa de ponto 30 mm combinada (CIWS) e reparos de 30 mm — tudo AUTOMÁTICO (defesa.js).
@@ -270,7 +271,7 @@ const META = { kestrel: ['EUA', 1, 'eua'], redwood: ['EUA', 2, 'eua'], monolito:
   tempestade: ['RUS', 2, 'artica'], sentinela: ['UK', 2, 'uk_escura'], tridente: ['EUA', 2, 'eua'], leviata: ['UK', 2, 'premium_oceano'],
   volkhar: ['RUS', 4, 'lend_grafite'], baluarte: ['EUA', 4, 'lend_aco'], kordao: ['RUS', 4, 'lend_grafite'], estrelar: ['RUS', 4, 'lend_ardosia'], colosso: ['BRA', 4, 'lend_titanio'], atlantico: ['BRA', 4, 'lend_aco'], marcos: ['ITA', 4, 'lend_italia'], rodolfo: ['BRA', 4, 'lend_aco'], antonia: ['BRA', 4, 'lend_ardosia'], kelly: ['BRA', 4, 'cruz_vermelho'], laiane: ['BRA', 4, 'lend_aco'], klevton: ['BRA', 4, 'lend_grafite'], ananery: ['BRA', 4, 'lend_ardosia'], trajano: ['BRA', 4, 'slend_rubi'], leidevaldo: ['BRA', 4, 'slend_negro'], ronaldo: ['BRA', 4, 'slend_azul'], tamandare: ['BRA', 4, 'slend_safira'], barroso: ['BRA', 4, 'slend_negro'], isakov: ['RUS', 4, 'lend_grafite'], /* v1.2.33 */ horizonte: ['BRA', 3, 'bra'], mercante: ['BRA', 1, 'cinza_naval'],
   cruzador: ['BRA', 3, 'bra'], dragao: ['CHN', 3, 'chn'], capitania: ['BRA', 3, 'bra'], aurora: ['EUA', 3, 'premium_dourada'], parcel: ['BRA', 2, 'offshore'] };
-Object.assign(META, META_1225, META_1226, META_1231, META_1275, META_AMORIM); /* v1.2.75 */
+Object.assign(META, META_1225, META_1226, META_1231, META_1275, META_AMORIM, META_FRAGAMORIM); /* v1.2.75 */
 for (const k in META) { const [nacao, tier, pintura] = META[k]; Object.assign(CLASSES[k], { nacao, tier, pintura, premium: CLASSES[k].premium || 0 }); }
 /* v1.2.7: escola de CASCO por nação (geometria procedural original; L/B/T, hitbox e pontos de flutuação não mudam). EUA: tumblehome perfurador de ondas em todos os navios. */
 const CASCO_NAC = { EUA: 'eua', CHN: 'chn', RUS: 'rus', UK: 'uk', BRA: 'bra' };
@@ -289,8 +290,8 @@ export function razaoPoder(C, R) { const a = poderNavio(C), b = poderNavio(R); l
 export const REF_PREMIUM = { corsario: 'corveta', leviata: 'fragata', sapsan: 'tempestade', aurora: 'cruzador', fenghuang: 'dragao' };
 export const ALVO_PREMIUM = 1.2; // +20% (faixa pedida 15–25%)
 for (const [k, ref] of Object.entries(REF_PREMIUM)) { const C = CLASSES[k], R = CLASSES[ref]; for (let it = 0; it < 12; it++) { const r = razaoPoder(C, R); if (Math.abs(r - ALVO_PREMIUM) < 0.004) break; const f = Math.pow(ALVO_PREMIUM / r, 0.9); C.vida = Math.round(C.vida * f); C.canhao = Object.assign({}, C.canhao, { dano: +(C.canhao.dano * f).toFixed(2) }); } }
-export const ORDEM_CLASSES = ['corveta', 'corsario', 'kestrel', 'haiyan', 'strizh', 'puffin', 'fragata', 'destroier', 'furtivo', 'tempestade', 'sentinela', 'tridente', 'redwood', 'jinpeng', 'tianlong', 'sokol', 'thornwood', 'leviata', 'sapsan', 'cruzador', 'dragao', 'capitania', 'trovao', 'monolito', 'xuanwu', 'medved', 'warden', 'aurora', 'fenghuang', 'zarev', 'horizonte', 'volkhar', 'baluarte', 'kordao', 'estrelar', 'colosso', 'antonia', 'rodolfo', 'marcos', 'atlantico', 'kelly', 'laiane', 'klevton', 'ananery', 'trajano', 'leidevaldo', 'ronaldo', 'tamandare', 'barroso', 'isakov', ...IDS_1225, ...IDS_1226, ...IDS_1231, ...IDS_1275, 'amorim', 'parcel']; /* v1.2.75 */ /* v1.3.00: + Amorim */
-export const LENDARIOS = ['volkhar', 'baluarte', 'kordao', 'estrelar', 'colosso', 'antonia', 'rodolfo', 'marcos', 'atlantico', 'kelly', 'laiane', 'klevton', 'ananery', 'trajano', 'leidevaldo', 'ronaldo', 'tamandare', 'barroso', 'isakov', 'caracara', 'abrolhos', 'costaverde', ...IDS_1226, ...IDS_1231, 'amorim'];
+export const ORDEM_CLASSES = ['corveta', 'corsario', 'kestrel', 'haiyan', 'strizh', 'puffin', 'fragata', 'destroier', 'furtivo', 'tempestade', 'sentinela', 'tridente', 'redwood', 'jinpeng', 'tianlong', 'sokol', 'thornwood', 'leviata', 'sapsan', 'cruzador', 'dragao', 'capitania', 'trovao', 'monolito', 'xuanwu', 'medved', 'warden', 'aurora', 'fenghuang', 'zarev', 'horizonte', 'volkhar', 'baluarte', 'kordao', 'estrelar', 'colosso', 'antonia', 'rodolfo', 'marcos', 'atlantico', 'kelly', 'laiane', 'klevton', 'ananery', 'trajano', 'leidevaldo', 'ronaldo', 'tamandare', 'barroso', 'isakov', ...IDS_1225, ...IDS_1226, ...IDS_1231, ...IDS_1275, 'amorim', 'fragata_amorim', 'parcel']; /* v1.2.75 */ /* v1.3.00: + Amorim */
+export const LENDARIOS = ['volkhar', 'baluarte', 'kordao', 'estrelar', 'colosso', 'antonia', 'rodolfo', 'marcos', 'atlantico', 'kelly', 'laiane', 'klevton', 'ananery', 'trajano', 'leidevaldo', 'ronaldo', 'tamandare', 'barroso', 'isakov', 'caracara', 'abrolhos', 'costaverde', ...IDS_1226, ...IDS_1231, 'amorim', 'fragata_amorim'];
 export const SUPER_LENDARIOS = ['trajano', 'leidevaldo', 'ronaldo', 'tamandare', 'barroso', ...SUPER_LEND_1226, 'amorim']; /* v1.2.33: + Tamandaré e Barroso */ /* v1.2.18: nova raridade acima de lendário */
 /** Navios por nação (5+ projetos cada). */
 export const POR_NACAO = () => { const o = {}; for (const k of ORDEM_CLASSES) (o[CLASSES[k].nacao] = o[CLASSES[k].nacao] || []).push(k); return o; };
