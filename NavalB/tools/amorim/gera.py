@@ -48,8 +48,9 @@ def classifica(k, bb):
         if z1 <= T1['zpiv'] + 0.1 and 9.6 < y0 and y1 < 10.8: return 'c1'
         if z1 <= T2['zpiv'] + 0.1 and 12.3 < y0 and y1 < 13.4: return 'c2'
     if w <= 10.2 and abs(cx) < 3.2:
-        if -79.5 < cz < -59.0 and y0 >= 7.7 and y1 <= 12.9 and not (y0 >= 12.4 and cz > -61.0): return 't1'
-        if -61.0 < cz < -40.4 and y0 >= 10.2 and y1 <= 17.5: return 't2'
+        plano = (y1 - y0) < 0.02  # v1.3.02: placas planas do convés NÃO giram com a torre
+        if -79.5 < cz < -59.0 and y0 >= 7.7 and y1 <= 12.9 and not (y0 >= 12.4 and cz > -61.0) and not plano and math.hypot(cx, cz - T1['zc']) < 6.0: return 't1'  # v1.3.02: peças brancas do convés de proa (a 11 m) ficavam no grupo da torre e giravam soltas
+        if -61.0 < cz < -40.4 and y0 >= 10.2 and y1 <= 17.5 and not plano and math.hypot(cx, cz - T2['zc']) < 6.0: return 't2'
     # CIWS do teto do hangar (domo + canos), x ≈ ±1,7, z 43–46
     if 42.9 < z0 and z1 < 46.2 and 9.55 < y0 and 0.9 < abs(cx) < 2.5 and k.startswith('mat_8'): return 'ciws0' if cx < 0 else 'ciws1'
     # canhões automáticos pretos de ré (z ≈ 33,6–37,3)

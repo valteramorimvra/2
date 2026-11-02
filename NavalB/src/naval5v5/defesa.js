@@ -92,7 +92,7 @@ function abate(sim, n, tipo, alvo, arma, j) {
 // ---------------- LASER (v1.2.11) ----------------
 /** Laser de defesa aérea: feixe contínuo que precisa ficar sobre o alvo (tempo de permanência) para queimá-lo; depois recarrega (energia). Sem efeito sobre torpedos. */
 /** v1.3.01 (Valter): aeronave PILOTADA por você (não bot) — dano recebido ×0,35 e flare quase sempre engana o míssil (5% passa) */
-export const PILOTADA = Object.freeze({ dano: 0.35, flareSam: 0.05, flares: 10 });
+export const PILOTADA = Object.freeze({ dano: 0.2, flareSam: 0.05, flares: 12 }); /* v1.3.02 (Valter): ainda mais resistente — recebe 20% do dano (era 35%) e 12 flares */
 export const LASER = { alc: 2600, perm: { m: 1.5, h: 2.0, d: 0.9, u: 1.0 }, pk: 0.82, recarga: 2.6 };
 export function passoLaser(sim, n, dt) { if (!n.lasers || !n.lasers.length) return;
   for (let j = 0; j < n.lasers.length; j++) { const L = n.lasers[j], pl = n.P.laser[j]; if (n.morto) { L.on = 0; continue; } if (L.tc > 0) { L.tc -= dt; L.on = 0; continue; } sim.mundo(n, pl.x, pl.y, pl.z, _o);

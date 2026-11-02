@@ -46,3 +46,10 @@
   .tela-estaleiro .es-info { left: 8px; right: 8px; width: auto; top: auto; bottom: 8px; height: 50%; }
   .tela-estaleiro .es-dica { display: none; }
 }
+/* v1.3.02 (Valter): painéis da tela NAVIOS mais largos dos dois lados — nomes e textos organizados sem quebrar letra por letra */
+@media (orientation: landscape) {
+  .tela-estaleiro .es-lista { width: clamp(168px, 19vw, 260px); }
+  .tela-estaleiro .es-info { width: clamp(270px, 30vw, 420px); }
+  .tela-estaleiro .es-lista button b { font-size: 12px; line-height: 1.2; overflow-wrap: normal; word-break: normal; hyphens: none; }
+  .tela-estaleiro .es-info h2, .tela-estaleiro .es-info p { overflow-wrap: normal; word-break: normal; }
+}

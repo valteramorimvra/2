@@ -11,4 +11,4 @@ export function registraBatalha(r, cfg, nomePintura) {
     navios: r.navios.map((q) => ({ lado: q.time, eu: !!q.eu, cmd: q.cmd || '', nome: q.nome, classe: q.classe || '', camo: nomePintura ? nomePintura(q.pintura, q) : q.pintura || '', dano: q.dano || 0, danoRec: q.danoRec || 0, abates: q.abates || 0, aereos: q.abatidos || 0, tiros: q.tiros || 0, acertos: q.acertos || 0, morto: !!q.morto, vida: Math.round((q.vida || 0) * 100), mvp: q.id === r.mvpId, pts: q.pts || 0, merc: !!q.merc })) };
   const a = leHistorico(); a.unshift(e); while (a.length > HIST_MAX) a.pop(); if (!grava(a)) { while (a.length > 5 && !grava(a)) a.pop(); } return e;
 }
-export const precisao = (ac, ti) => (ti ? Math.round((100 * ac) / ti) + '%' : '—');
+export const precisao = (ac, ti) => (ti ? Math.min(100, Math.round((100 * ac) / ti)) + '%' : '—'); /* v1.3.02: nunca passa de 100% */

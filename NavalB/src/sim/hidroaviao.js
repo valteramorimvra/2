@@ -110,7 +110,7 @@ function antiaerea(sim, q, S, dt) { let dps = 0; const corte = q.tFlare > 0 ? HD
   for (const e of sim.navios) { if (e.morto || e.time === q.time || e.C.mercante) continue; const d = Math.hypot(q.x - e.x, q.y - e.C.F, q.z - e.z); if (d > HD.alcAA) continue;
     const f = d < HD.alcPleno ? 1 : 1 - (d - HD.alcPleno) / (HD.alcAA - HD.alcPleno); const forca = Math.min(1.6, 0.55 + 0.12 * (e.ciws ? e.ciws.length : 0) + (e.sam > 0 ? 0.25 : 0) + (e.C.antiAereo ? 0.2 : 0)); dps += HD.dpsNavio * f * forca; }
   q.sobFogo = dps > 0 ? 1 : 0; if (dps <= 0) return; if (q.tFlareCad <= 0 && q.flares > 0) soltaFlare(sim, q);
-  q.vida -= dps * corte * dt; if (q.vida <= 0) { q.vida = 0; termina(sim, q, 'abatido'); } }
+  q.vida -= dps * corte * dt * (q.manual ? 0.2 : 1); /* v1.3.02: hidroavião pilotado por você recebe 20% do dano */ if (q.vida <= 0) { q.vida = 0; termina(sim, q, 'abatido'); } }
 
 /** Passo de todos os hidroaviões (chamar depois de passoNuclear). */
 export function passoHidros(sim, dt) { if (!sim.nukes) return;

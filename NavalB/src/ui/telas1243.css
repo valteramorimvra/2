@@ -451,3 +451,41 @@
 .tela-arvore .ar-mil .ar-card .ar-nv.ld { color: #ddd6fe; border-color: rgba(167,139,250,.8); } .tela-arvore .ar-mil .ar-card .ar-nv.sl { color: #fde68a; border-color: rgba(253,230,138,.9); }
 .tela-arvore .ar-mil .ar-cel { display: none; }
 .cbx .cb-card { min-width: 0; overflow: hidden; } .cbx .cb-q > * { min-width: 0; }
+/* v1.3.02 (Valter): ÁRVORE — padrão militar de alto nível: painéis de aço grafite com rebites e régua âmbar, designação naval em estêncil,
+   quadro com FOTO (nível/PREMIUM só na foto) + FAIXA de texto própria (nada cobre o nome), sem nada piscando, sem espaços vazios */
+.tela-arvore *, .tela-arvore *::before, .tela-arvore *::after { animation: none !important; }
+.tela-arvore .ar-mil { background: linear-gradient(180deg, rgba(10,14,19,.92), rgba(6,9,13,.95)) !important; border: 1px solid rgba(201,162,74,.45) !important; border-radius: 3px !important; }
+.tela-arvore .ar-mil .ar-grade { gap: 6px; padding: 6px; }
+.tela-arvore .ar-mil .ar-linha { grid-template-columns: 118px max-content !important; border-radius: 2px !important; background: linear-gradient(180deg, #1a2028, #12171d) !important; border: 1px solid #2c3540 !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.05) !important; }
+.tela-arvore .ar-mil .ar-linha::after { display: none !important; }
+.tela-arvore .ar-mil .ar-tipo { position: sticky; left: 0; z-index: 3; gap: 4px; padding: 8px 8px; background: repeating-linear-gradient(135deg, #20272f 0 6px, #1c232a 6px 12px) !important; border-right: 3px solid #c9a24a !important; box-shadow: 4px 0 10px rgba(0,0,0,.45) !important; }
+.tela-arvore .ar-mil .ar-tipo span { font-size: 10px; letter-spacing: .14em; color: #e5e9ee; text-align: center; }
+.tela-arvore .ar-mil .ar-tipo small { color: #c9a24a; }
+.tela-arvore .ar-mil .ar-des { font-size: 20px; color: #f0c45a; letter-spacing: .16em; }
+.tela-arvore .ar-mil .ar-fila { gap: 8px; padding: 8px 12px; background: linear-gradient(180deg, transparent calc(50% - 1px), rgba(201,162,74,.35) calc(50% - 1px), rgba(201,162,74,.35) calc(50% + 1px), transparent calc(50% + 1px)) !important; }
+.ar-no { position: relative; flex: 0 0 auto; width: 128px; display: flex; flex-direction: column; padding: 0; border-radius: 3px; overflow: hidden; text-align: left; color: #f1f5f9; background: #0d1218; border: 1px solid #3a4552; box-shadow: 0 3px 10px rgba(0,0,0,.5); }
+.ar-no-img { position: relative; display: block; height: 64px; background: #0b1220 center / cover no-repeat; border-bottom: 2px solid #c9a24a; }
+.ar-no-nv, .ar-no-pr { position: absolute; top: 4px; font-style: normal; font-size: 8px; font-weight: 900; letter-spacing: .1em; line-height: 1; padding: 3px 5px; border-radius: 2px; }
+.ar-no-nv { left: 4px; background: rgba(8,11,15,.86); color: #f0c45a; border: 1px solid rgba(240,196,90,.6); }
+.ar-no-pr { right: 4px; background: linear-gradient(180deg, #fde68a, #c9a24a); color: #1c1300; }
+.ar-no-txt { display: grid; gap: 1px; padding: 5px 6px 6px; min-height: 40px; background: linear-gradient(180deg, #161d25, #10151b); }
+.ar-no-txt b { font-size: 10.5px; line-height: 1.2; color: #f1f5f9; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ar-no-txt small { font-size: 9px; color: #9fb0bf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ar-no.st-possui { border-color: #2f7d4f; } .ar-no.st-possui .ar-no-txt small { color: #6ee7a0; }
+.ar-no.st-pesq, .ar-no.st-pode { border-color: #2c6e94; } .ar-no.st-bloq .ar-no-img { filter: grayscale(.85) brightness(.6); } .ar-no.st-bloq { border-color: #3a4552; }
+.ar-no.lend { border-color: #7c63c9; } .ar-no.lend .ar-no-img { border-bottom-color: #a78bfa; } .ar-no.slend { border-color: #c9a24a; } .ar-no.slend .ar-no-img { border-bottom-color: #fde68a; }
+.ar-no:active { transform: translateY(1px); } .ar-no:focus-visible { outline: 2px solid #f0c45a; outline-offset: 2px; }
+@media (max-height: 440px) { .ar-no { width: 118px; } .ar-no-img { height: 56px; } }
+/* v1.3.02: seletor do câmbio */
+.cbs { gap: 10px; }
+.cbs-pares { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 6px; }
+.cbs-par { display: grid; grid-template-columns: auto auto auto 1fr; grid-template-rows: auto auto; align-items: center; column-gap: 5px; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(148,197,230,.25); background: rgba(12,20,30,.9); color: #e2e8f0; text-align: left; }
+.cbs-par > i { font-style: normal; color: #f3d77a; } .cbs-par span { grid-column: 1 / -1; font-size: 11.5px; font-weight: 700; } .cbs-par small { grid-column: 1 / -1; font-size: 10px; color: #94a3b8; font-variant-numeric: tabular-nums; }
+.cbs-par.on { border-color: #d4af37; box-shadow: inset 0 0 0 1px #d4af37, 0 0 12px rgba(212,175,55,.25); }
+.cbs .cb-lado strong { font-size: 18px; color: #fff; font-variant-numeric: tabular-nums; } .cbs .cb-lado u { text-decoration: none; color: #f3d77a; }
+.cbs-qtd { display: grid; grid-template-columns: repeat(3, auto) 1fr repeat(3, auto); gap: 5px; align-items: center; }
+.cbs-qtd input { min-width: 0; width: 100%; height: 40px; padding: 0 10px; border-radius: 8px; border: 1px solid rgba(212,175,55,.5); background: #070b10; color: #fff; font-size: 16px; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
+.cbs-st { min-height: 40px; min-width: 44px; padding: 0 8px; border-radius: 8px; border: 1px solid rgba(148,197,230,.3); background: rgba(14,26,40,.9); color: #e2e8f0; font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; } .cbs-st:disabled { opacity: .35; }
+.cbs input[type=range] { width: 100%; accent-color: #d4af37; }
+.cbs-rap { display: flex; flex-wrap: wrap; gap: 5px; }
+.cbs-ok { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; border-radius: 10px; border: 0; background: linear-gradient(180deg, #f5cf5a, #b8860b); color: #1c1300; font-size: 14px; font-weight: 900; letter-spacing: .06em; font-variant-numeric: tabular-nums; } .cbs-ok:disabled { opacity: .45; }

@@ -59,8 +59,8 @@ export function abreCaixa(eco, id, save, jaPaga = false) { const C = CAIXAS[id];
 export const chanceTxt = (C) => { const tot = C.premios.reduce((s, p) => s + p[0], 0); const nome = { prata: 'Prata', ouro: 'Ouro', lotes: 'Lotes de munição', pintura: 'Pintura', navio: 'Navio premium' }; return C.premios.map((p) => `${nome[p[1]]}${p[1] === 'pintura' ? ' ' + p[2] : ''}: ${(p[0] / tot * 100).toFixed(p[0] / tot < 0.02 ? 1 : 0)}%`); };
 
 /* ---------- CÂMBIO ---------- */
-export const CAMBIO = [{ id: 'nx_ouro', de: 'nexos', para: 'ouro', taxa: 10, txt: '1 NX → 10 de ouro' }, { id: 'ouro_prata', de: 'ouro', para: 'prata', taxa: 400, txt: '1 de ouro → 400 de prata' }];
-export function trocar(eco, c, qtd) { qtd = Math.max(1, Math.floor(qtd)); if (!eco.gasta(c.de, qtd)) return { ok: false, motivo: 'Saldo insuficiente' }; eco.credita(c.para, qtd * c.taxa); return { ok: true, v: qtd * c.taxa }; }
+export const CAMBIO = [{ id: 'nx_ouro', de: 'nexos', para: 'ouro', taxa: 10, txt: '1 NX → 10 de ouro' }, { id: 'ouro_prata', de: 'ouro', para: 'prata', taxa: 400, txt: '1 de ouro → 400 de prata' }, { id: 'nx_prata', de: 'nexos', para: 'prata', taxa: 4000, txt: '1 NX → 4.000 de prata' } /* v1.3.02: = 1 NX → 10 ouro → 4.000 prata (mesma taxa composta) */];
+export function trocar(eco, c, qtd) { if (!c) return { ok: false, motivo: 'Troca inválida' }; qtd = Math.floor(+qtd); if (!(qtd >= 1)) return { ok: false, motivo: 'Escolha a quantidade' }; if (!eco.gasta(c.de, qtd)) return { ok: false, motivo: 'Saldo insuficiente' }; const v = qtd * c.taxa; eco.credita(c.para, v); return { ok: true, v, q: qtd }; } /* v1.3.02: quantidade inteira validada; paga e recebe na mesma operação (salvo no aparelho) */
 
 /* ---------- LOJA (pacotes; preço em reais apenas ilustrativo — compra de TESTE credita sem cobrança) ---------- */
 export const LOJA = {
