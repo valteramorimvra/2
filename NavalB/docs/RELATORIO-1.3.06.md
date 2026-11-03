@@ -315,3 +315,10 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Óptica com alvo travado acompanha o ponto travado real do navio (não o avanço). | `autoMiraPasso` | VERIFICADO (navegador: alvo andando −86° → −83°, erro da mira < 1°) |
 | Saída da óptica suave (sem tremer): a câmera desliza até o ponto; inclinação achada por intervalo, medida só com a câmera assentada (vale nas câmeras de órbita com trechos planos), altura na tela pelo espaço da câmera (sem depender do plano de corte). | `voltaPontoBino` | VERIFICADO (ponto a 1,88 km — perto 1.894, FW 1.880, convés 1.894, canhão 1.881, ampla 1.880, popa 1.876, 3/4 alta 1.876, costado 1.879 m; popa alta 4.779 → 4.779 m; mesma marcação) |
 | Manual atualizado (1.3.33). | `manualDados1231.js` | — |
+
+## 1.3.34
+
+| Item | Onde | Estado |
+|---|---|---|
+| Marcação de voo do MANUAL como nos vídeos: escada de inclinação (gira com o horizonte), ALT/VEL com régua, mira central com munição, moldura de cantos + losango no alvo com distância, estado PRONTO / CARREGANDO / FORA DO ALCANCE. Etiqueta do próprio avião sai do centro (vida no quadro da direita). | `nkMwPasso`, `hud.js`, `hud1334.css`, `marcasAereas` | VERIFICADO (capturas 857×400: reto, curva e mergulho; alvo a 1,3 km → PRONTO verde) |
+| Tamanho e ângulos: no MANUAL a distância vem do tamanho real do modelo (≈0,72× — avião ≈ metade da largura), câmera acima mirando logo acima do avião (avião embaixo, fixo na tela), tela rola 45% da inclinação lateral (suave). IA e helicóptero sem mudança. | `nkCam` | VERIFICADO (avião em NDC y ≈ −0,6 a −0,7 em todas as capturas; horizonte na tela = 25° com rolagem 0,45 rad do avião; a escada gira igual) |
