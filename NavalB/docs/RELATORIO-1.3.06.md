@@ -269,3 +269,14 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | CÂMERA FW: fator 1,1 → 1,15 (a 1.3.16 era 1,2), mesmo ângulo. | `modernNavalCombat3D.js` (`kFw`) | VERIFICADO (build) |
 | Saída da ÓPTICA: a câmera volta ao ponto que estava na óptica (marcação corrigida direto; inclinação em malha fechada com a sensibilidade medida da câmera atual). Com alvo travado e "trava segue", a trava leva a câmera ao ponto/alvo travado. Arrastar cancela. Antes a saída forçava a inclinação mínima e a mira caía perto do navio. | `voltaPontoBino` | VERIFICADO (navegador, câmera FW: ponto a 8,5 km → 8,36 km na mesma marcação; ponto a 1,88 km → 1,885 km) |
 | Manual atualizado (Controles › Câmeras). | `manualDados1231.js` | VERIFICADO |
+
+## 1.3.29
+
+| Item | Onde | Estado |
+|---|---|---|
+| MANUAL: trava automática no navio dentro do cone de 40° em volta do eixo do nariz (3D: rumo e arfagem); fora do cone a trava solta (exceto TRAVAR apertado há < 4 s); câmera só gira para o alvo dentro do cone. | `modernNavalCombat3D.js` (`nkAutoAlvo`, `nkCam`), `nuclear.js` (`nkTrava` `liv`), `commands.js` | VERIFICADO (navegador: 23° e 17° travam; 63° solta) |
+| IA: bomba no ponto marcado ao passar; se não passar exato, lança na menor distância da passagem até 500 m (`NUK.lancaTol`). | `nuclear.js` | VERIFICADO (ponto a 34° do rumo: caiu a 118 m) |
+| IA contra navio: salva de todas as armas (todos os mísseis + 1 bomba + arma do heli) e volta ao navio; sem conseguir em 2 min, volta. Na volta: AR-AR em aeronave próxima e míssil/arma em navio ao alcance com visada; flares como antes. Bombas restantes voltam ao paiol. Caças Acauã/Uiraçu seguem o sistema próprio. | `nuclear.js` (`defendeRtb`) | VERIFICADO (caça: 4 mísseis, 1 bomba, volta e pousa) |
+| Navios: câmera da auto-mira com velocidade máxima de giro (0,55 rad/s escolhendo, 0,9 com trava; menor na óptica). | `autoMiraPasso` | VERIFICADO (trava segue com erro ~1°) |
+| A volta da óptica só move a câmera (marcação/inclinação); a física dos tiros não muda. | — | — |
+| Manual atualizado. | `manualDados1231.js` | VERIFICADO |

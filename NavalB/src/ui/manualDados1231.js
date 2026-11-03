@@ -5,7 +5,7 @@
 //   { gerar:'nome', arg } tabela/ficha montada a partir dos dados reais · { so:'novos.hidro' } (opcional, em qualquer bloco) só mostra se o caminho existir.
 // Regras de conteúdo: nada religioso, de marca, demoníaco ou de azar; personagens amigáveis; sem números inventados (o que não existe fica PENDENTE).
 export const CREDITO_DEV = 'Responsável pelo desenvolvimento do game: Valter Amorim';
-export const VERSAO_MANUAL = '1.3.28'; /* v1.3.24: manual atualizado com a mira, a trava, o radar e as câmeras de 1.3.15–1.3.24 */
+export const VERSAO_MANUAL = '1.3.29'; /* v1.3.24: manual atualizado com a mira, a trava, o radar e as câmeras de 1.3.15–1.3.24 */
 // Corte aprovado pelo Valter: o hidroavião fica para a 1.2.32. Tudo que tem `desde: '1.2.32'` (categoria, seção ou bloco) fica FORA
 // do manual enquanto LIGAR_1232 for false. Para ligar depois: troque para true (e passe novos.hidro em fontesHidro1232.js).
 export const LIGAR_1232 = false;
@@ -95,7 +95,7 @@ export const CATEGORIAS = [
 
   { id: 'armas', titulo: 'Armas', icone: IC.armas, resumo: 'Canhões, mísseis, torpedos, defesa, granadas e aeronaves — números reais do jogo', secoes: [
     { id: 'mira', titulo: 'Mira e trava', blocos: [
-      { p: '<b>Arraste</b> para mirar: a mira é <b>manual</b>. O botão <b>AUTO-MIRA</b> (desligado por padrão, fica salvo) procura o navio visível na tela e ajusta avanço e elevação; com ela ligada o <b>TRAVAR não trava</b>, porque a mira já é automática. O radar nunca liga a auto-mira.' },
+      { p: '<b>Arraste</b> para mirar: a mira é <b>manual</b>. O botão <b>AUTO-MIRA</b> (desligado por padrão, fica salvo) procura o navio visível na tela e ajusta avanço e elevação; com ela ligada o <b>TRAVAR não trava</b>, porque a mira já é automática. O radar nunca liga a auto-mira. A câmera da auto-mira gira com velocidade limitada, sem trancos.' },
       { p: '<b>TRAVAR num ponto</b>: aponte para a proa, a popa, a ponte… e toque <b>TRAVAR</b> (o botão fica verde; o 2º toque solta). A mira, o quadro e a <b>óptica</b> passam a acompanhar <b>aquele ponto</b> do navio, que gira com o casco. Fora do casco, trava no centro do navio.' },
       { p: '<b>Cruzes da mira</b>: a cruz <b>vermelha meio apagada</b> marca o ponto travado já com o avanço (onde a granada encontra o alvo). Cada <b>canhão disponível</b> tem um símbolo cinza com o número da torre, que mostra para onde <b>ele</b> aponta agora e vem até a vermelha — cada torre gira, eleva e recarrega sozinha. Quando <b>todos os disponíveis</b> assentam no ponto, o centro fica <b>VERDE</b>: hora de atirar. Torre fora do setor ou com a boca obstruída na direção do alvo não tem símbolo (veja os ícones das torres no botão CANHÃO).' },
       { p: 'Pare a mira sobre um navio inimigo dentro do alcance e ele é <b>travado sozinho</b> em cerca de {{param.trava.tAtivo}}–{{param.trava.tPassivo}} s: colchete verde (travando) → vermelho (travado), com alarme e vibração curta. A trava resiste até {{param.trava.tFora}} s fora da mira.' },
@@ -171,7 +171,8 @@ export const CATEGORIAS = [
     { id: 'aero', titulo: 'Helicóptero e esquadrilha', blocos: [
       { p: '<b>HELI</b> assume o helicóptero: joystick de movimento, altitude pelos botões ▲/▼. Botões do heli: <b>ARMA</b>, <b>FLARE</b>, <b>POUSAR</b>, <b>NAVIO</b> (volta ao navio) e <b>HELI 2</b> (troca). Enquanto você voa, a IA comanda o navio e usa todas as armas.' },
       { p: 'Na tela de pilotagem, tocar na tela marca a <b>bolinha</b>; o <b>TRAVAR</b> pega o navio inimigo mais próximo dela. Aeronave com <b>torpedo</b>: o <b>LANÇAR/ARMA</b> dispara no alvo travado até 3,5 km (de longe aparece a distância). O <b>COMBATE</b> do hangar começa no ar, a 750 m.' },
-      { p: '<b>Modo MANUAL</b> (IA desligada): a mira <b>trava sozinha</b> no navio inimigo mais perto do centro da tela, e a câmera gira para ele quando você solta a tela; <b>arraste a tela</b> para outro navio e a trava troca. A bolinha marcada e o TRAVAR têm prioridade por alguns segundos. Altura mínima de voo: <b>150 m</b>; acima disso você escolhe a altura e desvia das montanhas — <b>se bater, a aeronave explode</b> e a câmera volta ao navio. O modo <b>IA</b> continua como era.' },
+      { p: '<b>Modo MANUAL</b> (IA desligada): a mira <b>trava sozinha</b> no navio inimigo dentro de um <b>cone de 40°</b> em volta do nariz do avião (o mais perto do eixo); fora do cone a trava solta e o avião segue livre. Com alvo travado, a câmera gira para ele quando você solta a tela. A bolinha marcada e o TRAVAR têm prioridade por alguns segundos. Altura mínima de voo: <b>150 m</b>; acima disso você escolhe a altura e desvia das montanhas — <b>se bater, a aeronave explode</b> e a câmera volta ao navio. O modo <b>IA</b> continua como era.' },
+      { p: '<b>Modo IA</b>: vai exatamente ao ponto marcado na tela (mar ou terra) e lança a bomba ao passar por ele; se não conseguir passar exatamente, lança no ponto mais próximo da passagem, até 500 m. Com um navio inimigo como alvo, a IA ataca com a <b>salva de todas as armas</b> (todos os mísseis, uma bomba, a arma do helicóptero) e <b>volta ao navio</b> — se não conseguir usar todas em 2 min, volta mesmo assim. No caminho de volta ela se defende e luta: ar-ar em aeronave inimiga próxima e míssil/arma em navio inimigo ao alcance (com visada). As bombas que sobram voltam ao paiol.' },
       { p: 'Nos porta-aviões, <b>ESQUADRILHA</b> lança a ala aérea. O <b>DRONE</b> revela navios atrás das ilhas no radar da frota.' },
     ] },
     { id: 'bombardeiro', titulo: 'Bombardeiro nuclear', blocos: [
