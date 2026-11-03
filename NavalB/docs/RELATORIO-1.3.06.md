@@ -133,3 +133,9 @@ Fora da batalha normal nada muda: duelo, treino, teste de combate e batalha pers
 | Item | Onde | Estado |
 |---|---|---|
 | A curva do míssil de VLS dos navios agora é redonda e contínua. Antes ele quase parava no alto (18 m/s) e virava em 0,2 s, formando uma quina. Agora: freada só até 45 m/s, curva a ~75 m/s com virada de até ~2 rad/s, e entrada no cruzeiro só com a curva completa. Resultado: subida vertical até ~47 m, curva entre 0,6 e 1,5 s (de 55 a ~100 m) e depois o arco baixo. Mísseis de aeronave e lançadores laterais não mudam. | `src/sim/world.js` (fases EJEÇÃO e PITCH) | VERIFICADO (trajetória na simulação; 8/8 acertos de 4,5 a 12 km) |
+
+## 1.3.15 — câmera FW (vídeo de referência)
+
+| Item | Onde | Estado |
+|---|---|---|
+| Nova câmera "CÂMERA FW" no menu de câmeras (botão FW). Fica atrás do navio a ~0,72×L + 22 m e pouco acima do convés (F + 0,075×L + 7 m), olha para a frente pela mira com o horizonte perto do meio da tela, acompanha o balanço do navio e gira com o arraste. Nenhuma outra câmera muda. | `src/modernNavalCombat3D.js` (`camModo` `fw`), `src/ui/hud.js` (botão) | VERIFICADO (navegador: menu, seleção e foto comparada ao vídeo) |
