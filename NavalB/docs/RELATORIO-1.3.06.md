@@ -289,3 +289,11 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | ERRO antigo corrigido: o míssil próprio dos helicópteros (ex.: Beija-flor) nunca disparava no sistema da pilotagem; agora entra como míssil da aeronave (IA e botão MÍSSIL). | `nuclear.js` (lançamento) | VERIFICADO |
 | Câmera do MANUAL: só gira para um alvo dentro do cone de 40° (1.3.29); fora disso fica atrás do avião, como sempre. | — | — |
 | Manual atualizado. | `manualDados1231.js` | VERIFICADO |
+
+## 1.3.31 — saída da óptica
+
+| Item | Onde | Estado |
+|---|---|---|
+| Causa 1: o arraste feito DENTRO da óptica deixava o "toque manual" ativo por 1,5 s e cancelava a volta ao sair. Agora só um arraste depois de sair cancela. | `modernNavalCombat3D.js` (`voltaPontoBino`, `_nArr`) | VERIFICADO |
+| Causa 2: a opção "câmera volta para trás do navio" girava a câmera externa de volta. Agora fica suspensa depois da óptica até o próximo arraste. A volta corre até chegar exatamente ao ponto (máx. 4 s). | `voltaPontoBino`, `_camFixa` | VERIFICADO (navegador, arraste logo antes de sair: FW 1.880 → 1.875 m; EXTERNA 1.881 → 1.879 m, mesma marcação, e fica no ponto) |
+| Só a câmera se move; a física dos tiros não muda. Manual atualizado. | — | — |

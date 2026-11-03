@@ -5,7 +5,7 @@
 //   { gerar:'nome', arg } tabela/ficha montada a partir dos dados reais · { so:'novos.hidro' } (opcional, em qualquer bloco) só mostra se o caminho existir.
 // Regras de conteúdo: nada religioso, de marca, demoníaco ou de azar; personagens amigáveis; sem números inventados (o que não existe fica PENDENTE).
 export const CREDITO_DEV = 'Responsável pelo desenvolvimento do game: Valter Amorim';
-export const VERSAO_MANUAL = '1.3.30'; /* v1.3.24: manual atualizado com a mira, a trava, o radar e as câmeras de 1.3.15–1.3.24 */
+export const VERSAO_MANUAL = '1.3.31'; /* v1.3.24: manual atualizado com a mira, a trava, o radar e as câmeras de 1.3.15–1.3.24 */
 // Corte aprovado pelo Valter: o hidroavião fica para a 1.2.32. Tudo que tem `desde: '1.2.32'` (categoria, seção ou bloco) fica FORA
 // do manual enquanto LIGAR_1232 for false. Para ligar depois: troque para true (e passe novos.hidro em fontesHidro1232.js).
 export const LIGAR_1232 = false;
@@ -157,7 +157,7 @@ export const CATEGORIAS = [
       { p: 'Por padrão, tocar no radar define o rumo (piloto automático). Isso pode ser desligado em Ajustes.' },
     ] },
     { id: 'camera', titulo: 'Câmeras', blocos: [
-      { p: 'Ao <b>sair da ÓPTICA</b>, a câmera volta a apontar exatamente para o ponto que estava na óptica; com um alvo travado, ela segue a trava (o ponto ou o navio travado).' },
+      { p: 'Ao <b>sair da ÓPTICA</b>, a câmera volta a apontar exatamente para o ponto que estava na óptica e <b>fica ali</b> até você arrastar a tela; com um alvo travado, ela segue a trava (o ponto ou o navio travado).' },
       { p: 'Toque em <b>CÂMERA</b> para abrir o leque de câmeras. Em todas: <b>sem zoom</b> (distância fixa), <b>órbita 360°</b> livre por arrasto, da altura da água até o céu (mira antiaérea), suave e sem atravessar água ou casco.' },
       { gerar: 'cameras' },
       { pend: 'Distâncias finais das câmeras externas e do bombardeiro: estão sendo ajustadas na 1.2.30; os números só entram aqui depois que fecharem.' },
