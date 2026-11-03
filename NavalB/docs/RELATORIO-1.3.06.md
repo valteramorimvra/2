@@ -207,3 +207,12 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215` OK, `vtol138`, `de
 | Óptica com alvo travado acompanha o alvo (desde a 1.3.17/1.3.19). | `autoMiraPasso` | VERIFICADO |
 
 Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destroier133`, `amorim130`, `fragata132` OK.
+
+## 1.3.22
+
+| Item | Onde | Estado |
+|---|---|---|
+| Ficha do navio, campo do canhão principal: "Elevação máxima do canhão" (por modelo/calibre: 76 mm 85°, 152 mm 60°, 406–508 mm 65° etc.) e "Tiro em arco (por cima do relevo)". | `src/fichaTecnica.js` | VERIFICADO |
+| Atrás de uma cobertura (relevo), o inimigo só é visto/travado com o radar DELE e o SEU ligados. Qualquer um desligado → trava negada, a cobertura protege. | `src/sim/world.js` (`sensores`) | VERIFICADO (Baluarte × alvo atrás de montanha de 163 m: só os dois ligados → trava e tiro em arco) |
+
+Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `vtol138`, `destroier133`, `amorim130`, `fragata132` OK.

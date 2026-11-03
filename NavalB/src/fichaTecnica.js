@@ -2,7 +2,7 @@
 // calculados com as MESMAS fórmulas e parâmetros que a simulação usa (world.js / defesa.js / danoReal.js), já com os
 // modificadores daquele navio (módulos, propulsão, pintura, comandante). Munição padrão (HE) e míssil padrão.
 import { CLASSES, MISSEIS, TORPEDO, SAM, HELIS } from './sim/classes.js';
-import { PARAM, recargaMinCal } from './armasParametros.js';
+import { PARAM, recargaMinCal, elMaxCal } from './armasParametros.js';
 import { CIWS, A30, LASER } from './naval5v5/defesa.js';
 import { fracMissil, fracTorpedo, hpRef } from './naval5v5/danoReal.js';
 import { layoutDe } from './sim/layout.js';
@@ -22,7 +22,7 @@ export function fichaTecnica(k, m = {}) {
   { const A = C.canhao, nc = A.canos || 1, nt = A.torres || 1, rec = Math.max(A.cad * 0.8, recargaMinCal(A.cal)) * (m.cad || 1) /* v1.2.21 item 19: mesma regra do combate (piso realista do calibre × carregador/comandante) */, dG = A.dano * 0.65 * (m.municaoEf ? m.municaoEf.dano : 1) * dm;
     F.push({ id: 'canhao', simb: 'fogo', nome: `Canhão principal ${A.cal} mm`, desc: `${nt > 1 ? nt + ' torres' : '1 torre'}${nc > 1 ? ' de ' + nc + ' canos' : ''}; granada explosiva (HE) com espoleta de impacto, tiro balístico com arrasto e dispersão por calibre. Não pode ser interceptada: se acerta, causa dano.`,
       linhas: [{ k: 'cal', rot: 'Calibre', v: A.cal, un: 'mm', melhor: 1 }, { k: 'canos', rot: 'Canos', v: nc * nt, un: '', melhor: 1 }, { k: 'rec', rot: 'Recarga', v: r1(rec, 2), un: 's', melhor: -1 }, { k: 'dano', rot: 'Dano por granada', v: r1(dG, 1), un: 'HP', melhor: 1 },
-        { k: 'gpm', rot: 'Granadas por minuto (navio)', v: r1((60 / rec) * nc * nt, 0), un: '/min', melhor: 1 }, { k: 'alc', rot: 'Alcance', v: r1(A.alc / 1000, 1), un: 'km', melhor: 1 }, { k: 'v0', rot: 'Velocidade de boca', v: A.V0, un: 'm/s', melhor: 1 }] }); }
+        { k: 'gpm', rot: 'Granadas por minuto (navio)', v: r1((60 / rec) * nc * nt, 0), un: '/min', melhor: 1 }, { k: 'alc', rot: 'Alcance', v: r1(A.alc / 1000, 1), un: 'km', melhor: 1 }, { k: 'v0', rot: 'Velocidade de boca', v: A.V0, un: 'm/s', melhor: 1 }, { k: 'elev', rot: 'Elevação máxima do canhão', v: Math.round(elMaxCal(A.cal) * 57.2958), un: '°', melhor: 1 }, { k: 'arco', rot: 'Tiro em arco (por cima do relevo)', v: elMaxCal(A.cal) > 0.8 ? 'sim' : 'não', un: '' }] }); } /* v1.3.22 (Valter): inclinação do reparo na ficha */
   if (C.vls) { const lista = (C.misseis || [C.missil]).map((q) => MISSEIS[q]).filter(Boolean); const pf = MISSEIS[C.missil] || lista[0]; const ef = m.missilEf || {}; const mv = m.misVel || 1, mt = m.trava || 1, PT = PARAM.trava;
     const fr = fracMissil({ perfil: pf, danoMul: (ef.dano || 1) * dm }); const res = 1 - (pf.pkCiws || 1) * (ef.pkCiws || 1);
     F.push({ id: 'missil', simb: 'vls', nome: `Míssil antinavio ${pf.nome}`, desc: `Lançamento vertical (VLS), cruzeiro rasante e mergulho terminal guiado por radar. Precisa de TRAVA: primeiro o radar trava o alvo, depois a solução de tiro é passada ao míssil (anel no botão VLS). Pode ser interceptado por CIWS, SAM, laser ou iscas.${lista.length > 1 ? ' Salva alterna perfis: ' + lista.map((q) => q.nome).join(', ') + '.' : ''}`,

@@ -489,7 +489,7 @@ export class Sim {
         for (const o of meus) { const d = Math.hypot(e.x - o.x, e.z - o.z); if (d > 26000) continue; const hO = o.P.mastro;
           if (d < D.sonar * fatorSonar(e.C) && !bloqueado(T, o.x, o.z, -2, e.x, e.z, -2)) /* v1.2.14 */ { fonte = 'sonar'; q = 3; break; }
           const vis = d < aV * (o.optica ? 1.35 : 1) /* v1.2.10: ÓPTICA alcança +35% */, rad = o.radarAtivo && d < alcRadar(o, e), esm = e.radarAtivo && d < alcEsm(e); if (!vis && !rad && !esm) continue;
-          if (bloqueado(T, o.x, o.z, hO, e.x, e.z, vis || rad ? hE : e.P.mastro)) { if (esm && q < 2) { fonte = 'esm'; q = 2; } continue; } /* v1.3.21 (Valter): radar LIGADO denuncia a posição a todos no alcance do ESM, mesmo atrás do relevo (triangulação da emissão); radar desligado atrás do relevo = ninguém vê */
+          if (bloqueado(T, o.x, o.z, hO, e.x, e.z, vis || rad ? hE : e.P.mastro)) { if (esm && o.radarAtivo && q < 2) { fonte = 'esm'; q = 2; } continue; } /* v1.3.22 (Valter): atrás da COBERTURA só se vê com o radar DO ALVO e o SEU ligados; radar desligado atrás do relevo = ninguém vê */
           if (vis) { fonte = 'visual'; q = 3; break; } if (rad && q < 2) { fonte = 'radar'; q = 2; } else if (esm && q < 2) { fonte = 'esm'; q = 2; } }
         if (this.revelaTudo && q < 3) { fonte = 'visual'; q = 3; } /* só testes isolados de armas (dispersão/dano/trava): o alvo é dado como visto */
         if (q < 3) { const fa = sensorAereo(this, time, e); if (fa) { const ant = mapa.get(e.id); if (!ant || t - ant.t > 8) { const qd = this._aereoDono; if (qd != null && this.navios[qd]) this.navios[qd].stats.avistAereo = (this.navios[qd].stats.avistAereo || 0) + 1; } fonte = fa; q = 3; } } // helicóptero/VANT enxerga por cima das ilhas
