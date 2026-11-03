@@ -280,3 +280,12 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Navios: câmera da auto-mira com velocidade máxima de giro (0,55 rad/s escolhendo, 0,9 com trava; menor na óptica). | `autoMiraPasso` | VERIFICADO (trava segue com erro ~1°) |
 | A volta da óptica só move a câmera (marcação/inclinação); a física dos tiros não muda. | — | — |
 | Manual atualizado. | `manualDados1231.js` | VERIFICADO |
+
+## 1.3.30 — salva de armas da IA
+
+| Item | Onde | Estado |
+|---|---|---|
+| Salva = UMA vez cada arma disponível contra o navio-alvo (1 lançamento/onda de mísseis, 1 bomba, 1 torpedo ou rajada da arma do heli, bazuca) e volta ao navio; sem conseguir em 2 min, volta. Na volta não insiste no mesmo alvo: luta só com outros inimigos que encontrar. Restante volta ao paiol. | `src/sim/nuclear.js` (`q.sv`, `alvoSalva`) | VERIFICADO (caça: 1 onda de 2 mísseis + 1 bomba → volta e pousa; Coaxial: 1 torpedo → volta; Beija-flor: 1 onda → volta e pousa) |
+| ERRO antigo corrigido: o míssil próprio dos helicópteros (ex.: Beija-flor) nunca disparava no sistema da pilotagem; agora entra como míssil da aeronave (IA e botão MÍSSIL). | `nuclear.js` (lançamento) | VERIFICADO |
+| Câmera do MANUAL: só gira para um alvo dentro do cone de 40° (1.3.29); fora disso fica atrás do avião, como sempre. | — | — |
+| Manual atualizado. | `manualDados1231.js` | VERIFICADO |
