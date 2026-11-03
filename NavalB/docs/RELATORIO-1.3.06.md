@@ -96,3 +96,18 @@ Estado:
 | Trem de pouso: estava fundido na peça fixa, sempre baixado. Agora pernas e portas são peças móveis, com os pivôs e ângulos do META do Valter. Baixado no convés e na corrida; recolhe para trás em 4 s depois de sair, e as portas fecham; baixa na aproximação do navio. | `tools/vtol/gera.py`, `src/render/vtolDados.js`, `src/render/modeloVtol.js` (`tremVtol`), `vtolAmorimFx.js` | VERIFICADO (fotos do trem baixado e recolhido; em voo: 0 → −90° em 4 s) |
 | Todo o armamento disponível: NUKE, AAM, ASM e TORP disparam pelos botões. | | VERIFICADO |
 | Armamento dos caças 5× mais resistente à defesa aérea (CIWS, SAM e laser): `resistMissil` do jogo nos ASM e NUKE (fator 0,2). | `vtolAmorim.js` | VERIFICADO (chance de abate pelo CIWS × 0,20) |
+
+## 1.3.11
+
+| Item | Onde | Estado |
+|---|---|---|
+| Câmera dos caças do destróier = a do Pica-pau: mesma proporção (tamK 0,593) e enquadramento, mesma posição e distância em todo o voo. | `src/render/vtolAmorimFx.js` (`tamPica`); `nkCam` sem o desvio da 1.3.09 | VERIFICADO (navegador) |
+| A mesma arma nuclear do Pica-pau: bomba atômica do sistema no LANÇAR (10 a bordo). O computador só leva a bomba com a opção ligada. | `src/sim/vtolAmorim.js` (`arma`) | VERIFICADO (LANÇAR solta: 10 → 9) |
+| Todo o armamento ativo: AAM, ASM, TORP, bomba, canhão 25/30 mm e lasers dorsal e ventral (feixes). | `vtolAmorim.js`, `vtolAmorimFx.js` | VERIFICADO |
+| Acauã e Uiraçu no hangar e na árvore tecnológica (caças, nível V), com miniatura gerada pelo próprio hangar. | `src/aeronaves.js`, `public/fotos/aero/acaua.jpg` e `uiracu.jpg` | VERIFICADO (árvore e hangar no navegador) |
+| Batalha normal com formação militar. Cada time: 1 porta-aviões grande (no fundo da formação, oposto ao do outro time), 1 couraçado, 1 destróier, 1 cruzador e 1 corveta ou fragata. O jogador fica na vaga do seu tipo; o lado vermelho recebe o navio do mesmo tipo com poder mais próximo. | `src/sim/formacaoMil.js` (novo), `src/sim/match.js` | VERIFICADO (5 mapas) |
+| Inimigos mais perto no início: 5,2 a 5,6 km entre as frotas (antes ~7–8 km). | `formacaoMil.js` (`aproxima` 0,3) | VERIFICADO |
+| Mapas de ilhas: os navios ficam abrigados atrás das ilhas em relação ao inimigo, em ponto sorteado perto da vaga. | `abrigaAtrasDeIlhas` | VERIFICADO (10/10 navios abrigados em 4 mapas) |
+| Bots largam em velocidade máxima (os 2 times) para chegar mais cedo ao combate. | `match.js` | VERIFICADO |
+
+Fora da batalha normal nada muda: duelo, treino, teste de combate e batalha personalizada continuam iguais.

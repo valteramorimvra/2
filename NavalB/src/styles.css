@@ -186,6 +186,5 @@ button.trava { position: relative; opacity: .5; filter: grayscale(.7); cursor: n
 /* v1.3.06: Acauã/Uiraçu na TELA DO URUBU-REI (sem botões novos): LANÇAR = NUKE, AR-AR = AAM, MÍSSIL = ASM e o TORP do próprio painel; munição 0 = esmaecido */
 .hud.modo-vt .nk-bts .cb.hdb[data-a="hdTorp"] { display: flex !important; }
 .hud.modo-vt .nk-bts .cb.hdb[data-a="hdVolta"] { display: none !important; }
-.hud.modo-vt .nk-bts .cb[data-a="nkSolta"].off { opacity: 1; } .hud.modo-vt .nk-bts .cb[data-a="nkSolta"].nk-cue { box-shadow: none; }
 .hud.modo-vt .nk-bts .cb.vt-zero { opacity: .3 !important; pointer-events: none; }
 .hud.modo-vt .hl-bts .cb[data-a="nkEjeta"] { right: 276px !important; bottom: 160px !important; left: auto !important; top: auto !important; } /* EJETAR não cobre o BASE */
