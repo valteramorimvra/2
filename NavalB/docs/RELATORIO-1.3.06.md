@@ -261,3 +261,11 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Visibilidade por partes do alvo (10 pontos: 7 no casco de proa a popa, 3 na superestrutura), da boca da arma, com linha 3D contra o relevo; recalculada a cada 0,3 s. Parcial → mira no meio da parte exposta; total → centro como antes; nenhuma → não atira. Todos os navios (secundárias) e os automáticos do Amorim. | `src/sim/world.js` (`partesVisiveis`), `secundarias.js`, `amorim.js` | VERIFICADO (alvo com 4/10 pontos visíveis: 92 acertos na parte exposta, 0 tiros no morro; exposto: centro) |
 | Defesa (CIWS/30 mm/laser/SAM) e secundárias valem para todos os navios (código comum). | `defesa.js`, `secundarias.js` | — |
 | Manual atualizado. | `manualDados1231.js` | VERIFICADO |
+
+## 1.3.28
+
+| Item | Onde | Estado |
+|---|---|---|
+| CÂMERA FW: fator 1,1 → 1,15 (a 1.3.16 era 1,2), mesmo ângulo. | `modernNavalCombat3D.js` (`kFw`) | VERIFICADO (build) |
+| Saída da ÓPTICA: a câmera volta ao ponto que estava na óptica (marcação corrigida direto; inclinação em malha fechada com a sensibilidade medida da câmera atual). Com alvo travado e "trava segue", a trava leva a câmera ao ponto/alvo travado. Arrastar cancela. Antes a saída forçava a inclinação mínima e a mira caía perto do navio. | `voltaPontoBino` | VERIFICADO (navegador, câmera FW: ponto a 8,5 km → 8,36 km na mesma marcação; ponto a 1,88 km → 1,885 km) |
+| Manual atualizado (Controles › Câmeras). | `manualDados1231.js` | VERIFICADO |
