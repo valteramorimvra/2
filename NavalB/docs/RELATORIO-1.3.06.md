@@ -305,3 +305,13 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Cone de trava das aeronaves no MANUAL: 40° → 60° (câmera gira para o alvo só dentro dele). | `nkAutoAlvo`, `nkCam` | VERIFICADO (navegador: 52° e 29° travam; 72° não) |
 | Volta da óptica em TODAS as câmeras: giro e inclinação corrigidos pela sensibilidade medida da câmera (secante, com sentido e passo crescente onde o ponto quase não responde). Com alvo travado (inclusive o pego pela trava automática dentro da óptica) volta ao ponto travado com avanço. | `voltaPontoBino` | VERIFICADO (ponto a 1,88 km — externa 1.872, FW 1.871, convés 1.886, canhão 1.882, ampla 1.876, popa 1.880, 3/4 alta 1.875, popa alta 1.877, costado 1.875 m; mesma marcação) |
 | Cinema e câmeras de míssil/foguete/projétil/torpedo seguem o próprio objeto (fora da volta). Manual atualizado. | — | — |
+
+## 1.3.33
+
+| Item | Onde | Estado |
+|---|---|---|
+| Aviões no MANUAL como nos vídeos do Valter: a câmera é o manche (giro da tela vira o avião; olhar para baixo mergulha, para cima sobe; joystick tem prioridade). Câmera mais perto (×0,58), avião maior na tela. Helicóptero e IA sem mudança. | `nkPasso`, `nkCam` | VERIFICADO (navegador: rumo 60° → 2° em ~4 s; mergulho até −29° com a câmera para baixo) |
+| Sem cone: trava automática no navio inimigo no centro da tela; sem navio na tela, solta. | `nkAutoAlvo` | VERIFICADO (código e navegador) |
+| Óptica com alvo travado acompanha o ponto travado real do navio (não o avanço). | `autoMiraPasso` | VERIFICADO (navegador: alvo andando −86° → −83°, erro da mira < 1°) |
+| Saída da óptica suave (sem tremer): a câmera desliza até o ponto; inclinação achada por intervalo, medida só com a câmera assentada (vale nas câmeras de órbita com trechos planos), altura na tela pelo espaço da câmera (sem depender do plano de corte). | `voltaPontoBino` | VERIFICADO (ponto a 1,88 km — perto 1.894, FW 1.880, convés 1.894, canhão 1.881, ampla 1.880, popa 1.876, 3/4 alta 1.876, costado 1.879 m; popa alta 4.779 → 4.779 m; mesma marcação) |
+| Manual atualizado (1.3.33). | `manualDados1231.js` | — |
