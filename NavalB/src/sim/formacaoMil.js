@@ -11,7 +11,7 @@ import { poder } from './esquadra.js';
 import { alturaTerreno, distTerra } from './maps.js';
 import { TIPO_NAVIO } from '../navalTechTreeEconomy.js';
 
-export const FORM_MIL = Object.freeze({ aproxima: 0.3, abrigoMin: 250, abrigoMax: 1200, carrier: 'horizonte' });
+export const FORM_MIL = Object.freeze({ aproxima: 0.4 /* v1.3.16: times um pouco mais perto (era 0,3) */, abrigoMin: 250, abrigoMax: 1200, carrier: 'horizonte', folgaProa: 650 /* v1.3.16 */ });
 /** tipo do navio (mesma regra da árvore tecnológica) */
 export function tipoNavio(k) { const C = CLASSES[k]; if (!C) return 'fragata'; if (C.civil || C.mercante) return 'apoio'; if (C.porta || C.superPA) return 'porta'; if (TIPO_NAVIO[k]) return TIPO_NAVIO[k]; if (C.couracado) return 'capitania'; const L = C.L || 100; return L < 105 ? 'corveta' : L < 140 ? 'fragata' : L < 175 ? 'destroier' : L < 235 ? 'cruzador' : 'capitania'; }
 const PAPEL = { porta: 'capitania', capitania: 'capitania', destroier: 'batedor', cruzador: 'ataque', corveta: 'batedor', fragata: 'batedor' };
@@ -33,13 +33,25 @@ export function formacaoMilitar(rng, pools, classeJog) {
 
 /** a linha (x,z) → (ex,ez) passa por terra (ilha) no primeiro trecho? */
 function cobertoPorIlha(T, x, z, ex, ez) { const d = Math.hypot(ex - x, ez - z); for (let u = 120; u < Math.min(d * 0.7, 4500); u += 60) { const f = u / d; if (alturaTerreno(T, x + (ex - x) * f, z + (ez - z) * f) > 2) return true; } return false; }
+/** v1.3.16: distância (m) até a primeira terra na linha (x,z) → (ex,ez); 1e9 se não houver */
+function terraNaLinha(T, x, z, ex, ez) { const d = Math.hypot(ex - x, ez - z); for (let u = 40; u < Math.min(d * 0.7, 4500); u += 40) { const f = u / d; if (alturaTerreno(T, x + (ex - x) * f, z + (ez - z) * f) > -2) return u; } return 1e9; }
 /** mapas com ilhas: cada navio do time vai para um ponto abrigado por trás de uma ilha (em relação à base inimiga), sorteado perto da sua vaga. */
 export function abrigaAtrasDeIlhas(sim, time, base, alvo) { const T = sim.T, rng = sim.rng, lim = T.tam * 0.43; let terra = 0; for (let i = 0; i < 40 && !terra; i++) { const x = (rng.next() - 0.5) * T.tam * 0.8, z = (rng.next() - 0.5) * T.tam * 0.8; if (alturaTerreno(T, x, z) > 2) terra = 1; } if (!terra) return 0;
   let mov = 0; const ocup = sim.navios.filter((q) => q.time === time);
   for (const n of ocup) { const C = n.C; if (C.mercante || C.base || C.aerodromo) continue; const cands = [];
     for (let r = FORM_MIL.abrigoMin; r <= FORM_MIL.abrigoMax; r += 190) for (let a = 0; a < 20; a++) { const b = a / 20 * Math.PI * 2, x = n.x + Math.cos(b) * r, z = n.z + Math.sin(b) * r;
-      if (Math.abs(x) > lim || Math.abs(z) > lim || alturaTerreno(T, x, z) > -(C.T + 2.5) || distTerra(T, x, z) < Math.max(C.L * 0.6, 160)) continue;
+      if (Math.abs(x) > lim || Math.abs(z) > lim || alturaTerreno(T, x, z) > -(C.T + 2.5) || distTerra(T, x, z) < Math.max(C.L * 1.1, 260) /* v1.3.16: folga maior da costa (era 0,6·L ≥ 160 m): casco inteiro longe da terra ao manobrar a toda força */) continue;
       if (Math.hypot(x - alvo.x, z - alvo.z) < Math.hypot(n.x - alvo.x, n.z - alvo.z) - 900) continue; /* não avança demais para o inimigo */
-      if (ocup.some((q) => q !== n && Math.hypot(q.x - x, q.z - z) < 220)) continue; if (!cobertoPorIlha(T, x, z, alvo.x, alvo.z)) continue; cands.push(x, z); }
+      if (ocup.some((q) => q !== n && Math.hypot(q.x - x, q.z - z) < 220)) continue; if (!cobertoPorIlha(T, x, z, alvo.x, alvo.z)) continue; if (terraNaLinha(T, x, z, alvo.x, alvo.z) < FORM_MIL.folgaProa + C.L * 2) continue; /* v1.3.16: ilha não colada na proa — espaço para contornar a toda força sem encalhar na largada */ cands.push(x, z); }
     if (!cands.length || cobertoPorIlha(T, n.x, n.z, alvo.x, alvo.z)) continue; const k = Math.floor(rng.next() * (cands.length / 2)) * 2; n.x = cands[k]; n.z = cands[k + 1]; n.rumo = n.rumoAlvo = Math.atan2(alvo.x - n.x, -(alvo.z - n.z)); if (n.rumoAlvo != null) n.rumoAlvo = null; mov++; }
+  return mov; }
+/** v1.3.16: navio de guerra que nasce com o casco colado à costa (folga < 1,1·L ou 260 m) encalha ao largar a toda força: vai para o ponto de água livre mais próximo (até 900 m), sem avançar para o inimigo. */
+export function afastaDaCosta(sim) { const T = sim.T, lim = T.tam * 0.43; let mov = 0;
+  for (const n of sim.navios) { const C = n.C; if (n.morto || C.mercante || C.base || C.aerodromo) continue; const folga = Math.max(C.L * 1.1, 260); if (distTerra(T, n.x, n.z) >= folga) continue;
+    let ok = null; for (let r = 40; r <= 900 && !ok; r += 40) for (let a = 0; a < 24; a++) { const b = a / 24 * Math.PI * 2, x = n.x + Math.cos(b) * r, z = n.z + Math.sin(b) * r;
+      if (Math.abs(x) > lim || Math.abs(z) > lim || alturaTerreno(T, x, z) > -(C.T + 2.5) || distTerra(T, x, z) < folga) continue; if (sim.navios.some((q) => q !== n && !q.morto && Math.hypot(q.x - x, q.z - z) < 220)) continue; ok = [x, z]; break; }
+    if (ok) { n.x = ok[0]; n.z = ok[1]; mov++; } }
+  /* proa livre: quem nasce apontado para terra a menos de folgaProa + 2·L gira, na largada, para o rumo livre mais próximo do original (o navio sai a toda força) */
+  for (const n of sim.navios) { const C = n.C; if (n.morto || C.mercante || C.base || C.aerodromo) continue; const prec = FORM_MIL.folgaProa + C.L * 2, livre = (r) => terraNaLinha(T, n.x, n.z, n.x + Math.sin(r) * 6000, n.z - Math.cos(r) * 6000) >= prec;
+    if (livre(n.rumo)) continue; for (let k = 1; k <= 18; k++) { const r1 = n.rumo + k * 0.1745, r2 = n.rumo - k * 0.1745; const r = livre(r1) ? r1 : livre(r2) ? r2 : null; if (r != null) { n.rumo = Math.atan2(Math.sin(r), Math.cos(r)); mov++; break; } } }
   return mov; }

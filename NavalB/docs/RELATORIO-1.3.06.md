@@ -151,3 +151,16 @@ Fora da batalha normal nada muda: duelo, treino, teste de combate e batalha pers
 | NUCLEAR acima do TRAVAR, na mesma coluna (em telas baixas um pouco mais baixo, com o rótulo ao lado, para não tocar o placar nem o TRAVAR). | `src/ui/hud1316.css` | VERIFICADO |
 | Óptica (binóculo): zoom inicial ≈13× → ≈15×; máximo 20× → 25× (trilho 2×–25×). | `src/modernNavalCombat3D.js`, `src/ui/hud.js` | VERIFICADO |
 | Aeródromo militar retirado das batalhas por enquanto (chave `AERODROMO_OFF` em `src/sim/match.js`; `false` traz de volta). | `src/sim/match.js` | VERIFICADO (0 aeródromos; megabases continuam) |
+
+## 1.3.17
+
+| Item | Onde | Estado |
+|---|---|---|
+| Times mais perto na batalha normal (aproximação 0,3 → 0,4): ~4,2–5,5 km entre os centros das frotas (antes ~5,2–5,6). Abrigo atrás das ilhas mantido (6–10 de 10 navios abrigados nos mapas de ilhas; no Estreito não há ilha entre as frotas). | `src/sim/formacaoMil.js` | VERIFICADO (8 mapas, 2 sementes) |
+| Bots largam JÁ a toda força rumo ao oponente (sem os ~10 s de aceleração). Para não encalharem na largada: abrigo só com a ilha a ≥ 650 m + 2·L à proa e ≥ 1,1·L (mín. 260 m) da costa; navio que nasce colado à costa vai para a água livre mais próxima e quem nasce apontado para terra gira para o rumo livre mais próximo. | `src/sim/match.js`, `src/sim/formacaoMil.js` (`afastaDaCosta`) | VERIFICADO: 0 navios presos nos primeiros 40 s em 12 mapas × 2 sementes (antes até 7 encalhes, alguns de 35–45 s) |
+| Trava da mira: o centro da mira acompanha o navio travado desde o INÍCIO da trava (antes só com a trava a 100%, até lá só o quadro andava), também na óptica. Com AUTO-MIRA ligada o TRAVAR não trava (mensagem; botão mostra AUTO). | `src/modernNavalCombat3D.js` (`autoMiraPasso`, ação `travar`), `src/ui/hud.js` | VERIFICADO (navegador: erro da mira 0–2° com o alvo em movimento, câmera FW e óptica) |
+| Aeronaves: com a bolinha do toque marcada, TRAVAR pega o navio inimigo mais próximo da bolinha. As outras funções da tela não mudam. | `src/modernNavalCombat3D.js` (`nkAcao`) | VERIFICADO (navegador: travou o navio a 144 m da bolinha) |
+| Torpedos das aeronaves: na pilotagem, o LANÇAR (sem bomba a bordo) dispara o torpedo no alvo travado até 3,5 km, com aviso de distância/recarga; o ARMA dos helicópteros lançados do navio também (até 3,5 km). O disparo automático continua igual. | `src/sim/nuclear.js` (`nkTorp`), `src/naval5v5/aereo.js`, `src/net/commands.js`, `src/sim/world.js` | VERIFICADO (simulação: ASW, Coaxial e Inhambu — longe avisa, a 3 km lança e acerta) |
+| COMBATE do hangar: (1) a partida acabava no 1º instante ("Frota aliada destruída", a base de onde a aeronave sai não contava); (2) o comando "começar no ar" não estava na lista de comandos aceitos e era descartado; (3) o alerta de SAM inimigo caía no código de "bateu no relevo" e tirava você da pilotagem 3 s depois. Os três corrigidos. | `src/sim/match.js`, `src/net/commands.js`, `src/modernNavalCombat3D.js` | VERIFICADO (navegador: começa a 750 m, pilotando, combate em andamento) |
+
+Testes: `vtol138`, `destroier133`, `amorim130`, `fragata132`, `voo1278` OK. `esquadrilha1269` tem as mesmas falhas de antes desta versão (conferido sem as mudanças).

@@ -284,7 +284,7 @@ export class Hud {
     /* v1.2.25 item 4: botão DRONE removido — o drone decola sozinho (aereo.js) */
     const pa = (n.helis || []).length >= 6; if (pa !== this._paEsq) { this._paEsq = pa; const bb = this.r.b_heli && this.r.b_heli.querySelector('b'); if (bb) bb.textContent = pa ? 'ESQUADRILHA' : 'HELI'; } /* v1.2.16: porta-aviões → LANÇAR ESQUADRILHA */
     this._q('heli', s.helis.length ? (s.helis.length < 4 ? (n.esq ? 'IA EM AÇÃO' : 'LIBERAR ' + s.helis.length + '×') : (n.libEst >= 2 ? 'TODAS NO AR' : n.libEst === 1 ? 'LIBERAR TODAS' : 'LIBERAR ½')) : '—'); /* v1.2.32 */ /* v1.2.25 item 6: só o botão de LIBERAR — a IA pilota */ this._cls('heli', 'off', !s.helis.length); this._cls('heli', 'on', n.controle >= 0);
-    this._q('travar', s.alvo ? (n.trava >= 1 ? f1(s.alvo.d / 1000) + ' km' : Math.round(n.trava * 100) + '%') : (s.contatos ? s.contatos + ' cont.' : '—')); this._cls('travar', 'on', !!s.alvo && n.trava >= 1);
+    this._q('travar', s.alvo ? (n.trava >= 1 ? f1(s.alvo.d / 1000) + ' km' : Math.round(n.trava * 100) + '%') : (s.contatos ? s.contatos + ' cont.' : '—')); this._cls('travar', 'on', !!s.alvo && n.trava >= 1); this._cls('travar', 'off', !!s.autoMira); if (s.autoMira) this._q('travar', 'AUTO'); /* v1.3.16: com AUTO-MIRA não há trava manual */
     this._q('sam', C.sam ? String(n.sam) : '—'); this._cls('sam', 'off', !C.sam || n.sam <= 0); this._cls('sam', 'on', !!C.sam && n.sam > 0 && !!n.samAuto);
     this._q('cam', s.camNome); this._q('bino', '');
     r.bAuto.classList.toggle('on', !!n.autoFogo); r.bMira.classList.toggle('on', !!s.autoMira); if (r.bLivre) r.bLivre.classList.toggle('on', !!s.miraLivre); r.bTorpModo.textContent = n.torpModo === 'reto' ? 'RETO' : 'ACÚSTICO'; r.bTorpModo.hidden = !C.torp;
