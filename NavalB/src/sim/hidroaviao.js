@@ -34,10 +34,12 @@ export const HD = Object.freeze({
 });
 
 const _o = { x: 0, y: 0, z: 0 }, _imp = {};
-export const temHidro = (n) => !!(n && n.papel === 'jogador');
+/** v1.3.12 (Valter): hidroaviões RETIRADOS do jogo por enquanto (até ele pedir a volta) — true esconde e desliga em tudo; false traz de volta. */
+export const HIDRO_OFF = true;
+export const temHidro = (n) => !HIDRO_OFF && !!(n && n.papel === 'jogador');
 export function estadoHidro(n) { return n.hd || (n.hd = { tipo: n.hidroTipo || 'albatroz', noAr: -1, tRec: 0, pil: 0, perdidos: 0, voos: 0 }); }
 /** Por que não pode decolar agora? ('' = pode) */
-export function motivoHidro(sim, n) { if (!temHidro(n) && !(sim && sim.nkBotAtomica)) return 'sem'; if (n.morto) return 'morto'; const k = estadoHidro(n); if (k.noAr >= 0) return 'noAr'; if (k.tRec && sim.t < k.tRec) return 'recarga'; if (sim.t < HD.liberaApos && !(n.aeroPrin && n.aeroPrin.hidro)) return 'cedo'; /* v1.2.66: hidroavião como veículo principal sai já no início */ return ''; }
+export function motivoHidro(sim, n) { if (HIDRO_OFF) return 'sem'; if (!temHidro(n) && !(sim && sim.nkBotAtomica)) return 'sem'; if (n.morto) return 'morto'; const k = estadoHidro(n); if (k.noAr >= 0) return 'noAr'; if (k.tRec && sim.t < k.tRec) return 'recarga'; if (sim.t < HD.liberaApos && !(n.aeroPrin && n.aeroPrin.hidro)) return 'cedo'; /* v1.2.66: hidroavião como veículo principal sai já no início */ return ''; }
 export function hidroDe(sim, n) { const k = n && n.hd; if (!k || k.noAr < 0 || !sim.nukes) return null; const q = sim.nukes[k.noAr]; return q && q.ativo && q.hidro && q.dono === n.id ? q : null; }
 
 /** Comando { t:'hidro' } — decola (corrida na água ao lado do navio). */

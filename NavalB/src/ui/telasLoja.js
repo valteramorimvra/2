@@ -1,7 +1,8 @@
 // Nexo Naval Strike v1.2.43 — telas novas: ÁRVORE TECNOLÓGICA com fotos (nível × tipo, no estilo World of Warships),
 // MERCADO (ofertas do dia, caixas e câmbio, no estilo Modern Warships) e LOJA de pacotes (offline, compras de teste).
 import { CLASSES, ORDEM_CLASSES } from '../sim/classes.js';
-import { HIDROS, ORDEM_HIDROS } from '../sim/hidroaviao.js';
+import { HIDROS, ORDEM_HIDROS as ORDEM_HIDROS0, HIDRO_OFF } from '../sim/hidroaviao.js';
+const ORDEM_HIDROS = HIDRO_OFF ? [] : ORDEM_HIDROS0; /* v1.3.12: hidroaviões retirados por enquanto */
 import { AERONAVES, fichaAero, possuiAero, CAT_AERO } from '../aeronaves.js'; import { miniAero } from './telaHangar.js'; import { silh } from './silhuetas.js'; /* v1.2.61 */
 const fotoAero = (a) => { const m = miniAero(a.id); return m ? `<i class="cm-foto" style="background-image:url(${m})"></i>` : a.modelo.hidro ? `<i class="cm-foto" style="background-image:url(fotos/navios/${a.modelo.hidro}.webp)"></i>` : `<i class="cm-foto cm-silh">${silh(a.modelo.heli)}</i>`; };
 const ROM5 = ['', 'I', 'II', 'III', 'IV', 'V'];
@@ -49,7 +50,7 @@ export function telaArvore(D) { const { mostra, voltar, eco, carteira, statusNav
 /* ---------- preço de cada navio no COMÉRCIO (em Nexos) com variação diária, como uma bolsa ---------- */
 export function precoNavioNx(k) { const p = PRECO[k] || {}; const base = p.ouro ? p.ouro / 10 : p.prata ? p.prata / 400 : 300; return Math.max(300, Math.round(base / 50) * 50); }
 export function variacaoDia(k, dia = diaHoje()) { let h = dia; for (const c of k) h = (h * 31 + c.charCodeAt(0)) >>> 0; h = (h * 1664525 + 1013904223) >>> 0; return Math.round(((h / 4294967296) - 0.45) * 50) / 100; }
-const CATS = [['todos', 'Todos', '✦'], ['navios', 'Navios', '⛴'], ['aero', 'Aeronaves', '✈'], ['hidros', 'Hidroaviões', '⛵'], ['pinturas', 'Camuflagens', '◩'], ['ofertas', 'Ofertas do dia', '%'], ['caixas', 'Caixas', '▣'], ['cambio', 'Câmbio', '⇄']];
+const CATS = [['todos', 'Todos', '✦'], ['navios', 'Navios', '⛴'], ['aero', 'Aeronaves', '✈'], ...(HIDRO_OFF ? [] : [['hidros', 'Hidroaviões', '⛵']]), ['pinturas', 'Camuflagens', '◩'], ['ofertas', 'Ofertas do dia', '%'], ['caixas', 'Caixas', '▣'], ['cambio', 'Câmbio', '⇄']];
 const ORDENS = [['padrao', 'Padrão'], ['menor', 'Menor preço'], ['maior', 'Maior preço'], ['nivel', 'Nível'], ['alta', 'Maior alta do dia']];
 /** MERCADO no estilo "Comércio": coluna de categorias, ordenação e grade de cartões com FOTO, nome, nível, preço em Nexos e variação do dia. */
 export function telaMercado(D, aba = 'navios', ordem = 'padrao') { const { mostra, voltar, eco, save, carteira, som, toast, eventoCompra } = D;

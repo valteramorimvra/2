@@ -2,12 +2,12 @@
 // Nomes próprios (fictícios, aves e bichos do Brasil) inspirados em classes reais — evita marcas registradas (Play Store).
 // Os modelos 3D e a física já existem no jogo: modelo.heli → sim/classes (HELIS) e render/aereo3d · modelo.hidro → sim/hidroaviao.
 import { HELIS, ORDEM_HELIS } from './sim/classes.js';
-import { HIDROS } from './sim/hidroaviao.js';
+import { HIDROS, HIDRO_OFF } from './sim/hidroaviao.js';
 
-export const CAT_AERO = [['caca', 'Caças'], ['heli', 'Helicópteros'], ['hidro', 'Hidroaviões'], ['bomb', 'Bombardeiro'], ['apoio', 'Alerta aéreo e drones']];
+export const CAT_AERO = [['caca', 'Caças'], ['heli', 'Helicópteros'], ['hidro', 'Hidroaviões'], ['bomb', 'Bombardeiro'], ['apoio', 'Alerta aéreo e drones']].filter(([c]) => !(HIDRO_OFF && c === 'hidro')); /* v1.3.12: sem hidroaviões por enquanto */
 /* id, categoria, tier, preço, modelo, inspiração (classe real), papel, mísseis/armas de exibição */
 const A = (id, cat, tier, preco, modelo, insp, papel, armas) => ({ id, cat, tier, preco, modelo, insp, papel, armas });
-export const AERONAVES = [
+const TODAS_AERO = [
   A('raio', 'caca', 5, { ouro: 4200 }, { heli: 'raio' }, 'caça furtivo de 5ª geração embarcado', 'Superioridade aérea furtiva', ['AR-AR curto', 'AR-AR longo', 'Antinavio leve', 'Canhão 25 mm']),
   A('tesourao', 'caca', 5, { prata: 9800000 }, { heli: 'tesourao' }, 'caça furtivo multimissão (classe F-35C)', 'Multimissão furtivo', ['AR-AR curto', 'AR-AR longo', 'Bomba guiada', 'Antinavio leve']),
   A('tuiuiu', 'caca', 4, { prata: 7200000 }, { heli: 'tuiuiu' }, 'caça pesado bimotor (classe Su-57/J-20)', 'Caça pesado de longo alcance', ['AR-AR longo', 'Antinavio pesado', 'Canhão 30 mm']),
@@ -47,8 +47,10 @@ export const AERONAVES = [
   A('jacu', 'heli', 4, { prata: 0 }, { heli: 'jacu' }, 'helicóptero de ataque com bazuca de porta', 'Ataque moderno', ['Foguetes 70 mm', 'Bazuca de porta']),
   A('gaviao', 'heli', 3, { prata: 0 }, { heli: 'gaviao' }, 'helicóptero de assalto com bazuca de porta', 'Assalto moderno', ['Antinavio leve', 'Bazuca de porta']),
 ];
+/** v1.3.12: sem hidroaviões enquanto HIDRO_OFF (hangar, árvore, comércio e escolha de veículo) — AERO continua com todos para dados salvos antigos. */
+export const AERONAVES = HIDRO_OFF ? TODAS_AERO.filter((a) => !a.modelo.hidro) : TODAS_AERO;
 const NOMES_AERO = { acaua: 'Caça VTOL Acauã', uiracu: 'Caça VTOL Uiraçu', jato: 'Caça VTOL Pica-pau', ataque: 'Helicóptero de ataque Jararaca', multi: 'Helicóptero naval Gaivota', asw: 'Helicóptero antissubmarino Lontra', coaxial: 'Helicóptero coaxial Tamanduá', utilitario: 'Helicóptero utilitário Capivara', leve: 'Helicóptero leve Sabiá', caca: 'Caça multirrol Gavião' };
-export const AERO = Object.fromEntries(AERONAVES.map((a) => [a.id, a]));
+export const AERO = Object.fromEntries(TODAS_AERO.map((a) => [a.id, a]));
 /** Dados do modelo (nome oficial no jogo, velocidade, vida…) a partir das tabelas existentes. */
 export function fichaAero(id) { const a = AERO[id]; if (!a) return null; if (a.modelo.hidro) { const S = HIDROS[a.modelo.hidro] || {}; return { nome: 'Hidroavião ' + (S.nome || id), vmax: Math.round((S.vMax || 140) * 3.6), vida: S.vida || 60, alcance: S.alcance || 0, sensor: 9000, descr: S.base ? `Inspirado no ${S.base}` : '' }; }
   const H = HELIS[a.modelo.heli] || {}; return { nome: NOMES_AERO[id] || H.nome || id, vmax: Math.round((H.vmax || 60) * 3.6), vida: H.vida || 30, alcance: H.alc || 0, sensor: H.sensor || 0, descr: H.desc || '' }; }

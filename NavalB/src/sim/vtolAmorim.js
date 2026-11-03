@@ -24,7 +24,7 @@ const novoEst = (id) => ({ id, aam: 0, asm: 0, torp: 0, nuke: 0, tMis: 0, tNuke:
 function enche(E) { const M = VTOL_SIM[E.id].muni; E.aam = M.aam; E.asm = M.asm; E.torp = M.torp; E.nuke = M.nuke; E.tMis = 0; E.tNuke = 0; }
 /** estado dos 2 caças do navio (criado uma vez) */
 export function instalaVtol(n) { if (n.vtA) return n.vtA; n.vtA = { acaua: novoEst('acaua'), uiracu: novoEst('uiracu') }; enche(n.vtA.acaua); enche(n.vtA.uiracu); n.nkAero = 'acaua'; return n.vtA; }
-const estDe = (sim, q) => { const n = sim.navios[q.dono]; return n && n.vtA && q.vtId ? n.vtA[q.vtId] : null; };
+const estDe = (sim, q) => { if (q.vtE) return q.vtE; const n = sim.navios[q.dono]; return n && n.vtA && q.vtId ? n.vtA[q.vtId] : null; }; /* v1.3.12: no hangar cada caça leva o seu estado (q.vtE) */
 
 /** ponto local do caça (x boreste, y cima, z cauda) no mundo — pelo rumo */
 function ponto(q, p, out) { const c = Math.cos(q.rumo), s = Math.sin(q.rumo); out.x = q.x + p[0] * c - p[2] * s; out.z = q.z + p[0] * s + p[2] * c; out.y = q.y + p[1] - 2.2; return out; }
@@ -35,7 +35,13 @@ export function lancaVtol(sim, n, cmd) { const A = instalaVtol(n); n.nkAero = 'a
   const ok = lancaNuclear(sim, n, cmd); sim.nkBotAtomica = bk; if (!ok) return 0; const bomba = n.papel === 'jogador' || !!bk; const q = sim.nukes[n.nk.noAr]; arma(q, A.acaua, bomba);
   let ala = 0; for (const w of sim.nukes) { if (w.lider !== q.idx || w.ativo || !(w.espDec > 0)) continue; if (!ala) { ala = 1; w.aero = 'uiracu'; w.ala = 2; arma(w, A.uiracu, bomba); } /* v1.3.09: Uiraçu na vaga do ÚLTIMO da fila do Urubu-rei (o meio fica vazio) */ else { w.espDec = 0; w.lider = -1; } } /* o navio tem 2 caças: o Uiraçu é o único ala */
   return 1; }
-function arma(q, E, bomba) { enche(E); q.vidaMax = q.vida = VIDA_VT; q.H = null; /* sem perfil próprio: números de voo do Urubu-rei */ q.vtol = 1; q.vtId = E.id; q.semBomba = bomba ? 0 : 1; if (!bomba) q.cargas = 0; /* v1.3.11: a MESMA arma nuclear do Pica-pau — a bomba atômica do sistema no LANÇAR (computador só com a bomba ligada) */ q.misseis = E.asm; q.misAlc = VT.alcAsm; q.misDano = VT.danoAsm; q.misNome = 'ASM'; q.tMis = 1e6; q.aa = E.aam; q.tAA = 0;
+/** v1.3.12 (Valter): no HANGAR o Acauã e o Uiraçu são INDIVIDUAIS — cada um sai com até 3 aeronaves do mesmo tipo (líder + 2 alas) na
+ *  formação do Pica-pau (a câmera fica no último); voo e velocidade do Pica-pau; o armamento, as defesas e a IA são os do caça. */
+export const ehVtolInd = (n) => !!(n && !n.C.destAmorim && (n.nkAero === 'acaua' || n.nkAero === 'uiracu'));
+export function lancaVtolInd(sim, n, cmd) { const ok = lancaNuclear(sim, n, cmd); if (!ok) return 0; const L = sim.nukes[n.nk.noAr]; armaInd(L); let k = 0;
+  for (const w of sim.nukes) { if (w.lider !== L.idx) continue; if (k < 2) { k++; armaInd(w); } else { w.espDec = 0; w.lider = -1; w.ativo = 0; } } return 1; }
+function armaInd(q) { const E = q.vtE || (q.vtE = novoEst(q.aero)); E.id = q.aero; enche(E); q.vtInd = 1; q.vtId = q.aero; q.H = HELIS.jato; q.misseis = E.asm; q.misAlc = VT.alcAsm; q.misDano = VT.danoAsm; q.misNome = 'ASM'; q.tMis = 1e6; q.aa = E.aam; q.tAA = 0; }
+function arma(q, E, bomba) { enche(E); q.vidaMax = q.vida = VIDA_VT; q.H = HELIS.jato; /* v1.3.12 (Valter): configuração de voo e velocidade do Pica-pau */ q.vtol = 1; q.vtId = E.id; q.semBomba = bomba ? 0 : 1; if (!bomba) q.cargas = 0; /* v1.3.11: a MESMA arma nuclear do Pica-pau — a bomba atômica do sistema no LANÇAR (computador só com a bomba ligada) */ q.misseis = E.asm; q.misAlc = VT.alcAsm; q.misDano = VT.danoAsm; q.misNome = 'ASM'; q.tMis = 1e6; q.aa = E.aam; q.tAA = 0;
   E.q = q.idx; E.noAr = 1; E.abat = 0; }
 
 // ---------------- BOTÕES ----------------
@@ -56,13 +62,15 @@ function disparaTorp(sim, n, q, E, a) { const tp = sim.torpedos.find((x) => !x.a
   Object.assign(tp, { lancha: 0, ativo: 1, x: _o.x, z: _o.z, rumo: b, rumoAlvo: b, v: 10, dono: n.id, time: n.time, alvo: a.id, corrida: TORPEDO.arma, modo: 'acustico', t: 0, buscando: 0, danoMul: 1, alcMax: TORPEDO.arma + 3200, leve: 1 });
   n.stats.torpLanc++; sim.evento({ t: 'heliTorpedo', idx: q.idx, x: q.x, y: q.y - 1.4, z: q.z, tp: tp.idx }); return 1; }
 /** 1 arma do tipo pedido deste caça (alvo travado tem prioridade). true = saiu. */
-export function disparaVt(sim, n, q, tipo) { const E = estDe(sim, q); if (!E || !q.ativo || !q.vtol || q.fase !== 2 || E[tipo] <= 0) return false; if (tipo === 'nuke' ? E.tNuke > 0 : E.tMis > 0) return false;
+export function disparaVt(sim, n, q, tipo) { const E = estDe(sim, q); if (!E || !q.ativo || !(q.vtol || q.vtInd) || q.fase !== 2 || E[tipo] <= 0) return false; if (tipo === 'nuke' ? E.tNuke > 0 : E.tMis > 0) return false;
   let ok = 0;
   if (tipo === 'aam') { const e = inimigoAereo(sim, q, VT.alcAam); if (e) ok = lancaArAr(sim, q, e, _tp) ? 1 : 0; }
   else { const a = inimigoNavio(sim, q, n, tipo === 'torp' ? VT.alcTorp : tipo === 'nuke' ? VT.alcNuke : VT.alcAsm); if (a) ok = tipo === 'torp' ? disparaTorp(sim, n, q, E, a) : disparaMissil(sim, n, q, E, a, tipo); }
   if (!ok) return false; E[tipo]--; if (tipo === 'nuke') E.tNuke = VT.intNuke; else E.tMis = VT.intMis; return true; }
 /** botão da tela (comando 'vtArma'): dispara do líder se tiver a arma pronta; senão do ala. */
-export function comandoVtol(sim, n, cmd) { if (!n.vtA || TIPOS_VT.indexOf(cmd.tipo) < 0) return; const L = n.nk && n.nk.noAr >= 0 ? sim.nukes[n.nk.noAr] : null;
+export function comandoVtol(sim, n, cmd) { if (TIPOS_VT.indexOf(cmd.tipo) < 0) return; const L = n.nk && n.nk.noAr >= 0 ? sim.nukes[n.nk.noAr] : null;
+  if (L && L.vtInd) { if (disparaVt(sim, n, L, cmd.tipo)) return; for (const w of sim.nukes) if (w.ativo && w.vtInd && w.lider === L.idx && disparaVt(sim, n, w, cmd.tipo)) return; sim.evento({ t: 'vtNegado', id: n.id, tipo: cmd.tipo }); return; } /* hangar: líder, depois as alas */
+  if (!n.vtA) return;
   if (L && L.vtol && disparaVt(sim, n, L, cmd.tipo)) return;
   for (const id of IDS_VT) { const E = n.vtA[id], q = E.noAr && E.q >= 0 ? sim.nukes[E.q] : null; if (q && q !== L && q.vtol && q.vtId === id && disparaVt(sim, n, q, cmd.tipo)) return; }
   sim.evento({ t: 'vtNegado', id: n.id, tipo: cmd.tipo }); }
@@ -96,6 +104,10 @@ const _S = { aam: 0, asm: 0, torp: 0, nuke: 0 };
 
 /** Passo (chamado pelo mundo). Só age no Destróier Amorim. */
 export function passoVtolAmorim(sim, dt) { sim._vtAcc = (sim._vtAcc || 0) + dt; const tick = sim._vtAcc >= VT.tick; if (tick) sim._vtAcc = 0;
+  for (let i = 0; i < sim.nukes.length; i++) { const q = sim.nukes[i]; if (!q.ativo || !q.vtInd || !q.vtE) continue; const n = sim.navios[q.dono], E = q.vtE; if (!n) continue; /* v1.3.12: caças do hangar */
+    if (E.tMis > 0) E.tMis -= dt; if (E.tNuke > 0) E.tNuke -= dt; q.tMis = 1e6; E.nuke = Math.min(VTOL_SIM[E.id].muni.nuke, q.cargas | 0);
+    if (tick && q.fase === 2) { lasers(sim, n, q, E, VT.tick); canhao(sim, n, q, E, VT.tick); ia(sim, n, q, E, !(q.lider >= 0)); } else if (q.fase !== 2) E.las[0].on = E.las[1].on = 0;
+    if (!(q.lider >= 0)) { let aa = E.aam, as = E.asm; for (const w of sim.nukes) if (w.ativo && w.vtInd && w.lider === q.idx && w.vtE) { aa += w.vtE.aam; as += w.vtE.asm; } q.aa = aa; q.misseis = as; q.tAA = E.aam > 0 && E.tMis > 0 ? sim.t + E.tMis : 0; } }
   for (let ni = 0; ni < sim.navios.length; ni++) { const n = sim.navios[ni]; if (!n.C.destAmorim) continue; const A = instalaVtol(n); let algum = 0;
     for (let k = 0; k < IDS_VT.length; k++) { const E = A[IDS_VT[k]]; if (E.tMis > 0) E.tMis -= dt; if (E.tNuke > 0) E.tNuke -= dt; rastreiaNukes(sim, n, E);
       if (!E.noAr) continue; const q = E.q >= 0 ? sim.nukes[E.q] : null, meu = q && q.vtol && q.vtId === E.id && q.dono === n.id;

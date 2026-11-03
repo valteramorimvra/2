@@ -8,11 +8,11 @@ const passo = (s) => { for (let i = 0; i < Math.round(s * 60); i++) S.avanca(1 /
 ini.x = eu.x + 7000; ini.z = eu.z; ini.v = 0; ini.vida = 1e5; eu.vida = 1e6; passo(1);
 ok(eu.C.vida === 5000 && !(eu.helis && eu.helis.length) && eu.nkAero === 'acaua', 'destróier 5000 de vida; caças pelo DECOLAR');
 S.comando({ t: 'nuclear', px: eu.x + Math.sin(eu.rumo) * 9000, pz: eu.z - Math.cos(eu.rumo) * 9000 }); passo(0.2);
-const L = sim.nukes[eu.nk.noAr]; ok(L && L.vtol && L.aero === 'acaua' && L.vidaMax === 2500 && !L.H, 'Acauã líder (2500 de vida), sem perfil próprio');
+const L = sim.nukes[eu.nk.noAr]; ok(L && L.vtol && L.aero === 'acaua' && L.vidaMax === 2500 && L.H && L.H.id === 'jato', 'Acauã líder (2500 de vida), voo e velocidade do Pica-pau');
 const ala = sim.nukes.find((w) => w.lider === L.idx && w.aero === 'uiracu'); ok(!!ala && ala.vidaMax === 2500 && sim.nukes.filter((w) => w.lider === L.idx && (w.ativo || w.espDec > 0)).length === 1, 'Uiraçu é o único ala');
 const z0 = L.z, x0 = L.x; passo(2.5); ok(L.fase === 1 && Math.hypot(L.x - x0, L.z - z0) > 5 && L.v > 10, 'decolagem ORIGINAL: corrida no convés (catapulta) como o Urubu-rei');
-passo(4); ok(L.fase === 2, 'no ar'); S.comando({ t: 'nkPiloto', v: 1 }); passo(0.3); S.comando({ t: 'nkThr', v: 4 }); passo(25); ok(Math.abs(L.v - NUK.thrNiveis[4]) < 3, `MÁX = ${NUK.thrNiveis[4]} m/s do Urubu-rei (${L.v.toFixed(0)})`);
-S.comando({ t: 'nkThr', v: 0 }); passo(25); ok(Math.abs(L.v - NUK.thrNiveis[0]) < 3, `MIN = ${NUK.thrNiveis[0]} m/s do Urubu-rei (${L.v.toFixed(0)})`);
+passo(4); ok(L.fase === 2, 'no ar'); S.comando({ t: 'nkPiloto', v: 1 }); passo(0.3); S.comando({ t: 'nkThr', v: 4 }); passo(25); ok(Math.abs(L.v - 165) < 3, `MÁX = 165 m/s do Pica-pau (${L.v.toFixed(0)})`);
+S.comando({ t: 'nkThr', v: 0 }); passo(25); ok(Math.abs(L.v - 165 * 0.42) < 3, `MIN = 0,42 × 165 m/s do Pica-pau (${L.v.toFixed(0)})`);
 S.comando({ t: 'nkCtl', jx: 1, jy: 0 }); let wM = 0; for (let i = 0; i < 600; i++) { S.avanca(1 / 60); wM = Math.max(wM, Math.abs(L.w || 0)); } ok(wM <= NUK.manCurvaMax + 1e-6 && wM > NUK.manCurvaMax * 0.9, `curva do Urubu-rei (ω ${wM.toFixed(3)})`); S.comando({ t: 'nkCtl', jx: 0, jy: 0 });
 const mira = (dd) => { L.rumo = Math.atan2(ini.x - L.x, -(ini.z - L.z)); L.x = ini.x - Math.sin(L.rumo) * dd; L.z = ini.z + Math.cos(L.rumo) * dd; L.y = 300; };
 const A = eu.vtA.acaua; mira(4000); A.tMis = 0; const a0 = A.asm; S.comando({ t: 'vtArma', tipo: 'asm' }); passo(0.3); ok(A.asm === a0 - 1, `botão MÍSSIL = ASM (${a0}→${A.asm})`); ok(L.misseis === A.asm + eu.vtA.uiracu.asm, 'MÍSSIL mostra a soma dos 2');
