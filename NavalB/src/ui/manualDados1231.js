@@ -5,7 +5,7 @@
 //   { gerar:'nome', arg } tabela/ficha montada a partir dos dados reais · { so:'novos.hidro' } (opcional, em qualquer bloco) só mostra se o caminho existir.
 // Regras de conteúdo: nada religioso, de marca, demoníaco ou de azar; personagens amigáveis; sem números inventados (o que não existe fica PENDENTE).
 export const CREDITO_DEV = 'Responsável pelo desenvolvimento do game: Valter Amorim';
-export const VERSAO_MANUAL = '1.3.24'; /* v1.3.24: manual atualizado com a mira, a trava, o radar e as câmeras de 1.3.15–1.3.24 */
+export const VERSAO_MANUAL = '1.3.25'; /* v1.3.24: manual atualizado com a mira, a trava, o radar e as câmeras de 1.3.15–1.3.24 */
 // Corte aprovado pelo Valter: o hidroavião fica para a 1.2.32. Tudo que tem `desde: '1.2.32'` (categoria, seção ou bloco) fica FORA
 // do manual enquanto LIGAR_1232 for false. Para ligar depois: troque para true (e passe novos.hidro em fontesHidro1232.js).
 export const LIGAR_1232 = false;
@@ -168,6 +168,7 @@ export const CATEGORIAS = [
     { id: 'aero', titulo: 'Helicóptero e esquadrilha', blocos: [
       { p: '<b>HELI</b> assume o helicóptero: joystick de movimento, altitude pelos botões ▲/▼. Botões do heli: <b>ARMA</b>, <b>FLARE</b>, <b>POUSAR</b>, <b>NAVIO</b> (volta ao navio) e <b>HELI 2</b> (troca). Enquanto você voa, a IA comanda o navio e usa todas as armas.' },
       { p: 'Na tela de pilotagem, tocar na tela marca a <b>bolinha</b>; o <b>TRAVAR</b> pega o navio inimigo mais próximo dela. Aeronave com <b>torpedo</b>: o <b>LANÇAR/ARMA</b> dispara no alvo travado até 3,5 km (de longe aparece a distância). O <b>COMBATE</b> do hangar começa no ar, a 750 m.' },
+      { p: '<b>Modo MANUAL</b> (IA desligada): a mira <b>trava sozinha</b> no navio inimigo mais perto do centro da tela, e a câmera gira para ele quando você solta a tela; <b>arraste a tela</b> para outro navio e a trava troca. A bolinha marcada e o TRAVAR têm prioridade por alguns segundos. Altura mínima de voo: <b>150 m</b>; acima disso você escolhe a altura e desvia das montanhas — <b>se bater, a aeronave explode</b> e a câmera volta ao navio. O modo <b>IA</b> continua como era.' },
       { p: 'Nos porta-aviões, <b>ESQUADRILHA</b> lança a ala aérea. O <b>DRONE</b> revela navios atrás das ilhas no radar da frota.' },
     ] },
     { id: 'bombardeiro', titulo: 'Bombardeiro nuclear', blocos: [

@@ -233,3 +233,13 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `vtol138`, `destroier133`, `a
 | Manual do jogo (1.3.24): detecção/radar/cobertura, AUTO-MIRA × TRAVAR, trava num ponto, cruzes e símbolos por canhão, assentamento da torre, projétil sem correção de rumo, tiro em arco e elevação por calibre (tabela), granadas/foguetes não guiados, câmera FW, botões e ajustes padrão, aeronaves (bolinha, torpedo, COMBATE). | `src/ui/manualDados1231.js`, `src/ui/manualConteudo1231.js`, `src/ui/fontes1231.js` | VERIFICADO (navegador: seções de Armas; textos no build) |
 
 Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destroier133`, `amorim130`, `fragata132` OK.
+
+## 1.3.25 — aeronaves no modo manual
+
+| Item | Onde | Estado |
+|---|---|---|
+| Trava automática no MANUAL: navio inimigo mais perto do centro da tela (detectado pela frota ou a ≤ 6 km do avião), troca com histerese quando outro fica bem mais no centro; bolinha marcada e TRAVAR manual têm prioridade (4 s). Mensagem de trava silenciosa na troca automática. | `src/modernNavalCombat3D.js` (`nkAutoAlvo`) | VERIFICADO (navegador) |
+| Câmera do MANUAL gira para o alvo travado quando você solta a tela (2,2 s), por trás do avião; alvo atrás (> 120°) → câmera volta para trás do avião, como antes. | `nkCam` | VERIFICADO (navegador: câmera −34° → −3° do alvo, avião a 37°) |
+| Altura mínima do voo manual 150 m (piso firme, ajuda só nos últimos 40 m; antes empurrava para cima já abaixo de 320 m e o piso real era ~96 m). | `src/sim/nuclear.js` (`manAltMin`, `voaManual`) | VERIFICADO (mergulho total: mínimo 159 m) |
+| Batida no relevo: explosão (antes a aeronave só sumia), aviso e volta à câmera do navio; recarga como aeronave abatida. | `nuclear.js`, `modernNavalCombat3D.js` (`nkTerreno`) | VERIFICADO (montanha de 628 m: bateu a 377 m) |
+| Modo IA sem mudança. Manual do jogo atualizado. | `manualDados1231.js` | VERIFICADO |
