@@ -127,3 +127,9 @@ Fora da batalha normal nada muda: duelo, treino, teste de combate e batalha pers
 | Fumaça: rastro branco-acinzentado ENCORPADO, parado no ar (não acompanha o míssil), que abre em tufos e se desfaz em ~3–4 s. No booster: opacidade 0,30, 2,6 m, vida 4,2 s; no cruzeiro: 0,16, 1,6 m, 3 s. Antes: 0,10/0,07, ~1 m, 16 s. | `src/render/fx.js` (`rastroMissil`) | VERIFICADO (fotos no navegador) |
 | Altura: arco baixo, pico ≈ 1,4% da distância (era 7,5%). A 7 km: sobe 47–64 m, arco até ~108 m e rasante perto do alvo (antes ~390 m). | `src/armasParametros.js` (`missil.arco`) | VERIFICADO (simulação) |
 | Som: o lançamento do VLS é um rugido de foguete de banda larga (até ~12 kHz), com ataque seco e queda em ~0,9 s (camada nova `missilFoW`). Saíram desse lançamento o "rugido contínuo" e a varredura tonal 180→880 Hz; a amostra `vls_lancamento` continua. | `src/NavalAudio.js`, `src/modernNavalCombat3D.js` | VERIFICADO: pico 1,08 (inimigo) / 1,40 (jogador), contra 1,47 / 1,60 antes; o limitador e o softclip continuam na cadeia. Volume final no aparelho: NÃO VERIFICADO |
+
+## 1.3.14 — curva dos mísseis (vídeo de referência)
+
+| Item | Onde | Estado |
+|---|---|---|
+| A curva do míssil de VLS dos navios agora é redonda e contínua. Antes ele quase parava no alto (18 m/s) e virava em 0,2 s, formando uma quina. Agora: freada só até 45 m/s, curva a ~75 m/s com virada de até ~2 rad/s, e entrada no cruzeiro só com a curva completa. Resultado: subida vertical até ~47 m, curva entre 0,6 e 1,5 s (de 55 a ~100 m) e depois o arco baixo. Mísseis de aeronave e lançadores laterais não mudam. | `src/sim/world.js` (fases EJEÇÃO e PITCH) | VERIFICADO (trajetória na simulação; 8/8 acertos de 4,5 a 12 km) |
