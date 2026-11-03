@@ -33,6 +33,7 @@ export const PISCA_BOT = 0.2;
 /** v1.2.7 lança-granadas: velocidade de boca fixa (alcance máx. a 45°) e elevação de tiro baixo para a distância */
 /** v1.2.9: dispersão da salva do lança-granadas (1σ): velocidade (fração), elevação e azimute (rad). 1.2.8: { v: 0.01, el: 0.012, az: 0.02 } */
 export const RBU_DISP = { v: 0.003, el: 0.0012, az: 0.006 };
+export const PV_AMOSTRAS = [[-0.45, 0.7], [-0.3, 0.7], [-0.15, 0.7], [0, 0.7], [0.15, 0.7], [0.3, 0.7], [0.45, 0.7], [-0.12, -1], [0, -1], [0.12, -1]]; /* v1.3.27: pontos do alvo (fração do comprimento, fração do costado; −1 = topo da superestrutura) */
 export const rbuV0 = (R) => Math.sqrt(R.alc * G) * 1.6; /* v1.2.9: boca mais rápida → arco mais baixo e voo mais curto (mesmo alcance) */ /* v1.2.8: foguete mais rápido → trajetória mais baixa/plana */ export const elRbu = (d, V0, alta = 0) => { const e = 0.5 * Math.asin(Math.min(1, (d * G) / (V0 * V0))); return alta ? alta : e; }; /* alta = elevação fixa (LF-12): o alcance vem da carga (velocidade) */ /* alta: parábola alta (LF-12, el ≥ 0,8) */
 export const ALC_MIN = { vls: 0, torp: 400 }; /* fiscal nukefumaca (item 8 revisado Valter): SEM mín. de míssil (jogador+bots); torp 400 m */
 /** fiscal nukefumaca (item 7): VLS — corveta/fragata 8 s, destroier/cruzador 6 s, capitânia/PA 10 s (jogador = bots). */
@@ -502,6 +503,11 @@ export class Sim {
   /** v1.2.15: alvo atrás de ilha/montanha (sem visada própria) — não trava, não mira, perde a trava. */
   oculto(n, a) { return !a || !this.linhaLivre(n, a); }
   /** fiscal nukefumaca (item 6): jogador com VLS e paiol — alvo DETECTADO atrás do relevo continua travável p/ MÍSSIL (o míssil contorna o relevo; canhão segue sem visada). */
+  /** v1.3.27 (Valter): PARTES VISÍVEIS do navio a (de o = boca da arma): amostra o casco (7 pontos de proa a popa, a 70% do costado) e a superestrutura (3 pontos);
+   *  devolve em out { n (visíveis), tot, lon, lat, hy } com o MEIO da parte visível em coordenadas do casco. Todo visível → centro como antes (lon 0, 70% do costado). */
+  partesVisiveis(o, a, out) { const C = a.C, L = C.L, fx = Math.sin(a.rumo), fz = -Math.cos(a.rumo), arf = a.arfagem || 0, hS = C.F + ((a.P && a.P.sup && a.P.sup.h) || 4) * 2; let nv = 0, sl = 0, sh = 0, tot = 0;
+    for (const [fr, hy] of PV_AMOSTRAS) { const lon = L * fr, h = hy < 0 ? hS : C.F * hy, px = a.x + fx * lon, pz = a.z + fz * lon; tot++; if (!bloqueado(this.T, o.x, o.z, o.y, px, pz, arf + h)) { nv++; sl += lon; sh += h; } }
+    out.n = nv; out.tot = tot; if (nv === tot) { out.lon = 0; out.hy = C.F * 0.7; } else if (nv) { out.lon = sl / nv; out.hy = sh / nv; } out.lat = 0; return out; }
   /** v1.3.21: canhão que eleva o bastante para o tiro em ARCO por cima do relevo (todos, após a remodelação dos reparos de grande calibre) */
   arcoOk(n) { return !!(n.C.canhao && elMaxCal(n.C.canhao.cal) > 0.8); }
   vlsContorna(n) { return n.papel === 'jogador' && !n.controleIA && !!(n.C.vls && n.C.missil && n.vls > 0 && (!n.avaria || n.avaria.vls >= 0.3)); }

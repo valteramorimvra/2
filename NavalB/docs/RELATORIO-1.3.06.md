@@ -253,3 +253,11 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Aeronaves: canhão/metralhadora/foguetes/bazuca/torpedo/mísseis (sistema da pilotagem e IA), metralhadora de porta, AR-AR, helicópteros do sistema antigo, caças Acauã/Uiraçu (mísseis, torpedo, canhão, lasers) — só com visada livre; mensagem "alvo atrás do relevo". | `nuclear.js` (`visNk`), `defesa.js` (`lancaArAr`), `aereo.js`, `vtolAmorim.js`, `modernNavalCombat3D.js` | VERIFICADO (ASW e Beija-flor atrás de morro de 224 m: 0 disparos; com visada: disparam) |
 | Própria estrutura: já respeitada (máscaras de linha de tiro do CIWS/30 mm/laser/secundárias e arcos das torres). | `linhaTiro.js` | sem mudança |
 | Manual atualizado (Armas › Defesa). | `manualDados1231.js` | VERIFICADO |
+
+## 1.3.27 — canhões automáticos na parte exposta
+
+| Item | Onde | Estado |
+|---|---|---|
+| Visibilidade por partes do alvo (10 pontos: 7 no casco de proa a popa, 3 na superestrutura), da boca da arma, com linha 3D contra o relevo; recalculada a cada 0,3 s. Parcial → mira no meio da parte exposta; total → centro como antes; nenhuma → não atira. Todos os navios (secundárias) e os automáticos do Amorim. | `src/sim/world.js` (`partesVisiveis`), `secundarias.js`, `amorim.js` | VERIFICADO (alvo com 4/10 pontos visíveis: 92 acertos na parte exposta, 0 tiros no morro; exposto: centro) |
+| Defesa (CIWS/30 mm/laser/SAM) e secundárias valem para todos os navios (código comum). | `defesa.js`, `secundarias.js` | — |
+| Manual atualizado. | `manualDados1231.js` | VERIFICADO |

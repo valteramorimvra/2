@@ -1,4 +1,5 @@
 // Naval B v1.3.00 — SUPER LENDÁRIO "AMORIM" (SL 06), projeto do Valter. Navio jogável independente (não é cópia do Nakhimov).
+const _pvA = {}; /* v1.3.27 */
 // Física de movimento/flutuação/dano/colisão = a do jogo (nada aqui mexe nisso). Tudo abaixo usa as funções que o jogo já tem
 // (balística de granada, perfis de míssil, torpedo, lança-granadas, LASER, CIWS, míssil nuclear 1231). Novos, só do Amorim:
 //   1) REVEZAMENTO das salvas de mísseis: lateral BB (5) → lateral BE (5) → VLS de vante (4) → VLS de ré (4) → volta; pula o que
@@ -108,9 +109,10 @@ export function passoAutosAmorim(sim, n, dt) {
     if (st.tBusca <= 0) { st.tBusca = 0.25; st.alvo = -1; let md = S.alc; paraLocal(n, _o.x, _o.y, _o.z, _l0);
       for (let ie = 0; ie < sim.navios.length; ie++) { const e = sim.navios[ie]; if (e.morto || e.time === n.time || (e.C && e.C.civil)) continue; const de = Math.hypot(e.x - _o.x, e.z - _o.z); if (de >= md) continue;
         const rel = ang(marcacao(_o.x, _o.z, e.x, e.z) - n.rumo); if (Math.abs(ang(rel - pm.centro)) > pm.meio) continue; /* arco de giro da peça */
-        paraLocal(n, e.x, (e.C.F || 6) * 0.8, e.z, _l1); if (bateEstrutura(_l0, _l1, A.cfg.caixas)) continue; /* linha de tiro bloqueada pela própria estrutura */ if (!sim.linhaLivre(n, e)) continue; /* v1.3.26: nem atrás do relevo */ md = de; st.alvo = e.id; } }
+        paraLocal(n, e.x, (e.C.F || 6) * 0.8, e.z, _l1); if (bateEstrutura(_l0, _l1, A.cfg.caixas)) continue; /* linha de tiro bloqueada pela própria estrutura */ { const pv = sim.partesVisiveis(_o, e, _pvA); if (!pv.n) continue; } /* v1.3.26/1.3.27: atrás do relevo só se alguma parte estiver exposta */ md = de; st.alvo = e.id; } }
     const al = st.alvo >= 0 ? sim.navios[st.alvo] : null; let ok = 0;
-    if (al && !al.morto) { const vx = Math.sin(al.rumo) * al.v, vz = -Math.cos(al.rumo) * al.v; const s = solucaoArrasto(_o.x, _o.z, Math.max(0.5, _o.y - al.C.F * 0.7), S.V0, st.k, al.x, al.z, vx, vz, st.sol, al.w || 0); if (s && s.d <= S.alc) ok = 1; }
+    if (al && !al.morto) { st.tVis = (st.tVis || 0) - dt; if (st.tVis <= 0 || st.visId !== al.id) { st.tVis = 0.3; st.visId = al.id; st.vis = sim.partesVisiveis(_o, al, st.vis || {}); } const PV = st.vis; /* v1.3.27 (Valter): parte exposta → mira no meio dela; coberto → não atira; exposto → como antes */
+      const vx = Math.sin(al.rumo) * al.v, vz = -Math.cos(al.rumo) * al.v; const s = PV.n ? solucaoArrasto(_o.x, _o.z, Math.max(0.5, _o.y - PV.hy), S.V0, st.k, al.x + Math.sin(al.rumo) * PV.lon, al.z - Math.cos(al.rumo) * PV.lon, vx, vz, st.sol, al.w || 0) : null; if (s && s.d <= S.alc) ok = 1; }
     const alvoRel = ok ? ang(st.sol.az - n.rumo) : 0, alvoEl = ok ? clamp(st.sol.el, -0.15, 0.9) : 0; st.az += clamp(ang(alvoRel - st.az), -S.giro * dt, S.giro * dt); st.el += clamp(alvoEl - st.el, -S.giro * dt, S.giro * dt);
     if (!ok || st.rec > 0 || st.bala <= 0 || Math.abs(ang(alvoRel - st.az)) > 0.04) continue;
     const g = slotAuto(sim); if (!g) continue; const az = n.rumo + st.az + sim.rng.gauss() * PDs.az * S.disp * disp0 * PDs.calP, el = st.el * (1 + sim.rng.gauss() * PDs.alc * S.disp * disp0 * PDs.calP * 0.5), ce = Math.cos(el);
