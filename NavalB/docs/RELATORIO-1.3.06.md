@@ -139,3 +139,15 @@ Fora da batalha normal nada muda: duelo, treino, teste de combate e batalha pers
 | Item | Onde | Estado |
 |---|---|---|
 | Nova câmera "CÂMERA FW" no menu de câmeras (botão FW). Fica atrás do navio a ~0,72×L + 22 m e pouco acima do convés (F + 0,075×L + 7 m), olha para a frente pela mira com o horizonte perto do meio da tela, acompanha o balanço do navio e gira com o arraste. Nenhuma outra câmera muda. | `src/modernNavalCombat3D.js` (`camModo` `fw`), `src/ui/hud.js` (botão) | VERIFICADO (navegador: menu, seleção e foto comparada ao vídeo) |
+
+## 1.3.16
+
+| Item | Onde | Estado |
+|---|---|---|
+| CÂMERA FW um pouco mais afastada (×1,2 na distância e na altura, mesmo ângulo) e câmera padrão (instalações novas e, uma vez, quem atualiza; depois vale a escolha do jogador, que fica salva). | `src/modernNavalCombat3D.js`, `src/save.js` (`migra1316`) | VERIFICADO (navegador: entra na batalha em FW) |
+| Vozes da batalha, avisos de voz e dicas do tutorial desligados por padrão (uma vez para quem atualiza); continuam nos Ajustes. | `src/save.js` | VERIFICADO |
+| Quadro do perfil (retrato/nome/vida/módulos) fora da batalha; botão ATIVO/PASSIVO do radar no lugar dele. | `src/ui/hud1316.css` | VERIFICADO (762×355 e 915×427) |
+| MIRA LIVRE e ACÚSTICO embaixo de AUTO-MIRA e AUTO-FOGO, grade 2×2 com colunas iguais e 22 px entre todos (áreas de toque de 48 dp sem se cobrir). | `src/ui/hud1316.css` | VERIFICADO |
+| NUCLEAR acima do TRAVAR, na mesma coluna (em telas baixas um pouco mais baixo, com o rótulo ao lado, para não tocar o placar nem o TRAVAR). | `src/ui/hud1316.css` | VERIFICADO |
+| Óptica (binóculo): zoom inicial ≈13× → ≈15×; máximo 20× → 25× (trilho 2×–25×). | `src/modernNavalCombat3D.js`, `src/ui/hud.js` | VERIFICADO |
+| Aeródromo militar retirado das batalhas por enquanto (chave `AERODROMO_OFF` em `src/sim/match.js`; `false` traz de volta). | `src/sim/match.js` | VERIFICADO (0 aeródromos; megabases continuam) |

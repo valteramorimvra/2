@@ -1,0 +1,19 @@
+/* v1.3.16 (Valter) — quadro da batalha:
+   · o quadro do perfil do comandante (retrato/nome/vida/módulos) sai da batalha; no lugar dele fica o botão ATIVO/PASSIVO do radar;
+   · MIRA LIVRE e ACÚSTICO embaixo de AUTO-MIRA e AUTO-FOGO, em grade 2×2 com colunas iguais e o mesmo espaço entre todos;
+   · o botão NUCLEAR fica acima do TRAVAR (mesma coluna). */
+.hud .h-painel { display: none !important; }
+.hud .h-radar .rd-modo, .hud.v12 .h-radar .rd-modo { left: calc(100% + 8px); top: 0; bottom: auto; }
+.hud .h-chaves, .hud.ctl-novo .h-chaves { display: grid !important; grid-template-columns: repeat(2, 1fr); column-gap: 22px !important; row-gap: 22px !important; flex-direction: initial; align-items: stretch; }
+.hud .h-chaves button { width: auto; text-align: center; }
+.hud .h-chaves [data-r="bMira"] { order: 1; } .hud .h-chaves [data-r="bAuto"] { order: 2; }
+.hud .h-chaves [data-r="bLivre"] { order: 3; } .hud .h-chaves [data-r="bTorpModo"] { order: 4; } .hud .h-chaves .b-hidro { order: 5; }
+.hud .h-armas .cb.a2.p0.nk { right: 125px; bottom: 231px; }
+.hud.v12 .h-armas .cb.a2.p0.nk { right: 166px !important; bottom: 278px !important; } /* grade v12: passo de 66 px — TRAVAR em 212 → NUCLEAR em 278, mesma coluna */
+@media (max-height: 400px) { /* telas baixas: NUCLEAR um pouco mais baixo para não tocar o placar; o rótulo (PRONTA/tempo) vai para o lado esquerdo do botão para não cobrir o TRAVAR */
+  .hud.v12 .h-armas .cb.a2.p0.nk { bottom: 266px !important; }
+  .hud .h-armas .cb.a2.p0.nk > em { top: 50% !important; bottom: auto !important; left: auto !important; right: calc(100% + 4px) !important; transform: translateY(-50%) !important; white-space: nowrap; }
+}
+/* a grade acima usa !important: mantém as chaves escondidas nos modos onde já sumiam (óptica, espectador, aeronaves) */
+.hud.espec-on .h-chaves, .hud.modo-heli .h-chaves, .hud.modo-nk .h-chaves { display: none !important; }
+@media (min-width: 841px) { .hud.modo-bino .h-chaves, .hud.espectador .h-chaves { display: none !important; } } /* telas largas: como antes (nas estreitas a grade antiga já as mantinha) */
