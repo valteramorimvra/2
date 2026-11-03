@@ -170,3 +170,14 @@ Testes: `vtol138`, `destroier133`, `amorim130`, `fragata132`, `voo1278` OK. `esq
 | Item | Onde | Estado |
 |---|---|---|
 | AUTO-MIRA, MIRA LIVRE, AUTO-FOGO e ACÚSTICO/RETO numa coluna só (onde já estavam AUTO-MIRA e AUTO-FOGO), um embaixo do outro, mesma largura e 10 px entre eles; área de toque de cada um até a metade do espaço (uma não cobre a outra). | `src/ui/hud1316.css` | VERIFICADO (navegador 762×355 e 915×427) |
+
+## 1.3.19 — trava num ponto do navio
+
+| Item | Onde | Estado |
+|---|---|---|
+| TRAVAR guarda o PONTO do navio sob a mira (proa/popa/lado/altura, em coordenadas do casco — gira com ele). Sem casco sob a mira: a pontaria padrão de antes (centro do casco). Botão verde com a trava acionada; 1º toque trava no ponto (mesmo com o alvo já adquirido pela mira automática), 2º toque solta. | `src/modernNavalCombat3D.js` (ação `travar`), `src/sim/world.js` (`travaPt`, `ptTrava`), `src/net/commands.js`, `src/ui/hud.js`, `src/ui/hud1316.css` | VERIFICADO |
+| Canhões: solução balística com arrasto no ponto travado, com a velocidade DO PONTO (translação + guinada) e a altura dele. Granadas e foguetes: mesmo ponto com o avanço. | `src/sim/world.js` (`_pont1`, `pontoRbu`) | VERIFICADO (simulação, alvo a 4 km andando: impactos medianos a 39% (proa), −37% (popa), 1% (centro) e na ponte alta) |
+| Mira, quadro e óptica ficam no ponto travado (centro da tela na altura dele). | `autoMiraPasso`, quadro do alvo | VERIFICADO (navegador) |
+| Cruzes: vermelha meio apagada = ponto travado (com o avanço); cinza = para onde os canhões apontam agora (erro real de giro e elevação das torres), anda até a vermelha; alinhadas → a vermelha fica VERDE. Na óptica a cinza fica dentro do círculo, do lado de onde vem. | `src/modernNavalCombat3D.js`, `src/ui/hud1316.css` | VERIFICADO (navegador: cinza 30° → 0° e cruz verde; também na óptica) |
+
+Sem ponto marcado nada muda: `acerto125` dá o mesmo resultado de antes (90% mísseis / 97% torpedos, PASSOU). `vtol138`, `destroier133`, `amorim130`, `fragata132` OK.
