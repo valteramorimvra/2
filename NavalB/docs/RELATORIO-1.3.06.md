@@ -322,3 +322,11 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 |---|---|---|
 | Marcação de voo do MANUAL como nos vídeos: escada de inclinação (gira com o horizonte), ALT/VEL com régua, mira central com munição, moldura de cantos + losango no alvo com distância, estado PRONTO / CARREGANDO / FORA DO ALCANCE. Etiqueta do próprio avião sai do centro (vida no quadro da direita). | `nkMwPasso`, `hud.js`, `hud1334.css`, `marcasAereas` | VERIFICADO (capturas 857×400: reto, curva e mergulho; alvo a 1,3 km → PRONTO verde) |
 | Tamanho e ângulos: no MANUAL a distância vem do tamanho real do modelo (≈0,72× — avião ≈ metade da largura), câmera acima mirando logo acima do avião (avião embaixo, fixo na tela), tela rola 45% da inclinação lateral (suave). IA e helicóptero sem mudança. | `nkCam` | VERIFICADO (avião em NDC y ≈ −0,6 a −0,7 em todas as capturas; horizonte na tela = 25° com rolagem 0,45 rad do avião; a escada gira igual) |
+
+## 1.3.35
+
+| Item | Onde | Estado |
+|---|---|---|
+| Tela rola 100% junto com o avião no MANUAL, sem atraso (o avião não parece girar no próprio eixo). | `nkCam` | VERIFICADO (rolagem da tela = rotação do modelo em todas as amostras) |
+| Caça mais ágil no MANUAL: manche 5/s, rolagem até 1,8 rad/s (~100°/s), curva instantânea até 0,47 rad/s (~27°/s), arfagem 1,5×; ganho do comando pela câmera 3,5. Urubu-rei e IA sem mudança. | `voaManual`, `nkPasso` | VERIFICADO (curva medida 26,8°/s) |
+| Alvo localizado no MANUAL → câmera-comando aponta para o alvo e o avião vai na direção exata (desce até ele, piso 150 m). Arraste ou manche devolvem o comando. | `nkCam` | VERIFICADO (desvio de 90° → erro de rumo 31° → 0,5° em ~4 s de jogo) |
