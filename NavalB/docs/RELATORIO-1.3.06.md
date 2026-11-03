@@ -181,3 +181,17 @@ Testes: `vtol138`, `destroier133`, `amorim130`, `fragata132`, `voo1278` OK. `esq
 | Cruzes: vermelha meio apagada = ponto travado (com o avanço); cinza = para onde os canhões apontam agora (erro real de giro e elevação das torres), anda até a vermelha; alinhadas → a vermelha fica VERDE. Na óptica a cinza fica dentro do círculo, do lado de onde vem. | `src/modernNavalCombat3D.js`, `src/ui/hud1316.css` | VERIFICADO (navegador: cinza 30° → 0° e cruz verde; também na óptica) |
 
 Sem ponto marcado nada muda: `acerto125` dá o mesmo resultado de antes (90% mísseis / 97% torpedos, PASSOU). `vtol138`, `destroier133`, `amorim130`, `fragata132` OK.
+
+## 1.3.20 — conferência do sistema de mira (canhões, granadas e foguetes)
+
+Medições com a dispersão zerada (só o cálculo), cada torre isolada, alvo parado e em movimento, o próprio navio parado e em movimento, 2,5 a 8 km, pontos na proa/centro/popa:
+
+| Item | Resultado | Estado |
+|---|---|---|
+| Solução balística dos canhões (arrasto, avanço do ponto, velocidade do próprio navio, elevação por cano com a altura real da boca) | 0,1–0,4 m (1 torre) e 1,6–1,9 m (torres de 2–3 canos: é o afastamento entre canos paralelos) em destróier, capitânia, Baluarte (4 torres) e Marcos Vinícius (6 torres) | CORRETO — sem mudança |
+| ERRO: a salva saía com a torre ainda girando (tolerância 0,02 rad = 1,1°) | 1º tiro errava 35–115 m a 3–6 km | CORRIGIDO: só dispara com a torre assentada (0,8 mrad no giro / 0,6 mrad na elevação, `ALINHA` em `src/naval5v5/armas.js`) → 0,4–6 m. O toque rápido continua disparando na direção atual do cano (escolha do jogador) |
+| ERRO: granadas/foguetes com o alvo em movimento caíam À FRENTE (o avanço era somado duas vezes: na pontaria e de novo na correção em voo) | +7 m (3 km, 10 m/s), +19 m (4 km, 12 m/s) | CORRIGIDO: a correção em voo recalcula onde o ponto travado estará na chegada (tempo que falta do arco) e a pontaria usa o tempo de voo real do arco → 0,0–0,4 m ao longo do alvo; no casco batem no costado do lado de quem atira, como deve ser |
+| Cada torre e cada montagem de granadas/foguetes é independente (giro, elevação, recarga, obstrução) | conferido no código e nos testes | CORRETO |
+| Mira: um símbolo por canhão disponível (número da torre) mostrando para onde ELE aponta agora; vem até o ponto; verde por torre assentada; centro verde só com TODAS as disponíveis assentadas. "Disponível" = dentro do setor e com a boca livre NA DIREÇÃO DO ALVO (`obstrAlvo`, novo) | navegador: 3 torres da capitânia chegando em tempos diferentes; centro verde só com as 3 | VERIFICADO |
+
+Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215` OK, `vtol138`, `destroier133`, `amorim130`, `fragata132`, `voo1278` OK.

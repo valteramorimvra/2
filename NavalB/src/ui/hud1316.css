@@ -31,3 +31,11 @@
 .hud .h-crz.g::before, .hud .h-crz.g::after { background: rgba(203,213,225,.9); }
 .hud .h-crz.ok::before, .hud .h-crz.ok::after { background: #22c55e; box-shadow: 0 0 4px rgba(34,197,94,.9); }
 .hud.espectador .h-crz, .hud.espec-on .h-crz, .hud.modo-nk .h-crz, .hud.modo-heli .h-crz { display: none !important; }
+/* v1.3.20: símbolo de CADA canhão disponível (cinza com o número da torre; verde quando aquela torre está assentada no ponto) */
+.hud .h-crzTs { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+.hud .h-crzT { position: absolute; left: 0; top: 0; width: 10px; height: 10px; margin: -5px 0 0 -5px; will-change: transform; }
+.hud .h-crzT::before, .hud .h-crzT::after { content: ''; position: absolute; background: rgba(203,213,225,.9); box-shadow: 0 0 2px rgba(0,0,0,.7); }
+.hud .h-crzT::before { left: 4px; top: 0; width: 2px; height: 10px; } .hud .h-crzT::after { top: 4px; left: 0; height: 2px; width: 10px; }
+.hud .h-crzT b { position: absolute; left: 9px; top: -9px; font: 700 8px/1 system-ui, sans-serif; color: #e2e8f0; text-shadow: 0 1px 2px #000; }
+.hud .h-crzT.ok::before, .hud .h-crzT.ok::after { background: #22c55e; } .hud .h-crzT.ok b { color: #86efac; }
+.hud.espectador .h-crzTs, .hud.espec-on .h-crzTs, .hud.modo-nk .h-crzTs, .hud.modo-heli .h-crzTs { display: none !important; }
