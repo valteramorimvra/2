@@ -119,3 +119,11 @@ Fora da batalha normal nada muda: duelo, treino, teste de combate e batalha pers
 | Caças do destróier: voo e velocidade do Pica-pau (perfil `jato`: máx. 165 m/s, mín. 0,42×). Armamento, defesas e IA continuam os deles, com a bomba atômica do Pica-pau no LANÇAR. | `src/sim/vtolAmorim.js` (`arma`) | VERIFICADO (`tests/vtol138.mjs`) |
 | Hangar: Acauã e Uiraçu individuais, cada um com até 3 aeronaves do mesmo tipo (líder + 2 alas) na formação em V do Pica-pau. A câmera fica no último. Voo e velocidade do Pica-pau; armamento, lasers, canhão e IA deles; botões somando os 3. | `vtolAmorim.js` (`lancaVtolInd`), `src/sim/world.js`, `src/render/vtolAmorimFx.js` | VERIFICADO (simulação: 3 no ar, alas a 34 m atrás ±26 m, câmera no ala 2, ASM pela tela) |
 | Hidroaviões retirados de tudo por enquanto, por uma chave (`HIDRO_OFF`, `src/sim/hidroaviao.js`): árvore, hangar, comércio, estaleiro, escolha de veículo e botão HIDRO na batalha. Basta `false` para voltarem. | `hidroaviao.js`, `aeronaves.js`, `telasLoja.js`, `main.js`, `hud.js` | VERIFICADO (navegador: árvore, comércio, hangar e batalha sem hidroavião) |
+
+## 1.3.13 — mísseis entre navios (vídeo de referência do Valter)
+
+| Item | Onde | Estado |
+|---|---|---|
+| Fumaça: rastro branco-acinzentado ENCORPADO, parado no ar (não acompanha o míssil), que abre em tufos e se desfaz em ~3–4 s. No booster: opacidade 0,30, 2,6 m, vida 4,2 s; no cruzeiro: 0,16, 1,6 m, 3 s. Antes: 0,10/0,07, ~1 m, 16 s. | `src/render/fx.js` (`rastroMissil`) | VERIFICADO (fotos no navegador) |
+| Altura: arco baixo, pico ≈ 1,4% da distância (era 7,5%). A 7 km: sobe 47–64 m, arco até ~108 m e rasante perto do alvo (antes ~390 m). | `src/armasParametros.js` (`missil.arco`) | VERIFICADO (simulação) |
+| Som: o lançamento do VLS é um rugido de foguete de banda larga (até ~12 kHz), com ataque seco e queda em ~0,9 s (camada nova `missilFoW`). Saíram desse lançamento o "rugido contínuo" e a varredura tonal 180→880 Hz; a amostra `vls_lancamento` continua. | `src/NavalAudio.js`, `src/modernNavalCombat3D.js` | VERIFICADO: pico 1,08 (inimigo) / 1,40 (jogador), contra 1,47 / 1,60 antes; o limitador e o softclip continuam na cadeia. Volume final no aparelho: NÃO VERIFICADO |
