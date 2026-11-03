@@ -222,3 +222,14 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `vtol138`, `destroier133`, `a
 | Item | Onde | Estado |
 |---|---|---|
 | CÂMERA FW mais perto: fator 1,2 → 1,1 da distância/altura originais (mesmo ângulo; a de antes da 1.3.16 era 1,0). | `src/modernNavalCombat3D.js` (`kFw`) | VERIFICADO (build) |
+
+## 1.3.24 — projétil cai no ponto do mapa; manual atualizado
+
+| Item | Onde | Estado |
+|---|---|---|
+| Granadas e foguetes deixam de ser semiguiados (lança-granadas/foguetes reais não são guiados): saem com o avanço calculado no lançamento e caem naquele ponto; o alvo que manobra a tempo escapa. Canhão já era balístico puro. | `src/armasParametros.js` (`rbuArco.guia` 0), `src/sim/world.js` | VERIFICADO (alvo reto: 8/8; alvo que para após o lançamento: 0/8) |
+| Quem estiver no ponto de queda é atingido mesmo sem ser detectado (colisão física, sem depender de radar/visão). | `acertaNavio` | VERIFICADO (tiro às cegas em arco por cima de montanha em navio não detectado: acertos com MIRA LIVRE e mira manual) |
+| ERRO corrigido: a mira MANUAL (sem trava) media a distância a partir da boca da torre 1 e não do centro do navio (como a tela mede) → o tiro caía até ~100 m fora do ponto mirado em navios longos. | `world.js` (`_pont1`) | VERIFICADO (sem dispersão: 0/60 → 24/24 acertos no ponto) |
+| Manual do jogo (1.3.24): detecção/radar/cobertura, AUTO-MIRA × TRAVAR, trava num ponto, cruzes e símbolos por canhão, assentamento da torre, projétil sem correção de rumo, tiro em arco e elevação por calibre (tabela), granadas/foguetes não guiados, câmera FW, botões e ajustes padrão, aeronaves (bolinha, torpedo, COMBATE). | `src/ui/manualDados1231.js`, `src/ui/manualConteudo1231.js`, `src/ui/fontes1231.js` | VERIFICADO (navegador: seções de Armas; textos no build) |
+
+Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destroier133`, `amorim130`, `fragata132` OK.

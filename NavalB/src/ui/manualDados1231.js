@@ -5,7 +5,7 @@
 //   { gerar:'nome', arg } tabela/ficha montada a partir dos dados reais · { so:'novos.hidro' } (opcional, em qualquer bloco) só mostra se o caminho existir.
 // Regras de conteúdo: nada religioso, de marca, demoníaco ou de azar; personagens amigáveis; sem números inventados (o que não existe fica PENDENTE).
 export const CREDITO_DEV = 'Responsável pelo desenvolvimento do game: Valter Amorim';
-export const VERSAO_MANUAL = '1.2.31';
+export const VERSAO_MANUAL = '1.3.24'; /* v1.3.24: manual atualizado com a mira, a trava, o radar e as câmeras de 1.3.15–1.3.24 */
 // Corte aprovado pelo Valter: o hidroavião fica para a 1.2.32. Tudo que tem `desde: '1.2.32'` (categoria, seção ou bloco) fica FORA
 // do manual enquanto LIGAR_1232 for false. Para ligar depois: troque para true (e passe novos.hidro em fontesHidro1232.js).
 export const LIGAR_1232 = false;
@@ -31,7 +31,9 @@ export const CATEGORIAS = [
     ] },
     { id: 'manobra', titulo: 'Manobra e detecção', blocos: [
       { p: '<b>Telégrafo</b> (esquerda): AR, PAR, 1/3, 2/3 e TF. <b>Leme</b>: arraste para bombordo (BB) ou boreste (BE). O navio é lento para virar: use o <b>pivô</b> ↺ ↻.' },
-      { p: 'Inimigos ficam <b>ocultos</b> até serem detectados (o placar mostra <b>?</b>). Você sai em <b>radar PASSIVO</b>: vê pelos olhos (noite e chuva reduzem), sonar curto, drone e helicóptero. O <b>RADAR ativo</b> mostra um ponto sem nome muito mais longe, mas o inimigo percebe você (alerta <b>DETECTADO</b>).' },
+      { p: 'Inimigos ficam <b>ocultos</b> até serem detectados (o placar mostra <b>?</b>). Você sai em <b>radar PASSIVO</b>: vê pelos olhos (noite e chuva reduzem), óptica, sonar curto, drone e helicóptero, e recebe os contatos dos aliados. No <b>mar aberto</b> quem vê quem depende da distância, do tamanho, da furtividade, da camuflagem, da velocidade e da hora.' },
+      { p: '<b>RADAR ativo</b> enxerga muito mais longe, mas a emissão <b>denuncia a sua posição</b> a todos os inimigos no alcance de escuta (alerta <b>DETECTADO</b>). O botão ATIVO/PASSIVO fica no canto superior, ao lado do radar.' },
+      { p: '<b>Atrás de uma ilha ou montanha</b> ninguém tem visada. Só é possível ver (e travar para o tiro em arco) um navio escondido atrás da cobertura quando <b>o radar dele e o seu estão ligados</b>. Com qualquer um dos dois desligado, a cobertura protege — só aeronaves e drones enxergam por cima.' },
       { p: 'Navio furtivo, parado e sem atirar é mais difícil de ver. Contato perdido vira <b>?</b> na última posição por cerca de {{param.deteccao.perda}} s.' },
     ] },
     { id: 'tier1', titulo: 'Tier I', blocos: [{ gerar: 'tabelaNavios', arg: 1 }] },
@@ -93,13 +95,19 @@ export const CATEGORIAS = [
 
   { id: 'armas', titulo: 'Armas', icone: IC.armas, resumo: 'Canhões, mísseis, torpedos, defesa, granadas e aeronaves — números reais do jogo', secoes: [
     { id: 'mira', titulo: 'Mira e trava', blocos: [
-      { p: '<b>Arraste</b> para mirar: a mira é <b>manual</b>. O botão <b>AUTO-MIRA</b> (desligado por padrão, fica salvo) só ajusta o avanço e a elevação num cone pequeno em volta do retículo; o radar nunca liga a auto-mira nem puxa a mira para outro alvo.' },
+      { p: '<b>Arraste</b> para mirar: a mira é <b>manual</b>. O botão <b>AUTO-MIRA</b> (desligado por padrão, fica salvo) procura o navio visível na tela e ajusta avanço e elevação; com ela ligada o <b>TRAVAR não trava</b>, porque a mira já é automática. O radar nunca liga a auto-mira.' },
+      { p: '<b>TRAVAR num ponto</b>: aponte para a proa, a popa, a ponte… e toque <b>TRAVAR</b> (o botão fica verde; o 2º toque solta). A mira, o quadro e a <b>óptica</b> passam a acompanhar <b>aquele ponto</b> do navio, que gira com o casco. Fora do casco, trava no centro do navio.' },
+      { p: '<b>Cruzes da mira</b>: a cruz <b>vermelha meio apagada</b> marca o ponto travado já com o avanço (onde a granada encontra o alvo). Cada <b>canhão disponível</b> tem um símbolo cinza com o número da torre, que mostra para onde <b>ele</b> aponta agora e vem até a vermelha — cada torre gira, eleva e recarrega sozinha. Quando <b>todos os disponíveis</b> assentam no ponto, o centro fica <b>VERDE</b>: hora de atirar. Torre fora do setor ou com a boca obstruída na direção do alvo não tem símbolo (veja os ícones das torres no botão CANHÃO).' },
       { p: 'Pare a mira sobre um navio inimigo dentro do alcance e ele é <b>travado sozinho</b> em cerca de {{param.trava.tAtivo}}–{{param.trava.tPassivo}} s: colchete verde (travando) → vermelho (travado), com alarme e vibração curta. A trava resiste até {{param.trava.tFora}} s fora da mira.' },
-      { p: 'A elipse na água mostra a dispersão e o ponto de queda; o losango âmbar mostra o <b>avanço</b>. Verde = solução travada, âmbar = limite de alcance, vermelho = fora/obstruído. A <b>MIRA LIVRE</b> manda o canhão ao ponto exato do retículo, sem trava nem avanço.' },
+      { p: 'A elipse na água mostra a dispersão e o ponto de queda; o losango âmbar mostra o <b>avanço</b>. Verde = solução travada, âmbar = limite de alcance, vermelho = fora/obstruído. A <b>MIRA LIVRE</b> manda o canhão ao ponto exato do retículo (mar ou casco), sem trava nem avanço.' },
+      { nota: '<b>O avanço é calculado pelo sistema</b> (movimento do alvo e do seu navio). Não trave à frente da proa: o avanço seria contado duas vezes. Para mandar o tiro a um ponto fixo do mar, use a MIRA LIVRE.' },
       { nota: '<b>AUTO-FOGO é só de canhões.</b> No seu navio, mísseis, torpedos, foguetes e granadas nunca disparam sozinhos enquanto você comanda. A defesa (CIWS, SAM, 30 mm e laser) é automática. A auto-mira nunca dispara sozinha.' },
     ] },
     { id: 'canhao', titulo: 'Canhões', blocos: [
       { p: 'Granada explosiva (HE) com espoleta de impacto, tiro balístico com arrasto e dispersão por calibre. <b>Canhão não pode ser interceptado</b>: se acerta, causa dano (até o ricochete rasante arranca chapa). A recarga mínima segue o calibre.' },
+      { p: 'A salva só sai com a <b>torre assentada</b> no ponto (giro e elevação). O toque rápido no CANHÃO dispara na hora, na direção em que o cano está — só acerta se a mira já estiver verde.' },
+      { p: '<b>Depois de disparada, a granada não corrige o rumo</b>: cai no ponto do mapa calculado no disparo. Quem manobrar a tempo (guinar, parar, acelerar) pode escapar; quem estiver no ponto de queda é atingido, <b>mesmo escondido e não detectado</b> — inclusive num tiro às cegas.' },
+      { p: '<b>Tiro em arco</b>: com a linha de tiro bloqueada por ilha/montanha, o canhão eleva (carga reduzida) e passa por cima do relevo. A <b>elevação máxima</b> de cada navio aparece na ficha (campo do canhão); hoje todos os navios fazem tiro em arco (reparos de 280–508 mm remodelados para 65°). O tiro em arco é menos preciso que o direto.' },
       { gerar: 'calibres' },
     ] },
     { id: 'missil', titulo: 'Mísseis VLS', blocos: [
@@ -116,7 +124,7 @@ export const CATEGORIAS = [
       { p: '<b>ISCA TÉRM.</b>: protege contra míssil travado (85% no padrão, 95% com ouro); cargas limitadas, com recarga. <b>REPARO</b>: apaga incêndio e estanca alagamento.' },
     ] },
     { id: 'granadas', titulo: 'Granadas e foguetes', blocos: [
-      { p: 'Salva de foguetes-granada em arco, semiguiados para o alvo travado; explodem no casco ou sob a água. <b>Não podem ser interceptados.</b> Botão <b>GRANADA</b>.' },
+      { p: 'Salva de foguetes-granada em arco, <b>não guiados</b>: saem com o avanço calculado no lançamento para o ponto travado e caem naquele ponto do mapa — o alvo que manobra a tempo escapa. Cada montagem gira, eleva e recarrega sozinha. O arco sobe o necessário para passar por cima do relevo. Explodem no casco ou sob a água. <b>Não podem ser interceptados.</b> Botão <b>GRANADA</b>.' },
       { gerar: 'foguetes' },
     ] },
     { id: 'aeronaves', titulo: 'Aeronaves embarcadas', blocos: [
@@ -153,10 +161,13 @@ export const CATEGORIAS = [
     ] },
     { id: 'botoes', titulo: 'Botões do HUD', blocos: [
       { gerar: 'botoesHud' },
+      { p: 'AUTO-MIRA, MIRA LIVRE, AUTO-FOGO e ACÚSTICO/RETO ficam numa coluna só, um embaixo do outro. O botão RADAR ATIVO/PASSIVO fica no canto superior, ao lado do radar; o NUCLEAR fica acima do TRAVAR.' },
+      { p: '<b>Ajustes</b>: as vozes da batalha e as dicas do tutorial vêm desligadas (ligue em Ajustes, se quiser). A câmera padrão é a <b>FW</b>.' },
       { nota: 'Pausa → <b>EDITAR HUD</b> deixa você arrastar e redimensionar os botões. Nenhum botão fica sobre outro e nada fica no centro da tela.' },
     ] },
     { id: 'aero', titulo: 'Helicóptero e esquadrilha', blocos: [
       { p: '<b>HELI</b> assume o helicóptero: joystick de movimento, altitude pelos botões ▲/▼. Botões do heli: <b>ARMA</b>, <b>FLARE</b>, <b>POUSAR</b>, <b>NAVIO</b> (volta ao navio) e <b>HELI 2</b> (troca). Enquanto você voa, a IA comanda o navio e usa todas as armas.' },
+      { p: 'Na tela de pilotagem, tocar na tela marca a <b>bolinha</b>; o <b>TRAVAR</b> pega o navio inimigo mais próximo dela. Aeronave com <b>torpedo</b>: o <b>LANÇAR/ARMA</b> dispara no alvo travado até 3,5 km (de longe aparece a distância). O <b>COMBATE</b> do hangar começa no ar, a 750 m.' },
       { p: 'Nos porta-aviões, <b>ESQUADRILHA</b> lança a ala aérea. O <b>DRONE</b> revela navios atrás das ilhas no radar da frota.' },
     ] },
     { id: 'bombardeiro', titulo: 'Bombardeiro nuclear', blocos: [

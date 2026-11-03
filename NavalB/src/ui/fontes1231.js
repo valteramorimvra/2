@@ -1,7 +1,7 @@
 // v1.2.31 — LIGAÇÃO do manual/tutorial com os dados REAIS do jogo (só leitura; nada aqui altera o jogo).
 // Caminhos relativos já pensados para src/ui/ do jogo. Se a 1.2.30/1.2.31 mudar um valor, o manual muda junto.
 import { CLASSES, MISSEIS, TORPEDO, SAM, HELIS, TELEG } from '../sim/classes.js';
-import { PARAM, recargaMinCal } from '../armasParametros.js';
+import { PARAM, recargaMinCal, elMaxCal } from '../armasParametros.js';
 import { CIWS, A30, LASER } from '../naval5v5/defesa.js';
 import { NUK } from '../sim/nuclear.js';
 import { CONS, ORDEM_CONS } from '../naval5v5/consumiveis.js';
@@ -18,4 +18,4 @@ import { TIPO_NAVIO } from '../navalTechTreeEconomy.js';
 const vlsRec = {}; if (typeof WORLD.recargaVlsSeg === 'function') for (const [id, t] of Object.entries(TIPO_NAVIO)) if (CLASSES[id] && vlsRec[t] === undefined) vlsRec[t] = WORLD.recargaVlsSeg(id);
 export const V1230 = typeof WORLD.recargaVlsSeg === 'function' ? { vlsRec } : {};
 
-export const FONTES_1231 = { v1230: V1230, CLASSES, MISSEIS, TORPEDO, SAM, HELIS, TELEG, PARAM, recargaMinCal, CIWS, A30, LASER, NUK, CONS, ORDEM_CONS, CAMO_AEREO, ORDEM_CAMO_AEREO, PINTURAS, PAISES, fracMissil, fracTorpedo, hpRef, NOS, novos: NOVOS_1231 };
+export const FONTES_1231 = { v1230: V1230, CLASSES, MISSEIS, TORPEDO, SAM, HELIS, TELEG, PARAM, recargaMinCal, elMaxCal, CIWS, A30, LASER, NUK, CONS, ORDEM_CONS, CAMO_AEREO, ORDEM_CAMO_AEREO, PINTURAS, PAISES, fracMissil, fracTorpedo, hpRef, NOS, novos: NOVOS_1231 };
