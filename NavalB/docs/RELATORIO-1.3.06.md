@@ -297,3 +297,11 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Causa 1: o arraste feito DENTRO da óptica deixava o "toque manual" ativo por 1,5 s e cancelava a volta ao sair. Agora só um arraste depois de sair cancela. | `modernNavalCombat3D.js` (`voltaPontoBino`, `_nArr`) | VERIFICADO |
 | Causa 2: a opção "câmera volta para trás do navio" girava a câmera externa de volta. Agora fica suspensa depois da óptica até o próximo arraste. A volta corre até chegar exatamente ao ponto (máx. 4 s). | `voltaPontoBino`, `_camFixa` | VERIFICADO (navegador, arraste logo antes de sair: FW 1.880 → 1.875 m; EXTERNA 1.881 → 1.879 m, mesma marcação, e fica no ponto) |
 | Só a câmera se move; a física dos tiros não muda. Manual atualizado. | — | — |
+
+## 1.3.32
+
+| Item | Onde | Estado |
+|---|---|---|
+| Cone de trava das aeronaves no MANUAL: 40° → 60° (câmera gira para o alvo só dentro dele). | `nkAutoAlvo`, `nkCam` | VERIFICADO (navegador: 52° e 29° travam; 72° não) |
+| Volta da óptica em TODAS as câmeras: giro e inclinação corrigidos pela sensibilidade medida da câmera (secante, com sentido e passo crescente onde o ponto quase não responde). Com alvo travado (inclusive o pego pela trava automática dentro da óptica) volta ao ponto travado com avanço. | `voltaPontoBino` | VERIFICADO (ponto a 1,88 km — externa 1.872, FW 1.871, convés 1.886, canhão 1.882, ampla 1.876, popa 1.880, 3/4 alta 1.875, popa alta 1.877, costado 1.875 m; mesma marcação) |
+| Cinema e câmeras de míssil/foguete/projétil/torpedo seguem o próprio objeto (fora da volta). Manual atualizado. | — | — |
