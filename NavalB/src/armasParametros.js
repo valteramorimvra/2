@@ -32,7 +32,7 @@ export const PARAM_PADRAO = {
   torre: { az: [[90, 40], [140, 25], [200, 20], [999, 15]], el: 0.3 },
   /* v1.2.21 item 11c: RECARGA mínima realista por calibre (s por tiro, por torre) — vale igual para jogador e bots; [cal máx, s] */
   /* v1.2.21 item 14a/b: elevação MÁXIMA mecânica por calibre (rad): 57 mm 77° · 76 mm 85° · 100 mm 80° · 114 mm 55° · 127/130 mm 65° · 152/155 mm 60° · pesados 45°; recuo mola-amortecedor (curso normalizado; freio no recuo, recuperador amortecido no retorno) */
-  elevMax: [[60, 1.344], [80, 1.484], [105, 1.396], [120, 0.96], [135, 1.134], [160, 1.047], [999, 0.785]],
+  elevMax: [[60, 1.344], [80, 1.484], [105, 1.396], [120, 0.96], [135, 1.134], [160, 1.047], [999, 1.134]], /* v1.3.21 (Valter): reparos de 280–508 mm REMODELADOS para 65° (eram 45°) — todos os navios fazem tiro em arco por cima do relevo */
   recuo: { kick: [111, 49], freio: [38, 26], w: [7.5, 4.2], zeta: 1.05 },
   recarga: { canhao: [[45, 0], [60, 0.42], [80, 0.75], [105, 0.75], [120, 2.2], [135, 2.2], [160, 5.0], [210, 8.0], [999, 12.0]], torpTubo: 4.0, vls: 8.0 /* fallback; world.recargaVlsSeg por tipo (item 7) */, rbu: 15.0 },
   ciws: { giro: 2.8, cego: 0.6, elCego: 0.35 },

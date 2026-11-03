@@ -195,3 +195,15 @@ Medições com a dispersão zerada (só o cálculo), cada torre isolada, alvo pa
 | Mira: um símbolo por canhão disponível (número da torre) mostrando para onde ELE aponta agora; vem até o ponto; verde por torre assentada; centro verde só com TODAS as disponíveis assentadas. "Disponível" = dentro do setor e com a boca livre NA DIREÇÃO DO ALVO (`obstrAlvo`, novo) | navegador: 3 torres da capitânia chegando em tempos diferentes; centro verde só com as 3 | VERIFICADO |
 
 Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215` OK, `vtol138`, `destroier133`, `amorim130`, `fragata132`, `voo1278` OK.
+
+## 1.3.21 — tiro em arco para todos, radar e relevo
+
+| Item | Onde | Estado |
+|---|---|---|
+| 16 navios não faziam tiro em arco (reparos de 280–508 mm limitados a 45°; o arco pede > 46°): Trovão, Volkhar, Baluarte, Colosso, Antônia, Rodolfo, Marcos, Kelly, Laiane, Klévton, Ananery, Trajano, Leidevaldo, Ronaldo, Tamandaré, Barroso. Reparos remodelados para 65°. | `src/armasParametros.js` (`elevMax`) | VERIFICADO (Baluarte: arco 57° com carga reduzida por cima de montanha de 163 m a 4,1 km) |
+| Radar LIGADO denuncia a posição a todos os inimigos no alcance do ESM, mesmo atrás do relevo (contato travável). Radar desligado atrás do relevo: nenhum navio vê (só aeronaves por cima, como já era). Mar aberto: visão por distância, tamanho, furtividade, camuflagem e hora, como já era. | `src/sim/world.js` (`sensores`) | VERIFICADO |
+| Canhões, granadas e foguetes podem travar/adquirir alvo DETECTADO atrás do relevo (tiro em arco); sem detecção a trava é negada. | `world.js` (`arcoOk`, `travar`, `travaAuto`) | VERIFICADO |
+| Granadas/foguetes: altura do arco calculada pelo relevo no caminho (passam por cima do morro perto do alvo ou do navio); a correção em voo só segue alvo detectado/travado; a IA só lança em alvo detectado (antes lançava no inimigo mais próximo mesmo sem vê-lo). | `world.js` (`lancaRbu`, `pontoRbu`, `passoRbu`) | VERIFICADO (radar ligado: 24/24 no alvo, 0 no morro; radar desligado: sem perseguição) |
+| Óptica com alvo travado acompanha o alvo (desde a 1.3.17/1.3.19). | `autoMiraPasso` | VERIFICADO |
+
+Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destroier133`, `amorim130`, `fragata132` OK.
