@@ -243,3 +243,13 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Altura mínima do voo manual 150 m (piso firme, ajuda só nos últimos 40 m; antes empurrava para cima já abaixo de 320 m e o piso real era ~96 m). | `src/sim/nuclear.js` (`manAltMin`, `voaManual`) | VERIFICADO (mergulho total: mínimo 159 m) |
 | Batida no relevo: explosão (antes a aeronave só sumia), aviso e volta à câmera do navio; recarga como aeronave abatida. | `nuclear.js`, `modernNavalCombat3D.js` (`nkTerreno`) | VERIFICADO (montanha de 628 m: bateu a 377 m) |
 | Modo IA sem mudança. Manual do jogo atualizado. | `manualDados1231.js` | VERIFICADO |
+
+## 1.3.26 — nada atira através do relevo
+
+| Item | Onde | Estado |
+|---|---|---|
+| CIWS, 30 mm, laser e SAM só escolhem alvos com visada livre do relevo (linha 3D da montagem/mastro ao alvo). | `src/naval5v5/defesa.js` (`visT`) | VERIFICADO (heli inimigo a 1,1 km atrás de morro de 134 m: 0 quadros de fogo; em mar aberto: CIWS e laser atiram) |
+| Canhões secundários e canhões automáticos do Amorim não atiram em alvo atrás do relevo. | `secundarias.js`, `amorim.js` | VERIFICADO (código + testes) |
+| Aeronaves: canhão/metralhadora/foguetes/bazuca/torpedo/mísseis (sistema da pilotagem e IA), metralhadora de porta, AR-AR, helicópteros do sistema antigo, caças Acauã/Uiraçu (mísseis, torpedo, canhão, lasers) — só com visada livre; mensagem "alvo atrás do relevo". | `nuclear.js` (`visNk`), `defesa.js` (`lancaArAr`), `aereo.js`, `vtolAmorim.js`, `modernNavalCombat3D.js` | VERIFICADO (ASW e Beija-flor atrás de morro de 224 m: 0 disparos; com visada: disparam) |
+| Própria estrutura: já respeitada (máscaras de linha de tiro do CIWS/30 mm/laser/secundárias e arcos das torres). | `linhaTiro.js` | sem mudança |
+| Manual atualizado (Armas › Defesa). | `manualDados1231.js` | VERIFICADO |

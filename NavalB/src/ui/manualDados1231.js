@@ -5,7 +5,7 @@
 //   { gerar:'nome', arg } tabela/ficha montada a partir dos dados reais · { so:'novos.hidro' } (opcional, em qualquer bloco) só mostra se o caminho existir.
 // Regras de conteúdo: nada religioso, de marca, demoníaco ou de azar; personagens amigáveis; sem números inventados (o que não existe fica PENDENTE).
 export const CREDITO_DEV = 'Responsável pelo desenvolvimento do game: Valter Amorim';
-export const VERSAO_MANUAL = '1.3.25'; /* v1.3.24: manual atualizado com a mira, a trava, o radar e as câmeras de 1.3.15–1.3.24 */
+export const VERSAO_MANUAL = '1.3.26'; /* v1.3.24: manual atualizado com a mira, a trava, o radar e as câmeras de 1.3.15–1.3.24 */
 // Corte aprovado pelo Valter: o hidroavião fica para a 1.2.32. Tudo que tem `desde: '1.2.32'` (categoria, seção ou bloco) fica FORA
 // do manual enquanto LIGAR_1232 for false. Para ligar depois: troque para true (e passe novos.hidro em fontesHidro1232.js).
 export const LIGAR_1232 = false;
@@ -120,6 +120,7 @@ export const CATEGORIAS = [
     ] },
     { id: 'defesa', titulo: 'Defesa e iscas', blocos: [
       { p: 'Só <b>mísseis, torpedos e aeronaves</b> (drones, helicópteros) podem ser interceptados. Canhão, granadas e foguetes não têm defesa. O botão <b>SAM</b> liga/retém a defesa SAM automática do navio.' },
+      { p: 'A defesa automática (CIWS, 30 mm, laser e SAM), os canhões secundários e automáticos e as armas das aeronaves <b>só atiram com visada livre</b>: nunca num alvo atrás de ilha ou montanha. Também nunca atiram através da própria estrutura do navio (cada arma tem o seu setor livre).' },
       { gerar: 'defesa' },
       { p: '<b>ISCA TÉRM.</b>: protege contra míssil travado (85% no padrão, 95% com ouro); cargas limitadas, com recarga. <b>REPARO</b>: apaga incêndio e estanca alagamento.' },
     ] },

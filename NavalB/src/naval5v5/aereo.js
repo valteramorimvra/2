@@ -215,7 +215,7 @@ function voaAviao(h, rumoAlvo, vAlvo, altAlvo, dt, sim) { const H = h.H, vmax = 
 const _pa = { x: 0, y: 0, z: 0 }; function pontoArma(h, avante, lado, baixo) { const s = Math.sin(h.rumo), c = Math.cos(h.rumo); _pa.x = h.x + s * avante + c * lado; _pa.z = h.z - c * avante + s * lado; _pa.y = h.y - baixo; return _pa; }
 /** v1.2.29 item 13: dogfight — canhão no envelope à frente; 0 fogo amigo (time filtrado pelo chamador). */
 function disparaA2A(sim, h, ae, dt) {
-  if (!ae || !ae.ativo || ae.time === h.time || ae.estado === EST.ABATIDO) return 0;
+  if (!ae || !ae.ativo || ae.time === h.time || ae.estado === EST.ABATIDO) return 0; if (bloqueado(sim.T, h.x, h.z, h.y, ae.x, ae.z, ae.y || 0)) return 0; /* v1.3.26: visada livre do relevo */
   const d = Math.hypot(ae.x - h.x, ae.z - h.z, (ae.y || 0) - (h.y || 0));
   if (d > EQ_AR.a2aAlc * ((h.H && h.H.a2aAlc) || 1)) return 0; /* v1.2.65: AR-AR longo do hangar estende o alcance */
   const b = marcacao(h.x, h.z, ae.x, ae.z);
@@ -237,7 +237,7 @@ function disparaA2A(sim, h, ae, dt) {
 /** v1.2.30 item 15: registra lançamentos e marca o projétil com o modelo (hm); o disparo em si é o disparaIn() original. */
 function dispara(sim, h, n, a) { return regAereoDispara(sim, h, n, a, disparaIn); }
 function disparaIn(sim, h, n, a) {
-  const H = h.H; if (!a || H.aew) return 0; const d = Math.hypot(a.x - h.x, a.z - h.z);
+  const H = h.H; if (!a || H.aew) return 0; const d = Math.hypot(a.x - h.x, a.z - h.z); if (bloqueado(sim.T, h.x, h.z, h.y, a.x, a.z, (a.arfagem || 0) + a.C.F * 0.7)) return 0; /* v1.3.26: aeronave não atira em navio atrás do relevo */
   if (H.bazuca && d < 2400 && d > 80 && (!h.tBaz || h.tBaz <= sim.t)) { const offB = Math.abs(ang(marcacao(h.x, h.z, a.x, a.z) - h.rumo)); if (offB < 0.55) { let kb = 0; const V = 280, tB = d / V; for (let gi = 288; gi < sim.granadas.length && kb < 2; gi++) { const g = sim.granadas[gi]; if (g.ativo) continue; const o = pontoArma(h, 0.4, kb ? 1.5 : -1.5, 0.2); Object.assign(g, { ativo: 1, x: o.x, y: o.y, z: o.z, vx: Math.sin(h.rumo) * V, vz: -Math.cos(h.rumo) * V, vy: ((a.arfagem + a.C.F * 0.6) - h.y) / tB, dono: n.id, time: n.time, dano: 16, cal: 84, t: 0, k: 0, fogo: 0.2, ap: 0, foguete: 1, rbu: 0, arcR: 0, fim: null }); kb++; } if (kb) { h.tBaz = sim.t + 5.5; sim.evento({ t: 'heliFoguete', idx: h.idx, x: h.x, y: h.y, z: h.z, n: kb }); } } }
   if (h.mun <= 0 || h.tArma > 0 || d > (H.arma === 'torpedo' && h.ctrl === 'jog' && h.fogo > 0 ? Math.max(H.alc, 3500) : H.alc)) return 0; /* v1.3.16 (Valter): torpedo pelo botão ARMA na pilotagem — até 3,5 km do alvo travado (o automático continua no alcance curto) */
   if (H.arma === 'missil' || H.arma === 'foguete') { const off = Math.abs(ang(marcacao(h.x, h.z, a.x, a.z) - h.rumo)); const cone = H.aviao ? (H.arma === 'foguete' ? 0.42 : 0.7) : (H.arma === 'foguete' ? 1.15 : 1.5); if (off > cone) return 0; } /* v1.2.98: rotor aceita o nariz mais aberto; asa fixa continua apertada */

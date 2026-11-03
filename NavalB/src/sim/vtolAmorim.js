@@ -7,7 +7,8 @@
 // Só os BOTÕES são destes caças: LANÇAR = NUKE · AR-AR = AAM · MÍSSIL = ASM · TORP, com munição por tipo (Acauã 6/4/2/3, Uiraçu 4/4/2/3)
 // cheia a cada decolagem, somada dos 2 caças na tela, 7 s entre mísseis/torpedos e 12 s no nuclear tático (comando 'vtArma').
 // Zero alocação por quadro: estados criados uma vez por navio.
-import { VTOL_SIM } from './vtolDadosSim.js';
+import { VTOL_SIM } from './vtolDadosSim.js'; import { bloqueado } from './maps.js';
+const visV = (sim, o, e, y) => !bloqueado(sim.T, o.x, o.z, o.y, e.x, e.z, y != null ? y : (e.y || 0)); /* v1.3.26 (Valter): caças só atiram com visada livre do relevo */
 import { MISSEIS, TORPEDO, HELIS } from './classes.js';
 import { lancaArAr } from '../naval5v5/defesa.js'; import { resistMissil } from '../naval5v5/resistAereo.js';
 import { lancaNuclear } from './nuclear.js';
@@ -47,11 +48,11 @@ function arma(q, E, bomba) { enche(E); q.vidaMax = q.vida = VIDA_VT; q.H = HELIS
 // ---------------- BOTÕES ----------------
 let _tp = '';
 function inimigoAereo(sim, q, alc) { let best = null, bd = alc, tp = '';
-  for (let i = 0; i < sim.helis.length; i++) { const e = sim.helis[i]; if (!e.ativo || e.time === q.time || e.estado < 2 || e.estado > 5) continue; const d = Math.hypot(e.x - q.x, e.y - q.y, e.z - q.z); if (d < bd) { bd = d; best = e; tp = 'h'; } }
-  for (let i = 0; i < sim.nukes.length; i++) { const e = sim.nukes[i]; if (!e.ativo || e.time === q.time || e.fase < 2) continue; const d = Math.hypot(e.x - q.x, e.y - q.y, e.z - q.z); if (d < bd) { bd = d; best = e; tp = 'q'; } }
+  for (let i = 0; i < sim.helis.length; i++) { const e = sim.helis[i]; if (!e.ativo || e.time === q.time || e.estado < 2 || e.estado > 5) continue; const d = Math.hypot(e.x - q.x, e.y - q.y, e.z - q.z); if (d < bd && visV(sim, q, e)) { bd = d; best = e; tp = 'h'; } }
+  for (let i = 0; i < sim.nukes.length; i++) { const e = sim.nukes[i]; if (!e.ativo || e.time === q.time || e.fase < 2) continue; const d = Math.hypot(e.x - q.x, e.y - q.y, e.z - q.z); if (d < bd && visV(sim, q, e)) { bd = d; best = e; tp = 'q'; } }
   _tp = tp; return best; }
-function inimigoNavio(sim, q, n, alc) { const a0 = q.alvo >= 0 ? sim.navios[q.alvo] : n && n.alvoId >= 0 ? sim.navios[n.alvoId] : null; if (a0 && !a0.morto && a0.time !== q.time && Math.hypot(a0.x - q.x, a0.z - q.z) < alc) return a0;
-  let best = null, bd = alc; for (let i = 0; i < sim.navios.length; i++) { const e = sim.navios[i]; if (e.morto || e.time === q.time || (e.C && (e.C.civil || e.C.mercante))) continue; const d = Math.hypot(e.x - q.x, e.z - q.z); if (d < bd) { bd = d; best = e; } } return best; }
+function inimigoNavio(sim, q, n, alc) { const a0 = q.alvo >= 0 ? sim.navios[q.alvo] : n && n.alvoId >= 0 ? sim.navios[n.alvoId] : null; if (a0 && !a0.morto && a0.time !== q.time && Math.hypot(a0.x - q.x, a0.z - q.z) < alc && visV(sim, q, a0, (a0.arfagem || 0) + a0.C.F * 0.7)) return a0;
+  let best = null, bd = alc; for (let i = 0; i < sim.navios.length; i++) { const e = sim.navios[i]; if (e.morto || e.time === q.time || (e.C && (e.C.civil || e.C.mercante))) continue; const d = Math.hypot(e.x - q.x, e.z - q.z); if (d < bd && visV(sim, q, e, (e.arfagem || 0) + e.C.F * 0.7)) { bd = d; best = e; } } return best; }
 function disparaMissil(sim, n, q, E, a, tipo) { const m = sim.misseis.find((x) => !x.ativo); if (!m) return 0; const nuke = tipo === 'nuke'; ponto(q, estacao(E, tipo), _o); const d = Math.hypot(a.x - q.x, a.z - q.z), v0 = Math.max(130, (q.v || 0) + 15);
   const pf = Object.assign({}, MISSEIS.curto, { nome: nuke ? 'Nuclear tático' : 'Antinavio', v: nuke ? 240 : 270, vt: nuke ? 260 : 300, alc: nuke ? VT.alcNuke : VT.alcAsm, dano: nuke ? VT.danoNuke : VT.danoAsm });
   Object.assign(m, { ouro: 0, heli: 1, ativo: 1, x: _o.x, y: _o.y, z: _o.z, vx: Math.sin(q.rumo) * v0, vy: (q.vy || 0) - 4, vz: -Math.cos(q.rumo) * v0, dono: n.id, time: n.time, alvo: a.id, isca: -1, fase: 3, t: 0, v: v0, perfil: pf, cel: 0, iscasVistas: 0, tf: 0, d0: d, samAlvo: 0, dano: pf.dano, pkMul: nuke ? 0.6 : 1, velMul: 1, livre: 0, curto: d < 1500 ? 1 : 0, lat: null, vtNk: nuke ? 1 : 0 });
@@ -85,12 +86,12 @@ function rastreiaNukes(sim, n, E) { for (let k = 0; k < 3; k++) { const mi = E.n
 function lasers(sim, n, q, E, dt) { const D = VTOL_SIM[E.id], L = VT.laser;
   for (let j = 0; j < 2; j++) { const S = E.las[j]; if (S.tc > 0) { S.tc -= dt; S.on = 0; continue; } ponto(q, D.lasers[j], _o); let best = null, bd = L.alc;
     for (let i = 0; i < sim.misseis.length; i++) { const m = sim.misseis[i]; if (!m.ativo || m.time === q.time || m.t <= 0) continue; const dx = m.x - _o.x, dy = m.y - _o.y, dz = m.z - _o.z, d = Math.hypot(dx, dy, dz); if (!(d < bd)) continue;
-      if (j === 0 ? dy < -0.2 * d : dy > 0.2 * d) continue; /* dorsal só acima, ventral só abaixo: a linha nunca cruza a própria aeronave */ bd = d; best = m; }
+      if (j === 0 ? dy < -0.2 * d : dy > 0.2 * d) continue; /* dorsal só acima, ventral só abaixo: a linha nunca cruza a própria aeronave */ if (!visV(sim, _o, m)) continue; bd = d; best = m; }
     if (!best) { S.on = 0; S.alvo = -1; S.t = 0; continue; }
     if (S.alvo !== best.idx) S.t = 0; S.alvo = best.idx; S.on = 1; S.t += dt; S.tx = best.x; S.ty = best.y; S.tz = best.z;
     if (S.t >= L.perm) { S.t = 0; S.tc = L.rec; S.on = 0; if (sim.rng.next() < L.pk * (best.pkMul || 1)) { best.ativo = 0; n.stats.intercept++; sim.evento({ t: 'missilAbatido', idx: best.idx, x: best.x, y: best.y, z: best.z, por: n.id, mount: -1, arma: 'laser' }); } S.alvo = -1; } } }
 /** canhão 25/30 mm: no navio travado, à frente e ao alcance (rajadas curtas) */
-function canhao(sim, n, q, E, dt) { if (E.tCan > 0) { E.tCan -= dt; return; } const a = q.alvo >= 0 ? sim.navios[q.alvo] : null; if (!a || a.morto || a.time === q.time) return; const d = Math.hypot(a.x - q.x, a.z - q.z); if (d > VT.canhao.alc) return;
+function canhao(sim, n, q, E, dt) { if (E.tCan > 0) { E.tCan -= dt; return; } const a = q.alvo >= 0 ? sim.navios[q.alvo] : null; if (!a || a.morto || a.time === q.time) return; const d = Math.hypot(a.x - q.x, a.z - q.z); if (d > VT.canhao.alc || !visV(sim, q, a, (a.arfagem || 0) + a.C.F * 0.7)) return;
   if (Math.abs(ang(marcacao(q.x, q.z, a.x, a.z) - q.rumo)) > VT.canhao.cone) return; const H = HELIS[E.id]; const ap = sim.dano ? sim.dano(a, (H.dano || 3) * 0.45 * 6, n, 'heli', true) : 0; E.tCan = 0.8;
   if (ap > 0) sim.evento({ t: 'impacto', x: a.x, y: (a.arfagem || 0) + (a.C ? a.C.F : 4) + 2, z: a.z, alvo: a.id, dono: n.id, cal: E.id === 'uiracu' ? 30 : 25, tipo: 'mg', ly: 2, dano: Math.max(1, Math.round(ap)) }); }
 /** IA (fora da pilotagem): no lugar do míssil do sistema, usa as armas dos botões — o líder ataca, o ala se defende (AAM) */

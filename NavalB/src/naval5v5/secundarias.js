@@ -20,7 +20,7 @@ export function passoSec(sim, n, dt, quer, sol) {
   const M = n.P.sec; if (!M || !M.length || n.morto) return; const al = sol && sol.travado && !sol.livre && n.alvoId >= 0 ? sim.navios[n.alvoId] : null;
   const PDs = PARAM.dispersao, disp0 = sim.fatorDisp(n), bot = n.papel !== 'jogador' || n.controleIA ? PDs.bot : 1;
   for (let j = 0; j < M.length; j++) { const m = M[j], st = n.sec[j], A = m.arma; st.fogo = 0; if (st.rec > 0) st.rec -= dt;
-    let alvoOk = 0; if (al && !al.morto && quer) { sim.mundo(n, m.x, m.y + 1, m.z, _o); const h0 = Math.max(1.5, _o.y), vx = Math.sin(al.rumo) * al.v, vz = -Math.cos(al.rumo) * al.v;
+    let alvoOk = 0; if (al && !al.morto && quer && sim.linhaLivre(n, al) /* v1.3.26: secundária não atira em alvo atrás do relevo */) { sim.mundo(n, m.x, m.y + 1, m.z, _o); const h0 = Math.max(1.5, _o.y), vx = Math.sin(al.rumo) * al.v, vz = -Math.cos(al.rumo) * al.v;
       const s = solucaoArrasto(_o.x, _o.z, Math.max(0.5, h0 - al.C.F * 0.7), A.V0, st.k, al.x, al.z, vx, vz, st.sol, al.w || 0);
       if (s && s.d <= A.alc) { const rel = ang(s.az - n.rumo); if (Math.abs(ang(rel - m.centro)) <= m.meio) alvoOk = 1; } }
     const alvoRel = alvoOk ? ang(st.sol.az - n.rumo) : m.centro, alvoEl = alvoOk ? clamp(st.sol.el, -0.1, 1.2) : 0;

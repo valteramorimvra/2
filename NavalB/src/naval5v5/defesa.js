@@ -10,7 +10,9 @@ import { clamp, ang, marcacao } from '../sim/util.js';
 import { PARAM } from '../armasParametros.js';
 import { SAM, DRONE, LANCHA, TORPEDO } from '../sim/classes.js';
 import { alturaMar } from '../sim/ocean.js';
-import { alturaTerreno } from '../sim/maps.js';
+import { alturaTerreno, bloqueado } from '../sim/maps.js';
+/** v1.3.26 (Valter): a defesa (CIWS, laser, SAM, 30 mm) só atira com VISADA livre do relevo — nunca num alvo atrás de ilha/montanha */
+const visT = (sim, o, q, y) => !bloqueado(sim.T, o.x, o.z, o.y, q.x, q.z, y != null ? y : q.y);
 import { derrubaAereo } from './aereo.js';
 import { regAereoInterc } from './regAereo.js'; /* v1.2.30 item 15 */
 import { resAr } from './resistAereo.js'; /* v1.2.30 item 15b */
@@ -56,11 +58,11 @@ export function passoCiws5(sim, n, dt) {
     let melhor = null, tipo = '', md = 1e9, score = 1e9;
     for (const m of sim.misseis) { if (!m.ativo || m.time === n.time || m.fase < FASE_PITCH || m.t < 0) continue; const d = Math.hypot(m.x - _o.x, m.y - _o.y, m.z - _o.z); if (d > alc * 1.6) continue;
       const aN = sim.navios[m.alvo]; const meu = m.alvo === n.id || (n.C.defesaFrota && aN && aN.time === n.time && Math.hypot(aN.x - n.x, aN.z - n.z) < n.C.defesaFrota); if (!meu && d > alc * 0.35) continue; /* v1.2.1: só ameaças reais */
-      if (d < score) { score = d; md = d; melhor = m; tipo = 'm'; } }
-    for (const q of sim.drones) { if (!q.ativo || q.time === n.time) continue; const d = Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z); if (d > alc * 1.3) continue; const sc = d * 1.15; if (sc < score) { score = sc; md = d; melhor = q; tipo = 'd'; } }
-    for (const tp of sim.torpedos) { if (!tp.ativo || tp.time === n.time) continue; const d = Math.hypot(tp.x - _o.x, tp.z - _o.z); if (d > CIWS.alcTorp) continue; const sc = d * 1.4; if (sc < score) { score = sc; md = d; melhor = tp; tipo = 't'; } }
-    for (const q of sim.helis) { if (!q.ativo || q.time === n.time) continue; const d = Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z); if (d > alc) continue; const sc = d * 1.25; if (sc < score) { score = sc; md = d; melhor = q; tipo = 'h'; } }
-    for (const q of sim.uavs) { if (!q.ativo || q.time === n.time) continue; const d = Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z); if (d > alc) continue; const sc = d * 1.5; if (sc < score) { score = sc; md = d; melhor = q; tipo = 'u'; } }
+      if (d < score && visT(sim, _o, m)) { score = d; md = d; melhor = m; tipo = 'm'; } }
+    for (const q of sim.drones) { if (!q.ativo || q.time === n.time) continue; const d = Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z); if (d > alc * 1.3) continue; const sc = d * 1.15; if (sc < score && visT(sim, _o, q)) { score = sc; md = d; melhor = q; tipo = 'd'; } }
+    for (const tp of sim.torpedos) { if (!tp.ativo || tp.time === n.time) continue; const d = Math.hypot(tp.x - _o.x, tp.z - _o.z); if (d > CIWS.alcTorp) continue; const sc = d * 1.4; if (sc < score && visT(sim, _o, tp, -0.5)) { score = sc; md = d; melhor = tp; tipo = 't'; } }
+    for (const q of sim.helis) { if (!q.ativo || q.time === n.time) continue; const d = Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z); if (d > alc) continue; const sc = d * 1.25; if (sc < score && visT(sim, _o, q)) { score = sc; md = d; melhor = q; tipo = 'h'; } }
+    for (const q of sim.uavs) { if (!q.ativo || q.time === n.time) continue; const d = Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z); if (d > alc) continue; const sc = d * 1.5; if (sc < score && visT(sim, _o, q)) { score = sc; md = d; melhor = q; tipo = 'u'; } }
     if (!melhor) { c.alvo = -1; c.tipo = ''; c.fogo = 0; c.tEng = 0; c.az += clamp(ang(0 - c.az), -dt, dt); continue; }
     if (c.alvo !== melhor.idx || c.tipo !== tipo) c.tEng = 0; c.alvo = melhor.idx; c.tipo = tipo;
     const my = tipo === 't' ? -0.5 : melhor.y; c.tx = melhor.x; c.ty = my; c.tz = melhor.z;
@@ -97,8 +99,8 @@ export const LASER = { alc: 2600, perm: { m: 1.5, h: 2.0, d: 0.9, u: 1.0 }, pk: 
 export function passoLaser(sim, n, dt) { if (!n.lasers || !n.lasers.length) return;
   for (let j = 0; j < n.lasers.length; j++) { const L = n.lasers[j], pl = n.P.laser[j]; if (n.morto) { L.on = 0; continue; } if (L.tc > 0) { L.tc -= dt; L.on = 0; continue; } sim.mundo(n, pl.x, pl.y, pl.z, _o);
     let alvo = null, tipo = '', md = LASER.alc;
-    const ok = (q, tp) => { const d = Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z); if (d < md) { md = d; alvo = q; tipo = tp; } };
-    if (L.alvo >= 0) { const q = L.tipo === 'm' ? sim.misseis[L.alvo] : L.tipo === 'h' ? sim.helis[L.alvo] : L.tipo === 'd' ? sim.drones[L.alvo] : sim.uavs[L.alvo]; if (q && q.ativo && q.time !== n.time && Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z) < LASER.alc) { alvo = q; tipo = L.tipo; } }
+    const ok = (q, tp) => { const d = Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z); if (d < md && visT(sim, _o, q)) { md = d; alvo = q; tipo = tp; } };
+    if (L.alvo >= 0) { const q = L.tipo === 'm' ? sim.misseis[L.alvo] : L.tipo === 'h' ? sim.helis[L.alvo] : L.tipo === 'd' ? sim.drones[L.alvo] : sim.uavs[L.alvo]; if (q && q.ativo && q.time !== n.time && Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z) < LASER.alc && visT(sim, _o, q)) { alvo = q; tipo = L.tipo; } }
     if (!alvo) { for (const m of sim.misseis) if (m.ativo && m.time !== n.time && m.t > 0 && m.fase >= FASE_PITCH) { const aN = sim.navios[m.alvo]; if (aN && aN.time === n.time) ok(m, 'm'); }
       for (const q of sim.helis) if (q.ativo && q.time !== n.time) ok(q, 'h'); for (const q of sim.drones) if (q.ativo && q.time !== n.time) ok(q, 'd'); for (const q of sim.uavs) if (q.ativo && q.time !== n.time) ok(q, 'u'); }
     if (!alvo) { L.on = 0; L.alvo = -1; L.t = 0; continue; }
@@ -114,9 +116,9 @@ export function passoSam(sim, n, dt) {
     const d = Math.hypot(m.x - n.x, m.y, m.z - n.z); if (d > SAM.alc * DEF.samAlcMis) continue; const aN = sim.navios[m.alvo]; if (!aN) continue;
     const protege = m.alvo === n.id || (aN.time === n.time && !aN.morto && Math.hypot(aN.x - n.x, aN.z - n.z) < DEF.samProtege); if (!protege) continue;
     const dA = Math.hypot(aN.x - m.x, aN.z - m.z); if (dA < 350) continue; // perto demais do alvo: fica para o CIWS
-    if (dA < md) { md = dA; melhor = m; } }
+    if (dA < md && visT(sim, { x: n.x, y: (n.P && n.P.mastro) || 25, z: n.z }, m)) { md = dA; melhor = m; } }
   if (!melhor) { // sem míssil: helicóptero inimigo dentro do alcance do SAM
-    for (const h of sim.helis) { if (!h.ativo || h.time === n.time || h.samAlvo || h.estado < 3) continue; const d = Math.hypot(h.x - n.x, h.y, h.z - n.z); if (h.y < 45 && d > (n.C.antiAereo ? 3000 : 1800)) continue; /* rasante: fora do horizonte do radar de tiro */ if (d < SAM.alc && d < md) { md = d; melhor = h; } }
+    for (const h of sim.helis) { if (!h.ativo || h.time === n.time || h.samAlvo || h.estado < 3) continue; const d = Math.hypot(h.x - n.x, h.y, h.z - n.z); if (h.y < 45 && d > (n.C.antiAereo ? 3000 : 1800)) continue; /* rasante: fora do horizonte do radar de tiro */ if (d < SAM.alc && d < md && visT(sim, { x: n.x, y: (n.P && n.P.mastro) || 25, z: n.z }, h)) { md = d; melhor = h; } }
     if (melhor) { const s = lancaSam(sim, n, melhor); if (s) s.tipoAlvo = 'h'; n.tSam = DEF.samCad * 2; } return; }
   lancaSam(sim, n, melhor); n.tSam = DEF.samCad;
 }
@@ -129,7 +131,7 @@ export function lancaSam(sim, n, m) {
 }
 /** v1.2.59: MÍSSIL AR-AR lançado da aeronave que o jogador pilota (bombardeiro/hidroavião) — usa o mesmo guiamento do SAM (navegação proporcional com tempo-até-impacto), só contra alvos AÉREOS.
  *  tipo 'h' = helicóptero/caça (sim.helis) · 'q' = bombardeiro/hidroavião inimigo (sim.nukes). Nasce com a velocidade da aeronave lançadora. */
-export function lancaArAr(sim, q, alvo, tipo) { const s = livre(sim.sams); if (!s) return null; const v = Math.max(120, q.v || 150), cp = Math.cos(q.gam || q.pitch || 0);
+export function lancaArAr(sim, q, alvo, tipo) { if (alvo && bloqueado(sim.T, q.x, q.z, q.y, alvo.x, alvo.z, alvo.y || 0)) return null; /* v1.3.26: AR-AR só com visada livre do relevo */ const s = livre(sim.sams); if (!s) return null; const v = Math.max(120, q.v || 150), cp = Math.cos(q.gam || q.pitch || 0);
   s.ativo = 1; s.x = q.x; s.y = q.y - 2; s.z = q.z; s.vx = Math.sin(q.rumo) * v * cp; s.vy = 0; s.vz = -Math.cos(q.rumo) * v * cp; s.dono = q.dono; s.time = q.time; s.alvo = alvo.idx; s.t = 0; s.fase = 2; s.tipoAlvo = tipo; s.arAr = 1; s.aaDano = q.aaDano || 1; alvo.samAlvo = s.idx + 1; /* v1.2.74: dano extra do ar-ar viaja no míssil */
   sim.evento({ t: 'arArLanc', idx: s.idx, id: q.dono, q: q.idx, x: s.x, y: s.y, z: s.z, alvo: alvo.idx, tipo }); return s; }
 export function passoSams(sim, dt) {
@@ -163,11 +165,11 @@ export function passoA30(sim, n, dt) {
   if (n.morto) { for (const a of n.a30) a.fogo = 0; return; }
   for (let j = 0; j < n.a30.length; j++) { const a = n.a30[j], pm = n.P.a30[j]; sim.mundo(n, pm.x, pm.y, pm.z, _o); a.t -= dt;
     if (a.t <= 0) { a.t = 0.25; a.alvo = -1; a.tipo = ''; let md = A30.alc, sc = 1e9;
-      for (const l of sim.lanchas) { if (!l.ativo || l.time === n.time) continue; const d = Math.hypot(l.x - _o.x, l.z - _o.z); if (d < md && d < sc && cobre(n, pm, l.x, l.z)) { sc = d; a.alvo = l.idx; a.tipo = 'l'; } }
-      for (const tp of sim.torpedos) { if (!tp.ativo || tp.time === n.time) continue; const d = Math.hypot(tp.x - _o.x, tp.z - _o.z); if (d < md && d * 1.1 < sc && cobre(n, pm, tp.x, tp.z)) { sc = d * 1.1; a.alvo = tp.idx; a.tipo = 't'; } }
-      for (const q of sim.drones) { if (!q.ativo || q.time === n.time) continue; const d = Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z); if (d < md && d * 1.3 < sc && cobre(n, pm, q.x, q.z)) { sc = d * 1.3; a.alvo = q.idx; a.tipo = 'd'; } }
-      for (const q of sim.helis) { if (!q.ativo || q.time === n.time) continue; const d = Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z); if (d < md && d * 1.2 < sc && cobre(n, pm, q.x, q.z)) { sc = d * 1.2; a.alvo = q.idx; a.tipo = 'h'; } }
-      for (const q of sim.uavs) { if (!q.ativo || q.time === n.time) continue; const d = Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z); if (d < md && d * 1.4 < sc && cobre(n, pm, q.x, q.z)) { sc = d * 1.4; a.alvo = q.idx; a.tipo = 'u'; } } }
+      for (const l of sim.lanchas) { if (!l.ativo || l.time === n.time) continue; const d = Math.hypot(l.x - _o.x, l.z - _o.z); if (d < md && d < sc && cobre(n, pm, l.x, l.z) && visT(sim, _o, l, 1.2)) { sc = d; a.alvo = l.idx; a.tipo = 'l'; } }
+      for (const tp of sim.torpedos) { if (!tp.ativo || tp.time === n.time) continue; const d = Math.hypot(tp.x - _o.x, tp.z - _o.z); if (d < md && d * 1.1 < sc && cobre(n, pm, tp.x, tp.z) && visT(sim, _o, tp, -0.3)) { sc = d * 1.1; a.alvo = tp.idx; a.tipo = 't'; } }
+      for (const q of sim.drones) { if (!q.ativo || q.time === n.time) continue; const d = Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z); if (d < md && d * 1.3 < sc && cobre(n, pm, q.x, q.z) && visT(sim, _o, q)) { sc = d * 1.3; a.alvo = q.idx; a.tipo = 'd'; } }
+      for (const q of sim.helis) { if (!q.ativo || q.time === n.time) continue; const d = Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z); if (d < md && d * 1.2 < sc && cobre(n, pm, q.x, q.z) && visT(sim, _o, q)) { sc = d * 1.2; a.alvo = q.idx; a.tipo = 'h'; } }
+      for (const q of sim.uavs) { if (!q.ativo || q.time === n.time) continue; const d = Math.hypot(q.x - _o.x, q.y - _o.y, q.z - _o.z); if (d < md && d * 1.4 < sc && cobre(n, pm, q.x, q.z) && visT(sim, _o, q)) { sc = d * 1.4; a.alvo = q.idx; a.tipo = 'u'; } } }
     const alvo = a.tipo === 'l' ? sim.lanchas[a.alvo] : a.tipo === 't' ? sim.torpedos[a.alvo] : a.tipo === 'd' ? sim.drones[a.alvo] : a.tipo === 'h' ? sim.helis[a.alvo] : a.tipo === 'u' ? sim.uavs[a.alvo] : null;
     if (!alvo || !alvo.ativo) { a.fogo = 0; continue; }
     const ty = a.tipo === 'd' || a.tipo === 'h' || a.tipo === 'u' ? alvo.y : a.tipo === 'l' ? 1.2 : -0.3; a.tx = alvo.x; a.ty = ty; a.tz = alvo.z; const d = Math.hypot(alvo.x - _o.x, ty - _o.y, alvo.z - _o.z);

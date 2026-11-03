@@ -108,7 +108,7 @@ export function passoAutosAmorim(sim, n, dt) {
     if (st.tBusca <= 0) { st.tBusca = 0.25; st.alvo = -1; let md = S.alc; paraLocal(n, _o.x, _o.y, _o.z, _l0);
       for (let ie = 0; ie < sim.navios.length; ie++) { const e = sim.navios[ie]; if (e.morto || e.time === n.time || (e.C && e.C.civil)) continue; const de = Math.hypot(e.x - _o.x, e.z - _o.z); if (de >= md) continue;
         const rel = ang(marcacao(_o.x, _o.z, e.x, e.z) - n.rumo); if (Math.abs(ang(rel - pm.centro)) > pm.meio) continue; /* arco de giro da peça */
-        paraLocal(n, e.x, (e.C.F || 6) * 0.8, e.z, _l1); if (bateEstrutura(_l0, _l1, A.cfg.caixas)) continue; /* linha de tiro bloqueada pela própria estrutura */ md = de; st.alvo = e.id; } }
+        paraLocal(n, e.x, (e.C.F || 6) * 0.8, e.z, _l1); if (bateEstrutura(_l0, _l1, A.cfg.caixas)) continue; /* linha de tiro bloqueada pela própria estrutura */ if (!sim.linhaLivre(n, e)) continue; /* v1.3.26: nem atrás do relevo */ md = de; st.alvo = e.id; } }
     const al = st.alvo >= 0 ? sim.navios[st.alvo] : null; let ok = 0;
     if (al && !al.morto) { const vx = Math.sin(al.rumo) * al.v, vz = -Math.cos(al.rumo) * al.v; const s = solucaoArrasto(_o.x, _o.z, Math.max(0.5, _o.y - al.C.F * 0.7), S.V0, st.k, al.x, al.z, vx, vz, st.sol, al.w || 0); if (s && s.d <= S.alc) ok = 1; }
     const alvoRel = ok ? ang(st.sol.az - n.rumo) : 0, alvoEl = ok ? clamp(st.sol.el, -0.15, 0.9) : 0; st.az += clamp(ang(alvoRel - st.az), -S.giro * dt, S.giro * dt); st.el += clamp(alvoEl - st.el, -S.giro * dt, S.giro * dt);
