@@ -164,3 +164,9 @@ Fora da batalha normal nada muda: duelo, treino, teste de combate e batalha pers
 | COMBATE do hangar: (1) a partida acabava no 1º instante ("Frota aliada destruída", a base de onde a aeronave sai não contava); (2) o comando "começar no ar" não estava na lista de comandos aceitos e era descartado; (3) o alerta de SAM inimigo caía no código de "bateu no relevo" e tirava você da pilotagem 3 s depois. Os três corrigidos. | `src/sim/match.js`, `src/net/commands.js`, `src/modernNavalCombat3D.js` | VERIFICADO (navegador: começa a 750 m, pilotando, combate em andamento) |
 
 Testes: `vtol138`, `destroier133`, `amorim130`, `fragata132`, `voo1278` OK. `esquadrilha1269` tem as mesmas falhas de antes desta versão (conferido sem as mudanças).
+
+## 1.3.18
+
+| Item | Onde | Estado |
+|---|---|---|
+| AUTO-MIRA, MIRA LIVRE, AUTO-FOGO e ACÚSTICO/RETO numa coluna só (onde já estavam AUTO-MIRA e AUTO-FOGO), um embaixo do outro, mesma largura e 10 px entre eles; área de toque de cada um até a metade do espaço (uma não cobre a outra). | `src/ui/hud1316.css` | VERIFICADO (navegador 762×355 e 915×427) |

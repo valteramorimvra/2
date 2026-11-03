@@ -17,3 +17,8 @@
 /* a grade acima usa !important: mantém as chaves escondidas nos modos onde já sumiam (óptica, espectador, aeronaves) */
 .hud.espec-on .h-chaves, .hud.modo-heli .h-chaves, .hud.modo-nk .h-chaves { display: none !important; }
 @media (min-width: 841px) { .hud.modo-bino .h-chaves, .hud.espectador .h-chaves { display: none !important; } } /* telas largas: como antes (nas estreitas a grade antiga já as mantinha) */
+/* v1.3.18 (Valter): as 4 chaves numa COLUNA só (a mesma onde já estavam AUTO-MIRA e AUTO-FOGO), uma embaixo da outra, mesma largura e mesmo espaço:
+   AUTO-MIRA · MIRA LIVRE · AUTO-FOGO · ACÚSTICO/RETO */
+.hud .h-chaves, .hud.ctl-novo .h-chaves { grid-template-columns: max-content !important; column-gap: 0 !important; row-gap: 10px !important; justify-items: stretch; }
+.hud .h-chaves [data-r="bMira"] { order: 1; } .hud .h-chaves [data-r="bLivre"] { order: 2; } .hud .h-chaves [data-r="bAuto"] { order: 3; } .hud .h-chaves [data-r="bTorpModo"] { order: 4; }
+.hud .h-chaves button::after { top: -5px !important; bottom: -5px !important; } /* área de toque até a metade do espaço: uma não cobre a outra */
