@@ -216,3 +216,9 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Atrás de uma cobertura (relevo), o inimigo só é visto/travado com o radar DELE e o SEU ligados. Qualquer um desligado → trava negada, a cobertura protege. | `src/sim/world.js` (`sensores`) | VERIFICADO (Baluarte × alvo atrás de montanha de 163 m: só os dois ligados → trava e tiro em arco) |
 
 Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `vtol138`, `destroier133`, `amorim130`, `fragata132` OK.
+
+## 1.3.23
+
+| Item | Onde | Estado |
+|---|---|---|
+| CÂMERA FW mais perto: fator 1,2 → 1,1 da distância/altura originais (mesmo ângulo; a de antes da 1.3.16 era 1,0). | `src/modernNavalCombat3D.js` (`kFw`) | VERIFICADO (build) |

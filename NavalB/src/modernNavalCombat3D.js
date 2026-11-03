@@ -594,7 +594,7 @@ export class NavalCombat3D {
     else if (this.camModo === 'conves') { /* v1.2.11 câmera de CONVÉS: na frente do passadiço, olhando por cima da proa; arrastar gira a vista e a mira */ const sp = n.P.sup, o = this.local(n, 0, n.C.F + (sp.h || 6) * 1.1 + 1.5, Math.min(sp.z0, sp.z1) - 1.5); pos = V.pos.set(o.x, o.y, o.z); olhaFixo = V.olha.copy(pos).addScaledVector(dir, 400); }
     else if (this.camModo === 'fw') { /* v1.3.15 (Valter): CÂMERA FW — perspectiva e distância do vídeo de referência: atrás da popa, alta (≈ F + 0,15·L), olhando para a frente pela mira com o horizonte perto do meio da tela; gira com o arraste/mira */
       if (this._arfId !== n.id || this._arfF == null) { this._arfId = n.id; this._arfF = n.arfagem; } this._arfF += (n.arfagem - this._arfF) * Math.min(1, dt / PARAM.cam.tauArf);
-      const hx = Math.sin(this.yaw), hz = -Math.cos(this.yaw), kFw = 1.2 /* v1.3.16: um pouco mais afastada, MESMO ângulo (dist e altura na mesma proporção) */, dist = (C.L * 0.72 + 22) * kFw, hCam = (C.F + C.L * 0.075 + 7) * kFw;
+      const hx = Math.sin(this.yaw), hz = -Math.cos(this.yaw), kFw = 1.1 /* v1.3.23 (Valter): mais perto que a 1.3.16 (1,2) sem voltar à de antes (1,0) — MESMO ângulo (dist e altura na mesma proporção) */, dist = (C.L * 0.72 + 22) * kFw, hCam = (C.F + C.L * 0.075 + 7) * kFw;
       pos = V.pos.set(n.x - hx * dist, this._arfF + hCam, n.z - hz * dist);
       { let cr = 0; for (let i = 0; i < ONDAS.length; i++) cr += ONDAS[i].A; const hA = Math.max(alturaMar(pos.x, pos.z, sim.t) + 1.2, cr * 0.9 + 2.5); if (pos.y < hA) pos.y = hA; }
       const fr = C.L * 3.5 + 200, yO = this._arfF + hCam * 0.85 - (this.pitch || 0) * fr * 1.6; olhaFixo = V.olha.set(n.x + hx * fr, yO, n.z + hz * fr); }
