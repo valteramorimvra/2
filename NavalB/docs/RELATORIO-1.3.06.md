@@ -458,3 +458,12 @@ Pedido: "em todos os modos a mesma suavidade e velocidade do modo IA; o que muda
   - Testes no Playwright: Raio em MM (ponto arrastado até o navio → trava; erro de rumo caiu de 19° para 1°) e Raio em MMD (ponto arrastado à direita → a aeronave virou de 42° para 88° e o ponto voltou para a frente).
 - Armas no modo IA: sem o TRAVAR (retirado na 1.3.48), MÍSSIL e TORPEDO pediam "Trave um alvo". Agora `nkAlvoAuto` marca sozinho o melhor navio à frente (até 22 km). A bomba em preparo mostra o tempo restante (antes o LANÇAR era ignorado em silêncio). No helicóptero de foguetes/tiro, o LANÇAR marca o alvo (antes dizia "paiol vazio"). Na aeronave do navio, o torpedo marca sozinho o alvo à frente.
 - Mapa tático: `amostra()` guarda o trajeto de cada unidade a cada 2 s, mesmo com o mapa fechado (até 300 pontos). Navios aparecem em linha cheia e aeronaves em linha tracejada, com cores próprias, e há legenda.
+
+## 1.3.52 — radar: posição, movimento e direções
+
+- `dirRadar()` (cliente) devolve o rumo real, a direção da tela/câmera e o rumo desejado de quem você controla. Navio: piloto de rumo, ou a guinada do leme projetada. Aeronave: `ctlRu` (ponto verde) ou o manche; no modo IA, o alvo.
+- Minirradar (proa para cima): a linha ciano da tela agora aparece também pilotando aeronaves, e há uma linha âmbar tracejada para o rumo desejado, com um triângulo vazado na borda.
+- Mapa tático: `ref()` e o anel de "você" passam a valer para o Urubu-rei/caça pilotado (antes só para o helicóptero do navio). Saem de você três raios: rumo, tela e desejado.
+- Verificado em screenshot:
+  - navio com rumo −90°, tela −159° e desejado −21°;
+  - Raio em MMD com rumo −43°, tela −45° e desejado 3°.

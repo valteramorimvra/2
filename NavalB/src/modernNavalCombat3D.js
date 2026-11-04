@@ -622,7 +622,12 @@ export class NavalCombat3D {
     return ok > 3 ? (Math.min(1, x1) - Math.max(-1, x0)) / 2 : 0; }
   /** v1.2.1: navios inimigos (contato atual) dentro do cone estreito da MIRA do jogador, do mais centrado ao menos; alc opcional. */
   naviosNaMira(alc = 1e9) { const sim = this.S.sim, n = this.eu, PT = PARAM.trava, out = []; const az = n.mira.az; for (const e of sim.navios) { if (e.morto || e.time === n.time || !sim.detectado(n.time, e.id)) continue; const d = Math.hypot(e.x - n.x, e.z - n.z); if (d > alc) continue; const tol = Math.max(PT.tolMin, Math.atan((e.C.L * 0.5 + PT.margem) / Math.max(1, d))); const err = Math.abs(ang(marcacao(n.x, n.z, e.x, e.z) - az)) / tol; if (err <= 1) out.push([err, e.id]); } return out.sort((a, b) => a[0] - b[0]).map((q) => q[1]); }
-  _miaAzR() { return this.nkPil || this.heliSob() ? null : this._miraAzRadar(); } /* v1.3.45: pilotando, sem a linha da mira do navio */
+  _miaAzR() { return this.nkPil || this.heliSob() ? this.yaw : this._miraAzRadar(); } /* v1.3.52 (Valter): pilotando, a linha ciano mostra para onde a TELA/câmera está virada */
+  /** v1.3.52: direções do radar a partir de VOCÊ — rumo real, direção da tela e rumo desejado (navio: piloto de rumo/leme; aeronave: ponto verde ou manche). */
+  dirRadar() { const n = this.eu; if (!n || !this.S) return null; const q = this.nkPil ? this.nkQ() : null, h = q ? null : this.heliSob();
+    if (q) { const des = q.manual ? (q.ctlRu != null ? q.ctlRu : Math.abs(q.sx || 0) > 0.05 ? q.rumo + q.sx : null) : q.alvo >= 0 && this.S.sim.navios[q.alvo] && !this.S.sim.navios[q.alvo].morto ? Math.atan2(this.S.sim.navios[q.alvo].x - q.x, -(this.S.sim.navios[q.alvo].z - q.z)) : null; return { rumo: q.rumo, tela: this.yaw, desejado: des }; }
+    if (h) { const des = h.ctrl === 'jog' ? (h.ctlRu != null ? h.ctlRu : Math.abs(h.sx || 0) > 0.05 ? h.rumo + h.sx : null) : null; return { rumo: h.rumo, tela: this.yaw, desejado: des }; }
+    return { rumo: n.rumo, tela: this._miraAzRadar(), desejado: n.rumoAlvo != null ? n.rumoAlvo : Math.abs(n.w || 0) > 0.004 ? n.rumo + clamp(n.w * 20, -1.2, 1.2) : null }; }
   alcRadar() { return this.eu.radarAtivo ? 12000 : 8000; }
 
   // ======================= CÂMERA =======================
@@ -1083,7 +1088,7 @@ export class NavalCombat3D {
       if (sim.nukes) for (const q of sim.nukes) { if (!q.ativo || q.fase < 2) continue; const dn = sim.navios[q.dono], meu = dn && dn.time === n.time; if (!meu && Math.hypot(q.x - n.x, q.z - n.z) > alcA) continue; ae.push({ id: 'q' + q.idx, x: q.x, z: q.z, r: q.rumo, v: q.v || 0, meu, eu: q === nq, rotor: !!q.rotor }); }
       for (const h of sim.helis) { if (!h.usado || !(h.estado >= EST.DECOLA && h.estado <= EST.POUSO) || h.oculto) continue; const meu = h.time === n.time; if (!meu && Math.hypot(h.x - n.x, h.z - n.z) > alcA) continue; ae.push({ id: 'h' + h.idx, x: h.x, z: h.z, r: h.rumo, v: Math.abs(h.v || 0), meu, eu: h === hs, rotor: !(h.H && h.H.aviao) }); }
       if (nq) cen = { x: nq.x, z: nq.z, rumo: nq.rumo, radarAtivo: n.radarAtivo }; else if (hs) cen = { x: hs.x, z: hs.z, rumo: hs.rumo, radarAtivo: n.radarAtivo };
-      H.desenhaRadar({ miraAz: this._miaAzR(), eu: cen, alcance: this.alcRadar(), aereos: ae, costa: this.costa, aliados: al, inimigos: ini, misseis: ms, zona: this.S.match.centro, menores: this.n5.listaMenores }, 1 / 30); }
+      H.desenhaRadar({ miraAz: this._miaAzR(), desejado: (this.dirRadar() || {}).desejado, eu: cen, alcance: this.alcRadar(), aereos: ae, costa: this.costa, aliados: al, inimigos: ini, misseis: ms, zona: this.S.match.centro, menores: this.n5.listaMenores }, 1 / 30); }
     // ETIQUETAS no mundo: comandante, bandeira, classe e vida em segmentos (aliados sempre; inimigos só se detectados)
     this.mem.tZonas -= dt; if (this.mem.tZonas <= 0 || !this._zonas) this._refZonas(); /* v1.2.18 item 5: zonas a ~8 Hz (botões do heli aparecem/somem) */
     { /* v1.2.18 item 3: indicador de borda das granadas inimigas chegando (30 Hz, sem alocação) */ this.mem.tGr = (this.mem.tGr || 0) - dt; if (this.mem.tGr <= 0) { this.mem.tGr = 1 / 30; const GI = this._grIn, vg = this._vg || (this._vg = new THREE.Vector3());
