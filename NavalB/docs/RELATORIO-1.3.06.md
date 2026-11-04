@@ -486,3 +486,16 @@ Valter relatou que, no celular, o ponto verde do MM e do MMD não dirigia a aero
   - Raio em MMD: travou, a aeronave foi ao alvo (erro de 24° para 1°), soltou e virou para o novo rumo.
   - Raio em MM: travou (erro de 18° para 2°) e soltou.
   - Helicóptero do destróier em MM e em MMD: travou, soltou e, no MMD, dirigiu a aeronave.
+
+## 1.3.54 — MM único no estilo Modern Warships, TRAVAR de volta e mapa tático maior
+
+- `mmd()` agora devolve sempre false, ou seja, há um só modo manual. O botão MM/MMD virou **TRAVAR** (`nkTrava`, classe `nk-trv`): acende quando há trava e a cruz fica verde.
+- A tela gira a câmera livremente; o arraste do ponto saiu.
+- `mwBusca`: procura o navio inimigo mais perto do centro da tela (raio de 0,2 NDC, até 14 km, com histerese) e dá um bipe a cada troca. `mwPonto`: o ponto encaixa no navio, mostra a cruz cinza (`nk-busca`) e desenha a linha `mw-linha` da aeronave até o ponto.
+- O ponto não trava mais sozinho (o `nkAutoAlvo`/`heliAutoAlvo` não é mais chamado). TRAVAR trava o navio do ponto; no mesmo navio, solta.
+- Com o alvo travado, o rumo vai para o alvo (`nkCtl.ru`/`heliCtrl.ru`) e a câmera vira para ele quando a tela não é tocada há 1,2 s. Sem trava, a aeronave mantém o rumo; o helicóptero do navio não vira mais o nariz sozinho para o contato mais próximo (`aereo.js`).
+- No MM, MÍSSIL e TORPEDO sem trava usam o navio do ponto, sem trava automática.
+- Mapa tático: virou um retângulo que ocupa toda a área livre. A escala preenche o maior lado e o mapa acompanha você no outro.
+- Testes com toque emulado:
+  - Raio: ao girar a tela, o ponto encaixou com a cruz e o rumo não mudou (63°); ao tocar TRAVAR, o botão acendeu e o erro de rumo caiu de 47° para 16°, com a câmera indo ao alvo.
+  - Helicóptero do destróier: o rumo ficou em −50° até a trava; depois o erro caiu de 42° para 4°.

@@ -74,3 +74,14 @@
 .hud .hl-bts .cb.nk-ej { right: 176px; bottom: 156px; } /* v1.3.45: EJETAR não cobre mais o BASE (sobreposição antiga) */
 /* v1.3.50 (Valter): em todos os modos a velocidade é a da IA — o acelerador deixou de existir, então o botão sai da tela */
 .hud .nk-acel, .hud .hl-acel { display: none !important; }
+/* v1.3.54 (Valter, vídeos MW): linha verde fina e quase transparente da aeronave ao ponto; cruz CINZA transparente quando o ponto encaixa num navio; TRAVAR com a cruz verde quando travado */
+.hud .mw-linha { position: absolute; left: 0; top: 0; height: 1px; background: rgba(74, 222, 128, .32); transform-origin: 0 50%; pointer-events: none; will-change: transform, width; }
+.hud .mw-linha[hidden] { display: none; }
+.hud .nk-busca { border-color: transparent; width: 34px; height: 34px; margin: -17px; filter: none; }
+.hud .nk-busca::before, .hud .nk-busca::after, .hud .nk-busca i::before, .hud .nk-busca i::after { background: rgba(203, 213, 225, .55); }
+.hud .nk-busca::before { top: -2px; height: 13px; } .hud .nk-busca::after { bottom: -2px; height: 13px; }
+.hud .nk-busca i::before { left: -2px; width: 13px; } .hud .nk-busca i::after { right: -2px; width: 13px; }
+.hud .nk-bts .cb.nk-trv i { color: #cbd5e1; }
+.hud .nk-bts .cb.nk-trv.mw-enc i { color: #e2e8f0; }
+.hud .nk-bts .cb.nk-trv.nk-on i { color: #4ade80; filter: drop-shadow(0 0 4px rgba(74, 222, 128, .8)); }
+.hud .nk-bts .cb.nk-trv.nk-on { box-shadow: 0 0 0 2px #4ade80 inset, 0 0 10px rgba(74, 222, 128, .45); }
