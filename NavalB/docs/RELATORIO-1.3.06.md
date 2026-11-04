@@ -383,3 +383,11 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Pilotagem pela tela (MANUAL) em todas as aeronaves, a partir das versões testadas 1.3.35/1.3.38, adaptada aos vídeos de 04/11: câmera de perseguição sem rolar, distância 0,8× o tamanho do modelo, câmera 0,26×dist acima (avião embaixo e no meio); avião de navio com o mesmo enquadramento; helicóptero: tela comanda só a curva. Caça ágil e piso de 150 m (como 1.3.35). IA sem mudança. | `nkCam`, `nkPasso`, `atualizaCamera` (heli), `voaManual` | VERIFICADO (Urubu-rei: rumo −36° → 0°, avião em NDC (0; −0,73), horizonte sem rolar; caça do Kordão: −69° → −2°) |
 | Busca por alvo + mira inteligente: trava o inimigo mais perto da mira (TRAVAR manda 4 s; troca só após 1,5 s), pequeno ponto verde que sai da mira e vai ao ponto de interceptação (alvo + velocidade × tempo de voo ~650 m/s); com tela/manche soltos o avião segue esse ponto. | `nkAutoAlvo`, `heliAutoAlvo`, `nkLead`, `nkMwPasso` | VERIFICADO (captura: moldura no alvo a 4,5 km, PRONTO ao lado da mira) |
 | Marcação: mira central verde, A APONTAR (amarelo) / PRONTO / RECARREGAMENTO / FORA DO ALCANCE + distância à esquerda da mira, escada, ALT/VEL; botões redondos da 1.2.99 mantidos. | `hud1334.css`, `hud.js` | VERIFICADO |
+
+## 1.3.43
+
+| Item | Onde | Estado |
+|---|---|---|
+| Medições nos vídeos de 04/11 (2 quadros/s, recortes ampliados) e na imagem marcada: ponto verde no CENTRO da tela; retículo ⌖ fixo em 60%/62%; envergadura ≈ 61% da largura; estado da arma preso ao ponto (−85; +55 px em 480 de altura); escada/ALT/VEL (±14,6% da largura) em volta do ponto quando PRONTO. | — | — |
+| PONTO VERDE: com alvo escolhido e tela/manche soltos, desliza do centro até o ponto de interceptação (4,5/s); a câmera segue (3/s) e o avião segue a câmera (curva e mergulho até o alvo). | `pontoVerde`, `nkCam`, câmera do avião de navio | VERIFICADO (Urubu-rei: −31° → 0°, A APONTAR → PRONTO; caça do Kordão: −68° → −2°) |
+| Câmera ao longo do comando, 0,3×dist acima (centro visual do avião 16,7° abaixo do eixo), distância 0,72× o tamanho do modelo. Moldura do navio só quando PRONTO. | `nkCam`, `nkMwPasso`, `hud1334.css` | VERIFICADO (captura) |
