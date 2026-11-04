@@ -367,3 +367,11 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 |---|---|---|
 | Voo, controles e câmeras de TODA a aviação iguais aos da 1.2.99 (commit 1e95e67): `voaManual` e `vooUnificado.js` da 1.2.99; `nkCam`, câmera e manche das aeronaves de navio da 1.2.99; saem o modo ACE (`voaAce.js`, comando `aceModo`, botão), câmera presa, comando pela tela, trava automática no centro, ida automática ao alvo, marcação de voo e botões em hexágono (`hud1334.css`); piso/assistência de altitude da 1.2.99 (manAltMin 160). | `nuclear.js`, `vooUnificado.js`, `modernNavalCombat3D.js`, `hud.js`, render | VERIFICADO (funções comparadas com a 1.2.99: iguais, exceto os 3 itens abaixo; navegador: manche inclina até 25° e o avião nivela sozinho ao soltar, câmera sem rolar, sem erros) |
 | Mantidos de propósito (correções de defeito pedidas depois da 1.2.99): faixa do acelerador de cada aeronave (1.3.02), câmera que não entra no convés/hangar na decolagem (1.3.01), batida no relevo = abatida com recarga (1.3.25). IA, armas, informações do painel e apoio do navio ao alvo da aeronave não mudam. | — | — |
+
+## 1.3.41
+
+| Item | Onde | Estado |
+|---|---|---|
+| Câmera FW um pouco mais perto: kFw 1,15 → 1,12 (distância e altura na mesma proporção = mesmo ângulo). | `atualizaCamera` (fw) | Alterado (valor) |
+| Trava do jogador (TRAVAR/ponto) não é trocada pela mira passando sobre outro navio nem solta ao olhar para o lado; só o 2º toque ou alvo inválido soltam. | `world.travaAuto` | VERIFICADO (olhando 69° ao lado por 5 s de jogo: trava mantida; 2º toque soltou) |
+| AUTO-MIRA desligada: a câmera não é puxada para o alvo travado (fora da óptica). | `autoMiraPasso` | VERIFICADO (câmera ficou a −21,2° onde o jogador deixou) |

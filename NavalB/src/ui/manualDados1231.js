@@ -5,7 +5,7 @@
 //   { gerar:'nome', arg } tabela/ficha montada a partir dos dados reais · { so:'novos.hidro' } (opcional, em qualquer bloco) só mostra se o caminho existir.
 // Regras de conteúdo: nada religioso, de marca, demoníaco ou de azar; personagens amigáveis; sem números inventados (o que não existe fica PENDENTE).
 export const CREDITO_DEV = 'Responsável pelo desenvolvimento do game: Valter Amorim';
-export const VERSAO_MANUAL = '1.3.40'; /* v1.3.24: manual atualizado com a mira, a trava, o radar e as câmeras de 1.3.15–1.3.24 */
+export const VERSAO_MANUAL = '1.3.41'; /* v1.3.24: manual atualizado com a mira, a trava, o radar e as câmeras de 1.3.15–1.3.24 */
 // Corte aprovado pelo Valter: o hidroavião fica para a 1.2.32. Tudo que tem `desde: '1.2.32'` (categoria, seção ou bloco) fica FORA
 // do manual enquanto LIGAR_1232 for false. Para ligar depois: troque para true (e passe novos.hidro em fontesHidro1232.js).
 export const LIGAR_1232 = false;
@@ -96,6 +96,7 @@ export const CATEGORIAS = [
   { id: 'armas', titulo: 'Armas', icone: IC.armas, resumo: 'Canhões, mísseis, torpedos, defesa, granadas e aeronaves — números reais do jogo', secoes: [
     { id: 'mira', titulo: 'Mira e trava', blocos: [
       { p: '<b>Arraste</b> para mirar: a mira é <b>manual</b>. O botão <b>AUTO-MIRA</b> (desligado por padrão, fica salvo) procura o navio visível na tela e ajusta avanço e elevação; com ela ligada o <b>TRAVAR não trava</b>, porque a mira já é automática. O radar nunca liga a auto-mira. A câmera da auto-mira gira com velocidade limitada, sem trancos.' },
+      { p: '<b>Trava do jogador</b>: travou com <b>TRAVAR</b> (ou num ponto), a trava fica naquele alvo até você tocar TRAVAR de novo ou o alvo afundar/sumir — a mira passando por outro navio não troca e olhar para outro lado não solta. Com a <b>AUTO-MIRA desligada</b> a câmera não é puxada para o alvo: ela fica onde você deixar (o canhão continua apontando sozinho para o alvo travado); na <b>óptica</b> a vista acompanha a trava. Com a AUTO-MIRA ligada, a mira e a câmera seguem o alvo (Ajustes → “Trava segue o alvo”).' },
       { p: '<b>TRAVAR num ponto</b>: aponte para a proa, a popa, a ponte… e toque <b>TRAVAR</b> (o botão fica verde; o 2º toque solta). A mira, o quadro e a <b>óptica</b> passam a acompanhar <b>aquele ponto</b> do navio, que gira com o casco. Fora do casco, trava no centro do navio.' },
       { p: '<b>Cruzes da mira</b>: a cruz <b>vermelha meio apagada</b> marca o ponto travado já com o avanço (onde a granada encontra o alvo). Cada <b>canhão disponível</b> tem um símbolo cinza com o número da torre, que mostra para onde <b>ele</b> aponta agora e vem até a vermelha — cada torre gira, eleva e recarrega sozinha. Quando <b>todos os disponíveis</b> assentam no ponto, o centro fica <b>VERDE</b>: hora de atirar. Torre fora do setor ou com a boca obstruída na direção do alvo não tem símbolo (veja os ícones das torres no botão CANHÃO).' },
       { p: 'Pare a mira sobre um navio inimigo dentro do alcance e ele é <b>travado sozinho</b> em cerca de {{param.trava.tAtivo}}–{{param.trava.tPassivo}} s: colchete verde (travando) → vermelho (travado), com alarme e vibração curta. A trava resiste até {{param.trava.tFora}} s fora da mira.' },
@@ -165,7 +166,7 @@ export const CATEGORIAS = [
     { id: 'botoes', titulo: 'Botões do HUD', blocos: [
       { gerar: 'botoesHud' },
       { p: 'AUTO-MIRA, MIRA LIVRE, AUTO-FOGO e ACÚSTICO/RETO ficam numa coluna só, um embaixo do outro. O botão RADAR ATIVO/PASSIVO fica no canto superior, ao lado do radar; o NUCLEAR fica acima do TRAVAR.' },
-      { p: '<b>Ajustes</b>: as vozes da batalha e as dicas do tutorial vêm desligadas (ligue em Ajustes, se quiser). A câmera padrão é a <b>FW</b>.' },
+      { p: '<b>Ajustes</b>: as vozes da batalha e as dicas do tutorial vêm desligadas (ligue em Ajustes, se quiser). A câmera padrão é a <b>FW</b> (atrás e acima da popa, olhando à frente pela mira).' },
       { nota: 'Pausa → <b>EDITAR HUD</b> deixa você arrastar e redimensionar os botões. Nenhum botão fica sobre outro e nada fica no centro da tela.' },
     ] },
     { id: 'aero', titulo: 'Helicóptero e esquadrilha', blocos: [
