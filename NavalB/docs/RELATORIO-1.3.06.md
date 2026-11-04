@@ -399,3 +399,14 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | MANUAL (vídeo 120403): arrastar = câmera em volta da aeronave (igual ao modo IA, volta para trás em 2,2 s), não muda a direção; câmera EXATAMENTE a do modo IA. Manche dirige. | `nkCam`, câmera do avião de navio | VERIFICADO (tela a −114°, avião visto de lado, rumo independente) |
 | Busca por proximidade (centro da tela a ≤ 9% da largura do navio, ≤ 14 km), ALVO MARCADO + bipe, ponto verde fixo no navio, cruz de busca no centro; com alvo marcado e manche solto a aeronave vai exatamente ao navio (independe da câmera). Troca só levando a cruz a outro navio (1,5 s). | `buscaProx`, `nkAutoAlvo`, `heliAutoAlvo`, `nkPasso`, `nkMwPasso` | VERIFICADO (Urubu-rei: sem alvo segue reto; olhando o navio → trava; olhando 70° ao lado → −64° → −8°; caça do Kordão −62° → −1,6°) |
 | Câmeras dos navios: canhão/convés só sobem ao sair do casco (antes trocavam de face e saltavam); enquadramento com trava nas câmeras de órbita entra/sai suave (antes degrau de até ~11 m); auto-mira com histerese entre navios próximos. | `colideCamera`, `atualizaCamera`, `autoMiraPasso` | VERIFICADO (9 câmeras × auto/livre/trava: sem inversões relevantes; saltos de posição ≤ 1,4 m por quadro) |
+
+## 1.3.45
+
+| Item | Onde | Estado |
+|---|---|---|
+| Escala real: removido o aumento visual de navios distantes (até 2,4×, v1.2.1) — tamanho na tela = distância real; velocidades conferidas (destróier 37 nós, fragata 35 nós). | render dos navios | VERIFICADO (escala 1,00 em todos; antes Fragata 151 m desenhada com 366 m) |
+| Radar e mapa tático: silhuetas de navio/aeronave no rumo, linha de 1 min, rastro; aeronaves no radar; radar centrado na aeronave pilotada. | `hud.desenhaRadar`, `mapaTatico`, `hudQuadro` | VERIFICADO (captura) |
+| TRAVAR troca direto para o navio sob a mira (manual, AUTO-MIRA e óptica). | `acao('travar')` | VERIFICADO (3 modos: alvo 1 → 3, câmera no novo alvo) |
+| Modos MM/MMD (botão), câmera na distância do modo IA (FILA.cam, atrás do próprio avião). | `nkCam`, `nkPasso`, câmera do avião de navio, `pontoVerde` | VERIFICADO (MM: sem alvo não segue a tela; MMD: segue a tela; ambos vão ao alvo marcado; câmera 31,1 m manual × 31,7 m IA) |
+| Teste em todas as categorias de aeronave: caça do sistema do Urubu-rei (Raio), avião de navio (Kordão), helicóptero de navio (destróier). Bombardeiro usa o mesmo código do caça (só a agilidade muda). | — | VERIFICADO (−64°→−10°, −62°→−2,3°, −52°→−1,2°) |
+| EJETAR com posição própria (não cobre o BASE). | `hud1334.css` | VERIFICADO (nenhum botão sobreposto) |

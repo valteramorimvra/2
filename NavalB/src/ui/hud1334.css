@@ -68,3 +68,7 @@
 .hud .nk-busca::before, .hud .nk-busca::after, .hud .nk-busca i::before, .hud .nk-busca i::after { content: ''; position: absolute; background: rgba(241, 245, 249, .85); }
 .hud .nk-busca::before { left: 50%; top: -9px; width: 1.4px; height: 7px; margin-left: -.7px; } .hud .nk-busca::after { left: 50%; bottom: -9px; width: 1.4px; height: 7px; margin-left: -.7px; }
 .hud .nk-busca i::before { top: 50%; left: -9px; height: 1.4px; width: 7px; margin-top: -.7px; } .hud .nk-busca i::after { top: 50%; right: -9px; height: 1.4px; width: 7px; margin-top: -.7px; }
+
+/* v1.3.45: botão do modo manual MM / MMD (fica livre, à esquerda do EJETAR) */
+.hud .hl-bts .cb.nk-modo { right: 245px; bottom: 168px; } .hud .nk-bts .cb.nk-modo i { color: #86efac; }
+.hud .hl-bts .cb.nk-ej { right: 176px; bottom: 156px; } /* v1.3.45: EJETAR não cobre mais o BASE (sobreposição antiga) */
