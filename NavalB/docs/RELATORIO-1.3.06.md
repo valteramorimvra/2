@@ -336,3 +336,9 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Item | Onde | Estado |
 |---|---|---|
 | Câmera do MANUAL presa ao avião desenhado (quaternion do modelo, mesmo quadro, sem atraso): atrás e acima no referencial do avião; arraste continua sendo o comando de direção. `cam.up` volta ao normal fora do avião. Distância 0,82× o tamanho do modelo (≈ +18%). Escada usa a inclinação/elevação reais da câmera. | `nkCam`, `atualizaCamera`, `nkMwPasso` | VERIFICADO (avião no mesmo ponto da tela — NDC 0,00/−0,66 — em voo reto, curva e mergulho) |
+
+## 1.3.37
+
+| Item | Onde | Estado |
+|---|---|---|
+| Acesso de combate estilo Modern Warships em todas as aeronaves (sistema do Urubu-rei mantido): botões em hexágono (contorno verde-água/verde pronto/vermelho alerta, anel de recarga fino), arco de armas em volta do LANÇAR, BASE/TRAVAR/IA no alto, FLARE/EJETAR embaixo no centro. Mesmas ações (data-a) de antes. | `hud1334.css` | VERIFICADO (857×400: nenhum botão sobreposto; antes BASE e EJETAR se cobriam) |

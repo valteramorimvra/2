@@ -43,3 +43,36 @@
 .hud .nk-alvo.ok u { border-color: #4ade80; }
 .hud .nk-alvo b { position: absolute; top: 48px; left: 50%; transform: translateX(-50%); color: #4ade80; font: 600 11px/1 system-ui, sans-serif; white-space: nowrap; text-shadow: 0 0 3px rgba(0, 0, 0, .7); }
 .hud.nk-mwon .nk-fpv { display: none; } /* a mira do centro substitui o marcador de trajetória no MANUAL */
+
+/* v1.3.37 (Valter: sistema do Urubu-rei + acesso de combate do Modern Warships, em TODAS as aeronaves):
+   botões das aeronaves em HEXÁGONO (contorno verde-água, verde quando pronto), arco de armas à direita em volta do LANÇAR,
+   fila de comando no alto (EJETAR · BASE · TRAVAR · IA) e FLARE embaixo no centro — mesmas ações de antes, nada sobreposto. */
+.hud.modo-nk .nk-bts .cb { background: transparent !important; border: 0 !important; border-radius: 0 !important; isolation: isolate; box-shadow: none !important; left: auto !important; top: auto !important; }
+.hud.modo-nk .nk-bts .cb::before, .hud.modo-nk .nk-bts .cb::after { content: ''; position: absolute; inset: 0; z-index: -1; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); pointer-events: none; }
+.hud.modo-nk .nk-bts .cb::before { background: rgba(94, 234, 212, .62); }
+.hud.modo-nk .nk-bts .cb::after { inset: 1.6px; background: rgba(6, 18, 22, .52); }
+.hud.modo-nk .nk-bts .cb .cb-anel { inset: 4px; width: calc(100% - 8px); height: calc(100% - 8px); }
+.hud.modo-nk .nk-bts .cb.pronto::before, .hud.modo-nk .nk-bts .cb.nk-on::before { background: #4ade80; }
+.hud.modo-nk .nk-bts .cb.nk-on::after { background: rgba(22, 101, 52, .5); }
+.hud.modo-nk .nk-bts .cb.nk-cue::before { background: #4ade80; filter: drop-shadow(0 0 4px #4ade80); }
+.hud.modo-nk .nk-bts .cb.nk-cue::after { background: rgba(22, 101, 52, .62); }
+.hud.modo-nk .nk-bts .cb.nk-alerta::before, .hud.modo-nk .nk-bts .cb.alarme::before { background: #ef4444; }
+.hud.modo-nk .nk-bts .cb.apertado::after { background: rgba(45, 212, 191, .45); }
+.hud.modo-nk .nk-bts .cb b { font-size: 7px; }
+/* fila de comando no alto, à direita */
+.hud.modo-nk .nk-bts .cb[data-a="nkVolta"], .hud.modo-nk .nk-bts .cb[data-a="nkTrava"], .hud.modo-nk .nk-bts .cb[data-a="nkIa"] { bottom: calc(100vh - 96px) !important; }
+.hud.modo-nk .nk-bts .cb[data-a="nkEjeta"] { right: calc(50vw - 82px) !important; bottom: 16px !important; width: 44px !important; height: 44px !important; } .hud.modo-nk .nk-bts .cb[data-a="nkEjeta"] i { width: 16px; height: 16px; } /* ao lado do FLARE, embaixo no centro */
+.hud.modo-nk .nk-bts .cb[data-a="nkVolta"] { right: 148px !important; }
+.hud.modo-nk .nk-bts .cb[data-a="nkTrava"] { right: 92px !important; }
+.hud.modo-nk .nk-bts .cb[data-a="nkIa"] { right: 34px !important; }
+/* arco de armas em volta do LANÇAR */
+.hud.modo-nk .nk-bts .cb[data-a="nkSolta"] { right: 59px !important; bottom: 44px !important; width: 76px !important; height: 76px !important; }
+.hud.modo-nk .nk-bts .cb[data-a="hdMissil"] { right: 110px !important; bottom: 122px !important; }
+.hud.modo-nk .nk-bts .cb[data-a="nkSair"] { right: 170px !important; bottom: 122px !important; }
+.hud.modo-nk .nk-bts .cb[data-a="nkArAr"] { right: 136px !important; bottom: 58px !important; }
+.hud.modo-nk .nk-bts .cb[data-a="aeRep"] { right: 151px !important; bottom: 6px !important; }
+.hud.modo-nk .nk-bts .cb[data-a="nkPorta"] { right: 194px !important; bottom: 58px !important; }
+/* FLARE embaixo, no centro (como o contador de despistadores dos vídeos) */
+.hud.modo-nk .nk-bts .cb[data-a="nkFlare"] { right: calc(50vw - 22px) !important; bottom: 16px !important; width: 44px !important; height: 44px !important; }
+.hud.modo-nk .nk-bts .cb[data-a="nkFlare"] i { width: 16px; height: 16px; }
+.hud.modo-nk .nk-bts .cb .cb-a { stroke-width: 3; opacity: .7; stroke: #5eead4; } .hud.modo-nk .nk-bts .cb.pronto .cb-a { stroke: #4ade80; }
