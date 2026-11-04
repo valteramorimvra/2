@@ -375,3 +375,11 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Câmera FW um pouco mais perto: kFw 1,15 → 1,12 (distância e altura na mesma proporção = mesmo ângulo). | `atualizaCamera` (fw) | Alterado (valor) |
 | Trava do jogador (TRAVAR/ponto) não é trocada pela mira passando sobre outro navio nem solta ao olhar para o lado; só o 2º toque ou alvo inválido soltam. | `world.travaAuto` | VERIFICADO (olhando 69° ao lado por 5 s de jogo: trava mantida; 2º toque soltou) |
 | AUTO-MIRA desligada: a câmera não é puxada para o alvo travado (fora da óptica). | `autoMiraPasso` | VERIFICADO (câmera ficou a −21,2° onde o jogador deixou) |
+
+## 1.3.42
+
+| Item | Onde | Estado |
+|---|---|---|
+| Pilotagem pela tela (MANUAL) em todas as aeronaves, a partir das versões testadas 1.3.35/1.3.38, adaptada aos vídeos de 04/11: câmera de perseguição sem rolar, distância 0,8× o tamanho do modelo, câmera 0,26×dist acima (avião embaixo e no meio); avião de navio com o mesmo enquadramento; helicóptero: tela comanda só a curva. Caça ágil e piso de 150 m (como 1.3.35). IA sem mudança. | `nkCam`, `nkPasso`, `atualizaCamera` (heli), `voaManual` | VERIFICADO (Urubu-rei: rumo −36° → 0°, avião em NDC (0; −0,73), horizonte sem rolar; caça do Kordão: −69° → −2°) |
+| Busca por alvo + mira inteligente: trava o inimigo mais perto da mira (TRAVAR manda 4 s; troca só após 1,5 s), pequeno ponto verde que sai da mira e vai ao ponto de interceptação (alvo + velocidade × tempo de voo ~650 m/s); com tela/manche soltos o avião segue esse ponto. | `nkAutoAlvo`, `heliAutoAlvo`, `nkLead`, `nkMwPasso` | VERIFICADO (captura: moldura no alvo a 4,5 km, PRONTO ao lado da mira) |
+| Marcação: mira central verde, A APONTAR (amarelo) / PRONTO / RECARREGAMENTO / FORA DO ALCANCE + distância à esquerda da mira, escada, ALT/VEL; botões redondos da 1.2.99 mantidos. | `hud1334.css`, `hud.js` | VERIFICADO |
