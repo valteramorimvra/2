@@ -342,3 +342,13 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Item | Onde | Estado |
 |---|---|---|
 | Acesso de combate estilo Modern Warships em todas as aeronaves (sistema do Urubu-rei mantido): botões em hexágono (contorno verde-água/verde pronto/vermelho alerta, anel de recarga fino), arco de armas em volta do LANÇAR, BASE/TRAVAR/IA no alto, FLARE/EJETAR embaixo no centro. Mesmas ações (data-a) de antes. | `hud1334.css` | VERIFICADO (857×400: nenhum botão sobreposto; antes BASE e EJETAR se cobriam) |
+
+## 1.3.38
+
+| Item | Onde | Estado |
+|---|---|---|
+| Aeronaves dos navios (sistema do convoo): comando pela câmera com o manche solto (avião: curva + mergulho; helicóptero: só curva), amortecido pela taxa de curva; sem retorno automático da câmera. | `laco` (heliCtrl), `atualizaCamera` | VERIFICADO (jato do Kordão: erro de rumo 69° → 2° sem passar; helicóptero do destróier: 59° → 22° e fechando) |
+| Trava automática no navio do centro da tela (TRAVAR manual tem prioridade 4 s; troca de alvo só após 1,5 s de jogo, nos dois sistemas) e ida direta ao alvo. | `heliAutoAlvo`, `nkAutoAlvo` | VERIFICADO (alvo estável, sem alternar entre dois navios próximos) |
+| Câmera presa ao avião do navio (depois do quadro do modelo, sem atraso), marcação de voo dos vídeos, etiqueta própria fora do centro. | `camAeroPresa`, `aeroPasso`, `marcasAereas` | VERIFICADO (captura: avião embaixo, escada, ALT/VEL, moldura no alvo a 3,7 km) |
+| IA do navio do jogador (enquanto ele voa) apoia o alvo travado pela aeronave em vez de trocar a trava compartilhada. | `ai.js` | VERIFICADO (antes a trava alternava 1↔3 a cada 0,3 s) |
+| Helicóptero do sistema do Urubu-rei: câmera comanda a curva, vai direto ao alvo, marcação de voo. Urubu-rei/caças: sem regressão (alvo a 5 km travado e no centro, erro 0,1°). | `nkPasso`, `nkCam` | VERIFICADO |
