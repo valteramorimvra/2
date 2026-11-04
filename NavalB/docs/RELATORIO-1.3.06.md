@@ -419,3 +419,11 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Teste drive: ESQUADRILHA = liberação como nas batalhas (sem o comando de outras aeronaves). | `acao('heli')` | Alterado (mesmo código das batalhas) |
 | EJETAR retirado da tela de pilotagem. | `hud.js` | VERIFICADO (botão ausente) |
 | MMD (ponto verde dirige) segue como opção no botão MM/MMD. | — | — |
+
+## 1.3.47
+
+| Item | Onde | Estado |
+|---|---|---|
+| Câmera de todos os modos = a do modo IA (mesmo código: segue o mesmo avião da esquadrilha, mesma distância). | `nkCam` | VERIFICADO (mesma fórmula; a distância medida varia só com a esquadrilha formada ou não) |
+| MMD = manual da 1.3.43: avião segue a câmera; navio mais perto do centro é marcado; ponto verde se move até o ponto de interceptação; câmera vai atrás. | `nkAutoAlvo`/`buscaCentro`, `pontoVerde`, `nkPasso`, `nkMwPasso` | VERIFICADO (avião seguiu a câmera −21°→−46° e foi ao navio) |
+| MM: ponto verde com a tela; perto do navio marca e dirige; afastar o ponto (arrastando) solta. Sem a cruz. | `nkAutoAlvo`/`longeDoCentro`, `heliAutoAlvo` | VERIFICADO (marcou ao olhar o navio, avião virou; arrastou 70° ao lado → alvo solto) |
