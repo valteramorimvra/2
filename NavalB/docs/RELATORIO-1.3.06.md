@@ -410,3 +410,12 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Modos MM/MMD (botão), câmera na distância do modo IA (FILA.cam, atrás do próprio avião). | `nkCam`, `nkPasso`, câmera do avião de navio, `pontoVerde` | VERIFICADO (MM: sem alvo não segue a tela; MMD: segue a tela; ambos vão ao alvo marcado; câmera 31,1 m manual × 31,7 m IA) |
 | Teste em todas as categorias de aeronave: caça do sistema do Urubu-rei (Raio), avião de navio (Kordão), helicóptero de navio (destróier). Bombardeiro usa o mesmo código do caça (só a agilidade muda). | — | VERIFICADO (−64°→−10°, −62°→−2,3°, −52°→−1,2°) |
 | EJETAR com posição própria (não cobre o BASE). | `hud1334.css` | VERIFICADO (nenhum botão sobreposto) |
+
+## 1.3.46
+
+| Item | Onde | Estado |
+|---|---|---|
+| Porta-aviões com aeronave pilotável: escolha (Urubu-rei ou aeronave do hangar) no estaleiro (aba das aeronaves) e na preparação; vai na partida como `aeroPil` → `n.nkAero`; botão DECOLAR; entra pilotando. | `main.js` (`aeroPaHtml`, `aplicaAeroPA`), `world.js`, `modernNavalCombat3D.js` | VERIFICADO (Lençóis com caça VTOL: decolou o caça, botão DECOLAR, pilotando) |
+| Teste drive: ESQUADRILHA = liberação como nas batalhas (sem o comando de outras aeronaves). | `acao('heli')` | Alterado (mesmo código das batalhas) |
+| EJETAR retirado da tela de pilotagem. | `hud.js` | VERIFICADO (botão ausente) |
+| MMD (ponto verde dirige) segue como opção no botão MM/MMD. | — | — |
