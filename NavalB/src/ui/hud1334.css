@@ -76,3 +76,8 @@
 .hud.modo-nk .nk-bts .cb[data-a="nkFlare"] { right: calc(50vw - 22px) !important; bottom: 16px !important; width: 44px !important; height: 44px !important; }
 .hud.modo-nk .nk-bts .cb[data-a="nkFlare"] i { width: 16px; height: 16px; }
 .hud.modo-nk .nk-bts .cb .cb-a { stroke-width: 3; opacity: .7; stroke: #5eead4; } .hud.modo-nk .nk-bts .cb.pronto .cb-a { stroke: #4ade80; }
+
+/* v1.3.39: botão do modo de pilotagem (ARCADE / ACE = controle profissional), no arco à esquerda do ESPERA */
+.hud.modo-nk .nk-bts .cb[data-a="nkModo"] { right: 230px !important; bottom: 122px !important; }
+.hud.modo-nk .nk-bts .cb.nk-modo.ace::before { background: #f59e0b; } .hud.modo-nk .nk-bts .cb.nk-modo.ace i { color: #fcd34d; }
+.hud .mw-vel.estol b, .hud .mw-vel.estol small { color: #f87171; } .hud .mw-vel.estol { animation: hpisca .5s steps(2) infinite; }

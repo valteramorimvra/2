@@ -352,3 +352,11 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Câmera presa ao avião do navio (depois do quadro do modelo, sem atraso), marcação de voo dos vídeos, etiqueta própria fora do centro. | `camAeroPresa`, `aeroPasso`, `marcasAereas` | VERIFICADO (captura: avião embaixo, escada, ALT/VEL, moldura no alvo a 3,7 km) |
 | IA do navio do jogador (enquanto ele voa) apoia o alvo travado pela aeronave em vez de trocar a trava compartilhada. | `ai.js` | VERIFICADO (antes a trava alternava 1↔3 a cada 0,3 s) |
 | Helicóptero do sistema do Urubu-rei: câmera comanda a curva, vai direto ao alvo, marcação de voo. Urubu-rei/caças: sem regressão (alvo a 5 km travado e no centro, erro 0,1°). | `nkPasso`, `nkCam` | VERIFICADO |
+
+## 1.3.39
+
+| Item | Onde | Estado |
+|---|---|---|
+| Controle profissional (modo Ace Combat) para aviões pilotados (Urubu-rei, caças e aviões dos navios): atitude em quaternion; manche lateral = rolagem (caça 3,2 rad/s, bombardeiro 1,1), manche para baixo = puxa (n até 7,5 g caça / 3 g bombardeiro; disponível ∝ v², estol natural); sustentação no eixo do avião + gravidade (curva = inclinar e puxar; de lado desce; de dorso mergulha); arrasto induzido; energia real (gravidade inteira, empuxo pela posição do acelerador); piso 150 m e teto preservados. | `sim/voaAce.js`, `voaManual`, `voaAsa` | VERIFICADO (rolagem 0→43° sem mudar o rumo; puxando a 71°: 25°/s a 7,5 g, perda 166→157 m/s; dorso + puxar = mergulho; subida a 70° no mínimo: 107→52 m/s com aviso ESTOL a 57 m/s) |
+| Desenho com a atitude exata (slerp entre passos), câmera presa já existente acompanha; escada de voo com rolagem completa (dorso). | `nuclearFx`, `aereo3d`, `nkMwPasso` | VERIFICADO (modelo = inclinação simulada; asas firmes na tela) |
+| Botão ARCADE/ACE (salvo nos ajustes; ARCADE padrão = comportamento anterior); no ACE não há comando pela câmera nem ida automática ao alvo; botão some no helicóptero e hidroavião. | `aceTroca`, `aceSync`, `hud.js`, `hud1334.css`, comando `aceModo` | VERIFICADO |
