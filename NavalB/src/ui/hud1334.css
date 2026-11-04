@@ -87,3 +87,7 @@
 .hud .nk-bts .cb.nk-trv.nk-on { box-shadow: 0 0 0 2px #4ade80 inset, 0 0 10px rgba(74, 222, 128, .45); }
 /* v1.3.56: botão MM/MMD logo acima do TRAVAR */
 .hud .hl-bts .cb.nk-mmd { right: 245px; bottom: 236px; } .hud .nk-bts .cb.nk-mmd i { color: #86efac; }
+/* v1.3.59 (Valter): aviso de AMEAÇA vindo na direção da sua aeronave */
+.hud .nk-ameaca { position: absolute; left: 50%; top: 58px; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 5px 12px 5px 8px; border-radius: 6px; background: rgba(127, 29, 29, .82); border: 1px solid #ef4444; color: #fee2e2; font: 800 11px/1 system-ui, sans-serif; letter-spacing: .06em; pointer-events: none; z-index: 30; box-shadow: 0 0 14px rgba(239, 68, 68, .55); animation: nkAm .6s ease-in-out infinite alternate; }
+.hud .nk-ameaca[hidden] { display: none; } .hud .nk-ameaca i { font-style: normal; font-size: 14px; color: #fca5a5; display: inline-block; } .hud .nk-ameaca span { font-weight: 600; font-size: 10px; color: #fecaca; }
+@keyframes nkAm { from { opacity: .75; } to { opacity: 1; } }

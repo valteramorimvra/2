@@ -105,7 +105,9 @@ export function somaVt(n, out) { out.aam = out.asm = out.torp = out.nuke = 0; if
 const _S = { aam: 0, asm: 0, torp: 0, nuke: 0 };
 
 /** Passo (chamado pelo mundo). Só age no Destróier Amorim. */
-export function passoVtolAmorim(sim, dt) { sim._vtAcc = (sim._vtAcc || 0) + dt; const tick = sim._vtAcc >= VT.tick; if (tick) sim._vtAcc = 0;
+/** v1.3.59 (Valter): armas das aeronaves do JOGADOR se RECARREGAM sozinhas (infinitas): AAM/ASM/torpedo 1 a cada 12 s, mini-nuke a cada 60 s. */
+function recargaVt(E, dt) { if (!E || E.abat) return; const M = VTOL_SIM[E.id] && VTOL_SIM[E.id].muni; if (!M) return; const R = E._rc || (E._rc = { aam: 0, asm: 0, torp: 0, nuke: 0 }); for (const k of ['aam', 'asm', 'torp', 'nuke']) { if (E[k] >= M[k]) { R[k] = 0; continue; } R[k] += dt; if (R[k] >= (k === 'nuke' ? 60 : 12)) { R[k] = 0; E[k]++; } } }
+export function passoVtolAmorim(sim, dt) { for (const n of sim.navios) if (n.papel === 'jogador' && n.vtA) for (const k in n.vtA) recargaVt(n.vtA[k], dt); if (sim.nukes) for (const q of sim.nukes) if (q.ativo && q.vtE) { const d = sim.navios[q.dono]; if (d && d.papel === 'jogador') recargaVt(q.vtE, dt); } sim._vtAcc = (sim._vtAcc || 0) + dt; const tick = sim._vtAcc >= VT.tick; if (tick) sim._vtAcc = 0;
   for (let i = 0; i < sim.nukes.length; i++) { const q = sim.nukes[i]; if (!q.ativo || !q.vtInd || !q.vtE) continue; const n = sim.navios[q.dono], E = q.vtE; if (!n) continue; /* v1.3.12: caças do hangar */
     if (E.tMis > 0) E.tMis -= dt; if (E.tNuke > 0) E.tNuke -= dt; q.tMis = 1e6; E.nuke = Math.min(VTOL_SIM[E.id].muni.nuke, q.cargas | 0);
     if (tick && q.fase === 2) { lasers(sim, n, q, E, VT.tick); canhao(sim, n, q, E, VT.tick); ia(sim, n, q, E, !(q.lider >= 0)); } else if (q.fase !== 2) E.las[0].on = E.las[1].on = 0;
