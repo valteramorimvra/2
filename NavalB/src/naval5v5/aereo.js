@@ -4,7 +4,7 @@
 // CIWS, 30 mm e SAM inimigos. Sensores elevados enxergam por cima das ilhas e plotam no radar da frota (data-link).
 import { PILOTADA } from './defesa.js';
 import { bonusNivel, perfilArma } from '../aeronaves.js';
-import { voaUnificado, bateuRelevo } from '../sim/vooUnificado.js'; /* v1.2.68: controle único (motor do bombardeiro) */
+import { voaUnificado, bateuRelevo } from '../sim/vooUnificado.js'; import { pontoRota, pausa as pausaRota, ROTA } from '../sim/rotas.js'; /* v1.3.56 */ /* v1.2.68: controle único (motor do bombardeiro) */
 import { clamp, ang, marcacao, G } from '../sim/util.js';
 import { HELIS, UAV, MISSEIS, TORPEDO } from '../sim/classes.js';
 import { alturaMar } from '../sim/ocean.js';
@@ -100,19 +100,19 @@ export function comandoAereo(sim, n, cmd) {
   switch (cmd.t) {
     case 'heliLanca': if (h && h.estado === EST.CONVOO && cabeLado(sim, n)) { h.lancar = 1; h.auto = 1; } break; /* v1.2.26 item C: pedido de lançamento — decola quando chegar à catapulta/ao ponto (sem teleporte) */
     case 'aeroReparo': if (h && h.rep > 0 && !(h.tRep > sim.t) && h.estado !== EST.ABATIDO && h.vida < h.H.vida) { h.vida = Math.min(h.H.vida, h.vida + h.H.vida * REP_AERO.cura); h.fogo = 0; h.rep--; h.tRep = sim.t + REP_AERO.recarga; sim.evento({ t: 'aeroReparo', id: n.id, idx: h.idx, rep: h.rep }); } break; /* v1.2.69 */
-    case 'heliCtrl': if (h) { h.jx = clamp(+cmd.jx || 0, -1, 1); h.jy = clamp(+cmd.jy || 0, -1, 1); h.ctlRu = cmd.ru != null && Number.isFinite(+cmd.ru) ? ang(+cmd.ru) : null; h.ctlAl = cmd.al != null && Number.isFinite(+cmd.al) ? +cmd.al : null; h.alt = clamp(+cmd.alt || ALT_IA, PARAM.heli.altMin, Math.max(PARAM.heli.altMax, 15)); } break;
+    case 'heliCtrl': if (h) { h.jx = clamp(+cmd.jx || 0, -1, 1); h.jy = clamp(+cmd.jy || 0, -1, 1); if (h.rotaJ && !h.rotaJ.pausa && h.ctrl === 'ia' && (Math.abs(h.jx) > 0.2 || Math.abs(h.jy) > 0.2)) { pausaRota(sim, n, 'h', h); h.ctrl = 'jog'; } /* v1.3.56: mexer no manche pausa a rota */ h.ctlRu = cmd.ru != null && Number.isFinite(+cmd.ru) ? ang(+cmd.ru) : null; h.ctlAl = cmd.al != null && Number.isFinite(+cmd.al) ? +cmd.al : null; h.alt = clamp(+cmd.alt || ALT_IA, PARAM.heli.altMin, Math.max(PARAM.heli.altMax, 15)); } break;
     case 'heliFlare': if (h && h.estado >= EST.DECOLA && h.estado <= EST.POUSO && (h.flares ?? PARAM.heli.flares) > 0 && !(h.tFlare > 0)) { h.flares = (h.flares ?? PARAM.heli.flares) - 1; h.tFlare = PARAM.heli.flareDur; sim.evento({ t: 'heliFlare', idx: h.idx, id: n.id, x: h.x, y: h.y, z: h.z }); } break;
     case 'heliFogo': if (h) h.fogo = 0.4; break;
     case 'heliThr': if (h) h.thr = Math.max(0, Math.min(4, cmd.v | 0)); break; /* v1.2.68: acelerador (asa) / coletivo (rotor) — 5 posições como no bombardeiro */
     case 'engajar': { const k = n.controle; const q = k >= 0 && n.helis ? sim.helis[n.helis[k]] : null; const alvo = cmd.v && cmd.alvo >= 0 && sim.navios[cmd.alvo] && !sim.navios[cmd.alvo].morto ? cmd.alvo | 0 : -1; /* v1.2.67: PILOTO AUTOMÁTICO OFENSIVO */
       if (q && q.estado >= EST.DECOLA && q.estado <= EST.RETORNO) { q.apAlvo = alvo; q.apEng = alvo >= 0 ? 1 : 0; q.ctrl = alvo >= 0 ? 'ia' : 'jog'; if (alvo >= 0) { q.missao = 'ataque'; if (q.estado === EST.RETORNO && q.comb > q.combMax * 0.15) q.estado = EST.VOO; } }
-      else if (k < 0) { n.apAlvo = alvo; n.controleIA = alvo >= 0 ? 1 : 0; if (alvo >= 0) { n.alvoId = alvo; n.apGraca = sim.t + 1.8; } } /* v1.2.79: 1,8 s de graça — o leme que já estava no manche não cancela o ENGAJAR */
+      else if (k < 0) { n.apAlvo = alvo; n.controleIA = alvo >= 0 ? 1 : 0; if (alvo < 0) { n.rotaFeita = 0; if (n.rotaJ) n.rotaJ.pausa = 1; } /* v1.3.56: desligar o piloto pausa a rota */ if (alvo >= 0) { n.alvoId = alvo; n.apGraca = sim.t + 1.8; } } /* v1.2.79: 1,8 s de graça — o leme que já estava no manche não cancela o ENGAJAR */
       sim.evento({ t: alvo >= 0 ? 'apIni' : 'apFim', id: n.id, alvo, motivo: 'jogador' }); break; }
     case 'heliVolta': if (h && (h.estado === EST.VOO)) { h.estado = EST.RETORNO; } break;
     case 'controle': { const k = cmd.k == null || cmd.k < 0 ? -1 : cmd.k | 0; for (const i of n.helis || []) { const q = sim.helis[i]; if (q.ctrl === 'jog') q.ctrl = 'ia'; }
       if (k >= 0 && n.helis && n.helis[k] != null) { const q = sim.helis[n.helis[k]]; if (q.estado === EST.CONVOO && cabeLado(sim, n)) { q.lancar = 1; q.auto = 1; }
-        if (q.estado !== EST.ABATIDO && q.estado !== EST.HANGAR && q.estado !== EST.REARMA) { q.ctrl = 'jog'; q.ctlRu = q.ctlAl = null; q.alt = Math.max(40, q.y); q.bank = q.roll || 0; /* v1.2.69: mesma convenção do voaUnificado */ q.gam = q.pitch || 0; q.sx = q.jx = 0; q.sy = q.jy = 0; if (q.thr == null) q.thr = q.H.aviao ? 2 : 2; n.controle = k; n.controleIA = 1; break; } }
-      n.controle = -1; n.controleIA = 0; break; }
+        if (q.estado !== EST.ABATIDO && q.estado !== EST.HANGAR && q.estado !== EST.REARMA) { q.ctrl = q.rotaJ && !q.rotaJ.pausa ? 'ia' : 'jog'; q.ctlRu = q.ctlAl = null; q.alt = Math.max(40, q.y); /* v1.3.56: assumir uma aeronave em ROTA mantém a rota (mexer no manche pausa) */ q.bank = q.roll || 0; /* v1.2.69: mesma convenção do voaUnificado */ q.gam = q.pitch || 0; q.sx = q.jx = 0; q.sy = q.jy = 0; if (q.thr == null) q.thr = q.H.aviao ? 2 : 2; n.controle = k; n.controleIA = 1; break; } }
+      n.controle = -1; n.controleIA = n.rotaJ && !n.rotaJ.pausa ? 1 : 0; /* v1.3.56: rota do navio segue */ break; }
     case 'esquadrilha': if (n.helis && n.helis.length) { n.esq = 1; if (cmd.m === 1) { n.libMax = Math.ceil(n.helis.length / 2); n.libVel = 1.5; } else if (cmd.m === 2) { n.libMax = n.helis.length; n.libVel = 2; } /* v1.2.32: metade / todas, convés mais rápido */ for (const i of n.helis) { const q = sim.helis[i]; if (q.estado !== EST.ABATIDO) q.auto = 1; } sim.evento({ t: 'esquadrilha', id: n.id, n: n.helis.length }); } break; /* v1.2.16 item 13b: LANÇAR ESQUADRILHA — todos decolam em sequência (intervalo de convoo) e atacam */
     case 'uav': lancaUav(sim, n); break;
     case 'iaNavio': if (n.controle < 0) n.controleIA = cmd.v ? 1 : 0; break; // câmera do drone: a IA pilota o navio
@@ -127,7 +127,7 @@ export function lancaUav(sim, n) {
 }
 export function derrubaAereo(sim, tipo, q, por) {
   if (tipo === 'u') { q.ativo = 0; const d = sim.navios[q.dono]; if (d) { d.uav = -1; d.tUav = UAV.recarga; } sim.evento({ t: 'uavAbatido', x: q.x, y: q.y, z: q.z, idx: q.idx, por: por ? por.id : -1 }); return; }
-  q.ativo = 0; q.estado = EST.ABATIDO; q.ctrl = 'ia'; const d = sim.navios[q.dono]; if (d && d.controle >= 0 && d.helis[d.controle] === q.idx) { d.controle = -1; d.controleIA = 0; }
+  q.ativo = 0; q.estado = EST.ABATIDO; q.ctrl = 'ia'; const d = sim.navios[q.dono]; if (d && d.controle >= 0 && d.helis[d.controle] === q.idx) { d.controle = -1; d.controleIA = d.rotaJ && !d.rotaJ.pausa ? 1 : 0; }
   if (por) por.stats.menores = (por.stats.menores || 0) + 1; if (por) por.stats.helisAbatidos = (por.stats.helisAbatidos || 0) + 1;
   sim.evento({ t: 'heliAbatido', x: q.x, y: q.y, z: q.z, idx: q.idx, dono: q.dono, por: por ? por.id : -1 });
 }
@@ -176,7 +176,7 @@ function passoAbatida(sim, h, dt) {
   const ns = Math.min(8, Math.max(1, Math.ceil(Math.hypot(h.vx, h.vy, h.vz) * dt / 0.25))), sdt = dt / ns;
   for (let k = 0; k < ns; k++) { caiAbatida(sim, h, sdt); if (h.terra || h.y <= -5) break; contatoCasco(sim, h); }
 }
-export function arrancaDoConves(sim, h, vx, vy, vz, por) { const n = sim.navios[h.dono]; if (n) { soltaTok(n, h); soltaPonto(n, h); if (n.controle >= 0 && n.helis[n.controle] === h.idx) { n.controle = -1; n.controleIA = 0; } }
+export function arrancaDoConves(sim, h, vx, vy, vz, por) { const n = sim.navios[h.dono]; if (n) { soltaTok(n, h); soltaPonto(n, h); if (n.controle >= 0 && n.helis[n.controle] === h.idx) { n.controle = -1; n.controleIA = n.rotaJ && !n.rotaJ.pausa ? 1 : 0; /* v1.3.56: rota do navio segue */ } }
   if (n && n.C) { /* v1.2.30 item 12: NUNCA cai no próprio casco — impulso lateral p/ fora do bordo mais próximo, suficiente p/ passar do costado antes de voltar à altura do convés (conta o arrasto horizontal 0,3/s do ramo ABATIDO e a velocidade do navio) */
     const c = Math.cos(n.rumo), s = Math.sin(n.rumo), lx = (h.x - n.x) * c + (h.z - n.z) * s, lado = lx >= 0 ? 1 : -1, vsx = Math.sin(n.rumo) * n.v, vsz = -Math.cos(n.rumo) * n.v;
     const tC = Math.max(1.2, 2 * Math.max(vy, 6) / G), dist = Math.max(0, n.C.B * 0.5 * 1.05 + 5 - Math.abs(lx)) , need = dist * 0.3 / (1 - Math.exp(-0.3 * tC)) + 2; /* m/s lateral RELATIVO ao navio */
@@ -342,6 +342,7 @@ export function passoAereo(sim, dt) { POOL_REF.s = sim; if (!sim.stConves) sim.s
     if ((h.ctrl === 'ia' || h.ctrl === 'jog') && !(h.tFlare > 0) && (h.flares ?? PARAM.heli.flares) > 0 && sim.sams.some((s) => s.ativo && s.tipoAlvo === 'h' && s.alvo === h.idx && s.t > (h.ctrl === 'jog' ? 1.1 : 0.8))) { h.flares = (h.flares ?? PARAM.heli.flares) - 1; h.tFlare = PARAM.heli.flareDur; sim.evento({ t: 'heliFlare', idx: h.idx, id: n.id, x: h.x, y: h.y, z: h.z }); }
     if (h.estado === EST.VOO) { const a = alvoHeli(sim, h, n);
       if (h.ctrl === 'jog') { voaJog(h, dt, sim); if (h.estado !== EST.VOO || !h.ativo) continue; /* v1.3.50: mesmo voo da IA */ if (bateuRelevo(h, dt, sim)) { derrubaAereo(sim, 'h', h, null); sim.evento({ t: 'heliTerreno', idx: h.idx, x: h.x, y: h.y, z: h.z }); continue; } if (a && !a.morto && a.id === n.alvoId && !h.H.aviao && !h.H.aew && (h.mun > 0 || h.H.bazuca) && Math.abs(h.jx || 0) < 0.2) { /* v1.3.54: só vira o nariz sozinho com o alvo TRAVADO */ const brJ = marcacao(h.x, h.z, a.x, a.z); let drJ = ang(brJ - h.rumo); const limJ = 0.9 * dt; if (drJ > limJ) drJ = limJ; else if (drJ < -limJ) drJ = -limJ; h.rumo = ang(h.rumo + drJ); h.vx = Math.sin(h.rumo) * (h.v || 0); h.vz = -Math.cos(h.rumo) * (h.v || 0); } let noNariz = false; if (a && !a.morto && !h.H.aew && (h.mun > 0 || h.H.bazuca)) { const offJ = Math.abs(ang(marcacao(h.x, h.z, a.x, a.z) - h.rumo)), dJ = Math.hypot(a.x - h.x, a.z - h.z); const coneJ = h.H.aviao ? (h.H.arma === 'foguete' ? 0.42 : 0.7) : (h.H.arma === 'foguete' ? 1.15 : h.H.arma === 'missil' ? 1.5 : 1.2); noNariz = dJ < h.H.alc * 1.05 && offJ < coneJ; } if ((h.fogo > 0 || noNariz) && !h.H.aew && (h.mun > 0 || h.H.bazuca)) dispara(sim, h, n, a); }
+      else if (h.rotaJ && !h.rotaJ.pausa && (() => { const w = pontoRota(sim, n, 'h', h, ROTA.chegaAr); if (!w) return false; voa(h, marcacao(h.x, h.z, w.x, w.z), h.H.vmax * 0.85, Math.min(h.rotaJ.alt, h.H.aviao ? 3000 : 1200), dt, sim); return true; })()) { /* v1.3.56: ROTA traçada no mapa — a IA de voo desvia do relevo; no fim, ataque ao alvo */ }
       else if ((() => { /* v1.2.29 item 13: dogfight — prioridade sobre CAP/ataque se inimigo no envelope; busca stagger 3 ticks (FPS) */
         let ae = h._ae, ad = h._ad != null ? h._ad : 9e6;
         if ((sim.tick + h.idx) % 3 === 0 || !ae || !ae.ativo) { ae = null; ad = 9e6; for (const q of sim.helis) { if (!q.ativo || q.time === h.time || q.estado < EST.DECOLA || q.estado > EST.RETORNO) continue; const d2 = (q.x - h.x) ** 2 + (q.z - h.z) ** 2; if (d2 < ad) { ad = d2; ae = q; } } h._ae = ae; h._ad = ad; }
@@ -369,7 +370,7 @@ export function passoAereo(sim, dt) { POOL_REF.s = sim; if (!sim.stConves) sim.s
     else if (h.estado === EST.POUSO && pista(n, h)) pousoPista(sim, n, h, dt);
     else if (h.estado === EST.RETORNO) { const c = n.P.convoo, T = pontoPouso(sim, n, h); h.esp = 0; if (!T) { espera(sim, n, h, n.x, n.z, 320 + 45 * (h.slot % 6), 70, dt); continue; } /* v1.2.26 item C: convés/convoo ocupado → circuito de espera ao redor do navio */
       sim.mundo(n, T.x, c.y, T.z, _o); const d = Math.hypot(_o.x - h.x, _o.z - h.z); voa(h, marcacao(h.x, h.z, _o.x, _o.z), Math.min(h.H.vmax, Math.max(n.v + 3, d * (d > 1500 ? 0.25 : 0.08))), Math.max(45, c.y + 22), dt, sim); /* v1.2.26: desacelera perto (saindo do circuito não orbita o ponto) */
-      if (d < 50 && T.meu) { h.estado = EST.POUSO; h.tEst = 0; h.dk = { f: 'pv', x: T.x, z: T.z, y: 0, r: 0, p: [], vx: 0, vz: 0 }; if (h.ctrl === 'jog') { h.ctrl = 'ia'; n.controle = -1; n.controleIA = 0; sim.evento({ t: 'controleVolta', id: n.id }); } } }
+      if (d < 50 && T.meu) { h.estado = EST.POUSO; h.tEst = 0; h.dk = { f: 'pv', x: T.x, z: T.z, y: 0, r: 0, p: [], vx: 0, vz: 0 }; if (h.ctrl === 'jog') { h.ctrl = 'ia'; n.controle = -1; n.controleIA = n.rotaJ && !n.rotaJ.pausa ? 1 : 0; /* v1.3.56: rota do navio segue */ sim.evento({ t: 'controleVolta', id: n.id }); } } }
     else if (h.estado === EST.POUSO) { const c = n.P.convoo, q = h.dk || { x: c.x || 0, z: c.z }; if (q.lx == null) { const L0 = paraLocal(n, h); q.lx = L0.x; q.lz = L0.z; q.ly = h.y - n.arfagem - c.y - 0.6; } let lx = q.lx, lz = q.lz, ly = q.ly; const dH = Math.hypot(q.x - lx, q.z - lz);
       const hh = Math.max(0, 35 * (1 - h.tEst / 5), Math.min(35, dH * 1.5)), k = Math.min(1, dt * 2.5); /* v1.2.26: aproximação no referencial do NAVIO (sem atraso) e só desce sobre o PRÓPRIO ponto */
       { let mx = (q.x - lx) * k, mz = (q.z - lz) * k; const mh = Math.hypot(mx, mz), cap = 10 * dt; if (mh > cap) { mx *= cap / mh; mz *= cap / mh; } lx += mx; lz += mz; ly += clamp((hh - ly) * k, -8 * dt, 8 * dt); q.lx = lx; q.lz = lz; q.ly = ly; } /* integrado no referencial do navio (o navio anda depois deste passo) */

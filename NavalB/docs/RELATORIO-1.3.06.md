@@ -505,3 +505,44 @@ Valter relatou que, no celular, o ponto verde do MM e do MMD não dirigia a aero
 - No mapa tático, `amostra()` agora grava só o seu navio (`u.n === eu`) e as aeronaves que têm você como dono (`dono === eu.id`): o Urubu-rei e os caças com os seus alas, e as aeronaves do seu navio.
 - No minirradar, o rastro também ficou só para `eu`/`minha`; navios e aeronaves bots, inimigos ou aliados, não deixam mais risco.
 - A linha de rumo (onde a unidade estará em 1 min) continua para todos.
+
+## 1.3.56 — mapa tático remodelado, rotas, MMD e ponto no nariz
+
+### Mapa tático
+- Mostra o mapa inteiro num quadrado do tamanho da altura livre.
+- Fica girado para que a base do seu time fique embaixo: `orienta()` usa `T.plano`, e o ângulo é arredondado para múltiplos de 90° quando está perto.
+- Os navios inimigos aparecem em quadros (`mt-card`) com distância, vida, velocidade, rumo e avarias.
+- A legenda ficou dentro da largura do mapa.
+
+### Rotas (novo `sim/rotas.js`)
+- Comando `rota` (u: n/q/h; p = [x,z,…]; alvo; alt) e comandos `rotaPausa`/`rotaRetoma`. O `valida` agora aceita listas de números.
+- Navio:
+  - Rota é recusada se algum trecho tiver altura de terreno acima de −7 m (`segBloqueado` a cada 60 m). A validação roda no cliente e na simulação.
+  - `ai.js` segue os pontos com o telégrafo do jogador; a IA de tiro continua atirando nos inimigos do caminho.
+  - Leme firme ou toque de rumo pausam a rota; o telégrafo não pausa.
+  - Ao retomar, se o caminho até o próximo ponto cruzar terra, um caminho por água é calculado em grade de 150 m e simplificado.
+- Aeronave pilotável (Urubu-rei/caça líder e aeronaves do navio):
+  - Voa até cada ponto com a IA de voo (que desvia do relevo), na altura escolhida.
+  - No fim, o alvo vai para o ataque normal da IA.
+  - Mexer no manche ou entrar no manual pausa a rota; o botão IA retoma. Os botões mostram ROTA ou PAUSADA.
+- Ao assumir uma aeronave que está em rota, a rota continua.
+
+### Aeronaves
+- O ponto verde procura o navio mais perto da direção do nariz (até 14 km e 12°) e fica 3 km à frente do nariz quando não há navio.
+- Travado, o rumo vai para o alvo e a altitude desce para 220 m (helicóptero: 120 m; helicóptero do navio: 60 m). Se passar do alvo, a aeronave faz a volta.
+- TRAVAR com trava ativa só destrava.
+- MMD voltou: sem trava, a aeronave segue o yaw da câmera. Botão MM/MMD acima do TRAVAR.
+
+### Partidas
+- Sem mercantes (`match.mercantes = false`) e sem tráfego civil (`trafegoOn === true` só se pedido).
+- Trajetos só do navio e das aeronaves pilotáveis; os alas da esquadrilha ficam fora.
+
+### Testes
+- Partida: 0 mercantes e tráfego desligado.
+- Mapa: você embaixo com rotação de 90° e 6 quadros de inimigos.
+- Rota do navio aceita e seguida (ponto 1/2).
+- Rota do Raio:
+  - pontos 0 → 1 → fim, descendo de 742 m para 384 m;
+  - manche → PAUSADA; IA → ROTA; no fim o ataque ficou LIGADO.
+- MMD: o rumo foi de −38° a 4° em direção ao giro de 16°.
+- Ponto no nariz encaixou; ao travar, a aeronave desceu de 691 m para 625 m com rumo no alvo; TRAVAR de novo destravou.

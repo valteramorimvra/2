@@ -7,6 +7,7 @@ import { alturaTerreno, bloqueado } from './maps.js';
 import { recargaVlsSeg } from './world.js';
 import { terraAFrente } from './colisaoTerreno.js';
 import { querCons } from '../naval5v5/consumiveis.js';
+import { pontoRota, ROTA } from './rotas.js'; /* v1.3.56 */
 const AMOSTRAS = [0.15, 0.3, 0.45, 0.65, 0.82, 1];
 
 export class SquadAI {
@@ -63,7 +64,9 @@ export class SquadAI {
       if (n.papel !== 'mercante') { const w = this.navega(sim, n, M, dest, t, alvo && !M.recuando ? alvo.c : null); if (w) dest = w; } /* v1.2.18 item 13: rota NAVEGÁVEL — se terra corta a linha até o destino, segue o campo de fluxo (BFS de água) até a zona central, em vez de raspar a costa sem nunca fechar a distância */
       // separação entre aliados
       for (const o of sim.navios) if (o !== n && !o.morto && o.time === n.time) { const d = Math.hypot(o.x - n.x, o.z - n.z); const sep = 500; /* v1.2.20: separação cresce com a velocidade (avanço a toda força) */ if (d < sep) { dest.x += (n.x - o.x) / d * 400; dest.z += (n.z - o.z) / d * 400; } }
-      if (ehJog) { tel = Math.max(2, n.telAlvo); if (alvo && alvo.d < 3500) dest = { x: n.x - (alvo.c.x - n.x), z: n.z - (alvo.c.z - n.z) }; else if (alvo) { const b = marcacao(n.x, n.z, alvo.c.x, alvo.c.z) + (alvo.d > 6500 ? 0 : Math.PI / 2 * M.ala) /* v1.2.18 item 13: além de 6,5 km fecha a distância em vez de orbitar e abrir */; dest = { x: n.x + Math.sin(b) * 1500, z: n.z - Math.cos(b) * 1500 }; } } // navio do jogador sob IA: mantém a velocidade, orbita a 3,5–7 km e se afasta se o inimigo chegar perto
+      const wR = ehJog && n.rotaJ && !n.rotaJ.pausa ? pontoRota(sim, n, 'n', n, ROTA.chegaNavio) : null; /* v1.3.56: ROTA traçada no mapa — segue os pontos (validados sem ilha) a velocidade do telégrafo; os inimigos no caminho são atacados pela IA de tiro, mas o rumo é o da rota */
+      if (wR) { tel = Math.max(1, n.telAlvo); dest = { x: wR.x, z: wR.z }; }
+      else if (ehJog) { tel = Math.max(2, n.telAlvo); if (alvo && alvo.d < 3500) dest = { x: n.x - (alvo.c.x - n.x), z: n.z - (alvo.c.z - n.z) }; else if (alvo) { const b = marcacao(n.x, n.z, alvo.c.x, alvo.c.z) + (alvo.d > 6500 ? 0 : Math.PI / 2 * M.ala) /* v1.2.18 item 13: além de 6,5 km fecha a distância em vez de orbitar e abrir */; dest = { x: n.x + Math.sin(b) * 1500, z: n.z - Math.cos(b) * 1500 }; } } // navio do jogador sob IA: mantém a velocidade, orbita a 3,5–7 km e se afasta se o inimigo chegar perto
       if (n.alertaMissil === 2 && n.papel !== 'capitania') tel = 4;
       if (Math.hypot(dest.x - n.x, dest.z - n.z) < 250 && !alvo && n.papel === 'capitania') tel = 1; /* v1.2.18 item 13: só a capitania para no ponto; os demais seguem a busca */
       let rDes = marcacao(n.x, n.z, dest.x, dest.z);

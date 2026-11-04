@@ -31,3 +31,21 @@
 /* v1.3.51: legenda dos trajetos (navio = linha cheia, aeronave = tracejada) */
 .mt-leg .lg-tn { width: 16px; height: 0; border-top: 2px solid #60a5fa; }
 .mt-leg .lg-ta { width: 16px; height: 0; border-top: 2px dashed #22d3ee; }
+/* v1.3.56 (Valter): radar remodelado — mapa inteiro à esquerda; fichas dos inimigos em QUADROS e o editor de ROTAS à direita */
+.mapa-tat .mt-ficha { width: auto; }
+.mt-ficha .mt-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; margin-top: 4px; }
+.mt-ficha .mt-card { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; padding: 7px 8px; border-radius: 6px; border: 1px solid rgba(248, 113, 113, .45); background: linear-gradient(180deg, rgba(127, 29, 29, .38), rgba(30, 10, 14, .55)); color: #fee2e2; font: inherit; cursor: pointer; }
+.mt-ficha .mt-card.on { border-color: #facc15; box-shadow: 0 0 0 1px #facc15 inset; }
+.mt-ficha .mt-card.velho { opacity: .6; }
+.mt-ficha .mt-card b { font-size: 11.5px; line-height: 1.15; } .mt-ficha .mt-card small { font-size: 9.5px; color: #fca5a5; }
+.mt-ficha .mt-card em { font-style: normal; font-size: 10px; color: #e2e8f0; }
+.mt-ficha .mt-vb { display: block; width: 100%; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, .12); overflow: hidden; margin: 2px 0; } .mt-ficha .mt-vb i { display: block; height: 100%; }
+.mt-ficha .mt-ar { display: inline-block; margin: 3px 6px 0 0; font-size: 10px; color: #fdba74; }
+.mt-ficha .mt-dupla { display: flex; gap: 6px; flex-wrap: wrap; } .mt-ficha .mt-dupla .mt-bt { flex: 1 1 0; min-width: 84px; }
+.mt-ficha .mt-bt.mt-rota { background: rgba(21, 128, 61, .35); border-color: rgba(74, 222, 128, .6); color: #dcfce7; }
+.mt-ficha .mt-err { margin: 6px 0 0; font-size: 11px; font-weight: 800; color: #f87171; }
+.mt-ficha .mt-alt { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 10.5px; color: #94a3b8; } .mt-ficha .mt-alt .mt-bt { width: 38px; flex: none; margin: 0; padding: 6px 0; } .mt-ficha .mt-alt b { min-width: 58px; text-align: center; color: #f8fafc; }
+.mt-ficha .mt-rota { margin-top: 8px; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(74, 222, 128, .5); background: rgba(20, 83, 45, .3); } .mt-ficha .mt-rota.pau { border-color: rgba(251, 191, 36, .6); background: rgba(120, 53, 15, .3); }
+.mt-ficha .mt-rota b { display: block; font-size: 11px; } .mt-ficha .mt-rota small { display: block; font-size: 10px; color: #94a3b8; }
+.ap-off.rota { border-color: rgba(74, 222, 128, .7); } .ap-off.rota svg { stroke: #86efac; } .ap-off.rota.pausada { border-color: rgba(251, 191, 36, .8); } .ap-off.rota.pausada svg { stroke: #fbbf24; }
+.mapa-tat .mt-leg { flex-wrap: wrap; row-gap: 2px; font-size: 9px; }

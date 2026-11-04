@@ -25,7 +25,7 @@ import { instalaAvarias, passoAvarias, danoLocal, passoAfundamento, MODS_PADRAO 
 import { instalaAereo, instalaHelisNavio, comandoAereo, passoAereo, passoTurbulencia, sensorAereo, POOL_AEREO } from '../naval5v5/aereo.js';
 import { instalaDefesa, instalaNavio, passoCiws5, passoLaser, passoSam, passoSams, passoA30, passoAmeacas, granadaNaAgua, CIWS, POOL5 } from '../naval5v5/defesa.js';
 
-import { instalaNuclear, passoNuclear, lancaNuclear, comandoNuclear } from './nuclear.js'; import { criaTrafego, passoTrafego, acertaCivil, danoCivil } from './trafego.js'; /* v1.2.46 */
+import { instalaNuclear, passoNuclear, lancaNuclear, comandoNuclear, nkBombardeiroDe } from './nuclear.js'; import { comandoRota } from './rotas.js'; /* v1.3.56 */ import { criaTrafego, passoTrafego, acertaCivil, danoCivil } from './trafego.js'; /* v1.2.46 */
 import { passoHidros, comandoHidro } from './hidroaviao.js'; /* v1.2.39: hidroaviões */
 import { passoMissil1231, lancaMissilNuclear1231 } from './missilNuclear1231.js'; import { instalaAmorim, lancaMissilAmorim, passoLateral, passoAutosAmorim } from './amorim.js'; /* v1.3.00 */ import { passoVtolAmorim, comandoVtol, lancaVtol, lancaVtolInd, ehVtolInd } from './vtolAmorim.js'; /* v1.3.04 */ /* v1.2.31 */ /* v1.2.26: bombardeiro + bomba atômica */
 export const DT = 1 / 60;
@@ -95,6 +95,7 @@ export class Sim {
   aplica(cmd) {
     const n = this.navios[cmd.id]; if (!n || n.morto) return;
     switch (cmd.t) {
+      case 'rota': case 'rotaRetoma': case 'rotaPausa': comandoRota(this, n, cmd, nkBombardeiroDe); break; /* v1.3.56 */
       case 'telegrafo': n.telAlvo = clamp(cmd.v | 0, 0, 4); break;
       case 'leme': n.lemeCmd = clamp(+cmd.v || 0, -1, 1); n.rumoAlvo = null; break;
       case 'optica': n.optica = cmd.v ? 1 : 0; break; /* v1.2.2: ÓPTICA/binóculo reduz a dispersão */
@@ -129,7 +130,7 @@ export class Sim {
     const dt = DT; this.tick++; this.t += dt;
     const L = this.ordemTick(); /* v1.2.20: ORDEM NEUTRA — a cada tick a ordem de processamento dos navios se inverte (antes o azul sempre ia primeiro e o vermelho, por último, reagia ao estado mais novo: vantagem sistemática do vermelho em bot × bot) */
     for (const n of L) this.passoNavio(n, dt);
-    this.passoGranadas(dt); this.passoMisseis(dt); passoSams(this, dt); this.passoTorpedos(dt); passoAereo(this, dt); passoVtolAmorim(this, dt); /* v1.3.04: caças Acauã/Uiraçu (código próprio) */ passoTurbulencia(this, dt); /* v1.2.53 */ passoMissil1231(this, dt); passoNuclear(this, dt); passoHidros(this, dt); if (!this.trafego && this.trafegoOn !== false && this.tick === 1) this.trafego = criaTrafego(this, this._seedTr || 1); passoTrafego(this, dt); /* v1.2.46: tráfego civil */ this.passoIscas(dt); passoAmeacas(this, dt);
+    this.passoGranadas(dt); this.passoMisseis(dt); passoSams(this, dt); this.passoTorpedos(dt); passoAereo(this, dt); passoVtolAmorim(this, dt); /* v1.3.04: caças Acauã/Uiraçu (código próprio) */ passoTurbulencia(this, dt); /* v1.2.53 */ passoMissil1231(this, dt); passoNuclear(this, dt); passoHidros(this, dt); if (!this.trafego && this.trafegoOn === true && this.tick === 1) /* v1.3.56 (Valter): sem navios mercantes/civis nas partidas */ this.trafego = criaTrafego(this, this._seedTr || 1); passoTrafego(this, dt); /* v1.2.46: tráfego civil */ this.passoIscas(dt); passoAmeacas(this, dt);
     for (const n of L) { passoCiws5(this, n, dt); passoLaser(this, n, dt); passoSam(this, n, dt); passoA30(this, n, dt); }
     if (this.tick % 15 === 0) this.sensores();
     for (const n of L) passoArmas5(this, n, dt);

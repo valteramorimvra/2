@@ -85,3 +85,5 @@
 .hud .nk-bts .cb.nk-trv.mw-enc i { color: #e2e8f0; }
 .hud .nk-bts .cb.nk-trv.nk-on i { color: #4ade80; filter: drop-shadow(0 0 4px rgba(74, 222, 128, .8)); }
 .hud .nk-bts .cb.nk-trv.nk-on { box-shadow: 0 0 0 2px #4ade80 inset, 0 0 10px rgba(74, 222, 128, .45); }
+/* v1.3.56: botão MM/MMD logo acima do TRAVAR */
+.hud .hl-bts .cb.nk-mmd { right: 245px; bottom: 236px; } .hud .nk-bts .cb.nk-mmd i { color: #86efac; }
