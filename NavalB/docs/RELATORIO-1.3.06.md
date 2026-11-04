@@ -449,3 +449,12 @@ Pedido: "em todos os modos a mesma suavidade e velocidade do modo IA; o que muda
 - `aereo.js` `voaJog`: as aeronaves dos navios pilotadas usam o `voa()` da IA. A velocidade é `vmax·0,85`, como no ataque da IA. O comando é `heliCtrl.ru/al`.
 - Cliente: o MM/MMD mandam o rumo exato (alvo ou câmera) em vez dos ganhos do manche.
 - O acelerador saiu da tela, porque deixou de ter efeito.
+
+## 1.3.51 — ponto verde arrastável, armas no modo IA e trajetos no mapa tático (inclui a 1.3.50)
+
+- O ponto verde virou móvel: `pvPasso`, `pvArrasta`, `pvNaTela` e `longeDoPonto` em `modernNavalCombat3D.js`. Toque perto do ponto (raio de 20% da altura da tela) e arraste; no resto da tela, arrastar continua girando a câmera.
+  - MM: o ponto fica onde for solto. `buscaProx` procura em volta dele; travado, ele desliza até o navio e a aeronave vai exatamente para lá. Arrastado para mais de 0,22 de distância, a trava solta.
+  - MMD: o ponto é uma direção no mundo e a aeronave vai para ele (rumo e altitude via `nkCtl.ru/al` e `heliCtrl.ru/al`). `buscaCentro` só trava navios a até 0,35 do ponto. A câmera é a do modo IA (a câmera de comando do MMD foi retirada). Perdido o alvo, o ponto volta para a frente.
+  - Testes no Playwright: Raio em MM (ponto arrastado até o navio → trava; erro de rumo caiu de 19° para 1°) e Raio em MMD (ponto arrastado à direita → a aeronave virou de 42° para 88° e o ponto voltou para a frente).
+- Armas no modo IA: sem o TRAVAR (retirado na 1.3.48), MÍSSIL e TORPEDO pediam "Trave um alvo". Agora `nkAlvoAuto` marca sozinho o melhor navio à frente (até 22 km). A bomba em preparo mostra o tempo restante (antes o LANÇAR era ignorado em silêncio). No helicóptero de foguetes/tiro, o LANÇAR marca o alvo (antes dizia "paiol vazio"). Na aeronave do navio, o torpedo marca sozinho o alvo à frente.
+- Mapa tático: `amostra()` guarda o trajeto de cada unidade a cada 2 s, mesmo com o mapa fechado (até 300 pontos). Navios aparecem em linha cheia e aeronaves em linha tracejada, com cores próprias, e há legenda.
