@@ -499,3 +499,9 @@ Valter relatou que, no celular, o ponto verde do MM e do MMD não dirigia a aero
 - Testes com toque emulado:
   - Raio: ao girar a tela, o ponto encaixou com a cruz e o rumo não mudou (63°); ao tocar TRAVAR, o botão acendeu e o erro de rumo caiu de 47° para 16°, com a câmera indo ao alvo.
   - Helicóptero do destróier: o rumo ficou em −50° até a trava; depois o erro caiu de 42° para 4°.
+
+## 1.3.55 — trajetos só do jogador
+
+- No mapa tático, `amostra()` agora grava só o seu navio (`u.n === eu`) e as aeronaves que têm você como dono (`dono === eu.id`): o Urubu-rei e os caças com os seus alas, e as aeronaves do seu navio.
+- No minirradar, o rastro também ficou só para `eu`/`minha`; navios e aeronaves bots, inimigos ou aliados, não deixam mais risco.
+- A linha de rumo (onde a unidade estará em 1 min) continua para todos.
