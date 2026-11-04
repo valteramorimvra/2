@@ -467,3 +467,15 @@ Pedido: "em todos os modos a mesma suavidade e velocidade do modo IA; o que muda
 - Verificado em screenshot:
   - navio com rumo −90°, tela −159° e desejado −21°;
   - Raio em MMD com rumo −43°, tela −45° e desejado 3°.
+
+## 1.3.53 — ponto verde respondendo ao toque
+
+Valter relatou que, no celular, o ponto verde do MM e do MMD não dirigia a aeronave nem travava os alvos.
+
+- Causa 1: na 1.3.51 era preciso tocar exatamente perto do ponto para arrastá-lo; tocando em outro lugar, só a câmera girava.
+- Correção 1: agora o 1º dedo em qualquer área livre move o ponto pelo deslocamento do dedo (`pvMove`, ganho 1,25), e um 2º dedo gira a câmera.
+- Causa 2: um toque curto no mar marcava a mira de solo (`miraSolo`), e `nkAutoAlvo` saía cedo sempre que ela existia; com isso a trava do ponto ficava bloqueada.
+- Correção 2: `nkAutoAlvo` deixou de verificar a `miraSolo`.
+- Testes com toque real (CDP `Input.dispatchTouchEvent`, celular emulado):
+  - Raio em MM: o dedo começou longe do ponto e o arrastou até o navio; a trava aconteceu e o erro de rumo caiu de 18° para 1°.
+  - Também testados: Raio em MMD, helicóptero do destróier em MM e MMD, Kordão em MM e Tufão em MMD.
