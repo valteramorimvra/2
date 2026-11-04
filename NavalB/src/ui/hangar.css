@@ -70,3 +70,4 @@
 /* v1.3.59: ARMAS da aeronave na ficha (tipos e quantidade), como nos navios */
 .tela-hangar .hg-armas { display: flex; flex-wrap: wrap; gap: 3px; margin: 5px 0 2px; } .tela-hangar .hg-armas-t { margin: 6px 0 0; font-size: 9.5px; letter-spacing: .14em; color: #e0b54a; }
 .tela-hangar .hg-armas span { padding: 2px 6px; border-radius: 3px; border: 1px solid rgba(170,180,195,.28); background: rgba(30,38,48,.8); font-size: 9.5px; line-height: 1.25; color: #e2e8f0; } .tela-hangar .hg-armas span.on { border-color: #4b9fd1; color: #9ad6f7; } .tela-hangar .hg-armas span i { font-style: normal; color: #94a3b8; }
+.tela-hangar .hg-ficha { max-height: calc(100vh - 158px); overflow-y: auto; scrollbar-width: thin; } /* v1.3.59: a ficha (com as armas) rola em vez de passar por baixo das abas */
