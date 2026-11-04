@@ -10,7 +10,7 @@ import { clamp, ang, G } from './util.js';
 import { colideAereoTerreno } from './colisaoTerreno.js';
 import { alturaTerreno } from './maps.js';
 import { alturaMar } from './ocean.js';
-import { PARAM } from '../armasParametros.js'; import { aceAtitude, aceCfg, aceIni, aceFim } from './voaAce.js'; /* v1.3.39 */
+import { PARAM } from '../armasParametros.js';
 
 /** Bombardeiro (referência, nuclear.js NUK) — os perfis abaixo derivam destes ganhos. */
 const BASE = { manBank: 1, manTaxaRol: 0.9, manPitch: 0.5, manTaxaPitch: 0.6, manFatorCurva: 6, manCurvaMax: 0.36 };
@@ -33,15 +33,11 @@ export function voaUnificado(h, dt, sim) { const P = perfilVoo(h.H); if (h.thr =
 
 /** Asa fixa: transplante do voaManual do bombardeiro (bank/γ com taxa limitada, curva coordenada, acelerador-telégrafo, piso/teto). */
 function voaAsa(h, P, dt, sim) {
-  const chao = Math.max(alturaMar(h.x, h.z, sim.t), alturaTerreno(sim.T, h.x, h.z));
-  const dn = sim.navios[h.dono], ace = !!(dn && dn.aceModo); /* v1.3.39 (Valter): CONTROLE PROFISSIONAL (modo Ace Combat) */
-  if (ace) { if (h._aceTk !== sim.tick - 1 || !h.aq) aceIni(h); h._aceTk = sim.tick; aceAtitude(h, dt, aceCfg(P.thrMax, !!(h.H && h.H.bombardeiro), chao + P.altMin, P.faixaPiso + 40, P.altMax - 200, h._aceC || (h._aceC = {}))); h.roll = h.bank; /* convenção das aeronaves de navio */ }
-  else { if (h.aq) { aceFim(h); h.roll = h.bank; }
   h.bank += clamp((h.sx * P.manBank - h.bank) * 2.6 * dt, -P.manTaxaRol * dt, P.manTaxaRol * dt); let gA = h.sy * P.manPitch;
-  if (h.y < chao + P.altMin + P.faixaPiso) gA = Math.max(gA, (chao + P.altMin + P.faixaPiso - h.y) / 160); if (h.y > P.altMax - 200) gA = Math.min(gA, -(h.y - P.altMax + 200) / 800);
+  const chao = Math.max(alturaMar(h.x, h.z, sim.t), alturaTerreno(sim.T, h.x, h.z)); if (h.y < chao + P.altMin + P.faixaPiso) gA = Math.max(gA, (chao + P.altMin + P.faixaPiso - h.y) / 160); if (h.y > P.altMax - 200) gA = Math.min(gA, -(h.y - P.altMax + 200) / 800);
   h.gam += clamp((gA - h.gam) * 4 * dt, -P.manTaxaPitch * dt, P.manTaxaPitch * dt); const v = Math.max(1, h.v);
-  h.w = (h.w || 0) + (clamp(G * Math.tan(h.bank) / v * P.manFatorCurva, -P.manCurvaMax, P.manCurvaMax) - (h.w || 0)) * Math.min(1, 3 * dt); h.rumo = ang(h.rumo + h.w * dt); h.roll = h.bank; } /* v1.2.69 (Valter: "ao contrário"): o render das aeronaves de navio usa −roll; o do bombardeiro usa +roll → aqui o sinal é o oposto do nuclear.js */
-  const thr = P.thrNiveis[Math.max(0, Math.min(4, h.thr | 0))]; h.v = ace ? clamp(h.v + (clamp(thr - h.v, -6 * (1 + P.thrMax / 400), 7 * (1 + P.thrMax / 400) * (0.25 + 0.75 * (Math.max(0, Math.min(4, h.thr | 0)) / 4))) - G * Math.sin(h.gam)) * dt, Math.max(30, P.thrMax * 0.14), P.thrMax * 1.08) /* v1.3.39: energia real no profissional */ : clamp(h.v - G * Math.sin(h.gam) * 0.6 * dt + clamp(thr - h.v, -6 * dt * (1 + P.thrMax / 400), 7 * dt * (1 + P.thrMax / 400)), P.thrMin, P.thrMax); h.pitch = h.gam;
+  h.w = (h.w || 0) + (clamp(G * Math.tan(h.bank) / v * P.manFatorCurva, -P.manCurvaMax, P.manCurvaMax) - (h.w || 0)) * Math.min(1, 3 * dt); h.rumo = ang(h.rumo + h.w * dt); h.roll = h.bank; /* v1.2.69 (Valter: "ao contrário"): o render das aeronaves de navio usa −roll; o do bombardeiro usa +roll → aqui o sinal é o oposto do nuclear.js */
+  const thr = P.thrNiveis[Math.max(0, Math.min(4, h.thr | 0))]; h.v = clamp(h.v - G * Math.sin(h.gam) * 0.6 * dt + clamp(thr - h.v, -6 * dt * (1 + P.thrMax / 400), 7 * dt * (1 + P.thrMax / 400)), P.thrMin, P.thrMax); h.pitch = h.gam;
   h.vy = h.v * Math.sin(h.gam); const vh = h.v * Math.cos(h.gam); h.vx = Math.sin(h.rumo) * vh; h.vz = -Math.cos(h.rumo) * vh; h.x += h.vx * dt; h.y = Math.max(chao + 6, h.y + h.vy * dt); h.z += h.vz * dt; }
 
 /** Rotor: mesmo manche suavizado; cíclico (sy) = velocidade à frente/ré com inércia, guinada (sx) com curva coordenada em

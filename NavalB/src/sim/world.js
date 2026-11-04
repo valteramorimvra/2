@@ -119,7 +119,6 @@ export class Sim {
       case 'nuclear': (n.C.destAmorim ? lancaVtol : ehVtolInd(n) ? lancaVtolInd /* v1.3.12: Acauã/Uiraçu do hangar — até 3 na formação do Pica-pau */ : n.C.missilNuclear ? lancaMissilNuclear1231 : lancaNuclear)(this, n, cmd); break; /* v1.3.06: no Destróier Amorim o botão nuclear é a DECOLAGEM dos caças */ /* v1.2.31: míssil nuclear de navio */ /* v1.2.26 */
       case 'hidro': case 'hdPil': case 'hdMissil': case 'hdTorp': case 'hdFlare': case 'hdVolta': comandoHidro(this, n, cmd); break; /* v1.2.39 */
       case 'vtArma': comandoVtol(this, n, cmd); break; /* v1.3.04: botões AAM/ASM/TORP/NUKE dos caças do Destróier Amorim */
-      case 'aceModo': n.aceModo = cmd.v ? 1 : 0; break; /* v1.3.39: controle profissional (Ace Combat) nas aeronaves de asa fixa pilotadas */
       case 'nkArIni': case 'nkPiloto': case 'nkEspera': case 'nkArAr': case 'nkFlare': case 'nkMissil': case 'nkVolta': case 'nkCtl': case 'nkThr': case 'nkMiraSolo': case 'nkTorp': case 'nkTrava': case 'nkSolta': case 'nkEjeta': case 'nkPorta': case 'nkReparo': if (cmd.t === 'nkSolta' && n.hd && n.hd.pil && n.hd.noAr >= 0) { comandoHidro(this, n, cmd); break; } comandoNuclear(this, n, cmd); break; /* v1.2.79: BASE */
     }
   }
