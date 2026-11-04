@@ -439,3 +439,13 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Item | Onde | Estado |
 |---|---|---|
 | Formação igual à do modo IA em todos os modos: com o líder pilotado, os alas têm mais giro (2–3 rad/s), velocidade de alcance (+120/+200 m/s) e assentam suave no lugar perto dele. IA sem mudança. | `passoAla` | VERIFICADO (curva de 24°/s mantida: alas a 44/44/89/89 m — os lugares da formação — durante a curva e na reversão) |
+
+## 1.3.50 — voo manual = voo da IA
+
+Pedido: "em todos os modos a mesma suavidade e velocidade do modo IA; o que muda é o modo".
+
+- `nuclear.js` `voaManual`: o manual (avião e helicóptero) agora chama o mesmo `voaPara` da IA. O manche dá só o rumo (lado) e a subida/descida (frente/trás). O ponto verde (MM) ou a câmera (MMD) mandam o rumo (`nkCtl.ru`) e a altitude (`al`). A velocidade é a de cruzeiro da IA, o piso continua em 150 m e bater no relevo continua derrubando a aeronave.
+- `hidroaviao.js` `voaManualH`: usa o `voaAuto` da IA do mesmo jeito.
+- `aereo.js` `voaJog`: as aeronaves dos navios pilotadas usam o `voa()` da IA. A velocidade é `vmax·0,85`, como no ataque da IA. O comando é `heliCtrl.ru/al`.
+- Cliente: o MM/MMD mandam o rumo exato (alvo ou câmera) em vez dos ganhos do manche.
+- O acelerador saiu da tela, porque deixou de ter efeito.

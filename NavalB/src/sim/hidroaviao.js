@@ -93,12 +93,9 @@ function entraTorpedo(sim, q, p) { const n = sim.navios[q.dono]; const tp = sim.
 function soltaFlare(sim, q) { if (q.flares <= 0 || q.tFlare > 0) return 0; q.flares--; q.tFlare = HD.flareDur; q.tFlareCad = HD.flareCad; sim.evento({ t: 'hdFlare', idx: q.idx, id: q.dono, x: q.x, y: q.y, z: q.z }); return 1; }
 
 /** Voo MANUAL — mesma lógica do bombardeiro (manche suavizado, curva coordenada, nivelamento automático), com os limites do hidroavião. */
-function voaManualH(q, S, dt) { q.sx += (q.jx - q.sx) * Math.min(1, 2.6 * dt); q.sy += (q.jy - q.sy) * Math.min(1, 3 * dt); /* v1.2.58: mais suave */
-  const bankMax = 0.9 * S.giro; if (Math.abs(q.jx) < 0.05) q.sx *= 1 - Math.min(1, 1.6 * dt); /* nivelamento automático */ q.bank += clamp((q.sx * bankMax - q.bank) * 2.6 * dt, -0.9 * dt, 0.9 * dt);
-  let gA = q.sy * 0.42; if (q.y < HD.altMin + 60) gA = Math.max(gA, (HD.altMin + 60 - q.y) / 200); if (q.y > HD.altTeto - 150) gA = Math.min(gA, -(q.y - HD.altTeto + 150) / 600); if (Math.abs(q.jy) < 0.05) gA *= 0.5;
-  q.gam += clamp((gA - q.gam) * 4 * dt, -0.6 * dt, 0.6 * dt); const v = Math.max(1, q.v); q.w = (q.w || 0) + (clamp(G * Math.tan(q.bank) / v * 4.5, -0.42 * S.giro, 0.42 * S.giro) - (q.w || 0)) * Math.min(1, 3 * dt);
-  q.rumo = ang(q.rumo + q.w * dt); q.roll = -q.bank; const alvoV = S.vMax * HD.thrFr[Math.max(0, Math.min(4, q.thr | 0))]; q.v = clamp(q.v - G * Math.sin(q.gam) * 0.6 * dt + clamp(alvoV - q.v, -5 * dt, 6 * dt), S.vMin, S.vMax); q.pitch = q.gam;
-  q.vy = q.v * Math.sin(q.gam); const vh = q.v * Math.cos(q.gam); q.vx = Math.sin(q.rumo) * vh; q.vz = -Math.cos(q.rumo) * vh; q.x += q.vx * dt; q.y = Math.max(HD.altMin * 0.6, q.y + q.vy * dt); q.z += q.vz * dt; }
+function voaManualH(q, S, dt) { /* v1.3.50 (Valter): manual com a MESMA suavidade e velocidade da IA — o manche/ponto verde/câmera só dão a direção; quem voa é o voaAuto */ q.sx += (q.jx - q.sx) * Math.min(1, 4 * dt); q.sy += (q.jy - q.sy) * Math.min(1, 4 * dt);
+  let rA, altA; if (q.ctlRu != null) { rA = q.ctlRu; altA = q.ctlAl != null ? q.ctlAl : HD.altCruz; } else { rA = ang(q.rumo + clamp(q.sx, -1, 1)); altA = q.y + clamp(q.sy, -1, 1) * 400; }
+  altA = clamp(altA, HD.altMin, HD.altTeto - 150); voaAuto(q, S, q.x + Math.sin(rA) * 4000, q.z - Math.cos(rA) * 4000, altA, q.alvo >= 0 ? S.vMax * 0.9 : S.vCruz, dt); }
 /** Voo automático suave até (rx, rz) na altitude alt. */
 function voaAuto(q, S, rx, rz, alt, v, dt) { const e = ang(marcacao(q.x, q.z, rx, rz) - q.rumo); let w = clamp(e * 0.8, -0.3 * S.giro, 0.3 * S.giro), vy = clamp((alt - q.y) * 0.3, -18, 22);
   w = (q.w || 0) + clamp(w - (q.w || 0), -0.35 * dt, 0.35 * dt); vy = (q.vy || 0) + clamp(vy - (q.vy || 0), -10 * dt, 10 * dt); q.roll = (q.roll || 0) + clamp(clamp(-w * 2.4, -0.8, 0.8) - (q.roll || 0), -0.7 * dt, 0.7 * dt);

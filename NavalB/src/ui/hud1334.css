@@ -72,3 +72,5 @@
 /* v1.3.45: botão do modo manual MM / MMD (fica livre, à esquerda do EJETAR) */
 .hud .hl-bts .cb.nk-modo { right: 245px; bottom: 168px; } .hud .nk-bts .cb.nk-modo i { color: #86efac; }
 .hud .hl-bts .cb.nk-ej { right: 176px; bottom: 156px; } /* v1.3.45: EJETAR não cobre mais o BASE (sobreposição antiga) */
+/* v1.3.50 (Valter): em todos os modos a velocidade é a da IA — o acelerador deixou de existir, então o botão sai da tela */
+.hud .nk-acel, .hud .hl-acel { display: none !important; }
