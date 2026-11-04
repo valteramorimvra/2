@@ -433,3 +433,9 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Item | Onde | Estado |
 |---|---|---|
 | Botão TRAVAR retirado da tela das aeronaves (o ponto verde marca sozinho no MM/MMD). Acessos ao botão protegidos (`_cls`/`_q` checam se existe). | `hud.js` | VERIFICADO (botão ausente, sem erros) |
+
+## 1.3.49
+
+| Item | Onde | Estado |
+|---|---|---|
+| Formação igual à do modo IA em todos os modos: com o líder pilotado, os alas têm mais giro (2–3 rad/s), velocidade de alcance (+120/+200 m/s) e assentam suave no lugar perto dele. IA sem mudança. | `passoAla` | VERIFICADO (curva de 24°/s mantida: alas a 44/44/89/89 m — os lugares da formação — durante a curva e na reversão) |
