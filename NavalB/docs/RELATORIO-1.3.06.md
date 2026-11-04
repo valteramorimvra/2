@@ -391,3 +391,11 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Medições nos vídeos de 04/11 (2 quadros/s, recortes ampliados) e na imagem marcada: ponto verde no CENTRO da tela; retículo ⌖ fixo em 60%/62%; envergadura ≈ 61% da largura; estado da arma preso ao ponto (−85; +55 px em 480 de altura); escada/ALT/VEL (±14,6% da largura) em volta do ponto quando PRONTO. | — | — |
 | PONTO VERDE: com alvo escolhido e tela/manche soltos, desliza do centro até o ponto de interceptação (4,5/s); a câmera segue (3/s) e o avião segue a câmera (curva e mergulho até o alvo). | `pontoVerde`, `nkCam`, câmera do avião de navio | VERIFICADO (Urubu-rei: −31° → 0°, A APONTAR → PRONTO; caça do Kordão: −68° → −2°) |
 | Câmera ao longo do comando, 0,3×dist acima (centro visual do avião 16,7° abaixo do eixo), distância 0,72× o tamanho do modelo. Moldura do navio só quando PRONTO. | `nkCam`, `nkMwPasso`, `hud1334.css` | VERIFICADO (captura) |
+
+## 1.3.44
+
+| Item | Onde | Estado |
+|---|---|---|
+| MANUAL (vídeo 120403): arrastar = câmera em volta da aeronave (igual ao modo IA, volta para trás em 2,2 s), não muda a direção; câmera EXATAMENTE a do modo IA. Manche dirige. | `nkCam`, câmera do avião de navio | VERIFICADO (tela a −114°, avião visto de lado, rumo independente) |
+| Busca por proximidade (centro da tela a ≤ 9% da largura do navio, ≤ 14 km), ALVO MARCADO + bipe, ponto verde fixo no navio, cruz de busca no centro; com alvo marcado e manche solto a aeronave vai exatamente ao navio (independe da câmera). Troca só levando a cruz a outro navio (1,5 s). | `buscaProx`, `nkAutoAlvo`, `heliAutoAlvo`, `nkPasso`, `nkMwPasso` | VERIFICADO (Urubu-rei: sem alvo segue reto; olhando o navio → trava; olhando 70° ao lado → −64° → −8°; caça do Kordão −62° → −1,6°) |
+| Câmeras dos navios: canhão/convés só sobem ao sair do casco (antes trocavam de face e saltavam); enquadramento com trava nas câmeras de órbita entra/sai suave (antes degrau de até ~11 m); auto-mira com histerese entre navios próximos. | `colideCamera`, `atualizaCamera`, `autoMiraPasso` | VERIFICADO (9 câmeras × auto/livre/trava: sem inversões relevantes; saltos de posição ≤ 1,4 m por quadro) |
