@@ -13,6 +13,7 @@ import { MISSEIS, TORPEDO, HELIS } from './classes.js';
 import { lancaArAr } from '../naval5v5/defesa.js'; import { resistMissil } from '../naval5v5/resistAereo.js';
 import { lancaNuclear } from './nuclear.js';
 import { marcacao, ang } from './util.js';
+import { orgDe } from './origem.js'; /* v1.3.57 */
 
 export const VT = Object.freeze({ intMis: 7, intNuke: 12, tick: 0.1, alcAam: 6000, alcAsm: 9500, alcTorp: 3500, alcNuke: 9000, danoAsm: 26, danoNuke: 60, nukeRaio: 450, nukeDano: 650,
   laser: Object.freeze({ alc: 2600, perm: 1.0, pk: 0.82, rec: 2.6 }), canhao: Object.freeze({ alc: 1500, cone: 0.22 }) }); /* v1.3.11: lasers e canhão de volta (todo o armamento ativo) */
@@ -55,12 +56,12 @@ function inimigoNavio(sim, q, n, alc) { const a0 = q.alvo >= 0 ? sim.navios[q.al
   let best = null, bd = alc; for (let i = 0; i < sim.navios.length; i++) { const e = sim.navios[i]; if (e.morto || e.time === q.time || (e.C && (e.C.civil || e.C.mercante))) continue; const d = Math.hypot(e.x - q.x, e.z - q.z); if (d < bd && visV(sim, q, e, (e.arfagem || 0) + e.C.F * 0.7)) { bd = d; best = e; } } return best; }
 function disparaMissil(sim, n, q, E, a, tipo) { const m = sim.misseis.find((x) => !x.ativo); if (!m) return 0; const nuke = tipo === 'nuke'; ponto(q, estacao(E, tipo), _o); const d = Math.hypot(a.x - q.x, a.z - q.z), v0 = Math.max(130, (q.v || 0) + 15);
   const pf = Object.assign({}, MISSEIS.curto, { nome: nuke ? 'Nuclear tático' : 'Antinavio', v: nuke ? 240 : 270, vt: nuke ? 260 : 300, alc: nuke ? VT.alcNuke : VT.alcAsm, dano: nuke ? VT.danoNuke : VT.danoAsm });
-  Object.assign(m, { ouro: 0, heli: 1, ativo: 1, x: _o.x, y: _o.y, z: _o.z, vx: Math.sin(q.rumo) * v0, vy: (q.vy || 0) - 4, vz: -Math.cos(q.rumo) * v0, dono: n.id, time: n.time, alvo: a.id, isca: -1, fase: 3, t: 0, v: v0, perfil: pf, cel: 0, iscasVistas: 0, tf: 0, d0: d, samAlvo: 0, dano: pf.dano, pkMul: nuke ? 0.6 : 1, velMul: 1, livre: 0, curto: d < 1500 ? 1 : 0, lat: null, vtNk: nuke ? 1 : 0 });
+  Object.assign(m, { org: orgDe(sim, q, tipo === 'nuke' ? 'nuclear' : 'missil'), ouro: 0, heli: 1, ativo: 1, x: _o.x, y: _o.y, z: _o.z, vx: Math.sin(q.rumo) * v0, vy: (q.vy || 0) - 4, vz: -Math.cos(q.rumo) * v0, dono: n.id, time: n.time, alvo: a.id, isca: -1, fase: 3, t: 0, v: v0, perfil: pf, cel: 0, iscasVistas: 0, tf: 0, d0: d, samAlvo: 0, dano: pf.dano, pkMul: nuke ? 0.6 : 1, velMul: 1, livre: 0, curto: d < 1500 ? 1 : 0, lat: null, vtNk: nuke ? 1 : 0 });
   resistMissil(m); /* v1.3.10 (Valter): armamento dos caças 5× mais resistente à defesa aérea (CIWS, SAM, laser) — o mesmo fator das armas de aeronave do jogo */
   if (nuke) for (let k = 0; k < 3; k++) if (E.nk[k] < 0) { E.nk[k] = m.idx; E.nkT[k] = -1; break; }
   n.stats.misLanc++; sim.evento({ t: 'heliMissil', idx: q.idx, m: m.idx, x: m.x, y: m.y, z: m.z, vt: tipo }); return 1; }
 function disparaTorp(sim, n, q, E, a) { const tp = sim.torpedos.find((x) => !x.ativo); if (!tp) return 0; ponto(q, estacao(E, 'torp'), _o); const b = marcacao(q.x, q.z, a.x, a.z);
-  Object.assign(tp, { lancha: 0, ativo: 1, x: _o.x, z: _o.z, rumo: b, rumoAlvo: b, v: 10, dono: n.id, time: n.time, alvo: a.id, corrida: TORPEDO.arma, modo: 'acustico', t: 0, buscando: 0, danoMul: 1, alcMax: TORPEDO.arma + 3200, leve: 1 });
+  Object.assign(tp, { org: orgDe(sim, q, 'torpedo'), lancha: 0, ativo: 1, x: _o.x, z: _o.z, rumo: b, rumoAlvo: b, v: 10, dono: n.id, time: n.time, alvo: a.id, corrida: TORPEDO.arma, modo: 'acustico', t: 0, buscando: 0, danoMul: 1, alcMax: TORPEDO.arma + 3200, leve: 1 });
   n.stats.torpLanc++; sim.evento({ t: 'heliTorpedo', idx: q.idx, x: q.x, y: q.y - 1.4, z: q.z, tp: tp.idx }); return 1; }
 /** 1 arma do tipo pedido deste caça (alvo travado tem prioridade). true = saiu. */
 export function disparaVt(sim, n, q, tipo) { const E = estDe(sim, q); if (!E || !q.ativo || !(q.vtol || q.vtInd) || q.fase !== 2 || E[tipo] <= 0) return false; if (tipo === 'nuke' ? E.tNuke > 0 : E.tMis > 0) return false;
@@ -92,7 +93,7 @@ function lasers(sim, n, q, E, dt) { const D = VTOL_SIM[E.id], L = VT.laser;
     if (S.t >= L.perm) { S.t = 0; S.tc = L.rec; S.on = 0; if (sim.rng.next() < L.pk * (best.pkMul || 1)) { best.ativo = 0; n.stats.intercept++; sim.evento({ t: 'missilAbatido', idx: best.idx, x: best.x, y: best.y, z: best.z, por: n.id, mount: -1, arma: 'laser' }); } S.alvo = -1; } } }
 /** canhão 25/30 mm: no navio travado, à frente e ao alcance (rajadas curtas) */
 function canhao(sim, n, q, E, dt) { if (E.tCan > 0) { E.tCan -= dt; return; } const a = q.alvo >= 0 ? sim.navios[q.alvo] : null; if (!a || a.morto || a.time === q.time) return; const d = Math.hypot(a.x - q.x, a.z - q.z); if (d > VT.canhao.alc || !visV(sim, q, a, (a.arfagem || 0) + a.C.F * 0.7)) return;
-  if (Math.abs(ang(marcacao(q.x, q.z, a.x, a.z) - q.rumo)) > VT.canhao.cone) return; const H = HELIS[E.id]; const ap = sim.dano ? sim.dano(a, (H.dano || 3) * 0.45 * 6, n, 'heli', true) : 0; E.tCan = 0.8;
+  if (Math.abs(ang(marcacao(q.x, q.z, a.x, a.z) - q.rumo)) > VT.canhao.cone) return; const H = HELIS[E.id]; sim._org = orgDe(sim, q, 'mg'); const ap = sim.dano ? sim.dano(a, (H.dano || 3) * 0.45 * 6, n, 'heli', true) : 0; sim._org = null; E.tCan = 0.8;
   if (ap > 0) sim.evento({ t: 'impacto', x: a.x, y: (a.arfagem || 0) + (a.C ? a.C.F : 4) + 2, z: a.z, alvo: a.id, dono: n.id, cal: E.id === 'uiracu' ? 30 : 25, tipo: 'mg', ly: 2, dano: Math.max(1, Math.round(ap)) }); }
 /** IA (fora da pilotagem): no lugar do míssil do sistema, usa as armas dos botões — o líder ataca, o ala se defende (AAM) */
 function ia(sim, n, q, E, lider) { if (q.manual) return; if (E.aam > 0 && disparaVt(sim, n, q, 'aam')) return; if (!lider) return;

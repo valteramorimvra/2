@@ -14,7 +14,7 @@ import { alturaMar, emiteOndaNuclear } from './ocean.js';
 import { derrubaAereo, arrancaDoConves, noConvesVisivel } from '../naval5v5/aereo.js';
 import { LASER, lancaArAr } from '../naval5v5/defesa.js';
 import { SAM, MISSEIS, HELIS, TORPEDO } from './classes.js';
-import { voaUnificado } from './vooUnificado.js'; import { pontoRota, pausa as pausaRota, ROTA } from './rotas.js'; /* v1.3.56 */ /* v1.2.70: helicóptero no sistema do bombardeiro */
+import { voaUnificado } from './vooUnificado.js'; import { pontoRota, pausa as pausaRota, ROTA } from './rotas.js'; /* v1.3.56 */ import { orgDe } from './origem.js'; /* v1.3.57 */ /* v1.2.70: helicóptero no sistema do bombardeiro */
 import { danoEstr } from './destruicao.js';
 
 export const NUK = Object.freeze({
@@ -217,7 +217,7 @@ function defendeRtb(sim, q, n, dt) { if (!n || (q._tDef = (q._tDef || 0) - dt) >
 /** v1.3.16: torpedo leve da aeronave (mesmo disparo automático de antes; também usado pelo LANÇAR na pilotagem — comando 'nkTorp'). */
 export const ALC_TORP_NK = 3500; /* alcance do disparo manual = o do TORP dos caças Acauã/Uiraçu */
 function lancaTorpNk(sim, q, n, a) { const tp = sim.torpedos && sim.torpedos.find((x) => !x.ativo); if (!tp) return 0; const b = marcacao(q.x, q.z, a.x, a.z), mun = q.munH | 0;
-  Object.assign(tp, { lancha: 0, ativo: 1, x: q.x, z: q.z, rumo: b, rumoAlvo: b, v: 10, dono: n.id, time: n.time, alvo: a.id, corrida: TORPEDO.arma, modo: 'acustico', t: 0, buscando: 0, danoMul: (q.danoH || 36) / (TORPEDO.dano || 36), alcMax: TORPEDO.arma + 3200, leve: 1 });
+  Object.assign(tp, { org: orgDe(sim, q, 'torpedo'), lancha: 0, ativo: 1, x: q.x, z: q.z, rumo: b, rumoAlvo: b, v: 10, dono: n.id, time: n.time, alvo: a.id, corrida: TORPEDO.arma, modo: 'acustico', t: 0, buscando: 0, danoMul: (q.danoH || 36) / (TORPEDO.dano || 36), alcMax: TORPEDO.arma + 3200, leve: 1 });
   q.munH = mun - 1; q.tMis = 6; n.stats.torpLanc = (n.stats.torpLanc || 0) + 1; sim.evento({ t: 'heliTorpedo', idx: q.idx, x: q.x, y: q.y - 1.4, z: q.z, tp: tp.idx }); return 1; }
 /** v1.2.98: helicóptero com alvo travado aponta o nariz (manche livre) e atira. AEW sem arma fica quieto. */
 function atiraSeTravado(sim, q, n, dt) { if (!q.rotor || (q.fase !== 2 && !(q.fase === 3 && q.rtbIa)) || !n) return; /* v1.3.29: na volta também se defende */
@@ -227,15 +227,15 @@ function atiraSeTravado(sim, q, n, dt) { if (!q.rotor || (q.fase !== 2 && !(q.fa
   const livre = !q.manual || Math.abs(q.jx || 0) < 0.18;
   if (livre && off > 0.08 && dt > 0) { const br = marcacao(q.x, q.z, a.x, a.z); let dr = ang(br - q.rumo); const lim = 0.9 * dt; if (dr > lim) dr = lim; else if (dr < -lim) dr = -lim; q.rumo = ang(q.rumo + dr); const vh = Math.hypot(q.vx || 0, q.vz || 0) || q.v || 0; q.vx = Math.sin(q.rumo) * vh; q.vz = -Math.cos(q.rumo) * vh; off = Math.abs(ang(br - q.rumo)); }
   if (!visNk(sim, q, a)) return; /* v1.3.26: alvo atrás do relevo — não atira */
-  if (q.bazuca && off < 0.55 && d > 80 && d < 2400 && !(q.tBaz > sim.t) && sim.granadas) { let kb = 0; const V = 280, tB = Math.max(0.45, d / V); for (let gi = 288; gi < sim.granadas.length && kb < 2; gi++) { const g = sim.granadas[gi]; if (g.ativo) continue; const sp = kb ? 0.04 : -0.04, ux = Math.sin(q.rumo), uz = -Math.cos(q.rumo), cx = ux * Math.cos(sp) - uz * Math.sin(sp), cz = ux * Math.sin(sp) + uz * Math.cos(sp); Object.assign(g, { ativo: 1, x: q.x + cx * 3, y: q.y - 1.1, z: q.z + cz * 3, vx: cx * V + (q.vx || 0), vz: cz * V + (q.vz || 0), vy: ((a.arfagem + (a.C ? a.C.F : 4) * 0.5) - q.y) / tB, dono: n.id, time: n.time, dano: 16, cal: 84, t: 0, k: 0, fogo: 0.2, ap: 0, foguete: 1, rbu: 0, arcR: 0, fim: null }); kb++; } if (kb) { q.tBaz = sim.t + 5.5; sim.evento({ t: 'heliFoguete', idx: q.idx, x: q.x, y: q.y, z: q.z, n: kb }); } }
+  if (q.bazuca && off < 0.55 && d > 80 && d < 2400 && !(q.tBaz > sim.t) && sim.granadas) { let kb = 0; const V = 280, tB = Math.max(0.45, d / V); for (let gi = 288; gi < sim.granadas.length && kb < 2; gi++) { const g = sim.granadas[gi]; if (g.ativo) continue; const sp = kb ? 0.04 : -0.04, ux = Math.sin(q.rumo), uz = -Math.cos(q.rumo), cx = ux * Math.cos(sp) - uz * Math.sin(sp), cz = ux * Math.sin(sp) + uz * Math.cos(sp); Object.assign(g, { org: orgDe(sim, q, 'foguete'), ativo: 1, x: q.x + cx * 3, y: q.y - 1.1, z: q.z + cz * 3, vx: cx * V + (q.vx || 0), vz: cz * V + (q.vz || 0), vy: ((a.arfagem + (a.C ? a.C.F : 4) * 0.5) - q.y) / tB, dono: n.id, time: n.time, dano: 16, cal: 84, t: 0, k: 0, fogo: 0.2, ap: 0, foguete: 1, rbu: 0, arcR: 0, fim: null }); kb++; } if (kb) { q.tBaz = sim.t + 5.5; sim.evento({ t: 'heliFoguete', idx: q.idx, x: q.x, y: q.y, z: q.z, n: kb }); } }
   if (q.misAlc > 0 && q.misseis > 0 && off < 1.5 && d < q.misAlc && !(q.tMis > 0)) { if (disparaMissilNk(sim, q, n)) return; }
   const arma = q.armaH, mun = q.munH | 0;
   if (arma === 'torpedo' && mun > 0 && off < 1.1 && d < (q.alcH || 1800) * 1.05 && !(q.tMis > 0) && sim.torpedos) { if (!lancaTorpNk(sim, q, n, a)) return; return; }
   if (arma === 'foguete' && mun > 0 && off < 1.05 && d < (q.alcH || 2500) * 1.05 && !(q.tMis > 0) && sim.granadas) { let k = 0; const V = 280, tB = Math.max(0.45, d / V);
     for (let gi = 288; gi < sim.granadas.length && k < 4; gi++) { const g = sim.granadas[gi]; if (g.ativo) continue; const sp = (k - 1.5) * 0.03, ux = Math.sin(q.rumo), uz = -Math.cos(q.rumo), cx = ux * Math.cos(sp) - uz * Math.sin(sp), cz = ux * Math.sin(sp) + uz * Math.cos(sp);
-      Object.assign(g, { ativo: 1, x: q.x + cx * 3, y: q.y - 1.1, z: q.z + cz * 3, vx: cx * V + (q.vx || 0), vz: cz * V + (q.vz || 0), vy: ((a.arfagem + (a.C ? a.C.F : 4) * 0.5) - q.y) / tB, dono: n.id, time: n.time, dano: q.danoH || 12, cal: 70, t: 0, k: 0, fogo: 0.25, ap: 0, foguete: 1, rbu: 0, arcR: 0, fim: null }); k++; }
+      Object.assign(g, { org: orgDe(sim, q, 'foguete'), ativo: 1, x: q.x + cx * 3, y: q.y - 1.1, z: q.z + cz * 3, vx: cx * V + (q.vx || 0), vz: cz * V + (q.vz || 0), vy: ((a.arfagem + (a.C ? a.C.F : 4) * 0.5) - q.y) / tB, dono: n.id, time: n.time, dano: q.danoH || 12, cal: 70, t: 0, k: 0, fogo: 0.25, ap: 0, foguete: 1, rbu: 0, arcR: 0, fim: null }); k++; }
     if (k) { q.munH = Math.max(0, mun - k); q.tMis = 2.2; sim.evento({ t: 'heliFoguete', idx: q.idx, x: q.x, y: q.y, z: q.z, n: k }); } return; }
-  if (arma === 'mg' && mun > 0 && off < 1.2 && d < (q.alcH || 1500) && !(q.tMis > 0)) { const ap = sim.dano ? sim.dano(a, (q.danoH || 2) * 0.45, n, 'heli', true) : 0; q.munH = mun - 1; q.tMis = 0.12;
+  if (arma === 'mg' && mun > 0 && off < 1.2 && d < (q.alcH || 1500) && !(q.tMis > 0)) { sim._org = orgDe(sim, q, 'mg'); const ap = sim.dano ? sim.dano(a, (q.danoH || 2) * 0.45, n, 'heli', true) : 0; sim._org = null; q.munH = mun - 1; q.tMis = 0.12;
     if (ap > 0 && (!q._mgT || sim.t - q._mgT > 0.55)) { q._mgT = sim.t; sim.evento({ t: 'impacto', x: a.x, y: (a.arfagem || 0) + (a.C ? a.C.F : 4) + 2, z: a.z, alvo: a.id, dono: n.id, cal: 13, tipo: 'mg', ly: 2, dano: Math.max(1, Math.round(ap)) }); } return; }
   if ((q.portaMun | 0) > 0 && off < 1.2 && d < 4200 && !(q.tPorta > 0)) disparaPorta(sim, q, n); }
 
@@ -289,14 +289,14 @@ export function comandoNuclear(sim, n, cmd) { const q = nkBombardeiroDe(sim, n);
 /** v1.2.39: a mesma bomba atômica, usada pelo hidroavião (sim/hidroaviao.js). */
 export function soltaBomba(sim, q) { const t = q.tPrep; q.tPrep = 0; solta(sim, q); if (!q.b.ativo) q.tPrep = t; }
 
-function solta(sim, q) { if (q.b.ativo) return; /* uma bomba em queda por vez */ if ((q.tPrep || 0) > 0) return; /* v1.2.29: preparo */ const rest = (q.cargas | 0); if (rest <= 0) return; const b = q.b; b.ativo = 1; b.t = 0; b.chute = 0; b.x = b.px = q.x; b.y = b.py = q.y - 2; b.z = b.pz = q.z; b.vx = q.vx; b.vy = q.vy; b.vz = q.vz; b.dono = q.dono; b.time = q.time;
+function solta(sim, q) { if (q.b.ativo) return; q.b.org = orgDe(sim, q, 'bomba'); /* v1.3.57 */ /* uma bomba em queda por vez */ if ((q.tPrep || 0) > 0) return; /* v1.2.29: preparo */ const rest = (q.cargas | 0); if (rest <= 0) return; const b = q.b; b.ativo = 1; b.t = 0; b.chute = 0; b.x = b.px = q.x; b.y = b.py = q.y - 2; b.z = b.pz = q.z; b.vx = q.vx; b.vy = q.vy; b.vz = q.vz; b.dono = q.dono; b.time = q.time;
   q.cargas = rest - 1; q.nSoltas = (q.nSoltas | 0) + 1; /* v1.2.29: seguintes com preparo maior */ { const seq = NUK.tPrepN || [22, 32, 42]; q.tPrep = q.cargas > 0 ? (seq[Math.min(seq.length - 1, (q.nSoltas | 0) - 1)] || 28) : 0; }
   if (q.cargas <= 0) { q.fase = 3; q.tEsc = 18; q.rumoEsc = ang(q.rumo + Math.PI); q.devolve = 0; } else { q.devolve = 1; }
   sim.evento({ t: 'nkSolta', idx: q.idx, id: q.dono, x: b.x, y: b.y, z: b.z, ax: q.ax, az: q.az, tq: lanco().t, restam: q.cargas, prep: q.tPrep }); if (!(q.lider >= 0)) agendaAlas(sim, q); }
 
 function passoBomba(sim, q, dt) { const b = q.b; b.px = b.x; b.py = b.y; b.pz = b.z; b.t += dt; const k = b.t > NUK.tChute ? NUK.kChute : NUK.kLivre; if (b.t > NUK.tChute && !b.chute) { b.chute = 1; sim.evento({ t: 'nkChute', idx: q.idx, x: b.x, y: b.y, z: b.z }); }
   const v = Math.hypot(b.vx, b.vy, b.vz); b.vx -= k * v * b.vx * dt; b.vz -= k * v * b.vz * dt; b.vy -= (G + k * v * b.vy) * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;
-  if (b.y <= NUK.hRajada || b.y <= alturaMar(b.x, b.z, sim.t) + 1) { b.ativo = 0; detona(sim, b.x, Math.max(b.y, 2), b.z, sim.navios[b.dono], b.time); return; }
+  if (b.y <= NUK.hRajada || b.y <= alturaMar(b.x, b.z, sim.t) + 1) { b.ativo = 0; sim._org = b.org || null; detona(sim, b.x, Math.max(b.y, 2), b.z, sim.navios[b.dono], b.time); sim._org = null; return; }
   // v1.2.27: após paraquedas abrir a bomba NÃO é abatível por CIWS/laser (irrealista); só janela livre-queda pré-chute
   if (b.chute) return;
   let h = 0; for (const n of sim.navios) { if (n.morto || n.time === b.time) continue; const d = Math.hypot(b.x - n.x, b.y - n.C.F, b.z - n.z);
@@ -324,7 +324,7 @@ export function disparaMissilNk(sim, q, n) { if (!q._onda && q.tMis > 0) return 
   const d = Math.hypot(a.x - q.x, a.z - q.z); if (d > q.misAlc) { sim.evento({ t: 'nkMisNeg', idx: q.idx, id: n.id, motivo: 'alcance', d, alc: q.misAlc }); return 0; } if (!visNk(sim, q, a)) { sim.evento({ t: 'nkMisNeg', idx: q.idx, id: n.id, motivo: 'relevo' }); return 0; } /* v1.3.26 */
   let k = 0; for (let i = 0; i < 2 && q.misseis > 0; i++) { const m = sim.misseis.find((x) => !x.ativo); if (!m) break; const lado = i ? 1 : -1, c = Math.cos(q.rumo), s = Math.sin(q.rumo), ox = q.x + c * lado * 4 - s * 2, oz = q.z + s * lado * 4 + c * 2;
     const pf = Object.assign({}, MISSEIS.curto, { nome: q.misNome || 'Míssil ar-superfície', v: 270, vt: 310, alc: q.misAlc, dano: q.misDano }); const v0 = Math.max(150, q.v + 10);
-    Object.assign(m, { ouro: 0, heli: 1, ativo: 1, x: ox, y: q.y - 1.5, z: oz, vx: Math.sin(q.rumo) * v0, vy: (q.vy || 0) - 5, vz: -Math.cos(q.rumo) * v0, dono: n.id, time: n.time, alvo: a.id, isca: -1, fase: 3, t: 0, v: v0, perfil: pf, cel: 0, iscasVistas: 0, tf: 0, d0: d, samAlvo: 0, dano: q.misDano, pkMul: 1, velMul: 1 });
+    Object.assign(m, { org: orgDe(sim, q, 'missil'), ouro: 0, heli: 1, ativo: 1, x: ox, y: q.y - 1.5, z: oz, vx: Math.sin(q.rumo) * v0, vy: (q.vy || 0) - 5, vz: -Math.cos(q.rumo) * v0, dono: n.id, time: n.time, alvo: a.id, isca: -1, fase: 3, t: 0, v: v0, perfil: pf, cel: 0, iscasVistas: 0, tf: 0, d0: d, samAlvo: 0, dano: q.misDano, pkMul: 1, velMul: 1 });
     q.misseis--; k++; n.stats.misLanc = (n.stats.misLanc || 0) + 1; sim.evento({ t: 'hdMissil', idx: q.idx, id: n.id, m: m.idx, x: m.x, y: m.y, z: m.z }); }
   q.tMis = 1.8; return k; } /* v1.2.73: outro míssil sai enquanto o anterior ainda vai ao alvo */
 /** v1.2.73: atirador de porta do helicóptero — 1 míssil por vez, paiol próprio (não gasta os mísseis do hangar). Navio até 4,5 km; senão aeronave à frente até 2,8 km. */
@@ -333,7 +333,7 @@ function disparaPorta(sim, q, n) { if (!q || q.fase !== 2 || !q.rotor || !n || (
   if (!nav || nav.morto || nav.time === q.time || Math.hypot(nav.x - q.x, nav.z - q.z) > 4500 || !visNk(sim, q, nav)) { nav = null; let bd = 4500; for (const e of sim.navios) { if (!e || e.morto || e.time === q.time || !visNk(sim, q, e)) continue; const d = Math.hypot(e.x - q.x, e.z - q.z); if (d < bd) { bd = d; nav = e; } } }
   if (nav) { const m = sim.misseis.find((x) => !x.ativo); if (!m) return 0; const d = Math.hypot(nav.x - q.x, nav.z - q.z), v0 = Math.max(80, (q.v || 0) + 20);
     const pf = Object.assign({}, MISSEIS.curto, { nome: 'Porta', v: 220, vt: 260, alc: 4500, dano: dP });
-    Object.assign(m, { ouro: 0, heli: 1, ativo: 1, x: q.x + Math.cos(q.rumo) * 3, y: q.y - 1.2, z: q.z + Math.sin(q.rumo) * 3, vx: Math.sin(q.rumo) * v0, vy: -2, vz: -Math.cos(q.rumo) * v0, dono: n.id, time: n.time, alvo: nav.id, isca: -1, fase: 3, t: 0, v: v0, perfil: pf, cel: 0, iscasVistas: 0, tf: 0, d0: d, samAlvo: 0, dano: dP, pkMul: 0.85, velMul: 1 });
+    Object.assign(m, { org: orgDe(sim, q, 'porta'), ouro: 0, heli: 1, ativo: 1, x: q.x + Math.cos(q.rumo) * 3, y: q.y - 1.2, z: q.z + Math.sin(q.rumo) * 3, vx: Math.sin(q.rumo) * v0, vy: -2, vz: -Math.cos(q.rumo) * v0, dono: n.id, time: n.time, alvo: nav.id, isca: -1, fase: 3, t: 0, v: v0, perfil: pf, cel: 0, iscasVistas: 0, tf: 0, d0: d, samAlvo: 0, dano: dP, pkMul: 0.85, velMul: 1 });
     q.portaMun--; q.tPorta = cd; n.stats.misLanc = (n.stats.misLanc || 0) + 1; sim.evento({ t: 'portaTiro', idx: q.idx, id: n.id, x: q.x, y: q.y, z: q.z, rumo: q.rumo }); return 1; }
   let best = null, tp = '', bs = 2800; const cone = (x, z) => Math.abs(ang(marcacao(q.x, q.z, x, z) - q.rumo)) < 1.4;
   for (const h of sim.helis) { if (!h.ativo || h.time === q.time) continue; const d = Math.hypot(h.x - q.x, h.z - q.z); if (d < bs && cone(h.x, h.z)) { bs = d; best = h; tp = 'h'; } }

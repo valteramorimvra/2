@@ -6,6 +6,7 @@
 //  dano  = HP aplicado    afund = navios inimigos que ESSA arma levou a 0 de HP
 import { HELIS } from '../sim/classes.js';
 import { resistMissil } from './resistAereo.js'; /* v1.2.30 item 15b */
+import { orgDe } from '../sim/origem.js'; /* v1.3.57 */
 
 const vazio = () => ({ lanc: 0, ac: 0, int: 0, dano: 0, afund: 0 });
 export function regTipo(n, modelo) { const S = n.stats; const A = S.aereo || (S.aereo = {}); return A[modelo] || (A[modelo] = vazio()); }
@@ -16,7 +17,8 @@ export function regAereoDispara(sim, h, n, a, f) {
   const arma = h.H.arma; let m0 = null, t0 = null, g0 = null;
   if (arma === 'missil') m0 = sim.misseis.find((q) => !q.ativo); else if (arma === 'torpedo') t0 = sim.torpedos.find((q) => !q.ativo);
   else if (arma === 'foguete') { g0 = []; for (let gi = 288; gi < sim.granadas.length && g0.length < 4; gi++) if (!sim.granadas[gi].ativo) g0.push(sim.granadas[gi]); }
-  sim._hAr = h; let r; try { r = f(sim, h, n, a); } finally { sim._hAr = null; }
+  const org = orgDe(sim, h, arma); sim._hAr = h; const o0 = sim._org; sim._org = org; let r; try { r = f(sim, h, n, a); } finally { sim._hAr = null; sim._org = o0; } /* v1.3.57: origem do dano (pilotada × IA) */
+  if (r > 0) { if (m0 && m0.ativo) m0.org = org; if (t0 && t0.ativo) t0.org = org; if (g0) for (const g of g0) if (g.ativo) g.org = org; }
   if (r > 0 && arma !== 'mg') { const t = regTipo(n, h.modelo);
     if (m0) { m0.hm = h.modelo; resistMissil(m0); t.lanc++; } else if (t0) { t0.hm = h.modelo; t.lanc++; } else if (g0) { for (let i = 0; i < r && i < g0.length; i++) g0[i].hm = h.modelo; t.lanc += r; } }
   return r;

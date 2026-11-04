@@ -546,3 +546,21 @@ Valter relatou que, no celular, o ponto verde do MM e do MMD não dirigia a aero
   - manche → PAUSADA; IA → ROTA; no fim o ataque ficou LIGADO.
 - MMD: o rumo foi de −38° a 4° em direção ao giro de 16°.
 - Ponto no nariz encaixou; ao travar, a aeronave desceu de 691 m para 625 m com rumo no alvo; TRAVAR de novo destravou.
+
+## 1.3.57 — dano por origem e ponto verde afastado
+
+- Novo `sim/origem.js`. Cada projétil de aeronave sai marcado com `org = { pil, nome, arma, tick }`. Marcações:
+  - mísseis, torpedos e foguetes dos helicópteros do navio (via `regAereoDispara`, que também cobre a metralhadora);
+  - Urubu-rei e caças: míssil, porta, torpedo, bazuca, metralhadora e bomba;
+  - hidroavião;
+  - Acauã/Uiraçu.
+- `pil` vale 1 quando a aeronave era a sua no manual. Projéteis reaproveitados do pool perdem a marca (`orgValida`).
+- `world.dano` soma em `dono.stats.fontes[navio|pil|bot]`, por arma e por modelo, só o dano em inimigo.
+- O resultado mostra o bloco "Dano por origem"; o histórico guarda `fontes` e o dano por arma e mostra o mesmo quadro.
+- Teste: partida com Raio no manual e dano acelerado em 60 s de simulação.
+  - Pilotada: Raio, 264 de mísseis.
+  - IA: Beija-flor 1716 + Raio (alas) 1726.
+  - Total 3706, igual ao dano causado. A tela de resultado mostrou o quadro.
+- O ponto verde fica 6 km à frente do nariz, com distância mínima de 22% da altura da tela até a aeronave. Com a aeronave na metade de cima, o ponto vai para baixo dela.
+- ESPERA com alvo travado passa para a IA, que faz o ataque.
+- A mini-nuclear dos caças Acauã/Uiraçu ainda conta como dano do navio.

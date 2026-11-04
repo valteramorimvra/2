@@ -9,6 +9,7 @@ import { alturaTerreno } from './maps.js';
 import { colideAereoTerreno } from './colisaoTerreno.js';
 import { MISSEIS, TORPEDO } from './classes.js';
 import { NUK, impactoNuclear, soltaBomba, nuclearLiberado } from './nuclear.js';
+import { orgDe } from './origem.js'; /* v1.3.57 */
 
 /** Fichas (dados públicos dos aviões reais; armas e vida do jogo). v: m/s. */
 export const HIDROS = {
@@ -79,7 +80,7 @@ function disparaMisseis(sim, q, n) { if (q.fase !== 2 || q.misseis <= 0 || q.tMi
   const a = alvoDe(sim, q); if (!a) { sim.evento({ t: 'hdNegado', id: n.id, motivo: 'semAlvo' }); return 0; } const d = Math.hypot(a.x - q.x, a.z - q.z); if (d > HD.missilAlc) { sim.evento({ t: 'hdNegado', id: n.id, motivo: 'alcance' }); return 0; }
   let k = 0; for (let i = 0; i < 2 && q.misseis > 0; i++) { const m = sim.misseis.find((x) => !x.ativo); if (!m) break; const lado = i ? 1 : -1, c = Math.cos(q.rumo), s = Math.sin(q.rumo), ox = q.x + c * lado * 5 - s * 2, oz = q.z + s * lado * 5 + c * 2;
     const pf = Object.assign({}, MISSEIS.curto, { nome: 'AN-A Gavião', v: 270, vt: 310, alc: HD.missilAlc, dano: HD.missilDano }); const v0 = Math.max(130, q.v + 10);
-    Object.assign(m, { ouro: 0, heli: 1, ativo: 1, x: ox, y: q.y - 1.5, z: oz, vx: Math.sin(q.rumo) * v0, vy: (q.vy || 0) - 5, vz: -Math.cos(q.rumo) * v0, dono: n.id, time: n.time, alvo: a.id, isca: -1, fase: 3, t: 0, v: v0, perfil: pf, cel: 0, iscasVistas: 0, tf: 0, d0: d, samAlvo: 0, dano: HD.missilDano, pkMul: 1, velMul: 1 });
+    Object.assign(m, { org: orgDe(sim, q, 'missil'), ouro: 0, heli: 1, ativo: 1, x: ox, y: q.y - 1.5, z: oz, vx: Math.sin(q.rumo) * v0, vy: (q.vy || 0) - 5, vz: -Math.cos(q.rumo) * v0, dono: n.id, time: n.time, alvo: a.id, isca: -1, fase: 3, t: 0, v: v0, perfil: pf, cel: 0, iscasVistas: 0, tf: 0, d0: d, samAlvo: 0, dano: HD.missilDano, pkMul: 1, velMul: 1 });
     q.misseis--; k++; n.stats.misLanc = (n.stats.misLanc || 0) + 1; sim.evento({ t: 'hdMissil', idx: q.idx, id: n.id, m: m.idx, x: m.x, y: m.y, z: m.z }); }
   q.tMis = HD.missilCad; return k; }
 function lancaTorpedo(sim, q, n) { if (q.fase !== 2 || q.torps <= 0 || q.tTorp > 0) { sim.evento({ t: 'hdNegado', id: n.id, motivo: q.torps <= 0 ? 'semTorp' : 'torpRec' }); return 0; }
@@ -88,7 +89,7 @@ function lancaTorpedo(sim, q, n) { if (q.fase !== 2 || q.torps <= 0 || q.tTorp >
   const deriva = Math.min(q.v, 80) * HD.torpQueda * 0.45; q.pend.push({ t: sim.t + HD.torpQueda, x: q.x + Math.sin(q.rumo) * deriva, z: q.z - Math.cos(q.rumo) * deriva, alvo: a.id });
   q.torps--; q.tTorp = HD.torpCad; n.stats.torpLanc = (n.stats.torpLanc || 0) + 1; sim.evento({ t: 'hdTorpedo', idx: q.idx, id: n.id, x: q.x, y: q.y - 2, z: q.z, vx: q.vx * 0.3, vz: q.vz * 0.3, tq: HD.torpQueda }); return 1; }
 function entraTorpedo(sim, q, p) { const n = sim.navios[q.dono]; const tp = sim.torpedos.find((x) => !x.ativo); if (!tp || !n) return; const a = sim.navios[p.alvo]; const b = a && !a.morto ? marcacao(p.x, p.z, a.x, a.z) : q.rumo;
-  Object.assign(tp, { lancha: 0, ativo: 1, x: p.x, z: p.z, rumo: b, rumoAlvo: b, v: 10, dono: n.id, time: n.time, alvo: a ? a.id : -1, corrida: TORPEDO.arma, modo: 'acustico', t: 0, buscando: 0, danoMul: 1.1, alcMax: TORPEDO.arma + 3200, leve: 1 });
+  Object.assign(tp, { org: orgDe(sim, q, 'torpedo'), lancha: 0, ativo: 1, x: p.x, z: p.z, rumo: b, rumoAlvo: b, v: 10, dono: n.id, time: n.time, alvo: a ? a.id : -1, corrida: TORPEDO.arma, modo: 'acustico', t: 0, buscando: 0, danoMul: 1.1, alcMax: TORPEDO.arma + 3200, leve: 1 });
   sim.evento({ t: 'hdTorpAgua', idx: q.idx, x: p.x, z: p.z, tp: tp.idx }); }
 function soltaFlare(sim, q) { if (q.flares <= 0 || q.tFlare > 0) return 0; q.flares--; q.tFlare = HD.flareDur; q.tFlareCad = HD.flareCad; sim.evento({ t: 'hdFlare', idx: q.idx, id: q.dono, x: q.x, y: q.y, z: q.z }); return 1; }
 
