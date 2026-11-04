@@ -330,3 +330,9 @@ Testes: `acerto125` PASSOU, `canhao1212` 0 falhas, `disp1215`, `vtol138`, `destr
 | Tela rola 100% junto com o avião no MANUAL, sem atraso (o avião não parece girar no próprio eixo). | `nkCam` | VERIFICADO (rolagem da tela = rotação do modelo em todas as amostras) |
 | Caça mais ágil no MANUAL: manche 5/s, rolagem até 1,8 rad/s (~100°/s), curva instantânea até 0,47 rad/s (~27°/s), arfagem 1,5×; ganho do comando pela câmera 3,5. Urubu-rei e IA sem mudança. | `voaManual`, `nkPasso` | VERIFICADO (curva medida 26,8°/s) |
 | Alvo localizado no MANUAL → câmera-comando aponta para o alvo e o avião vai na direção exata (desce até ele, piso 150 m). Arraste ou manche devolvem o comando. | `nkCam` | VERIFICADO (desvio de 90° → erro de rumo 31° → 0,5° em ~4 s de jogo) |
+
+## 1.3.36
+
+| Item | Onde | Estado |
+|---|---|---|
+| Câmera do MANUAL presa ao avião desenhado (quaternion do modelo, mesmo quadro, sem atraso): atrás e acima no referencial do avião; arraste continua sendo o comando de direção. `cam.up` volta ao normal fora do avião. Distância 0,82× o tamanho do modelo (≈ +18%). Escada usa a inclinação/elevação reais da câmera. | `nkCam`, `atualizaCamera`, `nkMwPasso` | VERIFICADO (avião no mesmo ponto da tela — NDC 0,00/−0,66 — em voo reto, curva e mergulho) |
