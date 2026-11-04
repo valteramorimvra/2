@@ -479,3 +479,10 @@ Valter relatou que, no celular, o ponto verde do MM e do MMD não dirigia a aero
 - Testes com toque real (CDP `Input.dispatchTouchEvent`, celular emulado):
   - Raio em MM: o dedo começou longe do ponto e o arrastou até o navio; a trava aconteceu e o erro de rumo caiu de 18° para 1°.
   - Também testados: Raio em MMD, helicóptero do destróier em MM e MMD, Kordão em MM e Tufão em MMD.
+- Correções adicionais encontradas nos testes:
+  - A IA do navio refazia a trava enquanto você pilotava (`ai.js` 'travar' e `world.travaAuto`), puxando o ponto verde de volta. Com `controle >= 0`, a trava agora é só a do ponto verde.
+  - No MMD, a direção do ponto vinha de `unproject` com a matriz da câmera de outro quadro; o ponto fugia para a borda e a aeronave não ia aonde ele apontava. Agora o ponto guarda um RUMO (`pv.hd`), calculado pelo yaw da câmera, e a aeronave vira até ele.
+- Testes com toque real, todos passaram:
+  - Raio em MMD: travou, a aeronave foi ao alvo (erro de 24° para 1°), soltou e virou para o novo rumo.
+  - Raio em MM: travou (erro de 18° para 2°) e soltou.
+  - Helicóptero do destróier em MM e em MMD: travou, soltou e, no MMD, dirigiu a aeronave.
