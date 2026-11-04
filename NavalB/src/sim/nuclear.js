@@ -49,7 +49,7 @@ export const NUK = Object.freeze({
   ciwsQueda: 0.0015, laserQueda: 0.004, // só ANTES do paraquedas; após chute = 0
   iaIntervalo: 2, iaMinSc: 1.6,
   // v1.2.26 item K: PILOTAGEM MANUAL — v1.2.29: menos tremor (taxas menores)
-  manBank: 1, manTaxaRol: 0.9, manPitch: 0.5, manTaxaPitch: 0.6, manFatorCurva: 6, manCurvaMax: 0.36, /* v1.2.32: manche mais responsivo */ lancaTol: 500 /* v1.3.29 */, manAltMin: 150 /* v1.3.42 (vídeos 04/11): altura mínima do voo MANUAL = 150 m (piso firme) */, manAssist: 40, manAltMax: 3500, manTempo: 320, assume: 4,
+  manBank: 1, manTaxaRol: 0.9, manPitch: 0.5, manTaxaPitch: 0.6, manFatorCurva: 6, manCurvaMax: 0.36, /* v1.2.32: manche mais responsivo */ lancaTol: 500 /* v1.3.29 */, manAltMin: 120 /* v1.3.58 (Valter): altura mínima do manual = 120 m */ /* v1.3.42 (vídeos 04/11): altura mínima do voo MANUAL = 150 m (piso firme) */, manAssist: 40, manAltMax: 3500, manTempo: 320, assume: 4,
   // v1.2.28/29: acelerador + mira solo + preparo bombas (1ª = 10 s; seguintes mais longas)
   thrNiveis: [165, 195, 225, 255, 285], thrMin: 165, thrMax: 285, bombasSurtida: 10, vidaBomb: 1500 /* v1.2.69 (Valter): vida e resistência maiores */, tRecargaPouso: 25, relancaAbatido: 25, /* v1.2.29 Valter 15:07: era 3 / 18 s; relançamento 25 s após abatido */
   tPrep1: 10, tPrepN: [10, 10, 10], // s: 1ª bomba pronta em 10 s após decolar; v1.2.33: seguintes 10 s após a ÚLTIMA bomba da salva (ver FILA.rearme)

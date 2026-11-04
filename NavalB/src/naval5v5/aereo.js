@@ -203,7 +203,7 @@ function voa(h, rumoAlvo, vAlvo, altAlvo, dt, sim) { const H = h.H, P = PARAM.he
 /** v1.3.50 (Valter): aeronave PILOTADA com a mesma suavidade e velocidade da IA — manche, ponto verde (MM) ou câmera (MMD) só dão a direção; o voo é o mesmo voa() da IA (curva, rolagem, subida e velocidade de ataque). */
 function voaJog(h, dt, sim) { h.sx = (h.sx || 0) + ((h.jx || 0) - (h.sx || 0)) * Math.min(1, 4 * dt); h.sy = (h.sy || 0) + ((h.jy || 0) - (h.sy || 0)) * Math.min(1, 4 * dt); const av = !!h.H.aviao;
   let rA, altA; if (h.ctlRu != null) { rA = h.ctlRu; altA = h.ctlAl != null ? h.ctlAl : (av ? 320 : 170); } else { rA = ang(h.rumo + clamp(h.sx, -1, 1)); altA = h.y + clamp(h.sy, -1, 1) * (av ? 400 : 60); }
-  voa(h, rA, h.H.vmax * 0.85, clamp(altA, av ? 60 : 20, av ? 3000 : 1200), dt, sim); h.bank = h.roll || 0; h.gam = h.pitch || 0; }
+  voa(h, rA, h.H.vmax * 0.85, clamp(altA, av ? 120 : 20, av ? 3000 : 1200), dt, sim); /* v1.3.58: mínimo 120 m (avião) */ h.bank = h.roll || 0; h.gam = h.pitch || 0; }
 /** v1.2.15 (W) VOO DE AVIÃO (caça VTOL em combate): sem derrapagem — a velocidade fica SEMPRE no eixo do nariz; a curva é
  * COORDENADA: primeiro rola (taxa limitada ~95°/s), e a taxa de curva vem da inclinação (ω = g·tanφ/v, φ ≤ 60° ≈ 2 g);
  * aceleração/frenagem limitadas, subida/descida com ângulo de trajetória limitado e arfagem = ângulo da trajetória. */

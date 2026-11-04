@@ -564,3 +564,15 @@ Valter relatou que, no celular, o ponto verde do MM e do MMD não dirigia a aero
 - O ponto verde fica 6 km à frente do nariz, com distância mínima de 22% da altura da tela até a aeronave. Com a aeronave na metade de cima, o ponto vai para baixo dela.
 - ESPERA com alvo travado passa para a IA, que faz o ataque.
 - A mini-nuclear dos caças Acauã/Uiraçu ainda conta como dano do navio.
+
+## 1.3.58 — MMD sobe/desce, ponto verde estilo MW sem linha, mínimo 120 m
+
+- MMD: sem trava, a altitude pedida é `y + clamp(−(pitch−0,15)·1,6) · 1400 m` (helicóptero do navio: 300 m).
+  - Teste: olhando para cima, subiu de 746 m para 1248 m seguindo o giro da tela.
+- Ponto verde (`mwBusca`/`mwPonto`):
+  - A base fica abaixo do centro da tela e afastada da aeronave; se ela está no alto, a base vai para baixo.
+  - Escolhe o navio inimigo mais perto da base na tela (raio de 0,28, com histerese); girar a tela troca o alvo, com bipe.
+  - A linha da aeronave até o ponto saiu.
+- Trava: o rumo vai ao alvo e a altitude desce para 140 m (helicóptero: 120 m). A aeronave volta ao alvo até destravar.
+  - Teste: com a tela no navio o ponto encaixou; TRAVAR deu alvo 1 e altitude pedida de 140 m, com a aeronave virando para o alvo; destravando, ficou livre.
+- `NUK.manAltMin` passou para 120 m; avião do navio no manual com mínimo de 120 m.
