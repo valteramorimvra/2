@@ -1,0 +1,26 @@
+✔ motor a 1/3 e 2/3 (loop)                   → motor_diesel_loop.ogg
+✔ motor em toda força (crossfade)            → turbina_loop.ogg
+✔ canhão leve / 30–76 mm / granadas          → canhao_rapido.ogg
+✔ canhão médio 100–130 mm                    → canhao_medio.ogg
+✔ canhão grande 152 mm+                      → canhao_grande.ogg
+✔ canhão distante                            → canhao_longe.ogg
+✔ lançamento VLS                             → vls_lancamento.ogg
+✔ CIWS                                       → ciws.ogg
+✔ alarme de trava                            → alarme_trava.ogg
+✔ flares/iscas                               → flares.ogg
+✔ torpedo correndo                           → torpedo_corrida.ogg
+✔ bolhas/esteira do torpedo (loop)           → bolhas_loop.ogg
+✔ respingo de granada                        → respingo.ogg
+✔ respingo grande / geiser                   → respingo_grande.ogg
+✔ impacto no metal                           → impacto_metal.ogg
+✔ explosão perto                             → explosao_perto.ogg
+✔ explosão média                             → explosao_media.ogg
+✔ explosão grande / afundamento              → explosao_grande.ogg
+✔ explosão longe / camada grave do disparo   → explosao_longe.ogg
+✔ incêndio (loop)                            → incendio_loop.ogg
+✔ alagamento (loop)                          → alagamento_loop.ogg
+✔ rádio                                      → radio_estatica.ogg
+✔ música do menu                             → musica_menu.ogg
+✔ música da batalha                          → musica_batalha.ogg
+
+24/24 gatilhos com arquivo e referência

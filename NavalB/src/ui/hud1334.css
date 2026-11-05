@@ -1,0 +1,93 @@
+/* v1.3.34 (Valter, ref. vídeos) — marcação de voo do avião no MANUAL:
+   escada de inclinação (acompanha o horizonte), ALT à esquerda e VEL à direita com régua, mira no centro com a munição,
+   moldura verde-água com losango no alvo travado e a distância, e o estado da arma (PRONTO / CARREGANDO / FORA DO ALCANCE). */
+.hud .nk-mw { position: absolute; inset: 0; pointer-events: none; --mw: rgba(94, 234, 212, .78); --mw2: rgba(94, 234, 212, .42); color: var(--mw); font: 600 11px/1.1 system-ui, sans-serif; text-shadow: 0 0 3px rgba(0, 0, 0, .65); }
+.hud .nk-mw[hidden] { display: none; }
+.hud .mw-esc { position: absolute; left: 50%; top: 50%; width: 0; height: 0; will-change: transform; }
+.hud .mw-esc i { position: absolute; left: 0; top: 0; width: 0; height: 0; display: none; will-change: transform; }
+.hud .mw-esc i s { position: absolute; top: 0; width: 58px; height: 0; border-top: 1px solid var(--mw2); }
+.hud .mw-esc i s:first-of-type { right: 44px; } .hud .mw-esc i s:last-of-type { left: 44px; }
+.hud .mw-esc i s:first-of-type::after, .hud .mw-esc i s:last-of-type::after { content: ''; position: absolute; top: -1px; width: 0; height: 5px; border-left: 1px solid var(--mw2); }
+.hud .mw-esc i s:first-of-type::after { right: 0; } .hud .mw-esc i s:last-of-type::after { left: 0; }
+.hud .mw-esc i[data-g^="-"] s::after { top: -5px; }
+.hud .mw-esc i em { position: absolute; top: -6px; font: 600 9px/12px system-ui, sans-serif; font-style: normal; color: var(--mw2); }
+.hud .mw-esc i em:first-of-type { right: 106px; } .hud .mw-esc i em:last-of-type { left: 106px; }
+.hud .mw-esc i[data-g^="-"] s { border-top-style: dashed; }
+.hud .mw-esc i[data-g="0"] s { width: 96px; border-top-color: var(--mw); }
+.hud .mw-esc i[data-g="0"] s:first-of-type { right: 30px; } .hud .mw-esc i[data-g="0"] s:last-of-type { left: 30px; } .hud .mw-esc i[data-g="0"] s::after { display: none; }
+.hud .mw-alt, .hud .mw-vel { position: absolute; top: calc(50% - 20px); display: flex; flex-direction: column; gap: 1px; }
+.hud .mw-alt { right: calc(50% + 150px); align-items: flex-end; }
+.hud .mw-vel { left: calc(50% + 150px); align-items: flex-start; }
+.hud .mw-alt small, .hud .mw-vel small { font-size: 8px; letter-spacing: .08em; opacity: .75; }
+.hud .mw-alt b, .hud .mw-vel b { font-size: 13px; font-variant-numeric: tabular-nums; }
+.hud .mw-alt em, .hud .mw-vel em { display: block; width: 30px; height: 26px; margin-top: 2px; background: repeating-linear-gradient(to bottom, var(--mw2) 0 1px, transparent 1px 6px); }
+.hud .mw-alt em { -webkit-mask: linear-gradient(to left, #000 40%, transparent); mask: linear-gradient(to left, #000 40%, transparent); }
+.hud .mw-vel em { -webkit-mask: linear-gradient(to right, #000 40%, transparent); mask: linear-gradient(to right, #000 40%, transparent); }
+.hud .mw-mira { position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; margin: -15px; border: 1.4px solid rgba(241, 245, 249, .82); border-radius: 50%; filter: drop-shadow(0 0 2px rgba(0, 0, 0, .7)); }
+.hud .mw-mira i, .hud .mw-mira::before, .hud .mw-mira::after { content: ''; position: absolute; background: rgba(241, 245, 249, .9); }
+.hud .mw-mira::before { left: 50%; top: -6px; bottom: -6px; width: 1.4px; margin-left: -.7px; -webkit-mask: linear-gradient(#000 0 9px, transparent 9px calc(100% - 9px), #000 calc(100% - 9px)); mask: linear-gradient(#000 0 9px, transparent 9px calc(100% - 9px), #000 calc(100% - 9px)); }
+.hud .mw-mira::after { top: 50%; left: -6px; right: -6px; height: 1.4px; margin-top: -.7px; -webkit-mask: linear-gradient(90deg, #000 0 9px, transparent 9px calc(100% - 9px), #000 calc(100% - 9px)); mask: linear-gradient(90deg, #000 0 9px, transparent 9px calc(100% - 9px), #000 calc(100% - 9px)); }
+.hud .mw-mira i { left: 50%; top: 50%; width: 3px; height: 3px; margin: -1.5px; border-radius: 50%; }
+.hud .mw-mira b { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); white-space: nowrap; color: #f1f5f9; font-size: 11px; }
+.hud .mw-est { position: absolute; right: calc(50% + 80px); top: calc(50% + 34px); text-align: center; font-size: 11px; letter-spacing: .03em; white-space: pre-line; color: #4ade80; }
+.hud .mw-est.fora { color: #fbbf24; } .hud .mw-est.carga { color: #e2e8f0; }
+/* alvo travado: moldura de cantos verde-água + losango, distância embaixo (como nos vídeos) */
+.hud .nk-alvo { width: 44px; height: 44px; margin: -22px; border: 0; background:
+  linear-gradient(var(--mwc, #2dd4bf), var(--mwc, #2dd4bf)) 0 0 / 10px 1.6px no-repeat, linear-gradient(var(--mwc, #2dd4bf), var(--mwc, #2dd4bf)) 0 0 / 1.6px 10px no-repeat,
+  linear-gradient(var(--mwc, #2dd4bf), var(--mwc, #2dd4bf)) 100% 0 / 10px 1.6px no-repeat, linear-gradient(var(--mwc, #2dd4bf), var(--mwc, #2dd4bf)) 100% 0 / 1.6px 10px no-repeat,
+  linear-gradient(var(--mwc, #2dd4bf), var(--mwc, #2dd4bf)) 0 100% / 10px 1.6px no-repeat, linear-gradient(var(--mwc, #2dd4bf), var(--mwc, #2dd4bf)) 0 100% / 1.6px 10px no-repeat,
+  linear-gradient(var(--mwc, #2dd4bf), var(--mwc, #2dd4bf)) 100% 100% / 10px 1.6px no-repeat, linear-gradient(var(--mwc, #2dd4bf), var(--mwc, #2dd4bf)) 100% 100% / 1.6px 10px no-repeat;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, .7)); }
+.hud .nk-alvo::after { display: none; }
+.hud .nk-alvo u { position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px; border: 1.5px solid #fde68a; transform: rotate(45deg); }
+.hud .nk-alvo.ok u { border-color: #4ade80; }
+.hud .nk-alvo b { position: absolute; top: 48px; left: 50%; transform: translateX(-50%); color: #4ade80; font: 600 11px/1 system-ui, sans-serif; white-space: nowrap; text-shadow: 0 0 3px rgba(0, 0, 0, .7); }
+.hud.nk-mwon .nk-fpv { display: none; } /* a mira do centro substitui o marcador de trajetória no MANUAL */
+
+/* v1.3.43 (Valter, vídeos 04/11 medidos): RETÍCULO ⌖ na direção do voo (posição calculada; ~60%/62% da tela), MARCADOR DO ALVO = círculo tracejado com o
+   pequeno PONTO VERDE opaco no centro (sai do retículo e vai até o navio), estado da arma preso ao marcador, escada/ALT/VEL em volta do marcador quando PRONTO. */
+.hud .mw-mira { left: 0 !important; top: 0 !important; width: 26px; height: 26px; margin: -13px; border-color: rgba(241, 245, 249, .85); will-change: transform; }
+.hud .mw-mira::before, .hud .mw-mira::after, .hud .mw-mira i { background: rgba(241, 245, 249, .92); }
+.hud .mw-mira b { top: 34px; left: -6px; transform: translateX(-100%); font-size: 10px; }
+.hud .nk-mira-ia { position: absolute; left: 0; top: 0; width: 16px; height: 16px; margin: -8px; border: 1.3px dashed rgba(226, 232, 240, .8); border-radius: 50%; pointer-events: none; will-change: transform; filter: drop-shadow(0 0 2px rgba(0, 0, 0, .7)); }
+.hud .nk-mira-ia::after { content: ''; position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px; border-radius: 50%; background: rgba(74, 222, 128, .78); }
+.hud .nk-mira-ia[hidden] { display: none; }
+.hud .nk-mira-ia.ok { border-color: rgba(74, 222, 128, .9); } .hud .nk-mira-ia.ok::after { background: rgba(74, 222, 128, .95); }
+.hud .mw-est { left: 0 !important; top: 0 !important; right: auto !important; text-align: center; will-change: transform; color: #4ade80; }
+.hud .mw-est.mira { color: #facc15; } .hud .mw-est.carga { color: #facc15; } .hud .mw-est.fora { color: #fbbf24; }
+.hud .mw-alt, .hud .mw-vel { left: 0 !important; top: 0 !important; right: auto !important; align-items: center !important; will-change: transform; }
+.hud .mw-alt em, .hud .mw-vel em { display: none; }
+/* v1.3.43 (imagem marcada pelo Valter): o PONTO VERDE é um pontinho sólido e opaco, sem anel */
+.hud .nk-mira-ia { width: 6px; height: 6px; margin: -3px; border: 0; background: rgba(74, 222, 128, .9); box-shadow: 0 0 2px rgba(0, 0, 0, .6); }
+.hud .nk-mira-ia::after { display: none; }
+.hud .nk-mira-ia.ok { background: #4ade80; }
+
+/* v1.3.45 (vídeo 120403): com alvo marcado, o ponto de BUSCA no centro da tela vira uma CRUZ (círculo com 4 traços) — leve-a para perto de outro navio para trocar o alvo */
+.hud .nk-busca { position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px; border: 1.4px solid rgba(241, 245, 249, .8); border-radius: 50%; pointer-events: none; filter: drop-shadow(0 0 2px rgba(0, 0, 0, .7)); }
+.hud .nk-busca[hidden] { display: none; }
+.hud .nk-busca::before, .hud .nk-busca::after, .hud .nk-busca i::before, .hud .nk-busca i::after { content: ''; position: absolute; background: rgba(241, 245, 249, .85); }
+.hud .nk-busca::before { left: 50%; top: -9px; width: 1.4px; height: 7px; margin-left: -.7px; } .hud .nk-busca::after { left: 50%; bottom: -9px; width: 1.4px; height: 7px; margin-left: -.7px; }
+.hud .nk-busca i::before { top: 50%; left: -9px; height: 1.4px; width: 7px; margin-top: -.7px; } .hud .nk-busca i::after { top: 50%; right: -9px; height: 1.4px; width: 7px; margin-top: -.7px; }
+
+/* v1.3.45: botão do modo manual MM / MMD (fica livre, à esquerda do EJETAR) */
+.hud .hl-bts .cb.nk-modo { right: 245px; bottom: 168px; } .hud .nk-bts .cb.nk-modo i { color: #86efac; }
+.hud .hl-bts .cb.nk-ej { right: 176px; bottom: 156px; } /* v1.3.45: EJETAR não cobre mais o BASE (sobreposição antiga) */
+/* v1.3.50 (Valter): em todos os modos a velocidade é a da IA — o acelerador deixou de existir, então o botão sai da tela */
+.hud .nk-acel, .hud .hl-acel { display: none !important; }
+/* v1.3.54 (Valter, vídeos MW): linha verde fina e quase transparente da aeronave ao ponto; cruz CINZA transparente quando o ponto encaixa num navio; TRAVAR com a cruz verde quando travado */
+.hud .mw-linha { position: absolute; left: 0; top: 0; height: 1px; background: rgba(74, 222, 128, .32); transform-origin: 0 50%; pointer-events: none; will-change: transform, width; }
+.hud .mw-linha[hidden] { display: none; }
+.hud .nk-busca { border-color: transparent; width: 34px; height: 34px; margin: -17px; filter: none; }
+.hud .nk-busca::before, .hud .nk-busca::after, .hud .nk-busca i::before, .hud .nk-busca i::after { background: rgba(203, 213, 225, .55); }
+.hud .nk-busca::before { top: -2px; height: 13px; } .hud .nk-busca::after { bottom: -2px; height: 13px; }
+.hud .nk-busca i::before { left: -2px; width: 13px; } .hud .nk-busca i::after { right: -2px; width: 13px; }
+.hud .nk-bts .cb.nk-trv i { color: #cbd5e1; }
+.hud .nk-bts .cb.nk-trv.mw-enc i { color: #e2e8f0; }
+.hud .nk-bts .cb.nk-trv.nk-on i { color: #4ade80; filter: drop-shadow(0 0 4px rgba(74, 222, 128, .8)); }
+.hud .nk-bts .cb.nk-trv.nk-on { box-shadow: 0 0 0 2px #4ade80 inset, 0 0 10px rgba(74, 222, 128, .45); }
+/* v1.3.56: botão MM/MMD logo acima do TRAVAR */
+.hud .hl-bts .cb.nk-mmd { right: 245px; bottom: 236px; } .hud .nk-bts .cb.nk-mmd i { color: #86efac; }
+/* v1.3.59 (Valter): aviso de AMEAÇA vindo na direção da sua aeronave */
+.hud .nk-ameaca { position: absolute; left: 50%; top: 58px; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 5px 12px 5px 8px; border-radius: 6px; background: rgba(127, 29, 29, .82); border: 1px solid #ef4444; color: #fee2e2; font: 800 11px/1 system-ui, sans-serif; letter-spacing: .06em; pointer-events: none; z-index: 30; box-shadow: 0 0 14px rgba(239, 68, 68, .55); animation: nkAm .6s ease-in-out infinite alternate; }
+.hud .nk-ameaca[hidden] { display: none; } .hud .nk-ameaca i { font-style: normal; font-size: 14px; color: #fca5a5; display: inline-block; } .hud .nk-ameaca span { font-weight: 600; font-size: 10px; color: #fecaca; }
+@keyframes nkAm { from { opacity: .75; } to { opacity: 1; } }

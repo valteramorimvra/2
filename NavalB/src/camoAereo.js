@@ -1,0 +1,28 @@
+// v1.2.17 item 1 (13i): camuflagens das AERONAVES. v1.2.69: padrões reais. v1.2.97: padrão metálico do Brasil e bandeiras (pais = letreiro no casco).
+export const CAMO_AEREO = {
+  padrao: { nome: 'Brasil metálico', pais: 'BRASIL', p: 'ondas', c: '#0c6b32', c3: '#e6c200', c2: '#123a78', cv: '#d7e6c8' },
+  eua: { nome: 'Estados Unidos', pais: 'EUA', p: 'fragmentos', c: '#1d3f8b', c3: '#f4f7fb', c2: '#b42318', cv: '#e7eef8' },
+  reinounido: { nome: 'Reino Unido', pais: 'REINO UNIDO', p: 'ondas', c: '#0c2340', c3: '#c8102e', c2: '#ffffff', cv: '#d5dde8' },
+  franca: { nome: 'França', pais: 'FRANÇA', p: 'digital', c: '#002395', c3: '#ffffff', c2: '#ed2939', cv: '#e6eaf2' },
+  russia: { nome: 'Rússia', pais: 'RÚSSIA', p: 'fragmentos', c: '#d52b1e', c3: '#ffffff', c2: '#0033a0', cv: '#e4e7ee' },
+  china: { nome: 'China', pais: 'CHINA', p: 'manchas', c: '#de2910', c3: '#ffde00', c2: '#8c1c13', cv: '#f3e2c4' },
+  japao: { nome: 'Japão', pais: 'JAPÃO', p: 'ondas', c: '#bc002d', c3: '#f7f7f7', c2: '#7a1024', cv: '#efe8ea' },
+  alemanha: { nome: 'Alemanha', pais: 'ALEMANHA', p: 'digital', c: '#111111', c3: '#dd0000', c2: '#ffcc00', cv: '#e6e2d6' },
+  argentina: { nome: 'Argentina', pais: 'ARGENTINA', p: 'ondas', c: '#74acdf', c3: '#ffffff', c2: '#f6b40e', cv: '#e7f1fa' },
+  portugal: { nome: 'Portugal', pais: 'PORTUGAL', p: 'fragmentos', c: '#046a38', c3: '#ffcc29', c2: '#da020e', cv: '#e7f0e4' },
+  india: { nome: 'Índia', pais: 'ÍNDIA', p: 'manchas', c: '#ff9933', c3: '#ffffff', c2: '#138808', cv: '#f6efe4' },
+  italia: { nome: 'Itália', pais: 'ITÁLIA', p: 'digital', c: '#009246', c3: '#ffffff', c2: '#ce2b37', cv: '#e8f0e6' },
+  baixa: { nome: 'Baixa visibilidade', c: '#8d969d', c2: '#727b83' },
+  oceano: { nome: 'Azul oceânico', c: '#3e5468', c2: '#2d3e4f' },
+  oliva: { nome: 'Verde-oliva', c: '#4b5740', c2: '#39432f' },
+  areia: { nome: 'Areia', c: '#a1906f', c2: '#817257' },
+  noturno: { nome: 'Noturno', c: '#2c3138', c2: '#1f2329' },
+  atlantico: { nome: 'Ondas do Atlântico', p: 'ondas', c: '#4f6f8f', c3: '#6f8fae', c2: '#2f4a66', cv: '#b9c7d3' },
+  fragmentos: { nome: 'Fragmentos navais', p: 'fragmentos', c: '#5b6670', c3: '#7d8890', c2: '#3f4850', cv: '#a9b2b9' },
+  digital: { nome: 'Digital marítimo', p: 'digital', c: '#56636e', c3: '#76828c', c2: '#3a444d', cv: '#a3adb5' },
+  selva: { nome: 'Selva tropical', p: 'manchas', c: '#4a5a3a', c3: '#6b5a3e', c2: '#2f3a28', cv: '#9aa58f' },
+  deserto: { nome: 'Deserto tricolor', p: 'manchas', c: '#b09a74', c3: '#8c7452', c2: '#cdb98f', cv: '#d8d0bd' },
+  artico: { nome: 'Ártico', p: 'fragmentos', c: '#d9dee2', c3: '#a9b2ba', c2: '#7c8790', cv: '#e6eaed' },
+  agressor: { nome: 'Agressor azul', p: 'fragmentos', c: '#8aa0b8', c3: '#5d7891', c2: '#c3cfdb', cv: '#d4dce4' },
+};
+export const ORDEM_CAMO_AEREO = Object.keys(CAMO_AEREO);

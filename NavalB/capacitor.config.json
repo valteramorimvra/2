@@ -1,0 +1,7 @@
+{
+  "appId": "br.com.valteramorim.nexonaval.b",
+  "appName": "Naval B",
+  "webDir": "dist",
+  "android": { "allowMixedContent": false, "captureInput": false, "webContentsDebuggingEnabled": false, "backgroundColor": "#060606" },
+  "plugins": { "CapacitorHttp": { "enabled": false } }
+}

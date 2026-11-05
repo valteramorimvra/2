@@ -1,0 +1,5 @@
+v10_partida_entardecer: skylines 2, hora entardecer
+v11_partida_noite: skylines 2, hora noite
+RBU: {"foguetes":12,"alt":387,"salvas":5,"botao":"FOGUETES"}
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

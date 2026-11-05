@@ -1,0 +1,47 @@
+estaleiro abas: navio,modulos,pintura,bandeira,comandante,helis
+pinturas: bra,cinza_naval,artica,dazzle,digital,noturno,costeiro,tropical,nac_bra,nac_deu,nac_rus,areia_verm,nac_eua,nac_uk,nac_chn,mercurio,eclipse,aurora_ouro,neon_tech,faixas_nexo,couraca_ouro
+premium na lista: Patrulha Rápida Premium | Fragata de Escolta Premium | Fragata Premium de Ataque | Cruzador de Ataque Premium | Destróier Premium de Escolta
+comparação premium: ★ PREMIUM × FRAGATA PESADA DE ATAQUE F 22 (MESMO TIER)
+Casco (HP efetivo)
++17%
+Fogo de canhão/min
++50%
+Salva de mísseis
+0%
+Defesa aérea
+-6%
+Velocidade
++3%
+PODER DE COMBATE
++20%
+enfeite: {"fragata":{"bandeira":"BR-SP","gala":true,"faixa":false}}
+créditos: ‹ Voltar / Créditos / Nexo Naval Strike 3D / Desenvolvedor: Valter Amorim / Simulador tático de combate naval moderno em 3D, desenvolvido para levar a potência de uma frota de guerra à palma da sua mão. Cada navio, oceano, efeito visual e trilha foi construído com dedicação e atenção aos detalhes, com hidrodinâmica, balística e sistemas de defesa pensados para uma experiência autêntica e envolvente. / Obrigado por jogar. Bons ventos e boa caçada, comandante. / Versão 1.2.5 · © 2026 Valter Amorim. Todos os direitos reservados. / LICENÇAS / Efeitos sonoros e música: gravações reais de domínio público (CC0 1.0) — inclusive rotor e turbina de helicóptero, flares, incêndio, alagamento, rangidos metálicos, bolhas, rádio e interface (Freesound, CC0); camadas complementares sintetizadas no aparelho. / Retratos: arte original criada para o jogo. / Bandeiras nacionais: símbolos oficiais de domínio público, desenhados de forma simplificada. / Dados cartográficos (Baía de Guanabara e Santos) © colaboradores do OpenStreetMap (ODbL 1.0). / Relevo e batimetria: Tilezen/Mapzen (SRTM/USGS e ETOPO1/NOAA, domínio público). / Gráficos 3D: three.js (licença MIT). Plataforma Android: Capacitor (licença MIT), Apache Cordova e bibliotecas AndroidX (licença Apache 2.0).
+v10_partida_entardecer: skylines 2, hora entardecer
+v11_partida_noite: skylines 2, hora noite
+RBU: {"foguetes":12,"alt":408,"salvas":5,"botao":"FOGUETES"}
+HUD partida: 19 elementos; PROBLEMAS: .h-painel × .h-placar[placar]; .h-painel × .h-fita; .h-painel × .h-feed
+FPS headless (SwiftShader, CPU): 2.7
+NaN: ok
+auto: {"tiros":2,"autoMira":true,"auto":1}
+HUD binóculo: 18 elementos; PROBLEMAS: .h-painel × .h-fita; .h-painel × .h-feed
+HUD drone: 19 elementos; PROBLEMAS: .h-painel × .h-placar[placar]; .h-painel × .h-fita
+cams: {"cam":"drone","uav":0}
+HUD alerta: 18 elementos; PROBLEMAS: .h-painel × .h-placar[placar]; .h-painel × .h-fita
+iscas: {"chaff":2,"res":5,"iscas":1}
+consumíveis: {"kit":"ouro 2/3 t39","controle":"ouro 2/3 t24","bomba":"ouro 3/3 t0","reparoHeli":"ouro 3/3 t0","abastece":"ouro 4/4 t0"} fogo 0
+crítico: {"vida":295,"max":1187,"fogo":0,"alag":0}
+helis do navio: [1,0]
+HUD helicóptero: 10 elementos; PROBLEMAS: .h-painel × .h-placar[placar]; .h-painel × .h-fita; tag × .h-heli .hl-alt
+heli: {"ctrl":0,"est":[[3,44],[1,8]]}
+heli atitude: {"pitch":-25.4,"roll":35.1,"kmh":33,"flares":2}
+após voltar: {"ctrl":-1,"est":[3,1]}
+NaN: ok
+afundamento alvo: 5
+farol em -3059,-2223
+NaN: ok
+HUD noite: 19 elementos; PROBLEMAS: .h-painel × .h-placar[placar]; .h-painel × .h-fita; .h-painel × .h-feed
+HUD chuva: 19 elementos; PROBLEMAS: .h-painel × .h-placar[placar]; .h-painel × .h-fita; .h-painel × .h-feed
+qualidade: {"q":1,"fps":60}
+economia antes/depois: {"p":99892000,"o":1000000} → {"p":101953552,"o":1000040}
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

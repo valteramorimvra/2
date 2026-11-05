@@ -1,0 +1,11 @@
+FINAL-03-bomber-trava-reta.diff 2,3
+FINAL-06-world-vls-perto-recarga.diff 6,7,8
+item11-radar.diff 11
+00-helper-mescla1230.diff crit9
+01-rotores-aeronaves.diff crit9
+02-navio-pecas-articuladas.diff crit9
+03-navio-luzes.diff crit9
+04-aeronave-luzes.diff crit9
+item12-nuke7s.diff 12
+FINAL-07c-aeronaves-terreno.diff 7
+item13-dano-aereo.diff 13

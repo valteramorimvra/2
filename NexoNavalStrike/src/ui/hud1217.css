@@ -1,0 +1,61 @@
+/* v1.2.17 item 6: ÁREA DE TOQUE >= 48 dp em todos os botões pequenos da batalha (área invisível; o desenho continua o mesmo) e nenhuma área cobre outra */
+.hud .h-chaves button { position: relative; }
+.hud .h-pausa::after, .hud .h-cons .cb::after, .hud .h-chaves button::after, .hud .rd-modo::after, .hud .h-placar::after, .btn-fantasma::after {
+  content: ''; position: absolute; background: transparent; pointer-events: auto;
+  top: min(0px, calc(50% - 24px)); bottom: min(0px, calc(50% - 24px)); left: min(0px, calc(50% - 24px)); right: min(0px, calc(50% - 24px)); }
+.hud .h-cons { gap: 14px !important; } /* 34 px de desenho + 14 px = passo de 48 px: as áreas de toque se encostam sem se sobrepor */
+/* v1.2.17 item 6: com o HUD oculto a PAUSA continua visível (discreta) e clicável */
+.ui-fantasma > .h-pausa.h-pausa { opacity: .55 !important; pointer-events: auto !important; }
+.hud .h-placar::after { top: -15px; bottom: -15px; } /* o placar é reduzido por escala em telas estreitas */
+/* telas estreitas: chaves em grade 2×2 com passo vertical de 48 dp (antes: coluna com passo de 25 px) */
+@media (max-width: 840px) {
+  .hud.ctl-novo .h-chaves, .hud .h-chaves { display: grid !important; grid-template-columns: repeat(2, max-content); column-gap: 6px !important; row-gap: 28px !important; bottom: 68px; }
+}
+/* estaleiro: botões do topo (VISTA DO PORTO / DIA / GIRO AUTO), olho "Visualizar" da árvore e ocultar HUD com área de toque >= 48 dp */
+.es-vista button, .es-ver, .btn-fantasma { position: relative; }
+.btn-fantasma.bf-dir, .btn-fantasma.bf-esq, .btn-fantasma[style*="left"], .btn-fantasma[style*="top"] { position: absolute; }
+.es-vista button::after, .es-ver::after { content: ''; position: absolute; background: transparent; pointer-events: auto;
+  top: min(0px, calc(50% - 24px)); bottom: min(0px, calc(50% - 24px)); left: min(0px, calc(50% - 24px)); right: min(0px, calc(50% - 24px)); }
+.btn-voltar::after { content: ''; position: absolute; background: transparent; pointer-events: auto; top: min(0px, calc(50% - 24px)); bottom: min(0px, calc(50% - 24px)); left: min(0px, calc(50% - 24px)); right: min(0px, calc(50% - 24px)); }
+/* v1.2.17 item 8: detalhamento da recompensa da Batalha Personalizada */
+.rs-ganho .sub { opacity: .8; border-top: 1px dashed rgba(148,163,184,.35); padding-top: 2px; }
+.rs-ganho .neg.pers span:first-child { color: #fbbf24; }
+.rs-ganho .mu.pers { font-size: 10px; opacity: .7; }
+.rs-ganho s { opacity: .55; }
+/* v1.2.17 item 17: progresso da trava do MÍSSIL no botão VLS (anel interno âmbar crescendo; TRAVADO = vermelho cheio com cadeado) */
+.cb .cb-tv { fill: none; stroke: #f59e0b; stroke-width: 6; stroke-dasharray: 239; stroke-dashoffset: 239; opacity: 0; transition: stroke-dashoffset .1s linear, opacity .2s; }
+.cb.travandoMis .cb-tv { opacity: .95; }
+.cb.travadoMis .cb-tv { opacity: 1; stroke: #ef4444; stroke-dashoffset: 0 !important; filter: drop-shadow(0 0 2px rgba(239,68,68,.8)); }
+.cb .cb-trv { position: absolute; top: 4px; left: 5px; width: 11px; height: 9px; border-radius: 2px; background: #ef4444; opacity: 0; pointer-events: none; text-decoration: none; }
+.cb .cb-trv::before { content: ''; position: absolute; left: 2px; top: -5px; width: 5px; height: 5px; border: 1.5px solid #ef4444; border-bottom: 0; border-radius: 4px 4px 0 0; }
+.cb.travadoMis .cb-trv { opacity: 1; }
+.cb.travandoMis em { color: #fbbf24; }
+/* item 17: durante a trava o botão sai do cinza (não está pronto, mas está TRABALHANDO): borda e texto âmbar, anel bem visível */
+.cb.off.travandoMis, .hud.v12 .h-armas .cb.off.travandoMis { opacity: .92; border-color: rgba(245,158,11,.75) !important; }
+.cb.off.travandoMis i { color: #fbbf24; }
+.hud.v12 .h-armas .cb.travandoMis .cb-tv, .cb.travandoMis .cb-tv { stroke: #f59e0b !important; opacity: 1; }
+.hud.v12 .h-armas .cb.travadoMis .cb-tv { stroke: #ef4444 !important; }
+/* v1.2.17 item 25: ficha técnica no estaleiro — linhas em 2 níveis (rótulo/valor + comparação) para nunca sobrepor no painel estreito */
+.es-abas { flex-wrap: wrap; row-gap: 3px; }
+.es-abas button { flex: 1 1 auto; min-width: 0; white-space: nowrap; }
+.ficha { display: flex; flex-direction: column; gap: 6px; padding-bottom: 6px; }
+.ficha .ft-cmp { font-size: 10.5px; color: #cbd5e1; margin: 2px 0; overflow-wrap: anywhere; }
+.ficha .ft-cmp b { color: #e2e8f0; }
+.ficha .ft-leg i { font-style: normal; margin-left: 4px; }
+.ficha .up { color: #4ade80; } .ficha .dn { color: #f87171; } .ficha .eq { color: #94a3b8; } .ficha .nov { color: #94a3b8; }
+.ft-arma { background: rgba(15,23,42,.55); border: 1px solid rgba(56,189,248,.18); border-radius: 9px; padding: 6px 7px; min-width: 0; }
+.ft-arma header { display: flex; gap: 7px; align-items: flex-start; min-width: 0; }
+.ft-arma .ft-ic { flex: 0 0 26px; width: 26px; height: 26px; color: #38bdf8; display: block; }
+.ft-arma .ft-ic svg { width: 26px; height: 26px; display: block; }
+.ft-arma header div { min-width: 0; display: flex; flex-direction: column; }
+.ft-arma header b { font-size: 12px; color: #f1f5f9; overflow-wrap: anywhere; }
+.ft-arma header small { font-size: 10px; color: #94a3b8; line-height: 1.3; overflow-wrap: anywhere; }
+.ft-tab { margin-top: 5px; display: flex; flex-direction: column; }
+.ft-l { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 6px; align-items: baseline; padding: 2px 0; border-top: 1px solid rgba(148,163,184,.1); font-size: 10.5px; min-width: 0; }
+.ft-l .ft-r { color: #cbd5e1; overflow-wrap: anywhere; min-width: 0; }
+.ft-l .ft-v { color: #e2e8f0; text-align: right; white-space: nowrap; }
+.ft-l .ft-v small { color: #94a3b8; font-size: 9.5px; }
+.ft-l .ft-c { grid-column: 1 / -1; justify-self: end; font-style: normal; font-size: 9.5px; white-space: nowrap; }
+.ficha .ft-nota { font-size: 9.5px; }
+.hud .h-lista { box-sizing: border-box; } /* v1.2.18 item 11: largura medida = largura real (encaixe entre botões) */
+.toast { pointer-events: none; } /* v1.2.18: aviso nunca bloqueia toque em botão */

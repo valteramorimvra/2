@@ -1,0 +1,10 @@
+FALHA em fx: TypeError: Cannot read properties of undefined (reading 'dano')
+    at Kg.dano (http://127.0.0.1:4173/assets/index-BUEhsvQD.js:3843:222969)
+    at <anonymous>:1:118
+    at <anonymous>:1:161
+HUD noite: 20 elementos; sem sobreposição
+HUD chuva: 20 elementos; sem sobreposição
+qualidade: {"q":1,"fps":60}
+economia antes/depois: {"p":9952000,"o":100000} → {"p":9952000,"o":100000}
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

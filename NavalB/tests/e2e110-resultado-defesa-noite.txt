@@ -1,0 +1,14 @@
+CIWS: sem engajamento na tentativa 0
+CIWS x míssil capturado a 626 m
+SAM: nenhum lançamento na tentativa 0
+SAM capturado a 199 m do míssil
+estatística SAM: {"tiros":0,"acertos":0,"misLanc":0,"misAcertos":0,"torpLanc":0,"torpAcertos":0,"abates":0,"dano":0,"intercept":1,"ricochetes":0}
+30 mm x lancha capturado a 1332 m
+lanchas: [10]
+drone: null
+drone final: {"ativo":1,"menores":1}
+HUD defesa: .hud-estado × .hud-teleg button[4]
+noite: {"q":1,"fps":60,"expo":1.25}
+áudio: {"canhao_grande":"gravação real","canhao_medio":"gravação real","canhao_rapido":"gravação real","canhao_longe":"gravação real","ciws":"gravação real","vls_lancamento":"gravação real","explosao_perto":"gravação real","explosao_media":"gravação real","explosao_grande":"gravação real","explosao_longe":"gravação real","respingo_grande":"gravação real","respingo":"gravação real","impacto_metal":"gravação real","torpedo_corrida":"gravação real","alarme_trava":"gravação real","motor_diesel_loop":"gravação real","turbina_loop":"gravação real"}
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

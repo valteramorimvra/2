@@ -1,0 +1,11 @@
+/* v1.2.30 item 15 — registro de dano das aeronaves */
+.hud .h-ar .h-ar-d { display: block; font-style: normal; margin-top: 1px; font-size: 10px; color: #cbd5e1; }
+.hud .h-ar .h-ar-d b { color: #7dd3fc; } .hud .h-ar .h-ar-d span { color: #fca5a5; }
+.rs-aer { margin-top: 8px; background: rgba(15,23,42,.72); border: 1px solid rgba(56,189,248,.25); border-radius: 10px; padding: 6px 8px; font-size: 11px; }
+.rs-aer h4 { margin: 0 0 4px; font-size: 12px; color: #38bdf8; letter-spacing: .04em; }
+.rs-aer .mu { margin: 0; color: #94a3b8; }
+.rs-aer-t { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+.rs-aer-t caption { text-align: left; font-weight: 700; color: #e2e8f0; padding: 2px 0; }
+.rs-aer-t.az caption { color: #7dd3fc; } .rs-aer-t.vm caption { color: #fca5a5; }
+.rs-aer-t th { font-weight: 600; color: #94a3b8; text-align: right; font-size: 10px; } .rs-aer-t th:first-child, .rs-aer-t td:first-child { text-align: left; }
+.rs-aer-t td { text-align: right; color: #e2e8f0; padding: 1px 0 1px 6px; }

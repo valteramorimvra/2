@@ -1,0 +1,48 @@
+/* v1.2.21 itens 21/21b/21c/21d — vitrine (menu inicial e estaleiro): navio grande na área livre, painéis SÓLIDOS, MODO OLHO limpo, RETRATO sem sobreposição. */
+
+/* ---------- 21b: painéis do estaleiro com fundo SÓLIDO AMOLED (nada de vidro/semitransparência; o cenário 3D não aparece atrás dos textos) ---------- */
+.tela-estaleiro { background: none !important; } /* sem o escurecimento lateral em degradê (os próprios painéis já são sólidos) */
+.tela-estaleiro .es-lista { background: #060606; border: 1px solid rgba(56,189,248,.2); border-radius: 12px; padding: 6px; }
+.tela-estaleiro .es-info { background: #060606; border-color: rgba(56,189,248,.24); }
+.tela-estaleiro .es-lista, .tela-estaleiro .es-info, .tela-estaleiro button, .tela-estaleiro .carteira { backdrop-filter: none; -webkit-backdrop-filter: none; }
+.tela-estaleiro .es-lista button { background-color: #0c1017; }
+.tela-estaleiro .es-vista button { background: #0c1017; color: #e5e9ee; } .tela-estaleiro .es-vista button.on { background: #0b4a5c; }
+.tela-estaleiro .carteira, .tela-estaleiro .btn-voltar { background: #0c1017; }
+.tela-estaleiro .es-dica { background: #060606; color: #a8b3c2; }
+.tela-estaleiro .es-info p { line-height: 1.3; } /* linha de classe + bônus premium em 2 linhas sem encostar na de baixo */
+/* ---------- 21e: proporção da referência — painéis COMPACTOS nas bordas (≈15% + 25% da largura), navio grande no centro (≈60% da largura) ---------- */
+@media (orientation: landscape) {
+  .tela-estaleiro .es-lista { width: clamp(124px, 13.5vw, 196px); left: max(8px, env(safe-area-inset-left)); }
+  .tela-estaleiro .es-info { width: clamp(204px, 22.5vw, 330px); right: max(8px, env(safe-area-inset-right)); }
+  .tela-inicio .logo { max-width: 272px; gap: 10px; } .tela-inicio .logo-ic { width: 44px; height: 44px; } .tela-inicio .logo h1 { font-size: 21px; line-height: 1.14; } .tela-inicio .logo p { font-size: 10.5px; }
+  .tela-inicio .perfil-card { font-size: 10.5px; bottom: 19px; } .tela-inicio > .versao { bottom: 3px; font-size: 10px; } /* versão abaixo do cartão do perfil, sem encostar no nome do navio */
+}
+@media (orientation: landscape) and (max-width: 1100px) {
+  .tela-estaleiro .es-lista button { grid-template-columns: 1fr; grid-template-areas: 'b' 'e'; padding: 4px 28px 4px 7px; } .tela-estaleiro .es-lista button img { display: none; }
+  .tela-estaleiro .es-lista button b { font-size: 11px; line-height: 1.15; } .tela-estaleiro .es-lista button em { font-size: 9.5px; } .tela-estaleiro .es-lista button small { display: none; }
+  .tela-estaleiro .es-lista .es-ver { width: 24px; height: 24px; right: 3px; }
+  .tela-estaleiro .es-abas { flex-wrap: wrap; } .tela-estaleiro .es-abas button { flex: 1 1 22%; font-size: 10px; padding: 4px 1px; }
+  .tela-estaleiro .es-info { padding: 7px 8px; } .tela-estaleiro .es-info h2 { font-size: 13.5px; } .tela-estaleiro .es-info p { font-size: 10.5px; }
+  .tela-estaleiro .bar { grid-template-columns: 62px minmax(34px, 1fr) auto; gap: 5px; font-size: 10px; } .tela-estaleiro .bar em { white-space: nowrap; font-size: 9.5px; } /* barras da ficha visíveis no painel compacto (eram 80+96 px fixos → barra 0 e rolagem lateral) */
+  .tela-estaleiro .es-corpo { overflow-x: hidden; } .tela-estaleiro .bds small { text-overflow: ellipsis; }
+  .tela-estaleiro .es-acoes { flex-wrap: wrap; gap: 6px; } .tela-estaleiro .es-acoes .primario { min-width: 0; flex: 1 1 auto; font-size: 12.5px; padding: 8px 8px; } .tela-estaleiro .es-acoes .btn { min-height: 36px; }
+}
+
+/* ---------- 21c/21d: MODO OLHO (botão do topo, ao lado do saldo) — TUDO some (opacidade 0 + visibility hidden + sem toque), só o navio em tela cheia ---------- */
+.tela.fantasma-usado > *:not(.btn-fantasma) { animation: none !important; transition: opacity .28s ease, visibility 0s linear 0s; }
+.tela.ui-fantasma > *:not(.btn-fantasma) { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; transition: opacity .28s ease, visibility 0s linear .28s; }
+.tela.ui-fantasma, .tela.ui-fantasma::before { background: none !important; } #ui:has(> .tela.ui-fantasma) { background: none !important; }
+.tela.ui-fantasma > .btn-fantasma { left: auto !important; right: calc(env(safe-area-inset-right, 0px) + 8px) !important; top: calc(env(safe-area-inset-top, 0px) + 8px) !important; opacity: .5; background: rgba(0,0,0,.3); }
+.tela > .btn-fantasma { transition: opacity .28s ease; }
+
+/* ---------- 21: RETRATO (navegador/tablet; o APK abre em paisagem) — nada sobreposto, navio na faixa livre ---------- */
+@media (orientation: portrait) {
+  .tela-inicio { padding-top: max(58px, calc(env(safe-area-inset-top) + 46px)); } /* logo abaixo do saldo (antes o saldo cobria "NAVAL") */
+  .tela-inicio::before, .canhoto .tela-inicio::before { inset: 0 0 auto 0; width: auto; height: 58%; transform: none; background: linear-gradient(180deg, rgba(1,3,6,.88) 0%, rgba(1,3,6,.74) 72%, rgba(1,3,6,0) 100%); }
+  .tela-estaleiro .es-vista { left: 50%; top: 54px; transform: translateX(-56%); } .tela-estaleiro .es-vista button { padding: 6px 8px; font-size: 10px; white-space: nowrap; }
+  .tela-estaleiro .es-lista { left: 8px; right: 8px; top: 96px; bottom: auto; width: auto; height: 64px; flex-direction: row; align-items: stretch; overflow-x: auto; overflow-y: hidden; gap: 4px; padding: 4px; }
+  .tela-estaleiro .es-lista h4 { writing-mode: vertical-rl; transform: rotate(180deg); margin: 0; font-size: 8.5px; flex: none; text-align: center; }
+  .tela-estaleiro .es-lista button { width: 164px; flex: none; } .tela-estaleiro .es-lista button small { display: none; }
+  .tela-estaleiro .es-info { left: 8px; right: 8px; width: auto; top: auto; bottom: 8px; height: 50%; }
+  .tela-estaleiro .es-dica { display: none; }
+}

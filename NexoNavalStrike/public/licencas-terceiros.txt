@@ -1,0 +1,19 @@
+Componentes de terceiros incluídos neste aplicativo (licença MIT):
+- three.js — Copyright © 2010-2024 three.js authors — https://github.com/mrdoob/three.js/blob/dev/LICENSE
+- Capacitor — Copyright © 2017-present Drifty Co. — https://github.com/ionic-team/capacitor/blob/main/LICENSE
+Texto da licença MIT: Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
+Sons: gravações CC0 1.0 (domínio público) — lista em CREDITS-audio.md no código-fonte.
+Mapas Guanabara e Santos: linha de costa © colaboradores do OpenStreetMap (ODbL 1.0); relevo Tilezen/Mapzen (SRTM, ETOPO1).
+- Apache Cordova Android 10.1.1 e AndroidX (appcompat, coordinatorlayout, core-splashscreen) — Apache License 2.0 — https://www.apache.org/licenses/LICENSE-2.0
+
+== Vozes de batalha (v1.2.11) ==
+Frases curtas em pt-BR geradas OFFLINE (no computador de desenvolvimento) com o Piper TTS (https://github.com/OHF-Voice/piper1-gpl;
+pacote piper-tts) e a voz neural "pt_BR-faber-medium" do repositório rhasspy/piper-voices (licença MIT do repositório;
+conjunto de dados da voz: CC0, https://github.com/OHF-Voice/voice-datasets; modelo afinado a partir da voz en_US "lessac" medium).
+Pós-processamento: filtro de rádio leve, compressão e normalização (ffmpeg), OGG Vorbis mono 22 kHz. Nenhuma síntese no aparelho.
+
+== Áudio v1.2.29 ==
+Gravações CC0/PD e CC-BY verificadas (LICENCAS-ASSETS.md / CREDITS-audio.md).
+CC-BY: Work With Sounds/Torsten Nilsson (Draken idle); lonemonk (CF-18 takeoff/cat proxy); jobro (torpedo launch).
+
+acao_batalha.ogg / acao_menu.ogg — síntese própria do projeto (v1.2.16), CC0 / domínio próprio.

@@ -1,0 +1,18 @@
+// Abstração de comandos: TUDO que um jogador (humano, bot ou remoto) pode fazer vira um comando serializável.
+// A simulação só muda via comandos aplicados num tick → replays e multijogador por lockstep ficam possíveis.
+export const TIPOS = {
+  telegrafo: ['v'], leme: ['v'], mira: ['az', 'dist', 'px', 'pz', 'h', 'elD'] /* v1.2.25 item 1 */, miraLivre: ['v'], /* v1.2.14: MIRA LIVRE — ponto exato (mar ou casco) */ travar: ['alvo', 'lon', 'lat', 'hy'] /* v1.3.19: ponto exato do navio travado (proa/popa/altura) */, canhao: ['modo'], missil: ['alvo', 'n', 'az'],
+  torpedo: ['alvo'], torpModo: ['v'], contramedida: [], radar: ['v'],
+  rota: ['u', 'k', 'alvo', 'p', 'alt', 'v'], rotaRetoma: ['u', 'k'], rotaPausa: ['u', 'k'], /* v1.3.56: rotas do piloto automático (p = [x0,z0,x1,z1,…]) */
+  auto: ['v'], pivo: ['v'], sam: ['v'], // v1.1.0: AUTO-FOGO, pivô por contra-rotação, defesa SAM automática
+  reparo: [], uav: [], engajar: ['v', 'alvo'] /* v1.2.67: piloto automático ofensivo */, esquadrilha: ['m'] /* v1.2.32: 1 = metade, 2 = todas */, vtArma: ['tipo'] /* v1.3.04: armas dos caças Acauã/Uiraçu */, hidro: ['tipo'], hdPil: ['v'], hdMissil: [], hdTorp: [], hdFlare: [], hdVolta: [], /* v1.2.39: hidroaviões */ /* v1.2.16: LANÇAR ESQUADRILHA (faltava na lista → comando descartado) */ heliLanca: ['k'], heliCtrl: ['k', 'jx', 'jy', 'alt', 'ru', 'al'], heliFogo: ['k'], heliThr: ['k', 'v'] /* v1.2.68 */, heliVolta: ['k'], heliFlare: ['k'], aeroReparo: ['k'] /* v1.2.69 */, iaNavio: ['v'], controle: ['k'], cons: ['k'], rbu: ['alvo', 'canal'], rumo: ['v'], optica: ['v'], nuclear: ['alvo', 'px', 'pz'], nkPiloto: ['v'], nkCtl: ['jx', 'jy', 'ru', 'al'], nkTrava: ['alvo', 'liv'], nkSolta: [], nkMissil: [] /* v1.2.69 */, nkVolta: [] /* v1.2.79: qualquer aeronave volta à base */, nkEjeta: [], nkPorta: [], nkReparo: [] /* v1.2.76 */, nkEspera: ['v'], nkThr: ['v'], nkMiraSolo: ['px', 'pz'], nkTorp: [] /* v1.3.16 */, nkArIni: ['alt'] /* v1.3.16 (Valter: COMBATE do hangar não começava no ar) — o comando de 1.3.03 não estava na lista e era descartado */, /* v1.2.28: acel + mira solo */ /* v1.2.26 item K */ /* v1.2.26: bombardeiro nuclear */ // v1.2.0: reparo, VANT, helicópteros
+};
+/** Valida e normaliza um comando vindo de qualquer fonte (inclusive rede). Devolve null se inválido. */
+export function valida(c) {
+  if (!c || typeof c !== 'object' || !(c.t in TIPOS) || !Number.isInteger(c.id) || c.id < 0 || c.id > 63) return null;
+  const o = { id: c.id, t: c.t };
+  for (const k of TIPOS[c.t]) if (k in c) { const v = c[k]; if (typeof v === 'number' && Number.isFinite(v)) o[k] = v; else if (typeof v === 'string' && v.length < 16) o[k] = v; else if (typeof v === 'boolean') o[k] = v ? 1 : 0; else if (Array.isArray(v) && v.length <= 64 && v.every((x) => typeof x === 'number' && Number.isFinite(x))) o[k] = v.slice(); }
+  return o;
+}
+export const serializa = (tick, cmds) => JSON.stringify({ k: tick, c: cmds });
+export const desserializa = (s) => { try { const o = JSON.parse(s); return { tick: o.k | 0, cmds: (o.c || []).map(valida).filter(Boolean) }; } catch (e) { return null; } };

@@ -1,0 +1,876 @@
+# Destróier Amorim — materiais (nome termina no hex da cor)
+
+newmtl mat_0_casco_preto_0d1013
+Kd 0.0040 0.0052 0.0065
+Ka 0 0 0
+Ks 0.73 0.73 0.73
+Ke 0.0000 0.0000 0.0000
+Ns 150
+d 1
+illum 2
+
+newmtl mat_1_casco_preto_111519
+Kd 0.0056 0.0075 0.0097
+Ka 0 0 0
+Ks 0.73 0.73 0.73
+Ke 0.0000 0.0000 0.0000
+Ns 150
+d 1
+illum 2
+
+newmtl mat_2_casco_preto_151a1f
+Kd 0.0075 0.0103 0.0137
+Ka 0 0 0
+Ks 0.73 0.73 0.73
+Ke 0.0000 0.0000 0.0000
+Ns 150
+d 1
+illum 2
+
+newmtl mat_3_fundo_vermelho_escuro_5b1613
+Kd 0.1046 0.0080 0.0065
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_4_convez_vermelho_5c2927
+Kd 0.1070 0.0222 0.0203
+Ka 0 0 0
+Ks 0.63 0.63 0.63
+Ke 0.0000 0.0000 0.0000
+Ns 131
+d 1
+illum 2
+
+newmtl mat_5_convez_vermelho_632d2a
+Kd 0.1248 0.0262 0.0232
+Ka 0 0 0
+Ks 0.63 0.63 0.63
+Ke 0.0000 0.0000 0.0000
+Ns 131
+d 1
+illum 2
+
+newmtl mat_6_faixa_amarela_ffc40a
+Kd 1.0000 0.5520 0.0030
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_7_costura_painel_2c3239
+Kd 0.0252 0.0319 0.0409
+Ka 0 0 0
+Ks 0.71 0.71 0.71
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1
+illum 2
+
+newmtl mat_8_preto_metalico_0b0c0e
+Kd 0.0033 0.0037 0.0044
+Ka 0 0 0
+Ks 0.80 0.80 0.80
+Ke 0.0000 0.0000 0.0000
+Ns 173
+d 1
+illum 2
+
+newmtl mat_9_porta_escura_3b454d
+Kd 0.0437 0.0595 0.0742
+Ka 0 0 0
+Ks 0.74 0.74 0.74
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1
+illum 2
+
+newmtl mat_10_casaria_prata_c4cad0
+Kd 0.5520 0.5906 0.6308
+Ka 0 0 0
+Ks 0.74 0.74 0.74
+Ke 0.0000 0.0000 0.0000
+Ns 162
+d 1
+illum 2
+
+newmtl mat_11_casaria_preta_lateral_0b0c0e
+Kd 0.0033 0.0037 0.0044
+Ka 0 0 0
+Ks 0.77 0.77 0.77
+Ke 0.0000 0.0000 0.0000
+Ns 169
+d 1
+illum 2
+
+newmtl mat_12_casaria_prata_bcc3c9
+Kd 0.5029 0.5457 0.5841
+Ka 0 0 0
+Ks 0.73 0.73 0.73
+Ke 0.0000 0.0000 0.0000
+Ns 150
+d 1
+illum 2
+
+newmtl mat_13_casaria_prata_c4cad0
+Kd 0.5520 0.5906 0.6308
+Ka 0 0 0
+Ks 0.73 0.73 0.73
+Ke 0.0000 0.0000 0.0000
+Ns 150
+d 1
+illum 2
+
+newmtl mat_14_casaria_prata_ccd2d8
+Kd 0.6038 0.6445 0.6867
+Ka 0 0 0
+Ks 0.73 0.73 0.73
+Ke 0.0000 0.0000 0.0000
+Ns 150
+d 1
+illum 2
+
+newmtl mat_15_casaria_prata_teto_d6dbe0
+Kd 0.6724 0.7084 0.7454
+Ka 0 0 0
+Ks 0.73 0.73 0.73
+Ke 0.0000 0.0000 0.0000
+Ns 154
+d 1
+illum 2
+
+newmtl mat_16_friso_chanfro_eef1f4
+Kd 0.8550 0.8796 0.9047
+Ka 0 0 0
+Ks 0.75 0.75 0.75
+Ke 0.0000 0.0000 0.0000
+Ns 165
+d 1
+illum 2
+
+newmtl mat_17_chamine_preto_metalico_14171a
+Kd 0.0070 0.0086 0.0103
+Ka 0 0 0
+Ks 0.77 0.77 0.77
+Ke 0.0000 0.0000 0.0000
+Ns 177
+d 1
+illum 2
+
+newmtl mat_18_faixa_amarela_metalica_f2b705
+Kd 0.8879 0.4735 0.0015
+Ka 0 0 0
+Ks 0.73 0.73 0.73
+Ke 0.0000 0.0000 0.0000
+Ns 150
+d 1
+illum 2
+
+newmtl mat_19_chamine_boca_050607
+Kd 0.0015 0.0018 0.0021
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_20_chamine_grade_0b0c0e
+Kd 0.0033 0.0037 0.0044
+Ka 0 0 0
+Ks 0.75 0.75 0.75
+Ke 0.0000 0.0000 0.0000
+Ns 152
+d 1
+illum 2
+
+newmtl mat_21_painel_aesa_10171c
+Kd 0.0052 0.0086 0.0116
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 177
+d 1
+illum 2
+
+newmtl mat_22_painel_aesa_linha_2b353c
+Kd 0.0242 0.0356 0.0452
+Ka 0 0 0
+Ks 0.68 0.68 0.68
+Ke 0.0000 0.0000 0.0000
+Ns 162
+d 1
+illum 2
+
+newmtl mat_23_vidro_0d1a24
+Kd 0.0040 0.0103 0.0176
+Ka 0 0 0
+Ks 0.59 0.59 0.59
+Ke 0.0000 0.0000 0.0000
+Ns 190
+d 1
+illum 2
+
+newmtl mat_24_moldura_cinza_eef1f4
+Kd 0.8550 0.8796 0.9047
+Ka 0 0 0
+Ks 0.75 0.75 0.75
+Ke 0.0000 0.0000 0.0000
+Ns 162
+d 1
+illum 2
+
+newmtl mat_25_casaria_prata_c4cad0
+Kd 0.5520 0.5906 0.6308
+Ka 0 0 0
+Ks 0.73 0.73 0.73
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1
+illum 2
+
+newmtl mat_26_casaria_prata_bcc3c9
+Kd 0.5029 0.5457 0.5841
+Ka 0 0 0
+Ks 0.73 0.73 0.73
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1
+illum 2
+
+newmtl mat_27_moldura_inox_c4cad0
+Kd 0.5520 0.5906 0.6308
+Ka 0 0 0
+Ks 0.74 0.74 0.74
+Ke 0.0000 0.0000 0.0000
+Ns 162
+d 1
+illum 2
+
+newmtl mat_28_cromado_eef2f6
+Kd 0.8550 0.8879 0.9216
+Ka 0 0 0
+Ks 0.80 0.80 0.80
+Ke 0.0000 0.0000 0.0000
+Ns 184
+d 1
+illum 2
+
+newmtl mat_29_porta_escura_2b3036
+Kd 0.0242 0.0296 0.0369
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_30_porta_escura_1e2328
+Kd 0.0130 0.0168 0.0212
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_31_luz_nav_1aff4a
+Kd 0.0103 1.0000 0.0685
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.1427 1.4000 0.4063
+Ns 143
+d 1
+illum 2
+
+newmtl mat_32_luz_nav_ff1a1a
+Kd 1.0000 0.0103 0.0103
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 1.4000 0.1427 0.1427
+Ns 143
+d 1
+illum 2
+
+newmtl mat_33_luz_branca_fffbe8
+Kd 1.0000 0.9647 0.8070
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 1.2000 1.1812 1.0918
+Ns 143
+d 1
+illum 2
+
+newmtl mat_34_domo_radar_2a3036
+Kd 0.0232 0.0296 0.0369
+Ka 0 0 0
+Ks 0.68 0.68 0.68
+Ke 0.0000 0.0000 0.0000
+Ns 162
+d 1
+illum 2
+
+newmtl mat_35_balsa_laranja_ff6a00
+Kd 1.0000 0.1441 0.0000
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_36_bote_cabine_f2f4f5
+Kd 0.8879 0.9047 0.9131
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1
+illum 2
+
+newmtl mat_37_arma_preta_141619
+Kd 0.0070 0.0080 0.0097
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_38_emblema_relevo_0a2a5c
+Kd 0.0030 0.0232 0.1070
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_39_arma_cinza_met_8f98a1
+Kd 0.2747 0.3140 0.3564
+Ka 0 0 0
+Ks 0.79 0.79 0.79
+Ke 0.0000 0.0000 0.0000
+Ns 173
+d 1
+illum 2
+
+newmtl mat_40_preto_metalico_0b0c0e
+Kd 0.0033 0.0037 0.0044
+Ka 0 0 0
+Ks 0.80 0.80 0.80
+Ke 0.0000 0.0000 0.0000
+Ns 169
+d 1
+illum 2
+
+newmtl mat_41_arma_cinza_met_a6afb8
+Kd 0.3813 0.4287 0.4793
+Ka 0 0 0
+Ks 0.79 0.79 0.79
+Ke 0.0000 0.0000 0.0000
+Ns 177
+d 1
+illum 2
+
+newmtl mat_42_furo_oco_020203
+Kd 0.0006 0.0006 0.0009
+Ka 0 0 0
+Ks 0.26 0.26 0.26
+Ke 0.0000 0.0000 0.0000
+Ns 28
+d 1
+illum 2
+
+newmtl mat_43_arma_cinza_met_9aa3ac
+Kd 0.3231 0.3663 0.4125
+Ka 0 0 0
+Ks 0.79 0.79 0.79
+Ke 0.0000 0.0000 0.0000
+Ns 179
+d 1
+illum 2
+
+newmtl mat_44_arma_cinza_met_8f98a1
+Kd 0.2747 0.3140 0.3564
+Ka 0 0 0
+Ks 0.79 0.79 0.79
+Ke 0.0000 0.0000 0.0000
+Ns 175
+d 1
+illum 2
+
+newmtl mat_45_arma_cinza_met_9aa3ac
+Kd 0.3231 0.3663 0.4125
+Ka 0 0 0
+Ks 0.79 0.79 0.79
+Ke 0.0000 0.0000 0.0000
+Ns 177
+d 1
+illum 2
+
+newmtl mat_46_preto_metalico_0b0c0e
+Kd 0.0033 0.0037 0.0044
+Ka 0 0 0
+Ks 0.68 0.68 0.68
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1
+illum 2
+
+newmtl mat_47_preto_metalico_15181b
+Kd 0.0075 0.0091 0.0110
+Ka 0 0 0
+Ks 0.80 0.80 0.80
+Ke 0.0000 0.0000 0.0000
+Ns 169
+d 1
+illum 2
+
+newmtl mat_48_vls_preto_030304
+Kd 0.0009 0.0009 0.0012
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_49_vls_tampa_preta_0b0c0e
+Kd 0.0033 0.0037 0.0044
+Ka 0 0 0
+Ks 0.26 0.26 0.26
+Ke 0.0000 0.0000 0.0000
+Ns 67
+d 1
+illum 2
+
+newmtl mat_50_vls_friso_2a2e33
+Kd 0.0232 0.0273 0.0331
+Ka 0 0 0
+Ks 0.26 0.26 0.26
+Ke 0.0000 0.0000 0.0000
+Ns 67
+d 1
+illum 2
+
+newmtl mat_51_preto_metalico_0b0c0e
+Kd 0.0033 0.0037 0.0044
+Ka 0 0 0
+Ks 0.80 0.80 0.80
+Ke 0.0000 0.0000 0.0000
+Ns 181
+d 1
+illum 2
+
+newmtl mat_52_preto_metalico_0b0c0e
+Kd 0.0033 0.0037 0.0044
+Ka 0 0 0
+Ks 0.80 0.80 0.80
+Ke 0.0000 0.0000 0.0000
+Ns 177
+d 1
+illum 2
+
+newmtl mat_53_arma_preta_141619
+Kd 0.0070 0.0080 0.0097
+Ka 0 0 0
+Ks 0.80 0.80 0.80
+Ke 0.0000 0.0000 0.0000
+Ns 173
+d 1
+illum 2
+
+newmtl mat_54_arma_preta_141619
+Kd 0.0070 0.0080 0.0097
+Ka 0 0 0
+Ks 0.77 0.77 0.77
+Ke 0.0000 0.0000 0.0000
+Ns 165
+d 1
+illum 2
+
+newmtl mat_55_torpedo_bronze_b07a35
+Kd 0.4342 0.1946 0.0356
+Ka 0 0 0
+Ks 0.75 0.75 0.75
+Ke 0.0000 0.0000 0.0000
+Ns 158
+d 1
+illum 2
+
+newmtl mat_56_torpedo_bronze_escuro_7d5424
+Kd 0.2051 0.0887 0.0176
+Ka 0 0 0
+Ks 0.74 0.74 0.74
+Ke 0.0000 0.0000 0.0000
+Ns 146
+d 1
+illum 2
+
+newmtl mat_57_esfera_laser_dfe6ea
+Kd 0.7379 0.7913 0.8228
+Ka 0 0 0
+Ks 0.44 0.44 0.44
+Ke 0.0000 0.3143 0.3500
+Ns 162
+d 1
+illum 2
+
+newmtl mat_58_radar_preto_1b1e21
+Kd 0.0110 0.0130 0.0152
+Ka 0 0 0
+Ks 0.68 0.68 0.68
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1
+illum 2
+
+newmtl mat_59_radar_preto_1b1e21
+Kd 0.0110 0.0130 0.0152
+Ka 0 0 0
+Ks 0.71 0.71 0.71
+Ke 0.0000 0.0000 0.0000
+Ns 152
+d 1
+illum 2
+
+newmtl mat_60_preto_metalico_0b0c0e
+Kd 0.0033 0.0037 0.0044
+Ka 0 0 0
+Ks 0.77 0.77 0.77
+Ke 0.0000 0.0000 0.0000
+Ns 162
+d 1
+illum 2
+
+newmtl mat_61_heliponto_preto_fosco_0d0f11
+Kd 0.0040 0.0048 0.0056
+Ka 0 0 0
+Ks 0.32 0.32 0.32
+Ke 0.0000 0.0000 0.0000
+Ns 28
+d 1
+illum 2
+
+newmtl mat_62_heliponto_amarelo_ffd400
+Kd 1.0000 0.6584 0.0000
+Ka 0 0 0
+Ks 0.53 0.53 0.53
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_63_heliponto_amarelo_ffd400
+Kd 1.0000 0.6584 0.0000
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_64_luz_ambar_ffb000
+Kd 1.0000 0.4342 0.0000
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 1.3000 0.8973 0.0000
+Ns 143
+d 1
+illum 2
+
+newmtl mat_65_mastro_inox_eef2f6
+Kd 0.8550 0.8879 0.9216
+Ka 0 0 0
+Ks 0.80 0.80 0.80
+Ke 0.0000 0.0000 0.0000
+Ns 171
+d 1
+illum 2
+
+newmtl mat_66_bandeira_verde_009c3b
+Kd 0.0000 0.3325 0.0437
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 47
+d 1
+illum 2
+
+newmtl mat_67_bandeira_amarelo_ffdf00
+Kd 1.0000 0.7379 0.0000
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 47
+d 1
+illum 2
+
+newmtl mat_68_bandeira_azul_002776
+Kd 0.0000 0.0203 0.1812
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 47
+d 1
+illum 2
+
+newmtl mat_69_bandeira_branca_f4f4f4
+Kd 0.9047 0.9047 0.9047
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 0.0000 0.0000 0.0000
+Ns 47
+d 1
+illum 2
+
+newmtl mat_70_luz_branca_fffbe8
+Kd 1.0000 0.9647 0.8070
+Ka 0 0 0
+Ks 0.20 0.20 0.20
+Ke 1.4000 1.3780 1.2737
+Ns 143
+d 1
+illum 2
+
+newmtl mat_71_letras_brancas_f2f4f5
+Kd 0.8879 0.9047 0.9131
+Ka 0 0 0
+Ks 0.53 0.53 0.53
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1
+illum 2
+
+newmtl mat_72_helice_bronze_b07a35
+Kd 0.4342 0.1946 0.0356
+Ka 0 0 0
+Ks 0.74 0.74 0.74
+Ke 0.0000 0.0000 0.0000
+Ns 152
+d 1
+illum 2
+
+newmtl mat_73_eixo_aco_aab2b8
+Kd 0.4020 0.4452 0.4793
+Ka 0 0 0
+Ks 0.74 0.74 0.74
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1
+illum 2
+
+newmtl mat_74_leme_aco_2a3036
+Kd 0.0232 0.0296 0.0369
+Ka 0 0 0
+Ks 0.68 0.68 0.68
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_75_escada_preta_metalica_1e2126
+Kd 0.0130 0.0152 0.0194
+Ka 0 0 0
+Ks 0.77 0.77 0.77
+Ke 0.0000 0.0000 0.0000
+Ns 177
+d 1
+illum 2
+
+newmtl mat_76_corrimao_preto_metalico_1e2126
+Kd 0.0130 0.0152 0.0194
+Ka 0 0 0
+Ks 0.77 0.77 0.77
+Ke 0.0000 0.0000 0.0000
+Ns 177
+d 1
+illum 2
+
+newmtl mat_77_balsa_casulo_e8ecef
+Kd 0.8070 0.8388 0.8632
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_78_casaria_prata_c4cad0
+Kd 0.5520 0.5906 0.6308
+Ka 0 0 0
+Ks 0.68 0.68 0.68
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1
+illum 2
+
+newmtl mat_79_sensor_eo_15191c
+Kd 0.0075 0.0097 0.0116
+Ka 0 0 0
+Ks 0.68 0.68 0.68
+Ke 0.0000 0.0000 0.0000
+Ns 162
+d 1
+illum 2
+
+newmtl mat_80_radar_preto_1b1e21
+Kd 0.0110 0.0130 0.0152
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_81_arma_cinza_met_bcc3c9
+Kd 0.5029 0.5457 0.5841
+Ka 0 0 0
+Ks 0.79 0.79 0.79
+Ke 0.0000 0.0000 0.0000
+Ns 173
+d 1
+illum 2
+
+newmtl mat_82_arma_cinza_met_eef1f4
+Kd 0.8550 0.8796 0.9047
+Ka 0 0 0
+Ks 0.79 0.79 0.79
+Ke 0.0000 0.0000 0.0000
+Ns 177
+d 1
+illum 2
+
+newmtl mat_83_arma_cinza_met_eef1f4
+Kd 0.8550 0.8796 0.9047
+Ka 0 0 0
+Ks 0.79 0.79 0.79
+Ke 0.0000 0.0000 0.0000
+Ns 179
+d 1
+illum 2
+
+newmtl mat_84_domo_radar_2a3036
+Kd 0.0232 0.0296 0.0369
+Ka 0 0 0
+Ks 0.74 0.74 0.74
+Ke 0.0000 0.0000 0.0000
+Ns 165
+d 1
+illum 2
+
+newmtl mat_85_boia_laranja_ff6a00
+Kd 1.0000 0.1441 0.0000
+Ka 0 0 0
+Ks 0.65 0.65 0.65
+Ke 0.0000 0.0000 0.0000
+Ns 158
+d 1
+illum 2
+
+newmtl mat_86_arma_cinza_met_eef1f4
+Kd 0.8550 0.8796 0.9047
+Ka 0 0 0
+Ks 0.74 0.74 0.74
+Ke 0.0000 0.0000 0.0000
+Ns 162
+d 1
+illum 2
+
+newmtl mat_87_junta_conves_2e1413
+Kd 0.0273 0.0070 0.0065
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_88_cabo_amarracao_a58b5a
+Kd 0.3763 0.2582 0.1022
+Ka 0 0 0
+Ks 0.50 0.50 0.50
+Ke 0.0000 0.0000 0.0000
+Ns 95
+d 1
+illum 2
+
+newmtl mat_89_aco_escuro_3b444b
+Kd 0.0437 0.0578 0.0704
+Ka 0 0 0
+Ks 0.75 0.75 0.75
+Ke 0.0000 0.0000 0.0000
+Ns 152
+d 1
+illum 2
+
+newmtl mat_90_bolso_ancora_3a4047
+Kd 0.0423 0.0513 0.0630
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_91_moldura_ancora_bcc3c9
+Kd 0.5029 0.5457 0.5841
+Ka 0 0 0
+Ks 0.73 0.73 0.73
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1
+illum 2
+
+newmtl mat_92_preto_metalico_15171a
+Kd 0.0075 0.0086 0.0103
+Ka 0 0 0
+Ks 0.77 0.77 0.77
+Ke 0.0000 0.0000 0.0000
+Ns 169
+d 1
+illum 2
+
+newmtl mat_93_bolso_ancora_030304
+Kd 0.0009 0.0009 0.0012
+Ka 0 0 0
+Ks 0.67 0.67 0.67
+Ke 0.0000 0.0000 0.0000
+Ns 135
+d 1
+illum 2
+
+newmtl mat_94_ancora_ferro_preto_2b2f35
+Kd 0.0242 0.0284 0.0356
+Ka 0 0 0
+Ks 0.75 0.75 0.75
+Ke 0.0000 0.0000 0.0000
+Ns 154
+d 1
+illum 2
+
+newmtl mat_95_marca_calado_f2f4f5
+Kd 0.8879 0.9047 0.9131
+Ka 0 0 0
+Ks 0.56 0.56 0.56
+Ke 0.0000 0.0000 0.0000
+Ns 143
+d 1
+illum 2
+
+newmtl mat_emblema_marinha
+Kd 1 1 1
+Ka 0 0 0
+Ks 0.10 0.10 0.10
+Ke 0 0 0
+Ns 60
+d 1
+illum 2
+map_Kd emblema_marinha.png
+map_d emblema_marinha.png

@@ -1,0 +1,16 @@
+HUD partida: 20 elementos; sem sobreposição
+FPS headless (SwiftShader, CPU): 2.4
+NaN: ok
+auto: {"tiros":8,"autoMira":true,"auto":1}
+HUD binóculo: 17 elementos; sem sobreposição
+HUD drone: 20 elementos; sem sobreposição
+cams: {"cam":"drone","uav":0}
+HUD alerta: 21 elementos; sem sobreposição
+iscas: {"chaff":2,"res":5,"iscas":1}
+helis do navio: [1,0]
+HUD helicóptero: 10 elementos; sem sobreposição
+heli: {"ctrl":0,"est":[[3,45],[1,8]]}
+após voltar: {"ctrl":-1,"est":[3,1]}
+NaN: ok
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

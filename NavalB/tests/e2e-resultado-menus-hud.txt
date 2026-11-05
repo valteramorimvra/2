@@ -1,0 +1,11 @@
+menus ok
+HUD 915x412: 25 elementos, sobreposições/fora: .hud-fita × .hud-estado
+HUD 800x360: 25 elementos, sobreposições/fora: .hud-placar × .hud-estado; .hud-fita × .hud-estado; .lm-linha button[1] × .hud-armas .ar[vls]; .hud-armas .ar[torp] × .hud-msg.on; .hud-armas .ar[torpModo] × .hud-msg.on
+HUD 1280x720: 25 elementos, sobreposições/fora: nenhuma
+HUD 960x432: 25 elementos, sobreposições/fora: .hud-fita × .hud-estado
+HUD 740x360: 25 elementos, sobreposições/fora: .hud-placar × .hud-estado; .hud-fita × .hud-estado; .hud-fita × .hud-radar canvas; .lm-linha button[1] × .hud-armas .ar[vls]; .hud-armas .ar[torp] × .hud-msg.on; .hud-armas .ar[torpModo] × .hud-msg.on
+HUD canhoto 915x412: .hud-fita × .hud-pausa[pausa]
+HUD binóculo: .hud-fita × .hud-estado
+áudio: {"canhao_grande":"gravação real","canhao_medio":"gravação real","canhao_rapido":"gravação real","canhao_longe":"gravação real","ciws":"gravação real","vls_lancamento":"gravação real","explosao_perto":"gravação real","explosao_media":"gravação real","explosao_grande":"gravação real","explosao_longe":"gravação real","respingo_grande":"gravação real","respingo":"gravação real","impacto_metal":"gravação real","torpedo_corrida":"gravação real","alarme_trava":"gravação real","motor_diesel_loop":"gravação real","turbina_loop":"gravação real"}
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

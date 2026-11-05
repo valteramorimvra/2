@@ -1,0 +1,51 @@
+/* v1.2.67: MAPA TÁTICO em tela cheia — painel militar escuro, filetes dourados, transição de escala + alfa a partir do mini-radar */
+.mapa-tat { position: absolute; inset: 0; z-index: 95; background: radial-gradient(ellipse at 40% 50%, rgba(8,18,28,.94), rgba(3,7,12,.97)); opacity: 0; transform: scale(.35); transform-origin: 70px 70px; transition: opacity .2s ease, transform .22s cubic-bezier(.2,.8,.2,1); pointer-events: auto; touch-action: none; color: #e6edf3; font-family: inherit; }
+.mapa-tat.on { opacity: 1; transform: none; }
+.mapa-tat .mt-cv { position: absolute; inset: 0; width: 100%; height: 100%; }
+.mapa-tat .mt-topo { position: absolute; left: 12px; right: 12px; top: max(8px, env(safe-area-inset-top)); height: 30px; display: flex; align-items: center; gap: 12px; padding-left: max(0px, env(safe-area-inset-left)); }
+.mapa-tat .mt-topo b { font-size: 13px; letter-spacing: .22em; color: #f3d77a; } .mapa-tat .mt-topo span { font-size: 11px; color: #94a3b8; flex: 1; }
+.mapa-tat .mt-fecha { width: 34px; height: 30px; border-radius: 4px; border: 1px solid rgba(212,175,55,.5); background: rgba(20,26,34,.9); color: #f3d77a; font-size: 16px; }
+.mapa-tat .mt-ficha { position: absolute; right: max(10px, env(safe-area-inset-right)); top: 44px; bottom: 10px; width: 266px; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; padding: 10px 12px; border-radius: 4px; border: 1px solid rgba(212,175,55,.35); background: linear-gradient(180deg, rgba(22,30,40,.95), rgba(10,14,20,.95)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.03); }
+.mt-ficha h3 { margin: 0 0 2px; font-size: 14px; letter-spacing: .04em; } .mt-ficha h3.hos { color: #ff8a80; } .mt-ficha h3.ami { color: #8ccaff; }
+.mt-ficha .mt-cls { margin: 0 0 6px; font-size: 10.5px; color: #9fb0bf; } .mt-ficha .mt-sub { margin: 8px 0 2px; font-size: 9.5px; letter-spacing: .16em; color: #e0b54a; text-transform: uppercase; }
+.mt-ficha dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 6px 0 0; font-size: 11.5px; } .mt-ficha dt { color: #94a3b8; } .mt-ficha dd { margin: 0; font-weight: 700; }
+.mt-ficha .mt-arm { margin: 0; font-size: 11px; line-height: 1.35; } .mt-ficha .mt-av { margin: 0; display: flex; flex-wrap: wrap; gap: 3px; font-size: 10px; } .mt-av i { font-style: normal; padding: 1px 5px; border-radius: 3px; background: rgba(245,158,11,.18); color: #fcd34d; } .mt-av i.av-fogo { background: rgba(239,68,68,.25); color: #fca5a5; } .mt-av i.av-agua { background: rgba(56,189,248,.22); color: #7dd3fc; } .mt-av span { color: #86efac; }
+.mt-vida { position: relative; height: 14px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; } .mt-vida i { position: absolute; inset: 0 auto 0 0; } .mt-vida span { position: relative; display: block; text-align: center; font-size: 9.5px; line-height: 14px; font-weight: 700; text-shadow: 0 1px 2px #000; }
+.mt-ficha .mt-bt { display: block; width: 100%; margin-top: 8px; padding: 9px 6px; border-radius: 4px; font-weight: 900; font-size: 11.5px; letter-spacing: .08em; color: #fff; border: 1px solid rgba(255,255,255,.15); }
+.mt-bt.mt-on { background: linear-gradient(180deg, #b45309, #7c2d12); border-color: #f59e0b; } .mt-bt.mt-off { background: linear-gradient(180deg, #1e3a5f, #0f1f33); border-color: #38bdf8; } .mt-bt.mt-sec { background: rgba(30,36,44,.8); font-weight: 700; color: #9fb0bf; }
+.mt-ficha .mt-dica { font-size: 11px; color: #94a3b8; } .mt-ficha .mt-eng { font-size: 11px; color: #fbbf24; font-weight: 700; margin: 8px 0 0; }
+.mt-lista { display: flex; flex-direction: column; gap: 4px; margin: 4px 0 8px; } /* v1.2.76 */
+.mt-ct { text-align: left; padding: 5px 7px; border-radius: 4px; border: 1px solid rgba(255,90,79,.4); background: rgba(80,16,16,.5); color: #ffd7d3; }
+.mt-ct b { display: block; font-size: 11px; font-weight: 800; } .mt-ct small { color: #fca5a5; font-size: 10px; }
+.mt-ct.on { border-color: #facc15; box-shadow: inset 0 0 0 1px #facc15; }
+.mapa-tat .mt-leg { position: absolute; left: 14px; bottom: max(8px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 6px; font-size: 10px; color: #94a3b8; } .mt-leg i { display: inline-block; width: 10px; height: 10px; margin-left: 6px; } .lg-am { border-radius: 50%; background: #1e4f8a; border: 2px solid #5ab4ff; } .lg-hs { transform: rotate(45deg) scale(.8); background: #7a1a1a; border: 2px solid #ff5a4f; } .lg-ar { border-radius: 10px 10px 0 0; background: #1e4f8a; border: 2px solid #5ab4ff; border-bottom: 0; }
+@media (max-height: 420px) { .mapa-tat .mt-ficha { width: 236px; } }
+/* botão DESATIVAR AUTO-PILOTO no HUD: centro, logo abaixo da faixa da bússola — não cobre leme, mira, telêmetro nem armas */
+.ap-off { position: absolute; left: 50%; top: calc(66px + env(safe-area-inset-top)); translate: -50% 0; z-index: 90; display: flex; align-items: center; gap: 7px; padding: 6px 12px 6px 8px; border-radius: 4px; border: 1px solid #f59e0b; background: linear-gradient(180deg, rgba(120,53,15,.92), rgba(60,24,6,.92)); color: #fde68a; font-weight: 900; font-size: 11px; letter-spacing: .08em; box-shadow: 0 0 14px rgba(245,158,11,.35); }
+.ap-off svg { width: 20px; height: 20px; stroke: #fde68a; fill: none; stroke-width: 2; } .ap-off small { display: block; font-size: 9px; font-weight: 700; letter-spacing: .04em; color: #fcd34d; opacity: .85; }
+.ap-off[hidden] { display: none; }
+
+/* v1.2.72 (Valter): DESATIVAR menor, à direita, abaixo do contador de aeronaves */
+.ap-off { left: auto !important; translate: none !important; right: calc(var(--sr, 0px) + 42px); top: calc(52px + env(safe-area-inset-top)); padding: 3px 7px 3px 5px !important; gap: 4px !important; font-size: 9px !important; border-radius: 4px; }
+.ap-off svg { width: 13px !important; height: 13px !important; } .ap-off b { font-size: 9px; letter-spacing: .03em; } .ap-off small { font-size: 8px !important; }
+/* v1.3.51: legenda dos trajetos (navio = linha cheia, aeronave = tracejada) */
+.mt-leg .lg-tn { width: 16px; height: 0; border-top: 2px solid #60a5fa; }
+.mt-leg .lg-ta { width: 16px; height: 0; border-top: 2px dashed #22d3ee; }
+/* v1.3.56 (Valter): radar remodelado — mapa inteiro à esquerda; fichas dos inimigos em QUADROS e o editor de ROTAS à direita */
+.mapa-tat .mt-ficha { width: auto; }
+.mt-ficha .mt-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; margin-top: 4px; }
+.mt-ficha .mt-card { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; padding: 7px 8px; border-radius: 6px; border: 1px solid rgba(248, 113, 113, .45); background: linear-gradient(180deg, rgba(127, 29, 29, .38), rgba(30, 10, 14, .55)); color: #fee2e2; font: inherit; cursor: pointer; }
+.mt-ficha .mt-card.on { border-color: #facc15; box-shadow: 0 0 0 1px #facc15 inset; }
+.mt-ficha .mt-card.velho { opacity: .6; }
+.mt-ficha .mt-card b { font-size: 11.5px; line-height: 1.15; } .mt-ficha .mt-card small { font-size: 9.5px; color: #fca5a5; }
+.mt-ficha .mt-card em { font-style: normal; font-size: 10px; color: #e2e8f0; }
+.mt-ficha .mt-vb { display: block; width: 100%; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, .12); overflow: hidden; margin: 2px 0; } .mt-ficha .mt-vb i { display: block; height: 100%; }
+.mt-ficha .mt-ar { display: inline-block; margin: 3px 6px 0 0; font-size: 10px; color: #fdba74; }
+.mt-ficha .mt-dupla { display: flex; gap: 6px; flex-wrap: wrap; } .mt-ficha .mt-dupla .mt-bt { flex: 1 1 0; min-width: 84px; }
+.mt-ficha .mt-bt.mt-rota { background: rgba(21, 128, 61, .35); border-color: rgba(74, 222, 128, .6); color: #dcfce7; }
+.mt-ficha .mt-err { margin: 6px 0 0; font-size: 11px; font-weight: 800; color: #f87171; }
+.mt-ficha .mt-alt { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 10.5px; color: #94a3b8; } .mt-ficha .mt-alt .mt-bt { width: 38px; flex: none; margin: 0; padding: 6px 0; } .mt-ficha .mt-alt b { min-width: 58px; text-align: center; color: #f8fafc; }
+.mt-ficha .mt-rota { margin-top: 8px; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(74, 222, 128, .5); background: rgba(20, 83, 45, .3); } .mt-ficha .mt-rota.pau { border-color: rgba(251, 191, 36, .6); background: rgba(120, 53, 15, .3); }
+.mt-ficha .mt-rota b { display: block; font-size: 11px; } .mt-ficha .mt-rota small { display: block; font-size: 10px; color: #94a3b8; }
+.ap-off.rota { border-color: rgba(74, 222, 128, .7); } .ap-off.rota svg { stroke: #86efac; } .ap-off.rota.pausada { border-color: rgba(251, 191, 36, .8); } .ap-off.rota.pausada svg { stroke: #fbbf24; }
+.mapa-tat .mt-leg { flex-wrap: wrap; row-gap: 2px; font-size: 9px; }

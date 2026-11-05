@@ -1,0 +1,40 @@
+/* v1.2.18 item 4: TELA INICIAL AAA naval — hierarquia (BATALHA em destaque), chanfros militares, vidro escuro AMOLED com borda metálica fina,
+   estados de toque, grade; gradiente escuro atrás do painel (nada do cenário 3D sob os botões — o navio é enquadrado no vão à direita) */
+.tela-inicio::before { content: ''; position: absolute; inset: 0 auto 0 0; width: min(62vw, 560px); pointer-events: none; z-index: 0;
+  background: linear-gradient(90deg, rgba(1,3,6,.86) 0%, rgba(1,3,6,.72) 55%, rgba(1,3,6,.32) 82%, rgba(1,3,6,0) 100%); }
+.tela-inicio > * { position: relative; z-index: 1; }
+.tela-inicio > .carteira, .tela-inicio > .perfil-card, .tela-inicio > .versao { position: absolute; }
+.mp18 { --ch: 9px; gap: 7px; width: 262px; }
+.mp18 .mpb { position: relative; display: flex; align-items: center; gap: 9px; text-align: left; border-radius: 0; color: #e5e9ee; letter-spacing: .1em;
+  border: 1px solid transparent;
+  background: linear-gradient(180deg, rgba(10,14,20,.78), rgba(2,4,7,.86)) padding-box,
+              linear-gradient(135deg, rgba(214,222,230,.55), rgba(70,80,92,.45) 38%, rgba(30,36,44,.5) 62%, rgba(186,196,206,.5)) border-box;
+  clip-path: polygon(var(--ch) 0, 100% 0, 100% calc(100% - var(--ch)), calc(100% - var(--ch)) 100%, 0 100%, 0 var(--ch));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06); transition: background-color .12s, filter .12s, transform .08s; -webkit-tap-highlight-color: transparent; }
+.mp18 .mpb::after { content: ''; position: absolute; left: 0; top: 0; width: calc(var(--ch) * 1.42); height: 1px; background: rgba(214,222,230,.55); transform-origin: 0 0; transform: translate(0, var(--ch)) rotate(-45deg); pointer-events: none; }
+.mp18 .mpi { width: 17px; height: 17px; flex: none; fill: none; stroke: #9fb3c4; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.mp18 .mpt { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; white-space: nowrap; }
+.mp18 .mpt small { font-size: 10px; font-weight: 600; letter-spacing: .06em; color: #8fa3b5; margin-top: 3px; text-transform: none; }
+.mp18 .mpb:active, .mp18 .mpb.toque { transform: scale(.975); filter: brightness(1.25); }
+.mp18 .mpb:focus-visible { outline: 1px solid #cbd5e1; outline-offset: 2px; }
+@media (hover: hover) { .mp18 .mpb:hover { filter: brightness(1.15); } }
+.mp18 .mpb.primario { --ch: 12px; min-height: 58px; font-size: 19px; letter-spacing: .14em; color: #fff;
+  background: linear-gradient(180deg, rgba(14,52,72,.92), rgba(4,22,34,.94)) padding-box,
+              linear-gradient(135deg, #e2e8f0, #64748b 40%, #334155 60%, #cbd5e1) border-box; box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 0 0 1px rgba(125,211,252,.18); }
+.mp18 .mpb.primario .mpi { width: 22px; height: 22px; stroke: #e0f2fe; }
+.mp18 .mpb.primario .mpt small { color: #bae6fd; }
+.mp18 .mpb.primario::before { content: ''; position: absolute; left: 0; top: 18%; bottom: 18%; width: 3px; background: #38bdf8; }
+.mp18 .mpc { margin-left: auto; font-style: normal; font-size: 22px; color: #bae6fd; opacity: .8; }
+.mp18 .mp-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.mp18 .mp-2 .mpb { padding-left: 9px; padding-right: 6px; font-size: 11.5px; letter-spacing: .07em; gap: 7px; min-width: 0; }
+.mp18 .mp-2 .mpi { width: 15px; height: 15px; }
+@media (max-height: 380px) { .mp18 .mpb.primario { min-height: 46px; font-size: 17px; } .mp18 .mpt small { display: none; } }
+@media (max-height: 330px) { .mp18 { gap: 4px; } .mp18 .mpb { min-height: 34px; } }
+.canhoto .tela-inicio::before { inset: 0 0 0 auto; transform: scaleX(-1); }
+/* v1.2.18: raridade SUPER LENDÁRIO — dourado-carmim (distinta do roxo lendário) */
+.slend-s { color: #fbbf24; font-style: normal; text-shadow: 0 0 5px rgba(251,191,36,.6), 0 0 2px #b91c1c; }
+.lend-h.slend-h { color: #fde68a; }
+.es-lista .lend.slend { border-color: rgba(251,191,36,.8) !important; background: linear-gradient(90deg, rgba(153,27,27,.55), rgba(120,53,15,.35)) !important; box-shadow: 0 0 10px rgba(251,191,36,.45), 0 0 0 1px rgba(251,191,36,.35) inset; animation: slendPulso 2.4s ease-in-out infinite; }
+.es-lista .lend.slend.on { border-color: #fef3c7 !important; background: linear-gradient(90deg, rgba(185,28,28,.8), rgba(146,64,14,.6)) !important; box-shadow: 0 0 18px rgba(251,191,36,.9), 0 0 0 2px #fbbf24 inset; animation: none; }
+.selo.lend.slend { color: #fef3c7; background: linear-gradient(90deg, rgba(153,27,27,.8), rgba(146,64,14,.75)); border-color: #fbbf24; white-space: nowrap; display: inline-block; }
+@keyframes slendPulso { 0%, 100% { box-shadow: 0 0 6px rgba(251,191,36,.35), 0 0 0 1px rgba(251,191,36,.3) inset; } 50% { box-shadow: 0 0 16px rgba(251,191,36,.75), 0 0 0 1px rgba(254,243,199,.6) inset; } }

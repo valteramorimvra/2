@@ -1,0 +1,25 @@
+menus ok
+HUD 915x412: 24 elementos, sobreposições/fora: nenhuma
+HUD 800x360: 25 elementos, sobreposições/fora: nenhuma
+HUD 1280x720: 25 elementos, sobreposições/fora: nenhuma
+HUD 960x432: 25 elementos, sobreposições/fora: nenhuma
+HUD 740x360: 25 elementos, sobreposições/fora: nenhuma
+HUD canhoto 915x412: nenhuma
+HUD binóculo: nenhuma
+míssil idx 13
+estado antes CIWS: {"eu":0,"vida":364,"e":0,"d":5028,"torp":6,"alvoId":8,"esp":0}
+CIWS em ação capturado: true
+torp estado {"livres":12,"torp":6,"morto":0,"esp":0}
+torpedo idx 4
+fim: Frota aliada destruída
+mapa arquipelago  : {"q":0,"fps":11}
+mapa estreito  : {"q":0,"fps":11}
+mapa atois  : {"q":0,"fps":11}
+mapa fiordes  : {"q":0,"fps":11}
+mapa guanabara  : {"q":0,"fps":11}
+mapa santos  : {"q":0,"fps":11}
+mapa arquipelago noite limpo: {"q":0,"fps":11}
+mapa estreito dia chuva: {"q":0,"fps":12}
+áudio: {"canhao_grande":"gravação real","canhao_medio":"gravação real","canhao_rapido":"gravação real","canhao_longe":"gravação real","ciws":"gravação real","vls_lancamento":"gravação real","explosao_perto":"gravação real","explosao_media":"gravação real","explosao_grande":"gravação real","explosao_longe":"gravação real","respingo_grande":"gravação real","respingo":"gravação real","impacto_metal":"gravação real","torpedo_corrida":"gravação real","alarme_trava":"gravação real","motor_diesel_loop":"gravação real","turbina_loop":"gravação real"}
+ERROS DE CONSOLE: nenhum
+avisos: nenhum

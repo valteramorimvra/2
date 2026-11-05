@@ -1,0 +1,12 @@
+✔ AUTO-MIRA desligada por padrão
+✔ botão AUTO-MIRA presente no HUD
+✔ radar ATIVO / detecção / toque no radar não ligam a AUTO-MIRA
+✔ toque no radar não seleciona alvo (alvo -1)
+✔ AUTO-MIRA desligada: mira manual não se move (Δ 0.00°)
+✔ botão liga a AUTO-MIRA com estado visível
+✔ estado da AUTO-MIRA salvo
+✔ AUTO-MIRA ligada, inimigo a 14° da mira: não pula (Δ 0.00°)
+✔ AUTO-MIRA ligada, navio perto do retículo: ajusta até o navio (erro 0.98° → 0.12°)
+✔ a AUTO-MIRA não liga/desliga sozinha
+
+10 passaram, 0 falharam

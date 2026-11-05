@@ -1,0 +1,11 @@
+// v1.2.14 item 17 — avisos da batalha OPCIONAIS: com tudo desligado → 0 avisos (log lateral, mensagens, DETECTADO, faixa de míssil, voz); ligado → avisos aparecem.
+import { abre } from './cdp.mjs'; import fs from 'node:fs';
+const b = await abre('http://127.0.0.1:4173/?auto', { w: 915, h: 412 }); const ev = b.ev, esp = b.espera;
+for (let i = 0; i < 160; i++) { if (await ev(`!document.querySelector('#boot') && !!window.__nnsUI`)) break; await esp(500); }
+const rodada = async (liga) => { await ev(`(async()=>{ const a=__nnsUI.save.ajustes; a.qualidade='baixa'; for (const k of ['avisos','avisosNav','avisosDet','avisosArmas','avisosDano','avisosDefesa','avisosObj','avisosVoz']) a[k]=${liga}; await __nnsUI.zarpar({ mapa: 'estreito', modo: 'frota', classe: 'cruzador', seed: 5, hora: 'dia', tempo: 'limpo', mercantes: true }); __nns.tutorial=false; __nns.eu.controleIA=1; const H=__nns.hud; H.nAvisos=0; H.nAvisosFiltrados=0; window.__alerta=0; window.__voz=0; const A=__nns.audio; if (!A.__f) { A.__f=A.fala.bind(A); A.fala=(...x)=>{ window.__voz++; return A.__f(...x); }; } return 1 })()`, 180000);
+  const r = await ev(`(async()=>{ const j=__nns, S=j.S, H=j.hud; for (let k=0;k<90;k++){ for (let i=0;i<60;i++){ S.avanca(1/60); if (i%6===0){ j.processaEventos(); } S.sim.eventos.length=0; } j.hudQuadro && j.hudQuadro(1); H.atualiza(j.estadoHud()); if (!H.r.alerta.hidden) window.__alerta++; await new Promise(r=>setTimeout(r,5)); } const lg=H.r.log ? H.r.log.querySelectorAll('.lg.info').length : -1; return JSON.stringify({ avisos: H.nAvisos||0, filtrados: H.nAvisosFiltrados||0, logVisiveis: lg, faixaMissil: window.__alerta, voz: window.__voz, detectado: H.r.detec ? !H.r.detec.hidden : null }); })()`, 300000);
+  return JSON.parse(r); };
+const des = await rodada(false), lig = await rodada(true);
+const ok = des.avisos === 0 && des.logVisiveis === 0 && des.faixaMissil === 0 && des.voz === 0 && lig.avisos + lig.filtrados > 0;
+const linha = `AVISOS OPCIONAIS: desligados ${JSON.stringify(des)} | ligados ${JSON.stringify(lig)} → ${ok ? 'OK' : 'FALHOU'}`; console.log(linha, 'erros', JSON.stringify(b.erros.slice(0, 3)));
+fs.writeFileSync('/workspace/avisos1214.log', linha + '\n'); b.fecha(); process.exit(ok ? 0 : 1);

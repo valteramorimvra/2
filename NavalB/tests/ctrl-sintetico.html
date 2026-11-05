@@ -1,0 +1,38 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000;overflow:hidden}canvas{width:100vw;height:100vh;display:block}</style></head><body><canvas id="c"></canvas>
+<script type="module">
+/* Controle sintético (Fiscal 16:15): cena ESTÁTICA, sem lógica de jogo, mesmo renderer/config do jogo (three r169,
+   antialias, ACES, sRGB, sombras PCFSoft). Só render. monta(nTex,nPlain) ajusta o nº de malhas para casar
+   uniformMatrix e activeTexture por quadro com o combate. */
+import * as THREE from './three.module.js';
+const canvas = document.getElementById('c');
+const R = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', stencil: false });
+R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping; R.shadowMap.type = THREE.PCFSoftShadowMap; R.shadowMap.enabled = true;
+R.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); R.setSize(innerWidth, innerHeight, false);
+const cena = new THREE.Scene(); cena.background = new THREE.Color(0x87a8c8);
+const cam = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 1, 20000); cam.position.set(0, 60, 260); cam.lookAt(0, 0, -200);
+cena.add(new THREE.HemisphereLight(0xffffff, 0x334455, 0.8));
+const sol = new THREE.DirectionalLight(0xffffff, 2); sol.position.set(200, 400, 100); sol.castShadow = true; sol.shadow.mapSize.set(1024, 1024);
+Object.assign(sol.shadow.camera, { left: -600, right: 600, top: 600, bottom: -600, far: 2000 }); cena.add(sol);
+const geoB = new THREE.BoxGeometry(6, 4, 14), geoS = new THREE.SphereGeometry(3, 12, 8);
+const grupo = new THREE.Group(); cena.add(grupo);
+const QS = new URLSearchParams(location.search); const NPROG = +(QS.get('prog') || 0), BUFKB = +(QS.get('buf') || 0); cena.fog = new THREE.Fog(0x87a8c8, 500, 9000);
+const dinam = []; if (BUFKB) { const nv = Math.round(BUFKB * 1024 / 12); const g = new THREE.BufferGeometry(); const pos = new Float32Array(nv * 3); for (let i = 0; i < nv; i++) { pos[i*3] = (i % 100) * 0.5; pos[i*3+1] = 0; pos[i*3+2] = Math.floor(i / 100) * 0.5; } const at = new THREE.BufferAttribute(pos, 3); at.setUsage(THREE.DynamicDrawUsage); g.setAttribute('position', at);
+  const pt = new THREE.Points(g, new THREE.PointsMaterial({ size: 1, color: 0xffffff })); pt.frustumCulled = false; pt.position.set(0, 20, -300); cena.add(pt); dinam.push(at); }
+function tex(i) { const n = 16, d = new Uint8Array(n * n * 4); for (let k = 0; k < n * n; k++) { d[k*4] = (i*37+k)&255; d[k*4+1] = (i*91)&255; d[k*4+2] = (k*5)&255; d[k*4+3] = 255; }
+  const t = new THREE.DataTexture(d, n, n); t.needsUpdate = true; t.colorSpace = THREE.SRGBColorSpace; return t; }
+function monta(nTex, nPlain) {
+  for (const o of [...grupo.children]) { grupo.remove(o); o.material.map && o.material.map.dispose(); o.material.normalMap && o.material.normalMap.dispose(); o.material.dispose(); }
+  const tot = nTex + nPlain;
+  for (let i = 0; i < tot; i++) {
+    const comTex = i < nTex;
+    const k = (!comTex && NPROG) ? (i % NPROG) : 0;
+    const m = new THREE.MeshStandardMaterial({ flatShading: !!(k & 1), vertexColors: false, fog: !!(k & 2), side: (k & 4) ? THREE.DoubleSide : THREE.FrontSide, alphaTest: (k & 8) ? 0.1 : 0, toneMapped: !(k & 16), dithering: !!(k & 32), wireframe: false, emissive: (k & 64) ? 0x111111 : 0x000000, emissiveIntensity: 1, transparent: !!(k & 128), color: new THREE.Color().setHSL((i * 0.13) % 1, 0.5, 0.5), roughness: 0.6, metalness: 0.2, map: comTex ? tex(i) : null, normalMap: comTex ? tex(i + 7) : null });
+    const o = new THREE.Mesh(i % 2 ? geoS : geoB, m); const a = i * 2.399, r = 20 + 8 * Math.sqrt(i);
+    o.position.set(Math.cos(a) * r, (i % 5) * 3, -200 + Math.sin(a) * r); o.rotation.y = a; o.castShadow = true; o.receiveShadow = true; grupo.add(o);
+  }
+  R.compile(cena, cam); R.render(cena, cam); return tot;
+}
+const j = { R, cena, cam, THREE, fx: null, eu: {}, S: { sim: { tick: 999, t: 0, helis: [], navios: [], granadas: [], misseis: [], torpedos: [] } }, monta,
+  laco(t) { for (const a of dinam) { const p = a.array; const o = ((t / 16) | 0) % 7; for (let i = 0; i < p.length; i += 3) p[i + 1] = ((i + o) % 5) * 0.1; a.needsUpdate = true; } R.render(cena, cam); this._raf = requestAnimationFrame(this._laco); }, _raf: 0 };
+j._laco = (t) => j.laco(t); window.__nns = j; window.__ctrlPronto = true;
+</script></body></html>

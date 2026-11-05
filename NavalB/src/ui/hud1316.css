@@ -1,0 +1,41 @@
+/* v1.3.16 (Valter) — quadro da batalha:
+   · o quadro do perfil do comandante (retrato/nome/vida/módulos) sai da batalha; no lugar dele fica o botão ATIVO/PASSIVO do radar;
+   · MIRA LIVRE e ACÚSTICO embaixo de AUTO-MIRA e AUTO-FOGO, em grade 2×2 com colunas iguais e o mesmo espaço entre todos;
+   · o botão NUCLEAR fica acima do TRAVAR (mesma coluna). */
+.hud .h-painel { display: none !important; }
+.hud .h-radar .rd-modo, .hud.v12 .h-radar .rd-modo { left: calc(100% + 8px); top: 0; bottom: auto; }
+.hud .h-chaves, .hud.ctl-novo .h-chaves { display: grid !important; grid-template-columns: repeat(2, 1fr); column-gap: 22px !important; row-gap: 22px !important; flex-direction: initial; align-items: stretch; }
+.hud .h-chaves button { width: auto; text-align: center; }
+.hud .h-chaves [data-r="bMira"] { order: 1; } .hud .h-chaves [data-r="bAuto"] { order: 2; }
+.hud .h-chaves [data-r="bLivre"] { order: 3; } .hud .h-chaves [data-r="bTorpModo"] { order: 4; } .hud .h-chaves .b-hidro { order: 5; }
+.hud .h-armas .cb.a2.p0.nk { right: 125px; bottom: 231px; }
+.hud.v12 .h-armas .cb.a2.p0.nk { right: 166px !important; bottom: 278px !important; } /* grade v12: passo de 66 px — TRAVAR em 212 → NUCLEAR em 278, mesma coluna */
+@media (max-height: 400px) { /* telas baixas: NUCLEAR um pouco mais baixo para não tocar o placar; o rótulo (PRONTA/tempo) vai para o lado esquerdo do botão para não cobrir o TRAVAR */
+  .hud.v12 .h-armas .cb.a2.p0.nk { bottom: 266px !important; }
+  .hud .h-armas .cb.a2.p0.nk > em { top: 50% !important; bottom: auto !important; left: auto !important; right: calc(100% + 4px) !important; transform: translateY(-50%) !important; white-space: nowrap; }
+}
+/* a grade acima usa !important: mantém as chaves escondidas nos modos onde já sumiam (óptica, espectador, aeronaves) */
+.hud.espec-on .h-chaves, .hud.modo-heli .h-chaves, .hud.modo-nk .h-chaves { display: none !important; }
+@media (min-width: 841px) { .hud.modo-bino .h-chaves, .hud.espectador .h-chaves { display: none !important; } } /* telas largas: como antes (nas estreitas a grade antiga já as mantinha) */
+/* v1.3.18 (Valter): as 4 chaves numa COLUNA só (a mesma onde já estavam AUTO-MIRA e AUTO-FOGO), uma embaixo da outra, mesma largura e mesmo espaço:
+   AUTO-MIRA · MIRA LIVRE · AUTO-FOGO · ACÚSTICO/RETO */
+.hud .h-chaves, .hud.ctl-novo .h-chaves { grid-template-columns: max-content !important; column-gap: 0 !important; row-gap: 10px !important; justify-items: stretch; }
+.hud .h-chaves [data-r="bMira"] { order: 1; } .hud .h-chaves [data-r="bLivre"] { order: 2; } .hud .h-chaves [data-r="bAuto"] { order: 3; } .hud .h-chaves [data-r="bTorpModo"] { order: 4; }
+.hud .h-chaves button::after { top: -5px !important; bottom: -5px !important; } /* área de toque até a metade do espaço: uma não cobre a outra */
+/* v1.3.19 (Valter): TRAVAR verde quando acionado; cruzes da trava (vermelha = ponto travado, cinza = canhões; verde = alinhado) */
+.hud .h-armas .cb[data-a=travar].trv { border-color: #22c55e !important; background: rgba(34,197,94,.28) !important; color: #dcfce7; --cc: #4ade80; }
+.hud .h-armas .cb[data-a=travar].trv .cb-a { stroke: #22c55e; }
+.hud .h-crz { position: absolute; left: 0; top: 0; width: 18px; height: 18px; margin: -9px 0 0 -9px; pointer-events: none; z-index: 4; will-change: transform; }
+.hud .h-crz::before, .hud .h-crz::after { content: ''; position: absolute; background: rgba(239,68,68,.55); box-shadow: 0 0 2px rgba(0,0,0,.6); }
+.hud .h-crz::before { left: 8px; top: 0; width: 2px; height: 18px; } .hud .h-crz::after { top: 8px; left: 0; height: 2px; width: 18px; }
+.hud .h-crz.g::before, .hud .h-crz.g::after { background: rgba(203,213,225,.9); }
+.hud .h-crz.ok::before, .hud .h-crz.ok::after { background: #22c55e; box-shadow: 0 0 4px rgba(34,197,94,.9); }
+.hud.espectador .h-crz, .hud.espec-on .h-crz, .hud.modo-nk .h-crz, .hud.modo-heli .h-crz { display: none !important; }
+/* v1.3.20: símbolo de CADA canhão disponível (cinza com o número da torre; verde quando aquela torre está assentada no ponto) */
+.hud .h-crzTs { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+.hud .h-crzT { position: absolute; left: 0; top: 0; width: 10px; height: 10px; margin: -5px 0 0 -5px; will-change: transform; }
+.hud .h-crzT::before, .hud .h-crzT::after { content: ''; position: absolute; background: rgba(203,213,225,.9); box-shadow: 0 0 2px rgba(0,0,0,.7); }
+.hud .h-crzT::before { left: 4px; top: 0; width: 2px; height: 10px; } .hud .h-crzT::after { top: 4px; left: 0; height: 2px; width: 10px; }
+.hud .h-crzT b { position: absolute; left: 9px; top: -9px; font: 700 8px/1 system-ui, sans-serif; color: #e2e8f0; text-shadow: 0 1px 2px #000; }
+.hud .h-crzT.ok::before, .hud .h-crzT.ok::after { background: #22c55e; } .hud .h-crzT.ok b { color: #86efac; }
+.hud.espectador .h-crzTs, .hud.espec-on .h-crzTs, .hud.modo-nk .h-crzTs, .hud.modo-heli .h-crzTs { display: none !important; }

@@ -1,0 +1,69 @@
+// v1.2.17 itens 38/38b/38c: MODO CANHOTO = espelho horizontal EXATO do destro (x' = W − x − w), gerado do destro.
+// Para cada proporção (21:9, 20:9, 19.5:9, 18:9, 16:9, 1280×720, tablet 4:3) e cena (combate, binóculo, cinema, espectador):
+//  (1) 0 sobreposições entre clicáveis (radar incluso), mesma métrica do sobrepor1216;  (2) 0 elementos fora da tela (todo bloco visível do HUD);
+//  (3) espelho: cada bloco do canhoto = destro espelhado (±1,5 px);  (4) textos não espelhados (nenhum scaleX negativo efetivo);
+//  (5) interação: leme em arco (toque à direita = BE, +), telégrafo (topo = AVANTE TODA), radar, leque de câmeras abre para dentro da tela;
+//  (6) persistência: ajustes.canhoto salvo e reaplicado ao reabrir.
+import { abre } from './cdp.mjs'; import fs from 'node:fs';
+const URL0 = (process.env.VZ_URL || 'http://127.0.0.1:4173') + '/?auto'; const DIR = '/workspace/nexo-naval-shots/1217/canhoto'; fs.mkdirSync(DIR, { recursive: true });
+const TAMS = [['21x9', 961, 412], ['20x9', 915, 412], ['19.5x9', 892, 412], ['18x9', 824, 412], ['16x9', 732, 412], ['1280x720', 1280, 720], ['4x3', 1024, 768]];
+const b = await abre(null, { w: 915, h: 412 }); const ev = b.ev, esp = b.espera; const falhas = []; const R = {};
+const VIS = `const vis=e=>{ const q=e.getBoundingClientRect(); if(!(q.width>1&&q.height>1)) return false; if(e.closest('[hidden]')) return false; for(let x=e;x&&x!==document.body;x=x.parentElement){ const c=getComputedStyle(x); if(c.display==='none'||c.visibility==='hidden'||+c.opacity<0.02) return false; } return true; };`;
+const sobre = `(()=>{ ${VIS} const nm=e=>(e.dataset.a||e.dataset.ir||e.dataset.r||e.className||e.tagName).toString().slice(0,16)+':'+(e.textContent||'').trim().slice(0,8);
+  const L=[...new Set([...document.querySelectorAll('button, [data-a], [data-ir], input, select, .cb, [role=button], [data-r=man]')])].filter(vis);
+  const vr=e=>{ let q=e.getBoundingClientRect(); let l=q.left,t=q.top,r=q.right,bt=q.bottom; for(let x=e.parentElement;x&&x!==document.body;x=x.parentElement){ const c=getComputedStyle(x); if(c.overflow!=='visible'){ const p=x.getBoundingClientRect(); l=Math.max(l,p.left); t=Math.max(t,p.top); r=Math.min(r,p.right); bt=Math.min(bt,p.bottom); } } return {left:l,top:t,right:r,bottom:bt} };
+  const o=[]; for(let i=0;i<L.length;i++) for(let j=i+1;j<L.length;j++){ if (L[i].contains(L[j])||L[j].contains(L[i])) continue; const a=vr(L[i]), c=vr(L[j]); if(a.right-a.left<1||c.right-c.left<1) continue; if(a.left<c.right-0.5&&c.left<a.right-0.5&&a.top<c.bottom-0.5&&c.top<a.bottom-0.5) o.push(nm(L[i])+' × '+nm(L[j])); }
+  { const rd=document.querySelector('[data-r=radar]'); if (rd && vis(rd)) { const q=rd.getBoundingClientRect(), cx=q.left+q.width/2, cy=q.top+q.height/2, rr=Math.min(q.width,q.height)/2; for (const e of L) { if (rd.contains(e)) continue; const a=vr(e); const dx=Math.max(a.left-cx,0,cx-a.right), dy=Math.max(a.top-cy,0,cy-a.bottom); if (Math.hypot(dx,dy) < rr-0.5) o.push('RADAR(círculo) × '+nm(e)); } } }
+  { const rd=document.querySelector('[data-r=radar]'); const BL=[...document.querySelectorAll('.h-pausa,.h-painel,.h-placar,.h-fita,.rd-modo,.h-danos,.h-baixo,.h-log .lg,.h-vidaD,.btn-fantasma,.h-acel,.h-armas,.h-chaves')].filter(vis);
+    if (rd && vis(rd)) { const q=rd.getBoundingClientRect(), cx=q.left+q.width/2, cy=q.top+q.height/2, rr=Math.min(q.width,q.height)/2; for (const e of BL) { if (e.closest('.h-radar')===rd.closest('.h-radar') && !e.classList.contains('rd-modo')) continue; const a=e.getBoundingClientRect(); const dx=Math.max(a.left-cx,0,cx-a.right), dy=Math.max(a.top-cy,0,cy-a.bottom); if (Math.hypot(dx,dy) < rr-0.5) o.push('RADAR(disco) × bloco '+nm(e)); } }
+    const TOP=BL.filter(e=>!/h-acel|h-armas|h-chaves/.test(e.className)); for(let i=0;i<TOP.length;i++) for(let j=i+1;j<TOP.length;j++){ if (TOP[i].contains(TOP[j])||TOP[j].contains(TOP[i])) continue; const a=TOP[i].getBoundingClientRect(), c=TOP[j].getBoundingClientRect(); if(a.left<c.right-0.5&&c.left<a.right-0.5&&a.top<c.bottom-0.5&&c.top<a.bottom-0.5) o.push('bloco '+nm(TOP[i])+' × '+nm(TOP[j])); } }
+  const H=__nns.hud.el, SK=/h-marcas|h-impacto|h-alvo|h-avanco|h-mira|dano-f|h-cammenu|h-cine|esp-sa|h-colisao|h-ia|h-grInd/; const fora=[];
+  for (const e of [...H.querySelectorAll('*')].filter(vis)) { if (SK.test((e.closest('.h-marcas,.h-cammenu,.h-cine,.h-alvo,.h-mira,.h-impacto,.h-avanco,.dano-f,.h-colisao,.h-ia,.h-grInd')||{}).className||'')) continue; const q=e.getBoundingClientRect(); if (q.left<-0.5||q.top<-0.5||q.right>innerWidth+0.5||q.bottom>innerHeight+0.5) fora.push(nm(e)+'@'+Math.round(q.left)+','+Math.round(q.top)+','+Math.round(q.right)); }
+  let esp=0; for (const e of [...H.querySelectorAll('button, span, b, em, canvas, .cb, [data-r=man], .h-leme')].filter(vis)) { const m=new DOMMatrix(getComputedStyle(e).transform==='none'?undefined:getComputedStyle(e).transform); let a=m.a; for(let x=e.parentElement;x&&x!==document.body;x=x.parentElement){ const t=getComputedStyle(x).transform; if(t!=='none') a*=new DOMMatrix(t).a; const s=getComputedStyle(x).scale; if(s&&s!=='none'&&parseFloat(s)<0) a*=-1; } if(a<0) esp++; }
+  return JSON.stringify({ n:L.length, o, fora: fora.slice(0,8), nf: fora.length, esp }) })()`;
+const blocos = `(()=>{ const H=__nns.hud.el, SK=/h-marcas|h-impacto|h-alvo|h-avanco|h-mira|dano-f|h-cammenu|h-editor|h-cine|h-colisao|esp-sa|h-ia|h-grInd/, G=/h-armas|h-acel|h-cons|h-chaves|h-heli/; const o={};
+  for (const c of H.children) { if (SK.test(c.className)) continue; const q=c.getBoundingClientRect(); if(!(q.width>0)) continue; const k=c.className.toString().split(' ')[0]; o[k]=[q.left,q.right,q.top]; if (G.test(c.className)) [...c.children].forEach((f,i)=>{ const r=f.getBoundingClientRect(); if(r.width>0) o[k+'>'+i+':'+(f.dataset.a||f.dataset.r||f.className.toString().split(' ')[0]||f.tagName)]=[r.left,r.right,r.top]; }); }
+  return JSON.stringify({ W: H.getBoundingClientRect().width, o }) })()`;
+/* v1.2.17 r3: h-placar 2 px no cinema@19.5x9 = largura do placar mudou entre as medidas destro/canhoto (afundamento no cinema); par repetido quando a largura muda */
+const TRANS = /^(h-log|h-dica|h-feed|h-danos|h-alerta|h-colisao|h-detec|h-convite|h-vidaD)/;
+const setC = async (on) => { await ev(`(()=>{ __nns.hud.canhoto(${on}); return 1 })()`); await esp(900); };
+const checa = async (cena, tm, foto) => {
+  await ev(`(()=>{ __nns.hud.logImpacto('Impacto confirmado no alvo — teste de largura'); return 1 })()`); let D, C; for (let t = 0; t < 4; t++) { await setC(false); D = JSON.parse(await ev(blocos)); await setC(true); C = JSON.parse(await ev(blocos)); /* conteúdo dinâmico (placar: relógio/afundados) pode mudar de largura entre as duas medidas → repete o par; não afrouxa a tolerância */ if (!Object.keys(D.o).some((k) => C.o[k] && !TRANS.test(k) && Math.abs((C.o[k][1]-C.o[k][0])-(D.o[k][1]-D.o[k][0])) > 0.5)) break; R.repeticoesPar = (R.repeticoesPar || 0) + 1; } const r = JSON.parse(await ev(sobre)); R[cena + '@' + tm] = { clic: r.n, blocos: Object.keys(C.o).length };
+  if (r.o.length) falhas.push(`${cena}@${tm} sobreposição: ${r.o.slice(0, 5).join(' | ')}`); if (r.nf) falhas.push(`${cena}@${tm} fora da tela (${r.nf}): ${r.fora.join(' | ')}`); if (r.esp) falhas.push(`${cena}@${tm}: ${r.esp} textos/ícones espelhados`);
+  let pior = 0, quem = ''; for (const k in D.o) { const d = D.o[k], c = C.o[k]; if (!c) { if (!TRANS.test(k)) falhas.push(`${cena}@${tm}: bloco ${k} sumiu no canhoto`); continue; } if (TRANS.test(k) && Math.abs((c[1]-c[0])-(d[1]-d[0])) > 0.5) continue; /* conteúdo mudou entre as medidas */ const err = Math.max(Math.abs(c[0] - (D.W - d[1])), Math.abs(c[1] - (D.W - d[0])), Math.abs(c[2] - d[2])); if (err > pior) { pior = err; quem = k; } }
+  R[cena + '@' + tm].erroEspelho = +pior.toFixed(2); if (pior > 1.5) falhas.push(`${cena}@${tm}: espelho inexato ${pior.toFixed(1)} px em ${quem}`);
+  if (foto) await b.foto(`${DIR}/${cena}-${tm}-canhoto.png`); if (foto) { await setC(false); await b.foto(`${DIR}/${cena}-${tm}-destro.png`); await setC(true); } };
+await b.vai(URL0);
+for (let i = 0; i < 600; i++) { if (await ev(`!document.querySelector("#boot") && !!window.__nnsUI`)) break; await esp(500); } /* r3: boot sob carga (gradle em paralelo) passou de 80 s → espera até 300 s */
+// persistência: liga pelo save e reabre
+await ev(`(()=>{ const s=__nnsUI.save||window.__nnsSave; if (s) { s.ajustes.canhoto=true; s.salva(); } return !!s })()`).then((x) => { if (!x) console.log('aviso: save não exposto — persistência via localStorage'); });
+await ev(`(()=>{ for (const k of Object.keys(localStorage)) { try { const v=JSON.parse(localStorage[k]); if (v && v.ajustes) { v.ajustes.canhoto=true; localStorage[k]=JSON.stringify(v); } } catch {} } return 1 })()`);
+await b.vai(URL0); for (let i = 0; i < 600; i++) { if (await ev(`!document.querySelector("#boot") && !!window.__nnsUI`)) break; await esp(500); } /* r3: boot sob carga (gradle em paralelo) passou de 80 s → espera até 300 s */
+await ev(`(()=>{ __nnsUI.zarpar({ modo:'frota', classe:'cruzador', mapa:'atois', portaAvioes:'sim' }); return 1 })()`);
+for (let i = 0; i < 160; i++) { if (await ev(`!!(window.__nns && __nns.rodando && __nns.S && __nns.S.sim.tick > 90)`)) break; await esp(500); } await esp(2500);
+const persist = await ev(`__nns.hud.el.classList.contains('canhoto') && !!__nns.hud._esp`); R.persistencia = persist; if (!persist) falhas.push('persistência: canhoto não reaplicado ao reabrir');
+for (const [tm, w, h] of TAMS) { await b.tam(w, h); await esp(2000); await checa('combate', tm, true);
+  await ev(`(()=>{ __nns.acao('bino'); return 1 })()`); await esp(1500); await checa('binoculo', tm, tm === '20x9' || tm === '16x9'); await ev(`(()=>{ __nns.acao('bino'); return 1 })()`); await esp(600);
+  await ev(`(()=>{ __nns.camSel('cinema'); return 1 })()`); await esp(1500); await checa('cinema', tm, false); await ev(`(()=>{ __nns.cine.on && __nns.cine.sai(); return 1 })()`); await esp(600); }
+// taxa de remedições (nunca por quadro): 20 s de jogo parado na mesma tela
+{ await b.tam(915, 412); await esp(2500); const n0 = await ev(`__nns.hud._espN`), t0 = await ev(`__nns.S.sim.tick`), w0 = Date.now(); await esp(20000); const n1 = await ev(`__nns.hud._espN`), t1 = await ev(`__nns.S.sim.tick`); R.remedicoes = { n: n1 - n0, ticks: t1 - t0, s: (Date.now() - w0) / 1000 }; if ((n1 - n0) > 25) falhas.push('espelha remede demais: ' + JSON.stringify(R.remedicoes)); }
+// interação no 20:9
+await b.tam(915, 412); await esp(1500); await setC(true);
+const toque = async (sel, fx, fy) => { const p = JSON.parse(await ev(`(()=>{ const e=document.querySelector(${JSON.stringify(sel)}); if(!e) return 'null'; const q=e.getBoundingClientRect(); return JSON.stringify({x:q.left+q.width*${fx}, y:q.top+q.height*${fy}}) })()`)); if (!p) return; const tp = [{ x: p.x, y: p.y, id: 1 }];
+  await b.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: tp }); await esp(120); await b.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); };
+const SEL_RG = '[data-r=reg]';
+await toque(SEL_RG, 0.85, 0.4); await esp(300); const lemeD = await ev(`__nns.hud.lemeCmd`); R.lemeToqueDireita = lemeD; if (!(lemeD > 0.2)) falhas.push(`leme: toque no lado direito do arco deu ${lemeD} (esperado BE, +)`);
+await toque(SEL_RG, 0.15, 0.4); await esp(300); const lemeE = await ev(`__nns.hud.lemeCmd`); R.lemeToqueEsquerda = lemeE; if (!(lemeE < -0.2)) falhas.push(`leme: toque no lado esquerdo do arco deu ${lemeE} (esperado BB, −)`);
+await toque('[data-r=man] .am-t', 0.5, 0.02); await esp(400); const tel = await ev(`__nns.eu.telAlvo`); R.telegrafoTopo = tel; if (!(tel >= 4)) falhas.push(`telégrafo: toque no topo deu telAlvo ${tel} (esperado AVANTE TODA = 4)`);
+await toque('[data-r=man] .am-t', 0.5, 0.98); await esp(400); const tel2 = await ev(`__nns.eu.telAlvo`); R.telegrafoBase = tel2; if (!(tel2 <= 0)) falhas.push(`telégrafo: toque na base deu ${tel2} (esperado RÉ = 0)`);
+const lados = JSON.parse(await ev(`JSON.stringify({ armas: __nns.hud.el.querySelector('.h-armas').getBoundingClientRect().left, acel: __nns.hud.el.querySelector('.h-acel').getBoundingClientRect().left, W: innerWidth })`)); R.lados = lados;
+if (!(lados.armas < lados.W / 2 && lados.acel > lados.W / 2)) falhas.push(`lados: armas deviam ficar à esquerda e leme/telégrafo à direita (${JSON.stringify(lados)})`);
+const lq = await ev(`(()=>{ const bt=document.querySelector('[data-a=cam]'); if(!bt) return 'sem botão'; __nns.hud.camMenu(true, bt); const its=[...document.querySelectorAll('.h-cammenu .cm-i')].map(e=>e.getBoundingClientRect()); const q=bt.getBoundingClientRect(); const ok=its.every(r=>r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight); const dir=its.filter(r=>r.left+r.width/2>=q.left+q.width/2-1).length; return JSON.stringify({n:its.length, ok, dir}) })()`);
+await b.foto(`${DIR}/leque-20x9-canhoto.png`); await ev(`(()=>{ __nns.hud.camMenu(false); return 1 })()`); R.leque = lq; try { const L = JSON.parse(lq); if (!L.ok || L.dir < L.n) falhas.push('leque de câmeras: ' + lq); } catch { falhas.push('leque: ' + lq); }
+// espectador
+await ev(`(()=>{ __nns.S.sim.dano(__nns.eu, 1e7, null, 'missil', true); return 1 })()`);
+for (let i = 0; i < 300; i++) { if (await ev(`!document.querySelector('[data-r=convite]').hidden || !!document.querySelector('.rs')`)) break; await esp(500); }
+await ev(`(()=>{ const c=document.querySelector('[data-r=cv_sim]'); c&&c.click(); return 1 })()`); await esp(2000);
+for (const [tm, w, h] of TAMS) { await b.tam(w, h); await esp(1500); await checa('espectador', tm, tm === '20x9'); }
+console.log(JSON.stringify(R)); console.log('canhoto1217 falhas', falhas.length); for (const f of falhas) console.log(' - ' + f);
+fs.writeFileSync(DIR + '/resultado.json', JSON.stringify({ R, falhas }, null, 1)); b.fecha(); process.exit(falhas.length ? 1 : 0);

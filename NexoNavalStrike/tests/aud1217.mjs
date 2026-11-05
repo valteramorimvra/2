@@ -1,0 +1,56 @@
+// v1.2.17 itens 33/35 — TRAVADA POR MUITOS SONS: partida 8x8 real (com porta-aviões/aeronaves), frotas a ~2,5 km trocando fogo, MAIS rajadas sintéticas por quadro
+// de foguetes, granadas, mísseis, canhões, explosões, passagens, flares e laços de aeronaves/mísseis. Mede: quadros com áudio × linha de base SEM áudio (fases alternadas),
+// nós de áudio criados em combate (instrumentação de TODOS os create* e construtores) = 0, latência evento→início da voz no worklet (< 30 ms, sem atraso por distância),
+// nenhum som removido (todos os sons tocam isolados), pool com roubo de voz (sem fila).
+import { abre } from './cdp.mjs'; import fs from 'node:fs';
+const DIR = '/workspace/nexo-naval-shots/1217/audio33'; fs.mkdirSync(DIR, { recursive: true });
+const b = await abre(null, { w: 915, h: 412 }); const ev = b.ev, esp = b.espera; const falhas = []; const R = {};
+await b.vai('http://127.0.0.1:4173/?auto');
+for (let i = 0; i < 160; i++) { if (await ev(`!document.querySelector('#boot') && !!window.__nnsUI`)) break; await esp(500); }
+// instrumentação ANTES da partida (conta só quando W.medindo=1)
+await ev(`(()=>{ const W=window.__au={ q:[], nos:0, porTipo:{}, f:0, dec:0 }; let ul=performance.now(); const loop=(t)=>{ W.q.push(t-ul); ul=t; requestAnimationFrame(loop); }; requestAnimationFrame(loop);
+  const P=BaseAudioContext.prototype; for (const k of Object.getOwnPropertyNames(P)) { if(!/^create/.test(k) || typeof P[k]!=='function' || k==='createPeriodicWave') continue; const o=P[k]; P[k]=function(...a){ if(W.medindo){ W.nos++; W.porTipo[k]=(W.porTipo[k]||0)+1; } return o.apply(this,a); }; }
+  for (const n of ['GainNode','BiquadFilterNode','OscillatorNode','AudioBufferSourceNode','StereoPannerNode','PannerNode','DelayNode','ConvolverNode','DynamicsCompressorNode','WaveShaperNode','ConstantSourceNode','AudioWorkletNode','MediaElementAudioSourceNode','ChannelMergerNode','ChannelSplitterNode']) { const C=window[n]; if(!C) continue; window[n]=new Proxy(C,{ construct(t,a,nt){ if(W.medindo){ W.nos++; W.porTipo[n]=(W.porTipo[n]||0)+1; } return Reflect.construct(t,a,nt); } }); }
+  const D=P.decodeAudioData; P.decodeAudioData=function(...a){ if(W.medindo) W.dec++; return D.apply(this,a); }; const F=window.fetch; window.fetch=function(...a){ if(W.medindo) W.f++; return F.apply(this,a); }; return 1 })()`);
+await ev(`(async()=>{ await __nnsUI.zarpar({ mapa: 'atois', modo: 'frota', classe: 'destroier', seed: 5, hora: 'dia', tempo: 'limpo', portaAvioes: 'sim' }); __nns.tutorial=false; return 1 })()`, 180000); await esp(4000);
+await ev(`(async()=>{ const A=__nns.audio; try{ A.destrava&&A.destrava(); await (A.ctx&&A.ctx.resume()); }catch(e){} for(let i=0;i<60 && (!A.ctx||A.ctx.state!=='running'||!A.mixPrepMs);i++) await new Promise(r=>setTimeout(r,200)); return 1 })()`, 30000);
+R.mixer = JSON.parse(await ev(`(()=>{ const A=__nns.audio; return JSON.stringify({ ctx:A.ctx&&A.ctx.state, sr:A.ctx&&A.ctx.sampleRate, ativo:!!A.mix, erro:A.mixErro||null, laços:!!A.mixL, musica:!!A.mixM, buffersEfeitos:A.mix?Object.keys(A.mix.ids).length:0, buffersLacos:A.mixL?Object.keys(A.mixL.ids).length:0, buffersMusica:A.mixM?Object.keys(A.mixM.ids).length:0, prepMs:A.mixPrepMs, baseLatency:A.ctx.baseLatency||0, outputLatency:A.ctx.outputLatency||0, motor:!!A.motor, perfil:A.motor&&A.motor.P&&A.motor.P.tipo, erros:A.erros }) })()`));
+if (!R.mixer.ativo) falhas.push('mixer AudioWorklet inativo: ' + R.mixer.erro); if (R.mixer.ctx !== 'running') falhas.push('ctx ' + R.mixer.ctx);
+// NENHUM SOM REMOVIDO: cada som/camada/alerta toca ISOLADO (sem descarte), todos pré-renderizados/pré-decodificados
+R.isolado = JSON.parse(await ev(`(async()=>{ const A=__nns.audio, S=A.mixStats; const nomes=(A.arquivos||[]).filter(n=>!/_loop$/.test(n)); const CAM=['canhao','ciws','explosao','foguete','lancador','missil','missilImpacto','missilPassagem','missilRugido','missilTerminal','missilVarredura','torpImpacto','torpedo','boosterSep']; const perdidos=[]; let n=0;
+  const um=async(rot,fn)=>{ const a=S.tocados+S.agrupados; fn(); n++; if(S.tocados+S.agrupados===a) perdidos.push(rot); await new Promise(r=>setTimeout(r,60)); };
+  for (const x of nomes) await um(x,()=>A.toca(x,{d:300,pan:0,vol:0.8})); for (const t of CAM) await um('camada:'+t,()=>A.camada(t,{d:300,pan:0,vol:0.8}));
+  await um('passagem',()=>A.passagem(40,0,800,0)); await um('salva',()=>A.salva('canhao_medio',3,200,0)); await um('flares',()=>A.flares(200,0)); await um('alertaMissil',()=>A.alertaMissil(0,'x')); await um('alarmeEntrante',()=>A.alarmeEntrante(true)); await um('bip',()=>A.bip(1500,0.07,0.1)); await um('clique',()=>A.clique()); await um('radio',()=>A.radio()); await um('moeda',()=>A.moeda()); await um('fanfarra',()=>A.fanfarra());
+  return JSON.stringify({ testados:n, perdidos }) })()`, 120000));
+if (R.isolado.perdidos.length) falhas.push('sons que não tocaram isolados: ' + R.isolado.perdidos.join(','));
+// combate real: frota inimiga a ~2,5 km (todas as armas da IA em alcance) + aeronaves do porta-aviões
+await ev(`(()=>{ const j=__nns, sim=j.S.sim, eu=j.eu; let a=0, b=0; for (const n of sim.navios) { if (n.morto) continue; if (n.time===eu.time) { if(n!==eu){ n.x=eu.x+(a%4-1.5)*260; n.z=eu.z+Math.floor(a/4)*300+200; a++; } } else { n.x=eu.x+(b%4-1.5)*300; n.z=eu.z-2500-Math.floor(b/4)*350; b++; } } return a+'/'+b })()`);
+const fase = async (nome, seg, audio, rajada) => ev(`(async()=>{ const j=__nns, A=j.audio, W=window.__au, c=A.ctx; A.ligado=${audio ? 'true' : 'false'}; if(A.mestre) A.mestre.gain.value=${audio ? 'A.volSom??0.9' : 0}; W.q.length=0; const S0=JSON.parse(JSON.stringify(A.mixStats)); A._lat=${audio ? '[]' : 'null'};
+  await new Promise(r=>setTimeout(r,300)); W.nos=0; W.porTipo={}; W.f=0; W.dec=0; W.medindo=1; const t0=performance.now(), a0=c.currentTime; const custo=[]; let n=0, ativasMax=0, ativasMed=0;
+  const SONS=['canhao_grande','canhao_medio','canhao_rapido','canhao_longe','explosao_perto','explosao_media','explosao_grande','explosao_longe','respingo','respingo_grande','impacto_metal','vls_lancamento','ciws','torpedo_corrida','flares','heli_passagem'];
+  const CAM=['canhao','foguete','lancador','missil','missilImpacto','missilPassagem','missilTerminal','explosao','torpImpacto','boosterSep','ciws'];
+  while(performance.now()-t0 < ${seg}*1000){ await new Promise(r=>requestAnimationFrame(r)); const p0=performance.now();
+    for(let k=0;k<${rajada};k++){ const d=60+Math.random()*7000, pan=Math.random()*2-1, m=(n+k)%8;
+      if(m===0) A.toca(SONS[(n*3+k)%SONS.length],{d,pan,vol:0.4+Math.random()*0.6,voz:k}); else if(m===1) A.camada(CAM[(n+k)%CAM.length],{d,pan,vol:0.5,k:30+((n+k)%10)*30});
+      else if(m===2) A.salvaTorres&&A.salvaTorres('canhao_medio',[{d,pan,cal:127,torre:0},{d,pan:pan*0.9,cal:127,torre:1,cano:1}],k===2); else if(m===3) A.passagem(20+Math.random()*120,pan,k%2?820:290,k%3===0);
+      else if(m===4) A.salva('canhao_grande',3,d,pan); else if(m===5) A.toca('vls_lancamento',{d,pan}); else if(m===6) A.camada('foguete',{d,pan}); else A.flares(d,pan); }
+    for(let h=0;h<6;h++) A.rotor&&A.rotor('hx'+h,200+h*300,0.3*h-0.8,(h-3)*20,h===5?1:0); for(let q=0;q<12;q++) A.lacoRuido&&A.lacoRuido('mx'+q,'missil',0.3,Math.sin(n*0.1+q),1+0.1*Math.sin(n*0.05+q),400+q*200);
+    A.limpaLacos&&A.limpaLacos(); custo.push(performance.now()-p0); n++; const at=A.vozesAtivas?A.vozesAtivas():0; ativasMax=Math.max(ativasMax,at); ativasMed+=at; }
+  W.medindo=0; const q=W.q.slice(2).sort((a,b)=>a-b); const pct=(p)=>q.length?q[Math.min(q.length-1,Math.floor(p*q.length))]:0; custo.sort((a,b)=>a-b); await new Promise(r=>setTimeout(r,400));
+  const L=(A._lat||[]).filter(x=>x.tc>=0).map(x=>({ms:(x.tc-x.t)*1000, d:x.d||0})); const lm=L.map(x=>x.ms).sort((a,b)=>a-b); const longe=L.filter(x=>x.d>2000).map(x=>x.ms).sort((a,b)=>a-b); A._lat=null; const S=A.mixStats;
+  return JSON.stringify({ nome:'${nome}', audio:${audio}, quadros:q.length, q50:+pct(0.5).toFixed(1), q95:+pct(0.95).toFixed(1), q99:+pct(0.99).toFixed(1), qMax:+(q[q.length-1]||0).toFixed(1), chamadasPorQuadro:${rajada}+18, custoMed:+(custo[custo.length>>1]||0).toFixed(2), custo95:+(custo[Math.floor(custo.length*0.95)]||0).toFixed(2), custoMax:+(custo[custo.length-1]||0).toFixed(2),
+    nos:W.nos, porTipo:W.porTipo, downloads:W.f, decod:W.dec, relogio:+((c.currentTime-a0)/((performance.now()-t0)/1000)).toFixed(3), ativasMax, ativasMed:+(ativasMed/Math.max(1,n)).toFixed(1), tocados:S.tocados-S0.tocados, agrupados:S.agrupados-S0.agrupados, roubados:S.roubados-S0.roubados, descartados:S.descartados-S0.descartados,
+    latN:lm.length, latMed:+(lm[lm.length>>1]||0).toFixed(2), lat99:+(lm[Math.floor(lm.length*0.99)]||0).toFixed(2), latMax:+(lm[lm.length-1]||0).toFixed(2), latLongeN:longe.length, latLongeMax:+(longe[longe.length-1]||0).toFixed(2), tiros:j.S.sim.granadas?j.S.sim.granadas.filter(g=>g.ativo).length:0, misseis:j.S.sim.misseis.filter(m=>m.ativo).length, estado:c.state }) })()`, (seg + 90) * 1000);
+R.fases = [];
+for (const [nome, au] of [['base1', 0], ['audio1', 1], ['base2', 0], ['audio2', 1]]) { const F = JSON.parse(await fase(nome, 18, au, 40)); R.fases.push(F); console.log(JSON.stringify(F)); if (nome === 'audio1') await b.foto(DIR + '/combate8x8_audio.png'); }
+await ev(`(()=>{ const A=__nns.audio; A.ligado=true; if(A.mestre) A.mestre.gain.value=A.volSom??0.9; return 1 })()`);
+const base = R.fases.filter((f) => !f.audio), com = R.fases.filter((f) => f.audio); const m = (L, k) => L.reduce((a, f) => a + f[k], 0) / L.length;
+R.resumo = { baseQ95: +m(base, 'q95').toFixed(1), audioQ95: +m(com, 'q95').toFixed(1), baseQ99: +m(base, 'q99').toFixed(1), audioQ99: +m(com, 'q99').toFixed(1), baseMax: Math.max(...base.map((f) => f.qMax)), audioMax: Math.max(...com.map((f) => f.qMax)), nosEmCombate: com.reduce((a, f) => a + f.nos, 0), latMax: Math.max(...com.map((f) => f.latMax)), lat99: Math.max(...com.map((f) => f.lat99)), latLongeMax: Math.max(...com.map((f) => f.latLongeMax)) };
+const Rs = R.resumo;
+if (Rs.nosEmCombate !== 0) falhas.push(`nós de áudio criados em combate: ${Rs.nosEmCombate} ${JSON.stringify(com.map((f) => f.porTipo))}`);
+if (Rs.audioQ95 > Rs.baseQ95 * 1.1 + 3) falhas.push(`quadros p95 com áudio ${Rs.audioQ95} ms > base ${Rs.baseQ95}`);
+if (Rs.audioQ99 > Rs.baseQ99 * 1.15 + 5) falhas.push(`quadros p99 com áudio ${Rs.audioQ99} ms > base ${Rs.baseQ99}`);
+if (Rs.audioMax > Rs.baseMax * 1.25 + 10) falhas.push(`pico máximo com áudio ${Rs.audioMax} ms > base ${Rs.baseMax}`);
+if (!(Rs.latMax < 30)) falhas.push(`latência máx ${Rs.latMax} ms (≥ 30)`); if (!(Rs.latLongeMax < 30)) falhas.push(`latência de som distante ${Rs.latLongeMax} ms (atraso por distância?)`);
+for (const f of com) { if (f.downloads || f.decod) falhas.push(`${f.nome}: download/decodificação em combate`); if (f.ativasMax > 64) falhas.push(`${f.nome}: vozes ${f.ativasMax} > 64`); if (f.relogio < 0.9) falhas.push(`${f.nome}: relógio do áudio ${f.relogio}`); if (!f.latN) falhas.push(`${f.nome}: sem medidas de latência`); }
+R.falhas = falhas; fs.writeFileSync('/workspace/aud1217.out', JSON.stringify(R, null, 1)); console.log(JSON.stringify(R.mixer)); console.log(JSON.stringify(R.isolado)); console.log(JSON.stringify(R.resumo)); console.log('aud1217 falhas', falhas.length, falhas.join(' | ')); await b.fecha(); process.exit(0);

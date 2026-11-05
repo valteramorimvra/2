@@ -1,0 +1,26 @@
+# Lista branca do release 1.2.30 (regra do Fiscal, 20:1x): o script SÓ aplica o que está aqui, na ordem das linhas. Formato: <caminho completo><TAB><sha256 aprovado><TAB><item>
+# Se o sha do arquivo não bater, o script PARA antes de aplicar qualquer coisa. Fora da lista (de propósito): FINAL-01 (cogumelo), FINAL-02 (já está no 03), FINAL-09 (colisão; WIP em /workspace/fiscal/fix09), FINAL-10 (convoo aeronaves).
+/workspace/fiscal/nukefumaca/patches/FINAL-03-bomber-trava-reta.diff	27e780464f31226d7973b433c53553d6e2a049f6997d44831e047cd191f5a1ed	2,3
+/workspace/fiscal/nukefumaca/patches/FINAL-03b-nkTrava-ui.diff	2a360304812e2972988ac43fef2591d891663a3322bc83e01993c87b76a9046a	3
+/workspace/fiscal/nukefumaca/patches/FINAL-04-audio-nuclear.diff	f02be99ba8eaae241c0bfbdc36512e5676c572a6bd1491bef90283e1b2ac2a0e	4
+/workspace/fiscal/nukefumaca/patches/FINAL-04b-atraso-som-fx.diff	f079c70e2af1fc7d2d9fb5805e7a9cd43d25d15a68293c2693f68076369d94ce	4
+/workspace/fiscal/nukefumaca/patches/FINAL-05-cameras-meio-termo.diff	ddbb8da7e57af5a45cd08218677d7b3d76c13209f4b29e894ffe73ef37337104	5
+/workspace/fiscal/nukefumaca/patches/FINAL-06-world-vls-perto-recarga.diff	433c1d3c0d6d76b714b35169478977b5af617129fef7a7269dce7932941e125e	6,7,8
+/workspace/fiscal/nukefumaca/patches/FINAL-07-recarga-trava.diff	8643a7104fa996e867bd539a180a10a33b61b9fdefae85ac9d28d8fe59fbd4a3	7
+/workspace/fiscal/nukefumaca/patches/FINAL-07b-ai-recarga.diff	a3835fd43bc800e7a41780d04aff967bf63e9b4826f31da9cd52f13ca740bb80	7
+/workspace/fiscal/nukefumaca/patches/FINAL-08-perto-canhao.diff	d85b0974935fb55a83f0d6705f00e22a5fe9efa5867f18d8f2b0cba05c960ec2	8
+/workspace/fiscal/nukefumaca/patches/FINAL-08b-hud-perto.diff	f8e08f0beebfa6e7eec40799cfef757e12ce2d7537072897c8444990ee5fe724	8
+/workspace/fiscal/convoo/FINAL-07c-aeronaves-terreno.diff	831db2098464d611cce5b3bdf5163417eaa6216d1072c5e2021e6618eb6a5e30	7
+/workspace/fiscal/crit9fix/patches/00-helper-mescla1230.diff	e7b359a6b0cd60598ee0b69496182b06d64c3ec93bcc4db49a2bc22a8b3e0202	crit9
+/workspace/fiscal/crit9fix/patches/01-rotores-aeronaves.diff	6af812b90965af50a123bf6f6ff765c2400bf24707b3b902665c67a4bf2d25a4	crit9
+/workspace/fiscal/crit9fix/patches/02-navio-pecas-articuladas.diff	7d018faa53d8d3911b5b1ac8401f035a6b5a312a20e23474914142c645ccc22a	crit9
+/workspace/fiscal/crit9fix/patches/03-navio-luzes.diff	628e364e5b93011170e7180b7b19bdf508ef4216b673cb0cc2993327c1487755	crit9
+/workspace/fiscal/crit9fix/patches/04-aeronave-luzes.diff	cca2eb3c24849d869ab706450c0dfe9e883c04acd8a593b120ea9f00dc2d1955	crit9
+/workspace/fiscal/nukefumaca/patches/FINAL-01-cogumelo.diff	2efa2915c5a27b2151e1010c62c6c44077d85037016121b1f8c19c719efe8ce6	1
+/workspace/fiscal/nukefumaca/patches/FINAL-09b-colisao-terreno.diff	918b68a44788d2bdefd8970b8d47ca4448b189afd537f21b5082ae381e104cf1	9
+/workspace/nexo-naval-strike/scripts/item11-radar.diff	8311aff789881e98c937d0aabbb8fb4a45a17a981ba8a985fae9162b7007ccd9	11
+/workspace/release-1230/item12-nuke7s-SEM10.diff	9a5e49353983251b5b86202afab3f1b817c5425c6e75b4030d724ec7d7e4a309	12
+/workspace/release-1230/item13-dano-aereo-SEM-a2a.diff	f05e3ab7c4174464e7563bbc89e953df2e3f26d351e23be952ce06b2013a1b03	13
+/workspace/release-1230/item13b-botmul-aereo.diff	ddc24a33962df97d5bf40c1dde157a3f29fd3ddd19848fbc9c8f3e1e4ccf1d83	13b
+/workspace/release-1230/item15-registro-dano-aereo.diff	182560c3d4ee7ce22fe6d3766ce7ea11283bf56fa9e4aaf630b89350e4effaf3	15
+/workspace/release-1230/item15b-compensa-intercep.diff	43ebb821bd82d8bd78bd5e921ac7cac016799c172656ad57aff736ecd6ee660c	15b
