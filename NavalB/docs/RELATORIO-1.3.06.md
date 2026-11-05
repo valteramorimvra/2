@@ -576,3 +576,48 @@ Valter relatou que, no celular, o ponto verde do MM e do MMD não dirigia a aero
 - Trava: o rumo vai ao alvo e a altitude desce para 140 m (helicóptero: 120 m). A aeronave volta ao alvo até destravar.
   - Teste: com a tela no navio o ponto encaixou; TRAVAR deu alvo 1 e altitude pedida de 140 m, com a aeronave virando para o alvo; destravando, ficou livre.
 - `NUK.manAltMin` passou para 120 m; avião do navio no manual com mínimo de 120 m.
+
+## 1.3.59 — círculo vermelho + TRAVAR, manual ágil, vida/armas/aviso, hangar
+
+### Marcação do alvo (MM/MMD)
+- Padrão (`ajustes.aeroMarca = 'circulo'`), igual ao modo IA:
+  - um toque no mar ou na terra marca o círculo vermelho (Urubu-rei: `nkMiraSolo`; aeronave do navio: `_hMarca`);
+  - TRAVAR trava o navio inimigo mais perto do círculo; sem círculo novo, TRAVAR destrava.
+- O raio do toque é calculado pela base da câmera, porque o `unproject` caía longe do ponto tocado. A correção vale também para o modo IA.
+- Opção nos Ajustes (Tela e controles): "Ponto verde — estilo Modern Warships".
+  - Captura larga (0,4) e troca só quando o jogador gira a tela.
+  - Parado, o ponto mantém o alvo e, com trava, volta ao alvo travado.
+  - Só solta se o navio afundar, passar de 16 km ou se a tela girar para longe de tudo.
+
+### Voo manual
+- `voaPara` usa um fator de agilidade quando a aeronave está no manual:
+  - caças ×1,5 × giro do modelo (máx. ×2);
+  - Urubu-rei ×1,25;
+  - helicóptero ×1,3.
+- O fator aumenta a curva, a aceleração angular, a subida/descida e a rolagem.
+- Aeronave do navio pilotada: rolagem até 70°, taxas ×1,4 (avião) e guinada ×1,35 (helicóptero).
+
+### Vida, armas e aviso
+- Pilotando qualquer aeronave, o painel mostra a vida dela (`aeroHud` sem a restrição de `aeroPrin`).
+- Vida de 2.500:
+  - `NUK.vidaBomb` = 2500, também nas aeronaves do jogador lançadas do porta-aviões;
+  - aeronave do navio do jogador com vida 2500, e o dano absoluto escalado por `escVida` para manter a resistência a cada acerto.
+- Armas recarregam sozinhas nas aeronaves do jogador:
+  - Urubu-rei e caças (`recargaNk`): mísseis a cada 10 s, ar-ar a cada 12 s, flare a cada 10 s, munição de helicóptero cheia em 20 s, porta a cada 2 s, bomba a cada 45 s;
+  - aeronave do navio: munição cheia em 25 s, flare a cada 10 s;
+  - Acauã/Uiraçu: armas a cada 12 s, mini-nuke a cada 60 s.
+- Aviso de ameaça (`ameacaAviso`): SAM ou ar-ar com alvo na sua aeronave → faixa "MÍSSIL VINDO" com distância, lado e seta, bipe que acelera e vibração.
+
+### Hangar
+- Os botões ROTAÇÃO, UPGRADE, TESTE DRIVE e COMBATE foram para a coluna da direita.
+- A ficha mostra as ARMAS da aeronave (tipo e ×quantidade) e rola.
+
+### Testes
+- Raio com círculo vermelho:
+  - antes de travar, o rumo não mudou;
+  - depois de TRAVAR, alvo 1 e curva de 28°/s em direção ao alvo;
+  - destravou;
+  - painel 2.500/2.500.
+- Aeronave do destróier: círculo marcado e visível; TRAVAR levou o erro de −69° a 0°; destravou.
+- Ponto verde: pegou o navio e travou. Girando a tela para longe, soltou — foi pedido do jogador, não saída sozinha.
+- Hangar conferido em screenshot.
